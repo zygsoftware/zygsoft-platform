@@ -1,0 +1,6 @@
+python-docx
+PyMuPDF
+Pillow
+tkinterdnd2
+reportlab
+PyPDF2
