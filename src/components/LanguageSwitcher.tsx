@@ -31,15 +31,15 @@ export function LanguageSwitcher({ isScrolled }: { isScrolled?: boolean }) {
     };
 
     const textClass = isScrolled
-        ? "text-slate-600 dark:text-slate-300"
-        : "text-slate-100 drop-shadow";
+        ? "text-slate-700"
+        : "text-slate-800";
 
     return (
         <div className="relative" onMouseLeave={() => setIsOpen(false)}>
             <button
                 onMouseEnter={() => setIsOpen(true)}
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center gap-1.5 text-sm font-medium hover:text-emerald-400 transition-colors ${textClass}`}
+                className={`flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.14em] rounded-full border border-[#0a0c10]/10 px-3 py-2 bg-white/70 backdrop-blur hover:border-[#e6c800]/60 transition-colors ${textClass}`}
             >
                 <Globe size={16} />
                 <span className="uppercase">{locale}</span>
@@ -53,14 +53,14 @@ export function LanguageSwitcher({ isScrolled }: { isScrolled?: boolean }) {
                         transition={{ duration: 0.15 }}
                         className="absolute right-0 top-full pt-4 w-40 z-50"
                     >
-                        <div className="bg-zinc-950 rounded-2xl shadow-2xl shadow-black/60 border border-white/8 overflow-hidden py-2">
+                        <div className="bg-white/95 rounded-2xl shadow-2xl border border-[#0a0c10]/10 overflow-hidden py-2 backdrop-blur">
                             {languages.map((lang) => (
                                 <button
                                     key={lang.code}
                                     onClick={() => switchLocale(lang.code)}
-                                    className={`flex items-center gap-3 w-full px-5 py-3 text-sm transition-colors hover:bg-white/5 ${locale === lang.code
-                                        ? "text-emerald-400 font-bold bg-white/5"
-                                        : "text-zinc-400"
+                                    className={`flex items-center gap-3 w-full px-5 py-3 text-sm transition-colors hover:bg-[#fafafc] ${locale === lang.code
+                                        ? "text-[#0a0c10] font-bold bg-[#e6c800]/10"
+                                        : "text-[#0a0c10]/65"
                                         }`}
                                 >
                                     <span>{lang.flag}</span>

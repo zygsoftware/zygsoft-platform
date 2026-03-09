@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion, useInView } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, BookOpen, Clock, Tag } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import { Navigation, Pagination } from "swiper/modules";
+import { createHeadingReveal, createRevealUp, revealViewport } from "@/components/ui/motion";
 
 // Import Swiper styles
 import "swiper/css";
@@ -28,10 +29,10 @@ type BlogPost = {
 
 export function BlogSlider() {
     const t = useTranslations("Blog");
+    const locale = useLocale();
+    const reducedMotion = !!useReducedMotion();
     const [posts, setPosts] = useState<BlogPost[]>([]);
     const [loading, setLoading] = useState(true);
-    const ref = useRef(null);
-    const inView = useInView(ref, { once: true, margin: "-80px" });
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -53,7 +54,7 @@ export function BlogSlider() {
     }, []);
 
     return (
-        <section ref={ref} className="py-28 relative overflow-hidden" style={{ background: "#f3f0ea" }}>
+        <section className="py-28 relative overflow-hidden" style={{ background: "#f3f0ea" }}>
             <div className="absolute inset-0 pointer-events-none" />
 
 
@@ -61,18 +62,29 @@ export function BlogSlider() {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-end mb-14 gap-6">
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={inView ? { opacity: 1, y: 0 } : {}}
-                        transition={{ duration: 0.6 }}
+                        variants={createRevealUp(reducedMotion, 40, 8)}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={revealViewport}
                     >
                         <span className="section-label">{t("blogTag")}</span>
-                        <h2 className="font-display font-extrabold text-[clamp(32px,3.5vw,48px)] leading-tight text-[#0e0e0e] mt-2 mb-3">{t("blogTitle")}</h2>
+                        <motion.h2
+                            variants={createHeadingReveal(reducedMotion)}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={revealViewport}
+                            className="font-display font-extrabold text-[clamp(32px,3.5vw,48px)] leading-tight text-[#0e0e0e] mt-2 mb-3"
+                        >
+                            {t("blogTitle")}
+                        </motion.h2>
                         <p className="text-[#888] text-base max-w-md">{t("blogDesc")}</p>
                     </motion.div>
                     <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={inView ? { opacity: 1, x: 0 } : {}}
-                        transition={{ duration: 0.6, delay: 0.2 }}
+                        variants={createRevealUp(reducedMotion, 32, 8)}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={revealViewport}
+                        transition={{ delay: 0.08 }}
                     >
                         <Link
                             href="/blog"
@@ -84,17 +96,18 @@ export function BlogSlider() {
                 </div>
 
                 <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={inView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ duration: 0.7, delay: 0.2 }}
+                    variants={createRevealUp(reducedMotion, 40, 8)}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={revealViewport}
+                    transition={{ delay: 0.12 }}
                 >
                     <Swiper
-                        modules={[Navigation, Pagination, Autoplay]}
+                        modules={[Navigation, Pagination]}
                         spaceBetween={20}
                         slidesPerView={1}
                         navigation
                         pagination={{ clickable: true, dynamicBullets: true }}
-                        autoplay={{ delay: 5000, disableOnInteraction: true }}
                         breakpoints={{
                             640: { slidesPerView: 1 },
                             768: { slidesPerView: 2 },
@@ -119,9 +132,9 @@ export function BlogSlider() {
                         ) : (
                             posts.map((post) => (
                                 <SwiperSlide key={post.id} className="h-auto">
-                                    <div
-                                        className="block h-full group cursor-pointer"
-                                        onClick={() => window.location.href = `/blog/${post.slug}`}
+                                    <Link
+                                        href={`/blog/${post.slug}`}
+                                        className="block h-full group"
                                     >
                                         <div className="h-full flex flex-col bg-white border border-black/8 rounded-sm overflow-hidden hover:shadow-lg hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300">
                                             {/* Cover */}
@@ -152,7 +165,7 @@ export function BlogSlider() {
                                                     <span className="flex items-center gap-1">
                                                         <Clock size={10} />
                                                         {post.publishedAt
-                                                            ? new Date(post.publishedAt).toLocaleDateString("tr-TR", { day: "numeric", month: "short", year: "numeric" })
+                                                            ? new Date(post.publishedAt).toLocaleDateString(locale === "tr" ? "tr-TR" : "en-US", { day: "numeric", month: "short", year: "numeric" })
                                                             : t("new")
                                                         }
                                                     </span>
@@ -171,7 +184,7 @@ export function BlogSlider() {
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Link>
                                 </SwiperSlide>
                             ))
                         )}
@@ -182,18 +195,18 @@ export function BlogSlider() {
             <style jsx global>{`
                 .swiper-button-next,
                 .swiper-button-prev {
-                    color: #34d399 !important;
-                    background: rgba(16,185,129,0.1);
+                    color: #0a0c10 !important;
+                    background: rgba(230,200,0,0.18);
                     width: 42px !important;
                     height: 42px !important;
                     border-radius: 50%;
-                    border: 1px solid rgba(16,185,129,0.2);
+                    border: 1px solid rgba(230,200,0,0.5);
                     transition: all 0.2s ease;
                 }
                 .swiper-button-next:hover,
                 .swiper-button-prev:hover {
-                    background: rgba(16,185,129,0.25);
-                    border-color: rgba(16,185,129,0.4);
+                    background: rgba(230,200,0,0.3);
+                    border-color: rgba(230,200,0,0.8);
                 }
                 .swiper-button-next::after,
                 .swiper-button-prev::after {
@@ -201,10 +214,10 @@ export function BlogSlider() {
                     font-weight: bold;
                 }
                 .swiper-pagination-bullet {
-                    background: rgba(255,255,255,0.15) !important;
+                    background: rgba(10,12,16,0.2) !important;
                 }
                 .swiper-pagination-bullet-active {
-                    background: #10b981 !important;
+                    background: #e6c800 !important;
                 }
             `}</style>
         </section>

@@ -19,9 +19,16 @@ export default function AdminBlog() {
         try {
             const res = await fetch("/api/blog?all=true");
             const data = await res.json();
-            setPosts(data);
+            if (Array.isArray(data)) {
+                setPosts(data);
+            } else if (data.posts) {
+                setPosts(data.posts);
+            } else {
+                setPosts([]);
+            }
         } catch (error) {
             console.error("Blog yazıları yüklenirken hata:", error);
+            setPosts([]);
         } finally {
             setLoading(false);
         }

@@ -93,7 +93,7 @@ export default function AdminLoginPage() {
     return (
         <div className="min-h-screen flex">
             {/* Left Panel — Decorative */}
-            <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-zinc-950 flex-col items-center justify-center p-16">
+            <div className="hidden lg:flex lg:w-1/2 flex-shrink-0 relative overflow-hidden bg-zinc-950 flex-col items-center justify-center p-16">
                 {/* Animated background */}
                 <div className="absolute inset-0">
                     <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 animate-pulse" />
@@ -134,9 +134,9 @@ export default function AdminLoginPage() {
                 </div>
             </div>
 
-            {/* Right Panel — Form */}
-            <div className="flex-1 flex items-center justify-center p-6 lg:p-16 bg-zinc-50 dark:bg-zinc-950">
-                <div className="w-full max-w-md">
+            {/* Right Panel — Form (scrollable when content overflows) */}
+            <div className="flex-1 min-h-0 flex items-center justify-center p-6 lg:p-16 overflow-y-auto bg-zinc-100 dark:bg-zinc-950">
+                <div className="w-full max-w-md py-4">
                     {/* Logo mobile */}
                     <div className="lg:hidden text-center mb-10">
                         <span className="text-3xl font-black text-emerald-500">ZYG</span>
@@ -150,8 +150,8 @@ export default function AdminLoginPage() {
                                 key={m}
                                 onClick={() => { setMode(m); setError(""); setSuccess(""); }}
                                 className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 ${mode === m
-                                    ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
-                                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700"
+                                    ? "bg-white dark:bg-slate-700 text-zinc-900 dark:text-white shadow-sm"
+                                    : "text-zinc-600 dark:text-slate-400 hover:text-zinc-900"
                                     }`}
                             >
                                 {m === "login" ? "Giriş Yap" : "Kayıt Ol"}
@@ -168,10 +168,10 @@ export default function AdminLoginPage() {
                             transition={{ duration: 0.2 }}
                         >
                             <div className="mb-8">
-                                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+                                <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
                                     {mode === "login" ? "Hoş Geldiniz 👋" : "Hesap Oluşturun"}
                                 </h1>
-                                <p className="text-slate-500 dark:text-slate-400 mt-1.5 text-sm">
+                                <p className="text-zinc-600 dark:text-slate-400 mt-1.5 text-sm">
                                     {mode === "login"
                                         ? "Yönetim panelinize erişmek için giriş yapın."
                                         : "Ekibinize yeni bir yönetici hesabı ekleyin."}
@@ -203,58 +203,58 @@ export default function AdminLoginPage() {
                             <form onSubmit={mode === "login" ? handleLogin : handleRegister} className="space-y-4">
                                 {mode === "register" && (
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                        <label className="block text-sm font-semibold text-zinc-700 dark:text-slate-300 mb-1.5">
                                             Ad Soyad
                                         </label>
                                         <div className="relative">
-                                            <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                            <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
                                             <input
                                                 type="text"
                                                 required
                                                 value={name}
                                                 onChange={(e) => setName(e.target.value)}
                                                 placeholder="Gürkan Yavuz"
-                                                className="w-full pl-10 pr-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all text-sm"
+                                                className="w-full pl-10 pr-4 py-3 bg-white dark:bg-zinc-800 border-2 border-zinc-300 dark:border-zinc-600 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-sm"
                                             />
                                         </div>
                                     </div>
                                 )}
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                    <label className="block text-sm font-semibold text-zinc-700 dark:text-slate-300 mb-1.5">
                                         E-posta Adresi
                                     </label>
                                     <div className="relative">
-                                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
                                         <input
                                             type="email"
                                             required
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
-                                            placeholder="gurkanyavuz@zygsoft.com"
-                                            className="w-full pl-10 pr-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all text-sm"
+                                            placeholder="admin@zygsoft.com"
+                                            className="w-full pl-10 pr-4 py-3 bg-white dark:bg-zinc-800 border-2 border-zinc-300 dark:border-zinc-600 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-sm"
                                         />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                    <label className="block text-sm font-semibold text-zinc-700 dark:text-slate-300 mb-1.5">
                                         Şifre
                                     </label>
                                     <div className="relative">
-                                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
                                         <input
                                             type={showPassword ? "text" : "password"}
                                             required
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             placeholder={mode === "register" ? "En az 8 karakter" : "••••••••"}
-                                            className="w-full pl-10 pr-12 py-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all text-sm"
+                                            className="w-full pl-10 pr-12 py-3 bg-white dark:bg-zinc-800 border-2 border-zinc-300 dark:border-zinc-600 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-sm"
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-700 transition-colors"
                                         >
                                             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                         </button>
@@ -263,26 +263,26 @@ export default function AdminLoginPage() {
 
                                 {mode === "register" && (
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                        <label className="block text-sm font-semibold text-zinc-700 dark:text-slate-300 mb-1.5">
                                             Şifre Tekrar
                                         </label>
                                         <div className="relative">
-                                            <ShieldCheck className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                            <ShieldCheck className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" size={16} />
                                             <input
                                                 type={showConfirm ? "text" : "password"}
                                                 required
                                                 value={confirmPassword}
                                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                                 placeholder="Şifrenizi tekrar girin"
-                                                className={`w-full pl-10 pr-12 py-3 bg-white dark:bg-slate-800 border rounded-xl text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm ${confirmPassword && confirmPassword !== password
-                                                    ? "border-red-300 dark:border-red-700"
-                                                    : "border-slate-200 dark:border-slate-700"
+                                                className={`w-full pl-10 pr-12 py-3 bg-white dark:bg-zinc-800 border-2 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm ${confirmPassword && confirmPassword !== password
+                                                    ? "border-red-400 dark:border-red-600"
+                                                    : "border-zinc-300 dark:border-zinc-600"
                                                     }`}
                                             />
                                             <button
                                                 type="button"
                                                 onClick={() => setShowConfirm(!showConfirm)}
-                                                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-700 transition-colors"
                                             >
                                                 {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                                             </button>
@@ -296,7 +296,7 @@ export default function AdminLoginPage() {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/30 mt-2"
+                                    className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-70 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 mt-2"
                                 >
                                     {loading ? (
                                         <><Loader2 size={16} className="animate-spin" /> {mode === "login" ? "Giriş yapılıyor..." : "Hesap oluşturuluyor..."}</>
@@ -308,7 +308,7 @@ export default function AdminLoginPage() {
                         </motion.div>
                     </AnimatePresence>
 
-                    <p className="text-center text-xs text-slate-400 mt-8">
+                    <p className="text-center text-xs text-zinc-600 dark:text-slate-400 mt-8">
                         Bu panel yalnızca yetkili Zygsoft yöneticileri içindir.
                     </p>
                 </div>

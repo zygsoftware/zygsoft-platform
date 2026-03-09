@@ -75,17 +75,17 @@ export default function DashboardPage() {
                     </div>
                     <div className="p-8 flex-1 flex flex-col justify-center">
                         {activeProductSlugs.includes("udf-toolkit") ? (
-                            <div className="flex items-center justify-between p-5 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-[#e6c800]/30 transition-colors">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 bg-slate-950 text-[#e6c800] rounded-xl flex items-center justify-center shadow-lg shadow-black/10">
-                                        <CheckCircle2 size={28} />
+                            <div className="flex items-center justify-between p-6 bg-gradient-to-br from-[#0a0c10] to-[#0a0c10]/95 rounded-2xl border border-[#e6c800]/20 shadow-lg group hover:shadow-xl hover:border-[#e6c800]/40 transition-all duration-300">
+                                <div className="flex items-center gap-5">
+                                    <div className="w-16 h-16 bg-[#e6c800]/20 text-[#e6c800] rounded-2xl flex items-center justify-center border border-[#e6c800]/30">
+                                        <CheckCircle2 size={32} />
                                     </div>
                                     <div>
-                                        <h4 className="font-black text-slate-950">Hukuk UDF Dönüştürücü</h4>
-                                        <p className="text-[11px] text-slate-500 font-black uppercase tracking-wider">Sınırsız Lisans Aktif</p>
+                                        <h4 className="font-black text-white text-lg">Hukuk UDF Dönüştürücü</h4>
+                                        <p className="text-[11px] text-[#e6c800] font-bold uppercase tracking-wider">Aktif • Sınırsız Erişim</p>
                                     </div>
                                 </div>
-                                <Link href="/dashboard/tools/doc-to-udf" className="bg-white text-slate-950 px-6 py-2.5 rounded-xl text-xs font-black border border-slate-200 hover:bg-slate-950 hover:text-[#e6c800] hover:border-slate-950 transition-all shadow-sm">
+                                <Link href="/dashboard/tools/doc-to-udf" className="px-6 py-3 bg-[#e6c800] text-[#0a0c10] rounded-xl text-xs font-black uppercase tracking-wider hover:bg-white transition-all shadow-lg shadow-[#e6c800]/20">
                                     {t("sections.start")}
                                 </Link>
                             </div>
@@ -126,8 +126,8 @@ export default function DashboardPage() {
             </div>
 
             {/* Billing Alert / CTA */}
-            <div className="bg-slate-950 rounded-[3rem] p-8 md:p-14 relative overflow-hidden group">
-                <div className="absolute right-0 top-0 w-96 h-96 bg-[#e6c800] opacity-5 rounded-full blur-[100px] -mr-32 -mt-32 group-hover:opacity-10 transition-opacity duration-1000" />
+            <div className="bg-[#0a0c10] rounded-[3rem] p-8 md:p-14 relative overflow-hidden group">
+                <div className="absolute right-0 top-0 w-96 h-96 bg-[#e6c800]/20 rounded-full blur-[100px] -mr-32 -mt-32 group-hover:opacity-30 transition-opacity duration-1000" />
                 <div className="absolute left-0 bottom-0 w-64 h-64 bg-[#e6c800] opacity-[0.02] rounded-full blur-[80px] -ml-20 -mb-20" />
 
                 <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
@@ -135,7 +135,7 @@ export default function DashboardPage() {
                         <h3 className="text-3xl font-display font-black text-white mb-4 tracking-tight leading-tight">
                             {t("cta.title")}
                         </h3>
-                        <p className="text-slate-400 font-medium font-sans text-lg">
+                        <p className="text-white/60 font-medium font-sans text-lg">
                             {t("cta.desc")}
                         </p>
                     </div>

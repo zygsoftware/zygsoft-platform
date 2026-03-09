@@ -111,6 +111,7 @@
         "viewStoreButton": "App Store'u İncele",
         "hero": {
             "tag": "/ DİJİTAL DÖNÜŞÜM ORTAĞI",
+            "ctaProducts": "DİJİTAL ÜRÜNLER",
             "title1": "GELECEĞE HAZIR",
             "title2": "DİJİTAL SİSTEMLER",
             "title3": "İNŞA EDİYORUZ.",
@@ -232,6 +233,14 @@
             "viewProject": "PROJEYİ İNCELE",
             "exploreMore": "TÜM PORTFOLYO"
         },
+        "blogSection": {
+            "tag": "/ BLOG & İÇGÖRÜ",
+            "latest": "Son Yayınlar",
+            "allPosts": "Tüm Yazılar",
+            "sampleTitle": "Kurumsal Yazılımda Verimlilik ve Otomasyon",
+            "sampleExcerpt": "Modern kurumlar için yazılım, süreç otomasyonu ve ölçeklenebilir altyapı stratejileri.",
+            "readMore": "Devamını Oku"
+        },
         "socialServices": {
             "tag": "/ DİJİTAL GÖRÜNÜRLÜK",
             "title": "Marka Kimliğinizi <br /> Zirveye Taşıyın.",
@@ -248,6 +257,8 @@
             "tag": "/ PROJEYE BAŞLAYIN",
             "title": "Dijital Geleceğinizi <br /> Birlikte Kuralım.",
             "description": "Zygsoft ile statik yapıları geride bırakın. Veriye dayalı, estetik odaklı ve dönüşüm hedefli dijital altyapınızı bugün başlatın.",
+            "cta": "TEKLIF ALIN",
+            "ctaSecondary": "Portfoliyoyu İncele",
             "button": "TEKLİF ALIN",
             "directLine": "Doğrudan İletişim",
             "features": {
@@ -264,6 +275,10 @@
                     "desc": "Verileriniz bizimle güvende."
                 }
             }
+        },
+        "contactStrip": {
+            "title": "Yazılım ve Dönüşüm İhtiyacınızı İletin",
+            "subtitle": "Kurumunuza uygun yol haritası, kapsam ve teklif detaylarıyla hızlı geri dönüş sağlayalım."
         }
     },
     "Services": {
@@ -413,7 +428,7 @@
         "infoTitle": "İletişim Bilgileri",
         "infoDesc": "Modern dünyada işinizi büyütmek için doğru strateji ve teknolojiyle yanınızdayız. Ekibimiz sorularınızı yanıtlamak için hazır.",
         "officeTitle": "Merkez Ofis",
-        "officeDesc": "İstanbul, Türkiye",
+        "officeDesc": "Antalya, Türkiye",
         "emailTitle": "E-posta Destek",
         "emailDesc": "info@zygsoft.com",
         "phoneTitle": "Telefon",
@@ -425,11 +440,21 @@
         "formEmailPlaceholder": "ahmet@example.com",
         "formSubject": "Konu",
         "formSubjectPlaceholder": "Proje Geliştirme",
+        "formPhone": "Telefon",
+        "formPhonePlaceholder": "+90 5XX XXX XX XX",
+        "formCompany": "Sirket",
+        "formCompanyPlaceholder": "Sirket adi",
+        "formTopic": "Hizmet / Konu",
+        "formTopicPlaceholder": "Konu secin",
         "formMessage": "Mesajınız",
         "formMessagePlaceholder": "Projenizden bahsedin...",
         "formSend": "Mesaj Gönder",
         "formSending": "Gönderiliyor...",
         "formSuccess": "Gönderildi! ✓",
+        "formSuccessDetail": "Mesajınız başarıyla iletildi. Ekibimiz en kısa sürede sizinle iletişime geçecek.",
+        "formErrorRequired": "Lütfen zorunlu alanları doldurun.",
+        "formErrorNetwork": "Mesaj gönderilemedi. Lütfen tekrar deneyin.",
+        "formPrivacyNote": "İletilen bilgiler yalnızca talebinize dönüş yapmak amacıyla işlenir. Üçüncü kişilerle paylaşılmaz.",
         "faqTitle": "Sıkça Sorulan Sorular",
         "faqDesc": "Hizmetlerimiz ve süreçlerimiz hakkında merak ettiğiniz detaylar.",
         "faqQ1": "Bir web projesinin tamamlanması ne kadar sürer?",
@@ -458,14 +483,17 @@
     "AppStore": {
         "storeBadge": "SaaS Ürünleri & Araçlar",
         "storeTitle": "İşinizi Büyütecek Premium Araçlar",
-        "storeDesc": "Ajans hizmetlerimizin yanı sıra, işletmenizin günlük operasyonlarını kolaylaştıracak hazır yazılım çözümlerimizi de inceleyin. Aboneliğinizi başlatın ve saniyeler içinde kullanıma geçin.",
+        "storeDesc": "Kurumunuzun operasyonlarını hızlandıran SaaS ürünlerimizi ve yazılım araçlarımızı inceleyin. Aboneliği başlatın, saniyeler içinde kullanmaya başlayın.",
         "storeFeature1Title": "Kullanıma Hazır Araçlar",
         "storeFeature1Desc": "Projelerinizi hızlandıracak, test edilmiş ve onaylanmış premium yazılım çözümleri.",
         "storeFeature2Title": "Anında Teslimat",
         "storeFeature2Desc": "Satın aldıktan saniyeler sonra aracınızı panelinizde aktif olarak görmeye başlayın.",
         "storeFeature3Title": "Güvenli ve Şeffaf",
         "storeFeature3Desc": "Açık kaynaklı güven inşa eden sistemler. Verileriniz sunucuda işlendikten sonra anında imha edilir.",
-        "viewStoreButton": "Uygulamaları İncele",
+        "viewStoreButton": "Ürünleri İncele",
+        "udfFlagshipBadge": "Bayrak Ürün",
+        "useTool": "Aracı Kullan",
+        "featuresLabel": "Özellikler",
         "badge": "Uygulamalar",
         "title1": "Doğru Uygulamayı Edin,",
         "title2": "İşinizi Büyütün.",
@@ -483,6 +511,8 @@
         "step4": "Yöneticimiz saniyeler içinde dekontunuzu onaylayarak ilgili panelinizi derhal <strong>Aktif</strong> hale getirir.",
         "createAccount": "Ücretsiz Hesabını Oluştur",
         "services": {
+            "udfToolkitShortName": "Hukuk UDF Dönüştürücü",
+            "udfToolkitShortDesc": "DOCX dosyalarınızı UYAP uyumlu UDF formatına saniyeler içinde dönüştürün.",
             "udfToolkitName": "Zygsoft Kapsamlı Hukuk Paketi",
             "udfToolkitDesc": "Avukatlar ve hukuk büroları için profesyonel e-imza/UDF doküman yönetim araştırma ve yapay zeka araçları.",
             "udfToolkitPeriod": "/ay",
@@ -492,6 +522,10 @@
             "udfToolkitF4": "E-İmza & Mobil İmza Entegrasyonu",
             "udfToolkitF5": "Akıllı Dilekçe Şablonları",
             "udfToolkitF6": "TIFF/JPG ve DOCX to UDF Çevirisi",
+            "udfProductWhat": "Word (DOCX) dosyalarınızı UYAP uyumlu UDF formatına saniyeler içinde dönüştürün. Tek tıkla yükle, indir, işle.",
+            "udfProductWho": "Avukatlar, hukuk büroları, mahkeme sekreterleri ve hukuki belge hazırlayan tüm profesyoneller için.",
+            "udfProductFormats": "DOCX → UDF (desteklenir)",
+            "udfProductSecurity": "Belgeleriniz sunucuda işlendikten sonra anında silinir. KVKK uyumlu, gizlilik odaklı altyapı.",
             "webDevName": "Kurumsal Web Sitesi",
             "webDevDesc": "Sıfırdan tasarlanmış ve kodlanmış premium kurumsal kimlik ve web sitesi.",
             "webDevPrice": "Özel",

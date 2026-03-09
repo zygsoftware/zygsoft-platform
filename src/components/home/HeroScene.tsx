@@ -37,15 +37,17 @@ function GlassPanel({ position, scale, rotation }: any) {
 }
 
 function Grid({ size = 20, divisions = 20 }) {
-    return (
-        <gridHelper
-            args={[size, divisions, 0xe6c800, 0xeeeeee]}
-            position={[0, -2, 0]}
-            rotation={[0, 0, 0]}
-            transparent
-            opacity={0.1}
-        />
-    );
+    const grid = useMemo(() => {
+        const helper = new THREE.GridHelper(size, divisions, 0xe6c800, 0xeeeeee);
+        const mats = Array.isArray(helper.material) ? helper.material : [helper.material];
+        for (const m of mats) {
+            m.transparent = true;
+            m.opacity = 0.1;
+        }
+        return helper;
+    }, [size, divisions]);
+
+    return <primitive object={grid} position={[0, -2, 0]} rotation={[0, 0, 0]} />;
 }
 
 function Connections({ count = 10 }) {

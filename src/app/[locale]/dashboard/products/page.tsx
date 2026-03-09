@@ -7,13 +7,12 @@ import {
     FileText,
     Layers,
     FileImage,
-    ShieldAlert,
-    ScanText,
     BrainCircuit,
-    FileSignature,
-    Gem
+    Gem,
+    ArrowRight
 } from "lucide-react";
 import Link from "next/link";
+import { TiltCard } from "@/components/ui/TiltCard";
 
 const tools = [
     {
@@ -63,32 +62,36 @@ export default function ProductsPage() {
                     const isLocked = !activeProductSlugs.includes(tool.slug);
                     return (
                         <div key={idx} className="relative group">
+                            <TiltCard maxTilt={5} className="h-full">
                             <Link
-                                href={isLocked ? "#" : tool.href}
-                                className={`block h-full bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm transition-all duration-300 ${isLocked ? "opacity-60 grayscale cursor-not-allowed" : "hover:shadow-xl hover:shadow-slate-200/50 hover:-translate-y-1"
+                                href={isLocked ? "/abonelikler" : tool.href}
+                                className={`block h-full bg-white p-8 rounded-[2rem] border transition-all duration-300 hover-lift ${isLocked
+                                    ? "border-[#0a0c10]/[0.06] hover:border-[#e6c800]/40 hover:shadow-xl shadow-sm"
+                                    : "border-[#0a0c10]/[0.06] hover:shadow-xl hover:-translate-y-1 shadow-sm"
                                     }`}
                             >
-                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 ${isLocked ? "bg-slate-100 text-slate-400" : "bg-slate-950 text-[#e6c800]"
+                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-colors ${isLocked ? "bg-[#fafafc] text-[#0a0c10]/40 border border-[#0a0c10]/10" : "bg-[#0a0c10] text-[#e6c800]"
                                     }`}>
                                     {tool.icon}
                                 </div>
-                                <h3 className="text-xl font-heading font-black text-slate-950 mb-3">{tool.title}</h3>
-                                <p className="text-slate-500 text-sm font-medium leading-relaxed mb-6">{tool.desc}</p>
+                                <h3 className="text-xl font-display font-black text-[#0a0c10] mb-3">{tool.title}</h3>
+                                <p className="text-[#0a0c10]/60 text-sm font-medium leading-relaxed mb-6">{tool.desc}</p>
 
                                 {!isLocked ? (
                                     <div className="inline-flex items-center gap-2 text-slate-950 text-sm font-black group-hover:text-[#e6c800] transition-colors">
                                         ARACI AÇ <Box size={16} />
                                     </div>
                                 ) : (
-                                    <div className="inline-flex items-center gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest">
-                                        KİLİTLİ ÜRÜN
+                                    <div className="inline-flex items-center gap-2 text-[#e6c800] text-xs font-bold uppercase tracking-widest group-hover:gap-3 transition-all">
+                                        ABONELİK GEREKLİ <ArrowRight size={14} />
                                     </div>
                                 )}
                             </Link>
+                            </TiltCard>
 
                             {isLocked && (
-                                <div className="absolute top-4 right-4 bg-slate-100 p-2 rounded-xl">
-                                    <Gem size={16} className="text-slate-400" />
+                                <div className="absolute top-5 right-5 w-10 h-10 rounded-xl bg-[#e6c800]/10 flex items-center justify-center border border-[#e6c800]/20">
+                                    <Gem size={18} className="text-[#e6c800]" />
                                 </div>
                             )}
                         </div>
@@ -97,16 +100,16 @@ export default function ProductsPage() {
             </div>
 
             {!activeProductSlugs.length && (
-                <div className="bg-white rounded-[2rem] p-12 text-center border-2 border-dashed border-slate-100">
-                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Box size={32} className="text-slate-300" />
+                <div className="bg-white rounded-[2rem] p-12 text-center border-2 border-dashed border-[#0a0c10]/[0.08]">
+                    <div className="w-20 h-20 bg-[#fafafc] rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[#0a0c10]/5">
+                        <Box size={32} className="text-[#0a0c10]/30" />
                     </div>
-                    <h2 className="text-2xl font-heading font-black text-slate-950 mb-4">Henüz bir ürününüz yok mu?</h2>
-                    <p className="text-slate-500 font-medium font-sans mb-8 max-w-md mx-auto">
-                        Hukuk teknolojilerinden, dijital araçlara kadar Zygsoft Store'daki gelişmiş yazılımları hemen keşfedin.
+                    <h2 className="text-2xl font-display font-black text-[#0a0c10] mb-4">Henüz bir ürününüz yok mu?</h2>
+                    <p className="text-[#0a0c10]/60 font-medium mb-8 max-w-md mx-auto">
+                        Hukuk teknolojilerinden dijital araçlara—Zygsoft Mağazasındaki premium yazılımları keşfedin.
                     </p>
-                    <Link href="/abonelikler" className="bg-[#e6c800] text-slate-950 px-10 py-4 rounded-2xl text-[14px] font-black hover:bg-slate-950 hover:text-white transition-all shadow-xl shadow-[#e6c800]/20 font-heading">
-                        MAĞAZAYA GİT
+                    <Link href="/abonelikler" className="inline-flex items-center gap-2 bg-[#e6c800] text-[#0a0c10] px-10 py-4 rounded-2xl text-sm font-black hover:bg-[#c9ad00] transition-all shadow-xl shadow-[#e6c800]/20">
+                        MAĞAZAYA GİT <ArrowRight size={18} />
                     </Link>
                 </div>
             )}

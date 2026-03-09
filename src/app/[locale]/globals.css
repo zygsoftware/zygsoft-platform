@@ -96,7 +96,7 @@ h3,
 h4 {
   font-family: 'Syne', sans-serif;
   font-weight: 700;
-  color: var(--text);
+  color: inherit;
   line-height: 1.1;
 }
 
@@ -502,4 +502,169 @@ h4 {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+
+/* ─── Premium motion (respect reduced-motion) ────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Premium section reveal easing */
+.ease-premium {
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Subtle card lift on hover (for non-JS fallback) */
+.hover-lift {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+/* ─── Homepage Readability Tokens ─────────────────────────────── */
+.home-btn-primary-yellow {
+  background: #e6c800;
+  color: #0a0c10;
+  border: 1px solid rgba(230, 200, 0, 0.9);
+}
+.home-btn-primary-yellow:hover,
+.home-btn-primary-yellow:focus-visible,
+.home-btn-primary-yellow:active {
+  background: #d4b800;
+  color: #0a0c10;
+}
+
+.home-btn-secondary-dark {
+  background: #0a0c10;
+  color: #f8fafc;
+  border: 1px solid rgba(248, 250, 252, 0.2);
+}
+.home-btn-secondary-dark:hover,
+.home-btn-secondary-dark:focus-visible,
+.home-btn-secondary-dark:active {
+  background: #151922;
+  color: #f8fafc;
+}
+
+.home-btn-outline-light {
+  background: transparent;
+  color: #f8fafc;
+  border: 1px solid rgba(248, 250, 252, 0.22);
+}
+.home-btn-outline-light:hover,
+.home-btn-outline-light:focus-visible,
+.home-btn-outline-light:active {
+  background: #f8fafc;
+  color: #0a0c10;
+}
+
+.home-card-dark {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(248, 250, 252, 0.16);
+  color: #f8fafc;
+}
+.home-card-dark :is(h1, h2, h3, h4, h5, h6) {
+  color: #f8fafc;
+}
+.home-card-dark :is(p, span, small, li) {
+  color: rgba(248, 250, 252, 0.78);
+}
+
+.home-card-light {
+  background: #ffffff;
+  border: 1px solid rgba(10, 12, 16, 0.12);
+  color: #0a0c10;
+}
+.home-card-light :is(h1, h2, h3, h4, h5, h6) {
+  color: #0a0c10;
+}
+.home-card-light :is(p, span, small, li) {
+  color: rgba(10, 12, 16, 0.62);
+}
+
+/* ─── Global Surface Contrast System ─────────────────────────────── */
+/* Dark surfaces default to light text unless text-* is explicitly set */
+:is(
+  .surface-dark,
+  [class~="bg-[#0a0c10]"],
+  [class*="bg-black"],
+  [class*="bg-slate-9"],
+  [class*="bg-zinc-9"],
+  [class*="bg-neutral-9"]
+) {
+  color: #f8fafc;
+}
+
+:is(
+  .surface-dark,
+  [class~="bg-[#0a0c10]"],
+  [class*="bg-black"],
+  [class*="bg-slate-9"],
+  [class*="bg-zinc-9"],
+  [class*="bg-neutral-9"]
+)
+  :is(h1, h2, h3, h4, h5, h6, p, li, span, small, label, legend, blockquote, dt, dd):not([class*="text-"]) {
+  color: inherit;
+}
+
+/* Dark surface hard-fix: prevent dark text utility classes on dark backgrounds */
+:is(
+  .surface-dark,
+  [class~="bg-[#0a0c10]"],
+  [class*="bg-black"],
+  [class*="bg-slate-9"],
+  [class*="bg-zinc-9"],
+  [class*="bg-neutral-9"]
+)
+  :is(
+    [class~="text-[#0a0c10]"],
+    [class*="text-black"],
+    [class*="text-slate-9"],
+    [class*="text-zinc-9"],
+    [class*="text-neutral-9"]
+  ) {
+  color: #f8fafc !important;
+}
+
+/* Light surfaces default to dark text unless text-* is explicitly set */
+:is(
+  .surface-light,
+  [class*="bg-white"],
+  [class*="bg-[#fafafc]"],
+  [class*="bg-[#f9f7f3]"],
+  [class*="bg-cream"]
+) {
+  color: #0a0c10;
+}
+
+:is(
+  .surface-light,
+  [class*="bg-white"],
+  [class*="bg-[#fafafc]"],
+  [class*="bg-[#f9f7f3]"],
+  [class*="bg-cream"]
+)
+  :is(h1, h2, h3, h4, h5, h6, p, li, span, small, label, legend, blockquote, dt, dd):not([class*="text-"]) {
+  color: inherit;
+}
+
+/* Brand yellow actions must always keep dark foreground */
+:is(
+  [class~="bg-[#e6c800]"],
+  [class*="bg-brand-500"],
+  .btn-yellow
+)
+  :is(
+    [class*="text-white"],
+    [class*="text-zinc-100"],
+    [class*="text-slate-100"]
+  ) {
+  color: #0a0c10 !important;
 }

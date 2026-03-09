@@ -1,16 +1,19 @@
 import { prisma } from "@/lib/prisma";
-import { FolderKanban, Network, Users, BookOpen, TrendingUp, Clock, Activity } from "lucide-react";
+import { FolderKanban, Network, Users, BookOpen, TrendingUp, Clock, Activity, Package, Receipt } from "lucide-react";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-    const [projectCount, apiCount, userCount, blogCount, publishedBlogCount] = await Promise.all([
+    const [projectCount, apiCount, userCount, blogCount, publishedBlogCount, productCount, paymentCount, pendingPaymentCount] = await Promise.all([
         prisma.project.count(),
         prisma.apiConnection.count(),
         prisma.user.count(),
         prisma.blogPost.count(),
         prisma.blogPost.count({ where: { published: true } }),
+        prisma.product.count(),
+        prisma.payment.count(),
+        prisma.payment.count({ where: { status: "pending" } }),
     ]);
 
     const recentPosts = await prisma.blogPost.findMany({
@@ -22,6 +25,8 @@ export default async function AdminDashboard() {
     const stats = [
         { name: "Toplam Proje", value: projectCount, icon: FolderKanban, color: "blue", href: "/admin/projects" },
         { name: "Blog Yazısı", value: blogCount, subtext: `${publishedBlogCount} yayında`, icon: BookOpen, color: "violet", href: "/admin/blog" },
+        { name: "Mağaza Ürünü", value: productCount, icon: Package, color: "cyan", href: "/admin/products" },
+        { name: "Ödeme", value: paymentCount, subtext: pendingPaymentCount > 0 ? `${pendingPaymentCount} bekleyen` : undefined, icon: Receipt, color: "emerald", href: "/admin/payments" },
         { name: "API Bağlantısı", value: apiCount, icon: Network, color: "cyan", href: "/admin/apis" },
         { name: "Yönetici", value: userCount, icon: Users, color: "emerald", href: "/admin/users" },
     ];
@@ -42,7 +47,7 @@ export default async function AdminDashboard() {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5 mb-8">
                 {stats.map((stat) => {
                     const Icon = stat.icon;
                     return (

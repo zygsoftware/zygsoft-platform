@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "../[locale]/globals.css";
+import { AdminProviders } from "@/components/admin/AdminProviders";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,7 +15,10 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
     return (
         <html lang="tr" className="scroll-smooth">
             <body className={`${inter.className} min-h-screen`}>
-                {children}
+                <AdminProviders>
+                    {children}
+                    <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
+                </AdminProviders>
             </body>
         </html>
     );

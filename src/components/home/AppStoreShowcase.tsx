@@ -1,161 +1,232 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
-import { ArrowRight, Blocks, Zap, Shield, FileText, ImageIcon } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowRight, Blocks, Zap, Shield, FileText, Workflow, CheckCircle2, Sparkles, Layers, FileStack } from "lucide-react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
-import { useRef } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { ParticleField } from "@/components/ui/ParticleField";
+import { TiltCard } from "@/components/ui/TiltCard";
+import { createHeadingReveal, createRevealUp, revealViewport, staggerContainer } from "@/components/ui/motion";
 
 export function AppStoreShowcase() {
+    const locale = useLocale();
     const t = useTranslations("AppStore");
-    const ref = useRef(null);
-    const inView = useInView(ref, { once: true, margin: "-80px" });
+    const reducedMotion = !!useReducedMotion();
+    const isTr = locale === "tr";
 
     const showcaseFeatures = [
         {
-            title: t("storeFeature1Title") || "Kullanıma Hazır Araçlar",
-            desc: t("storeFeature1Desc") || "Projelerinizi hızlandıracak, test edilmiş ve onaylanmış premium yazılım çözümleri.",
-            icon: <Blocks size={22} className="text-emerald-400" />
+            title: t("storeFeature1Title") || "Dijital Ürünler & Yazılım Araçları",
+            desc: t("storeFeature1Desc") || "Hukuk büroları ve işletmeler için premium yazılım çözümleri. Hazır, test edilmiş, anında kullanıma hazır.",
+            icon: <Blocks size={22} className="text-[#e6c800]" />
         },
         {
-            title: t("storeFeature2Title") || "Anında Teslimat",
-            desc: t("storeFeature2Desc") || "Satın aldıktan saniyeler sonra aracınızı panelinizde aktif olarak görmeye başlayın.",
-            icon: <Zap size={22} className="text-cyan-400" />
+            title: t("storeFeature2Title") || "Anında Erişim",
+            desc: t("storeFeature2Desc") || "Ödeme onayından sonra araçlarınıza saniyeler içinde panel üzerinden erişin. Kurulum yok, hemen çalışır.",
+            icon: <Zap size={22} className="text-[#e6c800]" />
         },
         {
-            title: t("storeFeature3Title") || "Güvenli ve Şeffaf",
-            desc: t("storeFeature3Desc") || "Açık kaynaklı güven inşa eden sistemler. Verileriniz sunucuda işlendikten sonra anında imha edilir.",
-            icon: <Shield size={22} className="text-violet-400" />
+            title: t("storeFeature3Title") || "Gizlilik & Güvenlik",
+            desc: t("storeFeature3Desc") || "Belgeleriniz sunucuda işlendikten sonra anında silinir. KVKK uyumlu, hukuk profesyonelleri için güvenli altyapı.",
+            icon: <Shield size={22} className="text-[#e6c800]" />
         }
     ];
 
     const previewProducts = [
         {
             id: "udf-toolkit",
-            name: t("services.udfToolkitName") || "Kapsamlı Hukuk Paketi",
-            desc: t("services.udfToolkitDesc") || "Avukatlık büroları için UDF dönüştürücü, OCR, AI özet, KVKK sansürleme ve e-imza araçları.",
+            name: t("services.udfToolkitShortName") || "Hukuk UDF Dönüştürücü",
+            desc: t("services.udfToolkitShortDesc") || "DOCX dosyalarınızı UYAP uyumlu UDF formatına saniyeler içinde dönüştürün.",
             price: "₺499",
             period: t("services.udfToolkitPeriod") || "/ay",
-            icon: <FileText size={36} className="text-emerald-400" />,
-            tag: "Hukuk",
-            color: "emerald"
+            icon: <FileText size={36} className="text-[#e6c800]" />,
+            tag: t("udfFlagshipBadge") || "Bayrak Ürün",
+            flagship: true
         },
         {
-            id: "social-media",
-            name: t("services.socialMediaName") || "Sosyal Medya Yönetimi",
-            desc: t("services.socialMediaDesc") || "Aylık 15 kreatif özel gönderi, moderasyon, hedefleme ve Meta Ads yönetimi.",
-            price: "₺15.000",
-            period: t("services.socialMediaPeriod") || "/ay",
-            icon: <ImageIcon size={36} className="text-violet-400" />,
-            tag: "Dijital",
-            color: "violet"
+            id: "pdf-merge",
+            name: "PDF Birlestirici",
+            desc: "Birden fazla PDF dosyasini tek bir cikti halinde birlestiren hukuk odakli yardimci arac.",
+            price: "Yakinda",
+            period: "",
+            icon: <FileStack size={36} className="text-white/70" />,
+            tag: "Yardimci Arac"
         }
     ];
 
     return (
-        <section ref={ref} className="py-32 bg-[#0a0a0f] relative overflow-hidden">
-            {/* Orbs */}
-            <div className="orb orb-brand w-[700px] h-[700px] top-0 right-0 opacity-8" />
-            <div className="orb orb-accent w-[500px] h-[500px] bottom-0 left-0 opacity-8" />
-            <div className="absolute inset-0 grid-bg opacity-60 pointer-events-none" />
+        <section className="py-36 lg:py-44 bg-[#0a0c10] relative overflow-hidden">
+            <div className="absolute inset-0 pointer-events-none">
+                <ParticleField variant="dark" count={44} opacity={0.85} className="opacity-70" />
+                <div className="absolute top-0 right-0 w-[780px] h-[780px] bg-[#e6c800]/14 blur-[130px] rounded-full -translate-y-1/3 translate-x-1/3" />
+                <div className="absolute bottom-0 left-0 w-[520px] h-[520px] bg-[#e6c800]/8 blur-[120px] rounded-full -translate-x-1/3 translate-y-1/3" />
+                <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "56px 56px" }} />
+            </div>
 
             <div className="container mx-auto px-6 max-w-7xl relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-
-                    {/* Left: Info */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-16 items-start">
                     <motion.div
-                        initial={{ opacity: 0, x: -40 }}
-                        animate={inView ? { opacity: 1, x: 0 } : {}}
-                        transition={{ duration: 0.7 }}
+                        variants={createRevealUp(reducedMotion, 44, 10)}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={revealViewport}
+                        className="lg:col-span-6"
                     >
-                        <span className="section-eyebrow">
-                            <Blocks size={12} className="inline mr-1.5" />
-                            {t("storeBadge") || "SaaS Ürünleri & Araçlar"}
-                        </span>
+                        <div className="inline-flex items-center gap-3 mb-8 px-5 py-2.5 bg-white/8 border border-white/15 rounded-full backdrop-blur">
+                            <Blocks size={12} className="text-[#e6c800]" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80">{t("storeBadge") || "Dijital Ürünler & Yazılım Araçları"}</span>
+                        </div>
 
-                        <h2 className="section-title text-4xl md:text-5xl mb-6">
-                            {t("storeTitle") || "İşinizi Büyütecek Premium Araçlar"}
-                        </h2>
+                        <motion.h2
+                            variants={createHeadingReveal(reducedMotion)}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={revealViewport}
+                            className="text-4xl md:text-5xl xl:text-6xl font-display font-black leading-[0.96] tracking-tight text-white mb-7"
+                        >
+                            {t("storeTitle") || "Dijital Ürünler ile İşinizi Büyütün"}
+                        </motion.h2>
 
-                        <p className="section-desc text-base mb-10">
-                            {t("storeDesc") || "Ajans hizmetlerimizin yanı sıra, işletmenizin günlük operasyonlarını kolaylaştıracak hazır yazılım çözümlerimizi de inceleyin."}
+                        <p className="text-white/65 text-lg leading-relaxed mb-10 max-w-xl">
+                            {t("storeDesc") || "Avukatlık büroları ve işletmeler için özel yazılım araçları. Hukuk UDF Dönüştürücü ile belgelerinizi UYAP uyumlu formata anında çevirin. Abonelik başlat, saniyeler içinde kullanmaya başla."}
                         </p>
 
-                        <div className="space-y-6 mb-10">
+                        <motion.div
+                            className="space-y-4 mb-10"
+                            variants={staggerContainer}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={revealViewport}
+                        >
                             {showcaseFeatures.map((feat, idx) => (
                                 <motion.div
                                     key={idx}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={inView ? { opacity: 1, x: 0 } : {}}
-                                    transition={{ delay: 0.1 * idx + 0.3 }}
-                                    className="flex gap-4 group"
+                                    variants={createRevealUp(reducedMotion, 32, 8)}
+                                    className="home-card-dark group flex items-start gap-4 rounded-2xl p-4 hover:bg-white/[0.09] hover:border-[#e6c800]/40 transition-all duration-500"
                                 >
-                                    <div className="shrink-0 w-11 h-11 rounded-xl bg-white/[0.05] border border-white/8 flex items-center justify-center group-hover:border-emerald-500/20 transition-colors">
+                                    <div className="shrink-0 w-11 h-11 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center group-hover:bg-[#e6c800]/15 group-hover:border-[#e6c800]/40 transition-colors">
                                         {feat.icon}
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-white mb-1">{feat.title}</h4>
-                                        <p className="text-slate-500 text-sm leading-relaxed">{feat.desc}</p>
+                                        <h4 className="font-bold text-white mb-1.5">{feat.title}</h4>
+                                        <p className="text-white/75 text-sm leading-relaxed">{feat.desc}</p>
                                     </div>
                                 </motion.div>
                             ))}
+                        </motion.div>
+
+                        <div className="grid grid-cols-3 gap-3 mb-10">
+                            {[
+                                { k: "01", t: "Module", d: "UDF Core" },
+                                { k: "02", t: "Roadmap", d: "Next: PDF/AI" },
+                                { k: "03", t: "Audience", d: "Law Firms" },
+                            ].map((item) => (
+                                <div key={item.k} className="home-card-dark rounded-2xl p-4">
+                                    <p className="text-[#e6c800] text-xl font-black leading-none">{item.k}</p>
+                                    <p className="text-white/75 text-[10px] uppercase tracking-[0.2em] mt-2 font-black">{item.t}</p>
+                                    <p className="text-white text-sm font-semibold mt-1">{item.d}</p>
+                                </div>
+                            ))}
                         </div>
+
+                        <Link
+                            href="/abonelikler"
+                            className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-5 font-black uppercase tracking-[0.3em] text-[12px] rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-[#e6c800]/30"
+                        >
+                            {t("viewStoreButton")} <ArrowRight size={18} />
+                        </Link>
+                    </motion.div>
+
+                    <motion.div
+                        variants={createRevealUp(reducedMotion, 44, 10)}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={revealViewport}
+                        className="lg:col-span-6"
+                    >
+                        <TiltCard maxTilt={7} className="h-full">
+                            <div className="relative rounded-[2.3rem] border border-[#e6c800]/35 bg-gradient-to-b from-white/[0.09] to-white/[0.03] p-7 md:p-8 shadow-[0_50px_120px_rgba(0,0,0,0.38)] overflow-hidden">
+                                <div className="absolute -top-20 -right-16 h-60 w-60 rounded-full bg-[#e6c800]/25 blur-3xl" />
+                                <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #fff 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+
+                                <div className="relative z-10 flex items-start justify-between mb-7">
+                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e6c800] text-[#0a0c10] text-[10px] font-black uppercase tracking-[0.24em]">
+                                        <Sparkles size={12} />
+                                        {previewProducts[0].tag}
+                                    </div>
+                                    <span className="text-white/50 text-[10px] uppercase tracking-[0.2em] font-black">Legal-Tech Suite</span>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <div className="rounded-2xl bg-[#0a0c10] border border-white/10 p-5">
+                                        <div className="w-12 h-12 rounded-xl bg-[#e6c800]/20 text-[#e6c800] flex items-center justify-center mb-4">
+                                            {previewProducts[0].icon}
+                                        </div>
+                                        <h3 className="text-2xl font-black text-white leading-tight mb-2">{previewProducts[0].name}</h3>
+                                        <p className="text-white/55 text-sm leading-relaxed mb-4">{previewProducts[0].desc}</p>
+                                        <p className="text-white text-3xl font-black">{previewProducts[0].price}<span className="text-base text-white/50">{previewProducts[0].period}</span></p>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {[
+                                            { icon: <Workflow size={14} />, text: isTr ? "DOCX yukle > UDF indir" : "Upload DOCX > Download UDF" },
+                                            { icon: <Shield size={14} />, text: isTr ? "KVKK uyumlu isleme katmani" : "Privacy-compliant processing layer" },
+                                            { icon: <Layers size={14} />, text: isTr ? "Gelecek modullerle genisleme" : "Scales with upcoming modules" },
+                                            { icon: <CheckCircle2 size={14} />, text: isTr ? "Panel uzerinden aninda erisim" : "Instant access from dashboard" },
+                                        ].map((row, i) => (
+                                            <motion.div key={i} whileHover={{ x: 4 }} className="rounded-xl border border-white/10 bg-white/[0.04] p-3 flex items-center gap-3 text-white/85">
+                                                <span className="text-[#e6c800]">{row.icon}</span>
+                                                <span className="text-sm font-medium">{row.text}</span>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="relative rounded-2xl border border-white/12 bg-white/[0.03] p-4">
+                                    <div className="absolute inset-y-0 left-4 w-px bg-gradient-to-b from-transparent via-[#e6c800]/60 to-transparent" />
+                                    <div className="pl-7 space-y-3">
+                                        {[
+                                            isTr ? "1. Belgeleri yukleyin" : "1. Upload your documents",
+                                            isTr ? "2. Otomatik donusum kuyrugunu calistirin" : "2. Run automated conversion queue",
+                                            isTr ? "3. UYAP uyumlu ciktiyi indirin" : "3. Download UYAP-compatible output",
+                                        ].map((item, i) => (
+                                            <p key={i} className="text-white/70 text-sm">{item}</p>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                                    <Link href="/abonelikler" className="home-btn-primary-yellow inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-colors">
+                                        {isTr ? "Aboneligi gor" : "View plans"}
+                                        <ArrowRight size={14} />
+                                    </Link>
+                                    <Link href="/dashboard/tools/doc-to-udf" className="home-btn-outline-light inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-colors">
+                                        {isTr ? "Araci incele" : "Explore tool"}
+                                    </Link>
+                                </div>
+                            </div>
+                        </TiltCard>
 
                         <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={inView ? { opacity: 1, y: 0 } : {}}
-                            transition={{ delay: 0.6 }}
+                            variants={staggerContainer}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={revealViewport}
+                            className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3"
                         >
-                            <Link
-                                href="/abonelikler"
-                                className="btn-primary inline-flex px-8 py-4 rounded-2xl text-sm group"
-                            >
-                                {t("viewStoreButton")} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                            </Link>
+                            {previewProducts.slice(1).map((prod) => (
+                                <Link key={prod.id} href="/dashboard/tools/pdf-merge" className="block">
+                                    <motion.div variants={createRevealUp(reducedMotion, 28, 8)} whileHover={{ y: -4 }} className="home-card-dark rounded-2xl p-4 hover:border-[#e6c800]/45 transition-colors">
+                                        <div className="flex items-center gap-3 mb-3 text-white">
+                                            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">{prod.icon}</div>
+                                            <p className="font-bold">{prod.name}</p>
+                                        </div>
+                                        <p className="text-white/55 text-sm line-clamp-2">{prod.desc}</p>
+                                        <div className="mt-3 text-xs font-bold text-[#e6c800]/90">{prod.price}</div>
+                                    </motion.div>
+                                </Link>
+                            ))}
                         </motion.div>
                     </motion.div>
-
-                    {/* Right: Product Cards */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 40 }}
-                        animate={inView ? { opacity: 1, x: 0 } : {}}
-                        transition={{ duration: 0.7, delay: 0.2 }}
-                        className="relative h-full min-h-[480px] flex items-center justify-center"
-                    >
-                        <div className="relative w-full max-w-sm mx-auto">
-                            {previewProducts.map((prod, idx) => (
-                                <motion.div
-                                    key={prod.id}
-                                    initial={{ opacity: 0, y: 40, scale: 0.92 }}
-                                    animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
-                                    transition={{ delay: 0.3 + idx * 0.15, type: "spring", bounce: 0.3 }}
-                                    className={`${idx !== 0
-                                        ? "absolute top-16 -right-6 scale-[0.88] opacity-50 blur-[1px]"
-                                        : ""
-                                        } glass-card p-6 rounded-2xl`}
-                                >
-                                    <div className="flex items-start justify-between mb-5">
-                                        <div className={`w-14 h-14 rounded-xl bg-${prod.color === "emerald" ? "emerald" : "violet"}-500/10 border border-${prod.color === "emerald" ? "emerald" : "violet"}-500/20 flex items-center justify-center`}>
-                                            {prod.icon}
-                                        </div>
-                                        <span className={`badge-${prod.color === "emerald" ? "brand" : "accent"} text-[10px]`}>{prod.tag}</span>
-                                    </div>
-                                    <h3 className="text-lg font-extrabold text-white mb-2">{prod.name}</h3>
-                                    <p className="text-sm text-slate-500 mb-5 line-clamp-2">{prod.desc}</p>
-                                    <div className="flex items-center justify-between">
-                                        <div>
-                                            <span className="text-2xl font-black text-white">{prod.price}</span>
-                                            <span className="text-slate-600 text-sm ml-1">{prod.period}</span>
-                                        </div>
-                                        <Link href="/abonelikler" className="px-4 py-2 text-sm font-bold rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all">
-                                            Seç
-                                        </Link>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </motion.div>
-
                 </div>
             </div>
         </section>

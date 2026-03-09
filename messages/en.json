@@ -110,6 +110,7 @@
     "Homepage": {
         "viewStoreButton": "Explore App Store",
         "hero": {
+            "ctaProducts": "DIGITAL PRODUCTS",
             "tag": "/ DIGITAL TRANSFORMATION PARTNER",
             "title1": "BUILD THE",
             "title2": "FUTURE-READY",
@@ -232,6 +233,14 @@
             "viewProject": "VIEW PROJECT",
             "exploreMore": "ALL PROJECTS"
         },
+        "blogSection": {
+            "tag": "/ BLOG & INSIGHTS",
+            "latest": "Latest Articles",
+            "allPosts": "All Posts",
+            "sampleTitle": "Automation and Efficiency in Enterprise Software",
+            "sampleExcerpt": "How modern organizations scale operations with software platforms and automation systems.",
+            "readMore": "Read More"
+        },
         "socialServices": {
             "tag": "/ DIGITAL VISIBILITY",
             "title": "Take Your Brand <br /> To New Heights.",
@@ -248,6 +257,8 @@
             "tag": "/ START A PROJECT",
             "title": "Let's Build Your <br /> Digital Future Together.",
             "description": "Leave static structures behind with Zygsoft. Start your data-driven, aesthetics-focused digital infrastructure today.",
+            "cta": "GET A QUOTE",
+            "ctaSecondary": "EXPLORE PORTFOLIO",
             "button": "GET A QUOTE",
             "directLine": "Direct Line",
             "features": {
@@ -264,6 +275,10 @@
                     "desc": "Your data is safe with us."
                 }
             }
+        },
+        "contactStrip": {
+            "title": "Tell Us About Your Software Goals",
+            "subtitle": "Share your needs and we will return with a clear roadmap, scope, and proposal."
         }
     },
     "Services": {
@@ -415,7 +430,7 @@
         "infoTitle": "Contact Information",
         "infoDesc": "We are with you with the right strategy and technology to grow your business in the modern world. Our team is ready to answer your questions.",
         "officeTitle": "Headquarters",
-        "officeDesc": "Istanbul, Turkey",
+        "officeDesc": "Antalya, Turkey",
         "emailTitle": "Email Support",
         "emailDesc": "info@zygsoft.com",
         "phoneTitle": "Phone",
@@ -427,11 +442,21 @@
         "formEmailPlaceholder": "john@example.com",
         "formSubject": "Subject",
         "formSubjectPlaceholder": "Project Development",
+        "formPhone": "Phone",
+        "formPhonePlaceholder": "+90 5XX XXX XX XX",
+        "formCompany": "Company",
+        "formCompanyPlaceholder": "Company name",
+        "formTopic": "Service / Topic",
+        "formTopicPlaceholder": "Select topic",
         "formMessage": "Your Message",
         "formMessagePlaceholder": "Tell us about your project...",
         "formSend": "Send Message",
         "formSending": "Sending...",
         "formSuccess": "Sent! ✓",
+        "formSuccessDetail": "Your message has been submitted successfully. Our team will contact you shortly.",
+        "formErrorRequired": "Please fill in all required fields.",
+        "formErrorNetwork": "Message could not be sent. Please try again.",
+        "formPrivacyNote": "Submitted information is used only to respond to your inquiry and is not shared with third parties.",
         "faqTitle": "Frequently Asked Questions",
         "faqDesc": "Details you might be wondering about our services and processes.",
         "faqQ1": "How long does it take to complete a web project?",
@@ -460,14 +485,17 @@
     "AppStore": {
         "storeBadge": "SaaS Products & Tools",
         "storeTitle": "Premium Tools to Grow Your Business",
-        "storeDesc": "In addition to our agency services, explore our ready-to-use software solutions that will streamline your business's daily operations. Start your subscription and get up and running in seconds.",
+        "storeDesc": "Explore our SaaS products and software tools designed to accelerate your operational workflows. Start your subscription and get access in seconds.",
         "storeFeature1Title": "Ready-to-Use Tools",
         "storeFeature1Desc": "Tested and approved premium software solutions that will accelerate your projects.",
         "storeFeature2Title": "Instant Delivery",
         "storeFeature2Desc": "Start seeing your tool active in your panel seconds after purchase.",
         "storeFeature3Title": "Secure and Transparent",
         "storeFeature3Desc": "Open-source trust-building systems. Your data is instantly destroyed after processing.",
-        "viewStoreButton": "Explore App Store",
+        "viewStoreButton": "View Products",
+        "udfFlagshipBadge": "Flagship",
+        "useTool": "Use Tool",
+        "featuresLabel": "Features",
         "badge": "Applications",
         "title1": "Get the Right App,",
         "title2": "Grow Your Business.",
@@ -485,6 +513,8 @@
         "step4": "Our administrator will approve your receipt in seconds and make your panel <strong>Active</strong> immediately.",
         "createAccount": "Create Your Free Account",
         "services": {
+            "udfToolkitShortName": "Legal UDF Converter",
+            "udfToolkitShortDesc": "Convert your DOCX files to UYAP-compatible UDF format in seconds.",
             "udfToolkitName": "Zygsoft Comprehensive Legal Package",
             "udfToolkitDesc": "Professional e-signature/UDF document management, research, and AI tools for lawyers and law firms.",
             "udfToolkitPeriod": "/mo",
@@ -494,6 +524,10 @@
             "udfToolkitF4": "E-Signature & Mobile Signature Integration",
             "udfToolkitF5": "Smart Petition Templates",
             "udfToolkitF6": "TIFF/JPG and DOCX to UDF Conversion",
+            "udfProductWhat": "Convert your Word (DOCX) files to UYAP-compatible UDF format in seconds. Upload, convert, download—one click.",
+            "udfProductWho": "For lawyers, law firms, court clerks, and all professionals preparing legal documents.",
+            "udfProductFormats": "DOCX → UDF (supported)",
+            "udfProductSecurity": "Your documents are instantly deleted after processing. KVKK compliant, privacy-first infrastructure.",
             "webDevName": "Corporate Web Site",
             "webDevDesc": "Premium corporate identity and web site designed and coded from scratch.",
             "webDevPrice": "Custom",
