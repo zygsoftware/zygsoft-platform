@@ -1,0 +1,532 @@
+{
+    "Dashboard": {
+        "sidebar": {
+            "overview": "Genel Bakış",
+            "products": "Ürünlerim",
+            "services": "Hizmetlerim",
+            "support": "Destek Talepleri",
+            "billing": "Ödemeler",
+            "account": "Hesap Ayarları",
+            "logout": "Çıkış Yap",
+            "backToSite": "Siteye Geri Dön"
+        },
+        "breadcrumb": {
+            "home": "Başlangıç",
+            "dashboard": "Panel",
+            "products": "Ürünler",
+            "services": "Hizmetler",
+            "support": "Destek",
+            "billing": "Ödemeler",
+            "account": "Profil",
+            "tools": "Araçlar"
+        },
+        "overview": {
+            "welcome": "Merhaba",
+            "subtitle": "Hesabınızdaki son durum ve hızlı işlemler.",
+            "stats": {
+                "activeProducts": "Aktif Ürünler",
+                "activeServices": "Aktif Hizmetler",
+                "supportTickets": "Destek Talepleri"
+            },
+            "sections": {
+                "apps": "Aktif Yazılımlarım",
+                "support": "Son Destek Taleplerim",
+                "viewAll": "Tümünü Gör",
+                "start": "BAŞLAT",
+                "noApps": "Henüz aktif bir yazılımınız bulunmuyor.",
+                "browseStore": "Mağazaya Göz At",
+                "noTickets": "Aktif veya bekleyen bir talebiniz yok.",
+                "newTicket": "Yeni Talep Oluştur"
+            },
+            "cta": {
+                "title": "İşinizi Zygsoft ile Büyütün",
+                "desc": "Özel yazılım çözümleri, mobil uygulama geliştirme ve kurumsal SEO hizmetlerimizle dijital dünyada fark yaratın.",
+                "button": "HİZMETLERİ İNCELE"
+            }
+        },
+        "billing": {
+            "title": "Ödeme Bildirimi & Fatura",
+            "subtitle": "Havale veya EFT işlemlerinizi buradan bildirip aboneliğinizi aktive edebilirsiniz.",
+            "bankInfo": "Banka Bilgileri",
+            "bankName": "Banka Adı",
+            "receiverName": "Alıcı Adı",
+            "iban": "IBAN",
+            "note": "Açıklama kısmına hesap e-posta adresinizi yazmanız sürecin hızlanmasını sağlar.",
+            "formTitle": "Yeni Bildirim Oluştur",
+            "selectProduct": "Ödeme Yapılan Ürün / Hizmet",
+            "placeholder": "Lütfen bir hizmet seçin",
+            "amount": "Yatırılan Tutar (TL)",
+            "date": "Tarih",
+            "receipt": "Dekont Görüntüsü",
+            "upload": "Görüntü Yüklemek İçin Tıklayın",
+            "formats": "JPG, PNG, GIF veya PDF",
+            "submit": "Bildirimi Gönder",
+            "sending": "Gönderiliyor...",
+            "successTitle": "Bildirim Alındı!",
+            "successDesc": "Ödeme bildiriminiz ekibimize ulaştı. Dekont incelendikten sonra hesabınız otomatik olarak aktifleşecektir.",
+            "newNotice": "Yeni Bildirim Gönder",
+            "errorRequired": "Lütfen bir ürün seçin ve dekont görüntüsü yükleyin.",
+            "products": {
+                "udf_toolkit": "Hukuk UDF Dönüştürücü (₺499/ay)",
+                "web_dev": "Kurumsal Web Projesi",
+                "social_media": "Sosyal Medya Yönetimi (₺15.000/ay)",
+                "other": "Diğer / Özel Anlaşma"
+            }
+        },
+        "account": {
+            "title": "Hesabım",
+            "subtitle": "Üyelik bilgilerinizi ve abonelik durumunuzu buradan yönetebilirsiniz.",
+            "goToPanel": "Araç Paneline Git",
+            "profileDetails": "Profil Detayları",
+            "email": "E-posta Adresi",
+            "accountType": "Hesap Türü",
+            "admin": "Yönetici (Admin)",
+            "customer": "Standart Müşteri",
+            "subsTitle": "Aboneliklerim ve Uygulamalar",
+            "subsSubtitle": "Zygsoft Hizmet Mağazası erişim paketleriniz.",
+            "buyNew": "Yeni Uygulama Al",
+            "statusActive": "Aktif",
+            "statusPending": "Onay Bekleniyor",
+            "statusInactive": "Pasif",
+            "noSubs": "Henüz aktif bir aboneliğiniz veya uygulamanız bulunmuyor.",
+            "noSubsDesc": "Zygsoft Mağazasını ziyaret ederek yazılımlarımıza göz atabilirsiniz.",
+            "notifyPayment": "Havale/EFT Ödemesi Bildir",
+            "security": "Hesap Güvenliği",
+            "securityDesc": "Şifrenizi değiştirmek veya hesabınızı güvene almak için destek ekibimizle iletişime geçebilirsiniz.",
+            "contactSupport": "Destekle İletişime Geç"
+        }
+    },
+    "Navigation": {
+        "home": "Anasayfa",
+        "about": "Hakkımızda",
+        "services": "Hizmetler",
+        "portfolio": "Projeler",
+        "blog": "Blog",
+        "contact": "İletişim",
+        "getQuote": "Teklif Alın",
+        "login": "Giriş Yap",
+        "register": "Kayıt Ol"
+    },
+    "Homepage": {
+        "viewStoreButton": "App Store'u İncele",
+        "hero": {
+            "tag": "/ DİJİTAL DÖNÜŞÜM ORTAĞI",
+            "title1": "GELECEĞE HAZIR",
+            "title2": "DİJİTAL SİSTEMLER",
+            "title3": "İNŞA EDİYORUZ.",
+            "description": "Zygsoft, işletmeleri teknolojiyle büyüten, süreçlerini otomatize eden ve ölçeklenebilir dijital altyapılar tasarlayan Antalya merkezli bir teknoloji şirketidir. Profesyonel çözüm ortağınızla tanışın.",
+            "cta": "DÖNÜŞÜMÜ BAŞLAT",
+            "ctaSecondary": "HİZMETLERİMİZ",
+            "scroll": "KEŞFET"
+        },
+        "partnerSection": {
+            "tag": "/ GÜVENİLİR ORTAK",
+            "title": "Stratejiyle Başlayan, <br /> Teknolojiyle Büyüyen İşler.",
+            "description": "Sadece bir yazılım evi değiliz; işinizin dijital geleceğini tasarlayan bir çözüm ortağıyız.",
+            "pillars": [
+                {
+                    "t": "Strateji",
+                    "d": "İş hedeflerinize uygun teknolojik yol haritası."
+                },
+                {
+                    "t": "Tasarım",
+                    "d": "Kullanıcı deneyimini odağa alan premium estetik."
+                },
+                {
+                    "t": "Teknoloji",
+                    "d": "Modern, hızlı ve ölçeklenebilir yazılım altyapısı."
+                },
+                {
+                    "t": "İcraat",
+                    "d": "Mükemmel sonuç odaklı disiplinli geliştirme süreci."
+                }
+            ]
+        },
+        "servicesSection": {
+            "tag": "/ HİZMETLERİMİZ",
+            "title": "Dijital <br /> Yetkinliklerimiz.",
+            "description": "Karmaşık iş problemlerini basit ve etkili dijital çözümlere dönüştürüyoruz.",
+            "viewAll": "TÜMÜNÜ İNCELE",
+            "items": {
+                "web": {
+                    "t": "Web Tasarım & Geliştirme",
+                    "d": "Yüksek performanslı, SEO odaklı ve modern web deneyimleri."
+                },
+                "trans": {
+                    "t": "Dijital Dönüşüm",
+                    "d": "Geleneksel süreçleri dijitalin gücüyle optimize ediyoruz."
+                },
+                "auto": {
+                    "t": "Otomasyon Sistemleri",
+                    "d": "Hata payını azaltan, zaman kazandıran akıllı iş akışları."
+                },
+                "soft": {
+                    "t": "Özel Yazılım",
+                    "d": "İhtiyaçlarınıza özel, ölçeklenebilir kurumsal çözümler."
+                }
+            }
+        },
+        "processSection": {
+            "tag": "/ SÜRECİMİZ",
+            "title": "Sistematik <br/> Başarıya Giden Yol.",
+            "description": "Fikirlerinizi gerçeğe dönüştürmek için disiplinli ve şeffaf bir iş akışı sunuyoruz.",
+            "steps": [
+                {
+                    "n": "01",
+                    "t": "Keşif & Analiz",
+                    "d": "İhtiyaçlarınızı ve hedeflerinizi derinlemesine analiz ediyoruz."
+                },
+                {
+                    "n": "02",
+                    "t": "Stratejik Planlama",
+                    "d": "En doğru teknoloji ve tasarım yaklaşımını belirliyoruz."
+                },
+                {
+                    "n": "03",
+                    "t": "UI/UX Tasarım",
+                    "d": "Kullanımı kolay ve görsel olarak çarpıcı arayüzler tasarlıyoruz."
+                },
+                {
+                    "n": "04",
+                    "t": "Geliştirme",
+                    "d": "En güncel teknolojilerle projenizi hayata geçiriyoruz."
+                },
+                {
+                    "n": "05",
+                    "t": "Kalite & Yayın",
+                    "d": "Titiz testlerden sonra projenizi dünyaya sunuyoruz."
+                }
+            ]
+        },
+        "whyChooseUs": {
+            "tag": "/ NEDEN ZYGSOFT",
+            "title": "İşinizi Neden <br /> Bize Emanet Etmelisiniz?",
+            "items": [
+                {
+                    "t": "Özel Çözümler",
+                    "d": "Hazır şablonlar yerine, markanızın karakterine ve iş süreçlerine tam uyumlu butik çözümler üretiyoruz."
+                },
+                {
+                    "t": "Modern Teknoloji",
+                    "d": "Next.js, React ve Cloud altyapıları gibi en güncel dünyayla uyumlu dilleri kullanıyoruz."
+                },
+                {
+                    "t": "Ölçülebilir Sonuçlar",
+                    "d": "Sadece tasarım değil, yatırımınızın karşılığını (ROI) artıran performans odaklı sistemler kuruyoruz."
+                },
+                {
+                    "t": "Uzun Vadeli Ortaklık",
+                    "d": "Proje bittiğinde değil, işiniz büyüdüğü sürece yanınızda olan bir destek ekibi sunuyoruz."
+                }
+            ]
+        },
+        "capabilities": {
+            "tag": "/ TEKNOLOJİK GÜÇ",
+            "title1": "MODERN SİSTEMLER,",
+            "title2": "SINIRSIZ İMKANLAR.",
+            "desc": "Kullandığımız her teknoloji, projenizin hızı, güvenliği ve geleceği için özenle seçilmiştir."
+        },
+        "portfolioPreview": {
+            "tag": "/ SEÇİLİ PROJELER",
+            "title": "Başarı <br /> Hikayelerimiz.",
+            "viewProject": "PROJEYİ İNCELE",
+            "exploreMore": "TÜM PORTFOLYO"
+        },
+        "socialServices": {
+            "tag": "/ DİJİTAL GÖRÜNÜRLÜK",
+            "title": "Marka Kimliğinizi <br /> Zirveye Taşıyın.",
+            "desc": "Sosyal medya yönetimi ve dijital stratejilerimizle hedef kitlenizle her an etkileşimde kalın.",
+            "features": [
+                "Stratejik İçerik Planlama",
+                "Profesyonel Tasarım & Video",
+                "Hedef Kitle ve Data Analizi",
+                "Performans Pazarlaması"
+            ],
+            "cta": "MARKA GÜCÜNÜ ARTIR"
+        },
+        "ctaSection": {
+            "tag": "/ PROJEYE BAŞLAYIN",
+            "title": "Dijital Geleceğinizi <br /> Birlikte Kuralım.",
+            "description": "Zygsoft ile statik yapıları geride bırakın. Veriye dayalı, estetik odaklı ve dönüşüm hedefli dijital altyapınızı bugün başlatın.",
+            "button": "TEKLİF ALIN",
+            "directLine": "Doğrudan İletişim",
+            "features": {
+                "acceleration": {
+                    "title": "HIZLI TESLİMAT",
+                    "desc": "Zamanında ve kusursuz."
+                },
+                "resilience": {
+                    "title": "ÖLÇEKLENEBİLİRLİK",
+                    "desc": "Geleceğe tam uyum."
+                },
+                "precision": {
+                    "title": "GÜVENLİK",
+                    "desc": "Verileriniz bizimle güvende."
+                }
+            }
+        }
+    },
+    "Services": {
+        "title": "Hizmetlerimiz",
+        "subtitle": "İşletmeniz için özel premium dijital çözümler",
+        "cta": "Teklif Alın",
+        "readMore": "Daha Fazla Bilgi",
+        "webDev": "Web ve Uygulama Geliştirme",
+        "socialMedia": "Sosyal Medya Yönetimi",
+        "branding": "Marka Kimliği ve Grafik Tasarım",
+        "digitalStrategy": "Dijital Strateji ve Pazarlama",
+        "audienceAnalysis": "Hedef Kitle Analizi"
+    },
+    "ServiceDetails": {
+        "sosyal-medya-yonetimi": {
+            "title": "Sosyal Medya Yönetimi",
+            "subtitle": "Stratejik ve Ölçülebilir Sosyal Medya Yaklaşımı",
+            "content": "Sosyal medyada var olmak artık tek başına yeterli değildir. Asıl önemli olan; doğru hedef kitleyle, doğru platformda ve doğru mesajla etkili bir iletişim kurmaktır. ZYGSOFT, markaların sosyal medyadaki varlığını yalnızca görünür kılmakla kalmaz; etkileşim üreten, dönüşüm sağlayan ve sürdürülebilir marka değeri oluşturan sosyal medya stratejileri geliştirir. Her platformun kendi dinamiklerine uygun, veri odaklı ve performans temelli bir yaklaşım benimseriz.",
+            "features": [
+                "Hedef kitle ve persona analizi",
+                "Platform bazlı strateji (Instagram, Facebook, LinkedIn vb.)",
+                "Marka tonu ve iletişim dili",
+                "Rakip ve sektör analizi"
+            ],
+            "faq": [
+                {
+                    "q": "Sosyal medya yönetimi neden gereklidir?",
+                    "a": "Marka bilinirliğini artırmak, hedef kitleyle doğrudan bağ kurmak ve profesyonel bir dijital imaj sergilemek için hayati önem taşır."
+                },
+                {
+                    "q": "Hangi platformlarda aktif olmalıyız?",
+                    "a": "İşletmenizin türüne ve hedef kitlenizin nerede vakit geçirdiğine göre (Instagram, LinkedIn, TikTok vb.) size özel bir platform stratejisi belirliyoruz."
+                },
+                {
+                    "q": "Gönderi paylaşımları nasıl belirleniyor?",
+                    "a": "Aylık içerik takvimi hazırlıyoruz ve onayınızın ardından, markanıza özel tasarımlarla paylaşım planlıyoruz."
+                }
+            ]
+        },
+        "web-ve-uygulama-gelistirme": {
+            "title": "Web ve Uygulama Geliştirme",
+            "subtitle": "İşletmeniz İçin Hızlı, Güvenli ve Ölçeklenebilir Dijital Çözümler",
+            "content": "Firmanızın dijital dünyadaki yüzü olan web siteniz veya mobil uygulamanız, günümüz rekabet koşullarında mükemmel bir kullanıcı deneyimi sunmalıdır. ZYGSOFT olarak Antalya merkezli ekibimizle markanızın ihtiyaçlarına en uygun, global standartlarda web ve mobil uygulamalar geliştiriyoruz. En güncel teknolojileri kullanarak yüksek performanslı, SEO uyumlu ve ölçeklenebilir altyapılar inşa ediyoruz.",
+            "features": [
+                "Kullanıcı Odaklı (UI/UX) Modern Tasarım",
+                "Responsive (Mobil Uyumlu) Altyapı",
+                "Özel Yazılım Çözümleri ve API Entegrasyonları",
+                "Yüksek Performans ve Global SEO Optimizasyonu"
+            ],
+            "faq": [
+                {
+                    "q": "Süreç ne kadar sürüyor?",
+                    "a": "Kurumsal siteler genellikle 2-4 hafta, kapsamlı web uygulamaları ise 4-12 hafta arasında tamamlanmaktadır."
+                },
+                {
+                    "q": "Mobil uyumluluk sağlıyor musunuz?",
+                    "a": "Evet, tüm web projelerimiz 'Mobile-First' prensibiyle, tüm cihazlarda kusursuz çalışacak şekilde geliştirilmektedir."
+                },
+                {
+                    "q": "Hosting ve domain desteği veriyor musunuz?",
+                    "a": "Evet, projenizin yayına alınması için gerekli sunucu ve domain altyapısını anahtar teslim olarak sağlıyoruz."
+                }
+            ]
+        },
+        "marka-kimligi-ve-grafik-tasarim": {
+            "title": "Marka Kimliği ve Grafik Tasarım",
+            "subtitle": "Unutulmaz Bir Marka Hikayesi ve Görsel Kimlik Tasarımı",
+            "content": "Güçlü bir marka kimliği, hedef kitlenizin zihninde kalıcı bir iz bırakmanın ilk adımıdır. Sizi rakiplerinizden ayıracak, markanızın hikayesini yansıtacak kurumsal kimlik ve özgün grafik tasarım çalışmaları gerçekleştiriyoruz. Logonuzdan renk paletinize kadar tüm detaylar incelikle tasarlanıyor.",
+            "features": [
+                "Özgün Logo ve Kurumsal Kimlik Tasarımı",
+                "Marka Görsel Yönergeleri (Brand Guidelines)",
+                "Dijital Medya ve Basılı Materyal Tasarımları",
+                "Modern Ambalaj ve Katalog Tasarımı"
+            ],
+            "faq": [
+                {
+                    "q": "Logo tasarımı kaç revizyon içeriyor?",
+                    "a": "Mükemmel sonuç için genellikle 3 farklı konsept ve seçilen üzerinden sınırsız küçük düzeltme hakkı sunuyoruz."
+                },
+                {
+                    "q": "Kurumsal kimlik için hangi dosyaları teslim ediyorsunuz?",
+                    "a": "Baskıya hazır PDF, vektörel (AI, EPS) ve dijital kullanım için PNG/JPG formatlarında teslimat sağlıyoruz."
+                },
+                {
+                    "q": "Sadece logo tasarımı yapıyor musunuz?",
+                    "a": "Evet, ancak bütünsel bir marka algısı için tam kurumsal kimlik paketimizi öneriyoruz."
+                }
+            ]
+        },
+        "dijital-strateji-ve-pazarlama": {
+            "title": "Dijital Strateji ve Pazarlama",
+            "subtitle": "Veri Odaklı Dijital Büyüme ve Performans Pazarlaması",
+            "content": "Sadece tasarım veya yazılım tek başına yeterli değildir; büyüme için doğru bir strateji şarttır. ZYGSOFT olarak markanızın dijital dünyada nerede olması gerektiğini ve hedef kitleye en düşük maliyetle nasıl ulaşılacağını analiz ediyoruz. Google Ads, Meta Ads ve SEO (Arama Motoru Optimizasyonu) ile işletmenize gerçek dönüşümler kazandırıyoruz.",
+            "features": [
+                "Kapsamlı SEO (Arama Motoru Optimizasyonu) Çalışmaları",
+                "Google Ads, Meta (Facebook/Instagram) ve TikTok Reklamları",
+                "Dönüşüm Oranı Optimizasyonu (CRO)",
+                "Kapsamlı Veri Analizi ve Düzenli Raporlama"
+            ]
+        },
+        "hedef-kitle-analizi": {
+            "title": "Hedef Kitle Analizi",
+            "subtitle": "Müşterilerinizi Yakından Tanıyın ve Satışlarınızı Artırın",
+            "content": "Kiminle iletişim kurduğunuzu bilmeden doğru mesajı iletemezsiniz. Sektörünüze özel, detaylı hedef kitle ve persona analizleri yaparak dijital pazarlama bütçenizin boşa gitmesini engelliyoruz. Markanızın mesajını, ürünlerinize en çok ihtiyaç duyan potansiyel müşterilere ulaştıracak stratejileri veri analiziyle ortaya çıkartıyoruz.",
+            "features": [
+                "Detaylı Demografik ve Psikografik Analiz",
+                "Müşteri Satın Alma Yolculuğu (Customer Journey) Haritalaması",
+                "Pazar Trendleri ve Potansiyel Araştırması",
+                "Veri Odaklı İletişim Stratejisi Belirleme"
+            ]
+        }
+    },
+    "About": {
+        "title": "Hakkımızda",
+        "intro": "Zygsoft olarak sadece web siteleri geliştirmiyoruz — markaların dijital dünyada ilham veren, etkileşim yaratan ve dönüşüm sağlayan güçlü dijital deneyimler tasarlıyoruz.",
+        "mission": "Misyonumuz",
+        "missionDesc": "Markaların dijitalde fark yaratmasını sağlamak için çalışıyoruz. Hikâyelerini etkili biçimde anlatmalarına, çevrimiçi görünürlüklerini artırmalarına ve ölçülebilir sonuçlar elde etmelerine yardımcı oluyoruz. Bunu, yaratıcı dijital stratejiler, akıllı tasarım ve yenilikçi yazılım çözümleri ile başarıyoruz.",
+        "vision": "Vizyonumuz",
+        "visionDesc": "Zygsoft olarak vizyonumuz; tasarımı, teknolojiyi ve hikâye anlatımını birleştirerek her dijital etkileşimi anlamlı hale getirmektir. Amacımız; markaları yalnızca görünür kılmak değil, onları dijital dünyada fark yaratan markalara dönüştürmektir.",
+        "ctaBox": "Birlikte olağanüstü işler inşa edelim.",
+        "team": "Ekibimiz",
+        "teamSubtitle": "Yaratıcı zihinlerle markanıza etkileyici dijital deneyimler tasarlıyoruz.",
+        "founder": "Kıdemli Geliştirici & Kurucu",
+        "bioP1": "Ben Gürkan Yavuz. Kodla düşünmeyi, fikirleri dijital çözümlere dönüştürmeyi seviyorum. Akdeniz Üniversitesi Bilgisayar Programcılığı mezunuyum; teknik altyapımı yaratıcılıkla birleştirerek markalara güçlü, modern ve kullanıcı odaklı dijital deneyimler tasarlıyorum.",
+        "bioP2": "React, Next.js, Laravel ve modern web teknolojileriyle çalışan sistemler geliştiriyor; her projede tasarım, performans ve kullanıcı deneyimi arasında mükemmel bir denge kurmaya odaklanıyorum. Benim için her satır kod, markanın dijital dünyadaki hikâyesini biraz daha netleştiren bir detay.",
+        "bioP3": "Yazılımın ötesinde, tasarımın marka üzerindeki etkisine de inanıyorum. Her projenin yalnızca işlevsel değil, aynı zamanda görsel olarak da tutarlı ve ilham verici olmasını hedefliyorum. Kullanıcı deneyimini şekillendiren renk, tipografi ve kompozisyon gibi unsurları yazılım süreçleriyle entegre ederek, tasarımı işlevselliğin doğal bir uzantısı haline getiriyorum.",
+        "quote": "Teknolojiyi sadece bir araç değil, markaların geleceğini şekillendiren bir dil olarak görüyorum."
+    },
+    "Blog": {
+        "title": "Blog & İçgörüler",
+        "subtitle": "Türkiye'den ve Dünyadan yazılım, tasarım ve dijital pazarlama dünyasına dair güncel içerikler.",
+        "readMore": "Devamını Oku",
+        "backToBlog": "Blog'a Dön",
+        "noPostsYet": "Henüz blog yazısı yok. Yakında içerikler eklenecek!",
+        "emptyDesc": "Çok yakında dijital dünyaya dair yepyeni içeriklerle karşınızda olacağız.",
+        "by": "Yazar",
+        "blogTag": "Blog & İçerikler",
+        "blogTitle": "Son Yazılarımız",
+        "blogDesc": "Yazılım, tasarım ve dijital dünyaya dair zengin içerikler.",
+        "blogButton": "Tüm Yazıları Gör",
+        "readNow": "Hemen Oku",
+        "new": "Yeni"
+    },
+    "Contact": {
+        "title": "Bizimle İletişime Geçin",
+        "subtitle": "Projeniz için ücretsiz danışmanlık veya teklif almak için mesaj gönderin. En kısa sürede dönüş yapacağız.",
+        "infoTitle": "İletişim Bilgileri",
+        "infoDesc": "Modern dünyada işinizi büyütmek için doğru strateji ve teknolojiyle yanınızdayız. Ekibimiz sorularınızı yanıtlamak için hazır.",
+        "officeTitle": "Merkez Ofis",
+        "officeDesc": "İstanbul, Türkiye",
+        "emailTitle": "E-posta Destek",
+        "emailDesc": "info@zygsoft.com",
+        "phoneTitle": "Telefon",
+        "phoneDesc": "+90 (555) 123 45 67",
+        "formTitle": "Mesaj Gönderin",
+        "formName": "Ad Soyad",
+        "formNamePlaceholder": "Ahmet Yılmaz",
+        "formEmail": "E-posta",
+        "formEmailPlaceholder": "ahmet@example.com",
+        "formSubject": "Konu",
+        "formSubjectPlaceholder": "Proje Geliştirme",
+        "formMessage": "Mesajınız",
+        "formMessagePlaceholder": "Projenizden bahsedin...",
+        "formSend": "Mesaj Gönder",
+        "formSending": "Gönderiliyor...",
+        "formSuccess": "Gönderildi! ✓",
+        "faqTitle": "Sıkça Sorulan Sorular",
+        "faqDesc": "Hizmetlerimiz ve süreçlerimiz hakkında merak ettiğiniz detaylar.",
+        "faqQ1": "Bir web projesinin tamamlanması ne kadar sürer?",
+        "faqA1": "Projenin kapsamına ve ihtiyaçlarınıza göre değişmekle birlikte, standart bir kurumsal web sitesi 2-4 hafta, özel yazılım çözümleri ise 4-12 hafta arasında tamamlanmaktadır.",
+        "faqQ2": "Zygsoft Kapsamlı Hukuk Paketi neleri kapsar?",
+        "faqA2": "Bu paket; taranmış dava dosyalarından anında metin (OCR) çıkarma, kişisel verileri (TC, isim) otomatik KVKK prosedürüne uygun sansürleme, yapay zeka ile dava özeti oluşturma ve tarayıcı üzerinden E-İmza atabilme özelliklerini içerir.",
+        "faqQ3": "Uygulamalar (SaaS) için ödeme süreci nasıl işliyor?",
+        "faqA3": "Ücretsiz hesabınızı oluşturduktan sonra seçtiğiniz paketin tutarını havale/EFT ile gönderip sistemden dekont yüklersiniz. Ekibimiz anında onaylar ve paneliniz saniyeler içinde aktifleşir."
+    },
+    "Portfolio": {
+        "title": "Projelerimiz",
+        "subtitle": "Farklı sektörlerdeki müşterilerimiz için geliştirdiğimiz özgün dijital çözümler.",
+        "loading": "Projeler yükleniyor...",
+        "emptyTitle": "Henüz proje eklenmemiş.",
+        "emptyDesc": "Yönetici panelinden yeni projeler ekleyebilirsiniz.",
+        "client": "Müşteri:",
+        "viewProject": "Projeyi İncele"
+    },
+    "BlogPage": {
+        "badge": "Dijital Dünyadan",
+        "title": "Blog & İçgörüler",
+        "subtitle": "Yazılım, tasarım ve dijital pazarlama dünyasından güncel içerikler ve profesyonel bakış açıları.",
+        "empty": "Henüz blog yazısı yok. Yakında içerikler eklenecek!",
+        "readMore": "Devamını Oku"
+    },
+    "AppStore": {
+        "storeBadge": "SaaS Ürünleri & Araçlar",
+        "storeTitle": "İşinizi Büyütecek Premium Araçlar",
+        "storeDesc": "Ajans hizmetlerimizin yanı sıra, işletmenizin günlük operasyonlarını kolaylaştıracak hazır yazılım çözümlerimizi de inceleyin. Aboneliğinizi başlatın ve saniyeler içinde kullanıma geçin.",
+        "storeFeature1Title": "Kullanıma Hazır Araçlar",
+        "storeFeature1Desc": "Projelerinizi hızlandıracak, test edilmiş ve onaylanmış premium yazılım çözümleri.",
+        "storeFeature2Title": "Anında Teslimat",
+        "storeFeature2Desc": "Satın aldıktan saniyeler sonra aracınızı panelinizde aktif olarak görmeye başlayın.",
+        "storeFeature3Title": "Güvenli ve Şeffaf",
+        "storeFeature3Desc": "Açık kaynaklı güven inşa eden sistemler. Verileriniz sunucuda işlendikten sonra anında imha edilir.",
+        "viewStoreButton": "Uygulamaları İncele",
+        "badge": "Uygulamalar",
+        "title1": "Doğru Uygulamayı Edin,",
+        "title2": "İşinizi Büyütün.",
+        "desc": "İster avukatlık büronuz için saniyeler süren UDF çevirici yazılımımızı, ister markanız için kurumsal web tasarım paketini seçin. Satın aldıktan hemen sonra araçlarınızı anında kullanmaya başlayın.",
+        "popular": "En Çok Tercih Edilen",
+        "activeSub": "Abonelik Aktif (Panele Git)",
+        "endDate": "Bitiş Tarihi:",
+        "buyNow": "Satın Al ve Ödeme Bildir",
+        "getInfo": "Bilgi Al",
+        "registerNow": "Hemen Kayıt Ol",
+        "howItWorksTitle": "Nasıl Çalışır? (Havale / EFT)",
+        "step1": "Yukarıdan sistem üzerinden kayıt olun.",
+        "step2": "Bankalarımızdan herhangi birine Havale veya EFT ile seçtiğiniz servisin tutarını yollayın.",
+        "step3": "Kullanıcı (Dashboard) panelinize girip, dekontunuzu yükleyerek <strong>Ödeme Bildirimi</strong> yapın.",
+        "step4": "Yöneticimiz saniyeler içinde dekontunuzu onaylayarak ilgili panelinizi derhal <strong>Aktif</strong> hale getirir.",
+        "createAccount": "Ücretsiz Hesabını Oluştur",
+        "services": {
+            "udfToolkitName": "Zygsoft Kapsamlı Hukuk Paketi",
+            "udfToolkitDesc": "Avukatlar ve hukuk büroları için profesyonel e-imza/UDF doküman yönetim araştırma ve yapay zeka araçları.",
+            "udfToolkitPeriod": "/ay",
+            "udfToolkitF1": "OCR Taraması (Görselden Metne)",
+            "udfToolkitF2": "Otomatik KVKK Sansürleme (Yapay Zeka)",
+            "udfToolkitF3": "Yapay Zeka ile Dava Özeti Çıkarma",
+            "udfToolkitF4": "E-İmza & Mobil İmza Entegrasyonu",
+            "udfToolkitF5": "Akıllı Dilekçe Şablonları",
+            "udfToolkitF6": "TIFF/JPG ve DOCX to UDF Çevirisi",
+            "webDevName": "Kurumsal Web Sitesi",
+            "webDevDesc": "Sıfırdan tasarlanmış ve kodlanmış premium kurumsal kimlik ve web sitesi.",
+            "webDevPrice": "Özel",
+            "webDevPeriod": " Fiyat",
+            "webDevF1": "Next.js ve React mimarisi",
+            "webDevF2": "Özgün modern tasarım",
+            "webDevF3": "Antalya ve TR geneli SEO kurgusu",
+            "webDevF4": "Admin panel entegrasyonu",
+            "webDevF5": "Performans optimizasyonu",
+            "socialMediaName": "Sosyal Medya Yönetimi",
+            "socialMediaDesc": "Markanızı dijital dünyada parlatan aylık profesyonel içerik yönetimi.",
+            "socialMediaPeriod": "/aylık",
+            "socialMediaF1": "Aylık 15 özel tasarım gönderi",
+            "socialMediaF2": "Reels ve kısa video prodüksiyonu",
+            "socialMediaF3": "Stratejik hedef kitle analizi",
+            "socialMediaF4": "Meta Ads reklam yönetimi",
+            "socialMediaF5": "Aylık gelişim raporlaması"
+        }
+    },
+    "Footer": {
+        "tagline": "Markalar için güçlü dijital deneyimler, Antalya'da tasarlanıp dünyaya sunuluyor.",
+        "description": "Teknoloji ve estetiğin kesiştiği noktada, geleceği bugünden tasarlıyoruz. Antalya'dan dünyaya vizyoner dijital mimari.",
+        "quickLinks": "Hızlı Bağlantılar",
+        "ourServices": "Hizmetlerimiz",
+        "contactInfo": "İletişim",
+        "addressLabel": "Adres",
+        "emailLabel": "E-posta",
+        "workingHoursLabel": "Çalışma Saatleri",
+        "workingHours": "Pzt - Cum, 09:00 - 18:00",
+        "allRightsReserved": "Tüm hakları saklıdır.",
+        "privacyPolicy": "Gizlilik Politikası",
+        "termsOfService": "Kullanım Koşulları",
+        "company": "Şirket",
+        "services": "Hizmetler",
+        "social": "Sosyal",
+        "copyright": "Geleceği birlikte inşa ediyoruz."
+    }
+}

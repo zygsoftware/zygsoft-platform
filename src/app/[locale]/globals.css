@@ -1,0 +1,505 @@
+/* ─── Google Fonts ─────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
+@import "tailwindcss";
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+
+/*
+  ZYGSOFT Design System v3
+  Theme: Digitaal-inspired — Light/Cream, Dark Typography, Yellow Accent
+  Style: Clean agency aesthetic — minimal, bold, typographic
+*/
+
+/* ─── Design Tokens ────────────────────────── */
+@theme {
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+
+  /* Brand Colors */
+  --color-brand-400: #f5d002;
+  --color-brand-500: #e6c800;
+  --color-brand-600: #c9ad00;
+
+  /* Neutral */
+  --color-ink-950: #0e0e0e;
+  --color-ink-900: #1a1a1a;
+  --color-ink-700: #333333;
+  --color-ink-500: #666666;
+  --color-ink-300: #aaaaaa;
+  --color-ink-100: #eeeeee;
+  --color-cream-50: #f9f7f3;
+  --color-cream-100: #f3f0ea;
+  --color-cream-200: #e8e3d9;
+}
+
+/* ─── CSS Variables ────────────────────────── */
+:root {
+  --bg: #f9f7f3;
+  --bg-2: #f3f0ea;
+  --surface: #ffffff;
+  --surface-dark: #0e0e0e;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.15);
+  --text: #0e0e0e;
+  --text-muted: #555555;
+  --text-subtle: #888888;
+  --brand: #e6c800;
+  --brand-hover: #d4b800;
+  --radius-card: 0px;
+  --radius-btn: 0px;
+}
+
+.text-stroke-black {
+  -webkit-text-stroke: 1px rgba(14, 14, 14, 0.2);
+  color: transparent;
+}
+
+/* ─── Base ─────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  color: var(--text);
+  background: var(--bg);
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* ─── Typography ───────────────────────────── */
+.font-display {
+  font-family: 'Syne', sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #0e0e0e 0%, #555 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-highlight {
+  position: relative;
+  display: inline-block;
+}
+
+.text-highlight::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: var(--brand);
+  z-index: -1;
+  opacity: 0.7;
+}
+
+/* ─── Layout Utilities ─────────────────────── */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.section-label::before {
+  content: '';
+  width: 24px;
+  height: 2px;
+  background: var(--brand);
+  flex-shrink: 0;
+}
+
+.section-number {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-subtle);
+  letter-spacing: 0.1em;
+}
+
+/* ─── Buttons ──────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 32px;
+  background: var(--text);
+  color: var(--bg);
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: all 0.5s ease;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary:hover {
+  background: var(--brand);
+  color: var(--text);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(230, 200, 0, 0.2);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 31px;
+  background: transparent;
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-secondary:hover {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-yellow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 32px;
+  background: var(--brand);
+  color: var(--text);
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  border: none;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(230, 200, 0, 0.2);
+}
+
+.btn-yellow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: all 0.5s ease;
+}
+
+.btn-yellow:hover::before {
+  left: 100%;
+}
+
+.btn-yellow:hover {
+  background: var(--brand-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(230, 200, 0, 0.4);
+}
+
+/* ─── Cards ────────────────────────────────── */
+.service-card {
+  padding: 40px 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.service-card:hover {
+  border-color: var(--text);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+
+.service-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: var(--brand);
+  transition: width 0.4s ease;
+}
+
+.service-card:hover::after {
+  width: 100%;
+}
+
+/* ─── Dividers ─────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  width: 100%;
+}
+
+/* ─── Navigation ───────────────────────────── */
+.nav-link {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+  letter-spacing: 0.01em;
+}
+
+.nav-link:hover {
+  color: var(--text);
+}
+
+/* ─── Marquee ──────────────────────────────── */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+.animate-marquee-slow {
+  animation: marquee 60s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+.animate-marquee-reverse {
+  animation: marquee-reverse 40s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+/* ─── Scroll Animation ─────────────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.7s ease forwards;
+}
+
+/* ─── Counter Numbers ──────────────────────── */
+.counter-num {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(48px, 6vw, 80px);
+  line-height: 1;
+  color: var(--text);
+}
+
+/* ─── Dark Section ─────────────────────────── */
+.section-dark {
+  background: var(--surface-dark);
+  color: #f9f7f3;
+}
+
+.section-dark h1,
+.section-dark h2,
+.section-dark h3,
+.section-dark h4 {
+  color: #f9f7f3;
+}
+
+/* ─── Yellow Tag ───────────────────────────── */
+.tag-yellow {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--brand);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 2px;
+}
+
+/* ─── Number Badge ─────────────────────────── */
+.num-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* ─── Star Rating ──────────────────────────── */
+.star-rating {
+  display: flex;
+  gap: 2px;
+  color: var(--brand);
+  font-size: 16px;
+}
+
+/* ─── Image Hover Scale ────────────────────── */
+.img-hover {
+  overflow: hidden;
+}
+
+.img-hover img {
+  transition: transform 0.5s ease;
+}
+
+.img-hover:hover img {
+  transform: scale(1.05);
+}
+
+/* ─── Glassmorphism Utilities ────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+}
+
+.glass-dark {
+  background: rgba(14, 14, 14, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* ─── Advanced Animations ────────────────────── */
+.hover-glow {
+  transition: all 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(230, 200, 0, 0.3);
+  border-color: rgba(230, 200, 0, 0.5);
+}
+
+/* ─── Selection ────────────────────────────── */
+::selection {
+  background: var(--brand);
+  color: var(--text);
+}
+
+/* ─── Scrollbar ────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}

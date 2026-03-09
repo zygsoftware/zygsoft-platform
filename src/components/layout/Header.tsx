@@ -1,0 +1,191 @@
+"use client";
+
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { Menu, X, ChevronDown, LogOut, ArrowUpRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useSession, signOut } from "next-auth/react";
+import { Magnetic } from "@/components/ui/Magnetic";
+
+export function Header() {
+    const { data: session } = useSession();
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isServicesOpen, setIsServicesOpen] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => setIsScrolled(window.scrollY > 40);
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    const nav = useTranslations("Navigation");
+    const s = useTranslations("Services");
+    const a = useTranslations("AppStore");
+
+    const servicesLinks = [
+        { name: s("socialMedia"), href: "/services/sosyal-medya-yonetimi" },
+        { name: s("webDev"), href: "/services/web-ve-uygulama-gelistirme" },
+        { name: s("branding"), href: "/services/marka-kimligi-ve-grafik-tasarim" },
+        { name: s("digitalStrategy"), href: "/services/dijital-strateji-ve-pazarlama" },
+        { name: s("audienceAnalysis"), href: "/services/hedef-kitle-analizi" },
+    ];
+
+    return (
+        <>
+            <header
+                className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 border-b ${isScrolled
+                    ? "bg-white/80 backdrop-blur-lg border-black/5 py-3 shadow-sm"
+                    : "bg-transparent border-transparent py-5"
+                    }`}
+            >
+                <div className="container mx-auto px-6 flex items-center justify-between h-14">
+                    {/* Logo - Defined as Outfit/Syne in globals.css */}
+                    <Link href="/" className="flex items-center gap-0 group">
+                        <span className="font-heading text-[26px] font-black tracking-[-0.03em] text-slate-950">
+                            ZYG<span className="text-[#e6c800]">SOFT</span>
+                        </span>
+                    </Link>
+
+                    {/* Nav - Defined as Inter/Sans in globals.css */}
+                    <nav className="hidden md:flex items-center gap-9">
+                        <Link href="/" className="text-slate-600 hover:text-slate-950 text-[14px] font-bold tracking-tight transition-colors">{nav("home")}</Link>
+
+                        {/* Services dropdown */}
+                        <div className="relative" onMouseEnter={() => setIsServicesOpen(true)} onMouseLeave={() => setIsServicesOpen(false)}>
+                            <button className="flex items-center gap-1.5 text-slate-600 hover:text-slate-950 text-[14px] font-bold tracking-tight transition-colors">
+                                {nav("services")} <ChevronDown size={14} className={`transition-transform duration-300 ${isServicesOpen ? "rotate-180" : ""}`} />
+                            </button>
+                            <AnimatePresence>
+                                {isServicesOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 15 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 15 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="absolute top-full left-0 mt-4 w-72 bg-white border border-slate-100 shadow-2xl rounded-2xl overflow-hidden p-2"
+                                    >
+                                        {servicesLinks.map((link) => (
+                                            <Link
+                                                key={link.href}
+                                                href={link.href}
+                                                className="flex items-center justify-between px-4 py-3 text-[14px] text-slate-600 hover:bg-slate-50 hover:text-slate-950 rounded-xl transition-all font-bold"
+                                            >
+                                                {link.name}
+                                                <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            </Link>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+
+                        <Link href="/about" className="text-slate-600 hover:text-slate-950 text-[14px] font-bold tracking-tight transition-colors">{nav("about")}</Link>
+                        <Link href="/portfolio" className="text-slate-600 hover:text-slate-950 text-[14px] font-bold tracking-tight transition-colors">{nav("portfolio")}</Link>
+                        <Link href="/blog" className="text-slate-600 hover:text-slate-950 text-[14px] font-bold tracking-tight transition-colors">{nav("blog")}</Link>
+                        <Link href="/abonelikler" className="flex items-center text-slate-600 hover:text-slate-950 text-[14px] font-bold tracking-tight transition-colors">
+                            <span className="bg-[#e6c800]/20 text-[#c9ad00] px-2 py-0.5 rounded text-[10px] font-black mr-2">PRO</span>
+                            {a("badge") || "Uygulamalar"}
+                        </Link>
+                    </nav>
+
+                    {/* Right side */}
+                    <div className="hidden md:flex items-center gap-6">
+                        <LanguageSwitcher />
+                        {session ? (
+                            <div className="flex items-center gap-4">
+                                <Magnetic strength={20}>
+                                    <Link href="/dashboard" className="bg-slate-950 text-white text-[12px] font-black uppercase tracking-widest py-3 px-8 rounded-full hover:bg-[#e6c800] hover:text-slate-950 transition-all duration-500 shadow-xl shadow-slate-200" data-magnetic="true">
+                                        PANEL
+                                    </Link>
+                                </Magnetic>
+                                <button onClick={() => signOut()} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
+                                    <LogOut size={20} />
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-4">
+                                <Magnetic strength={20}>
+                                    <Link href="/login" className="text-slate-950 hover:text-[#e6c800] text-[14px] font-black uppercase tracking-widest transition-colors px-4" data-magnetic="true">
+                                        Giriş
+                                    </Link>
+                                </Magnetic>
+                                <Magnetic strength={30}>
+                                    <Link href="/register" className="bg-slate-950 text-white text-[12px] font-black uppercase tracking-widest py-3.5 px-8 rounded-full hover:bg-[#e6c800] hover:text-slate-950 transition-all duration-500 shadow-xl shadow-slate-900/20" data-magnetic="true">
+                                        KAYIT OL
+                                    </Link>
+                                </Magnetic>
+                            </div>
+                        )}
+                    </div>
+
+
+                    {/* Mobile menu button */}
+                    <button
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="md:hidden p-2 text-[#1e293b] hover:bg-gray-50 rounded-lg transition-colors"
+                    >
+                        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+                </div>
+            </header>
+
+            {/* Mobile Menu */}
+            <AnimatePresence>
+                {isMobileMenuOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
+                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                        exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
+                        transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="fixed inset-0 top-20 z-40 bg-white flex flex-col p-8 overflow-y-auto md:hidden"
+                    >
+                        <div className="flex flex-col gap-2">
+                            {[
+                                { name: nav("home"), href: "/" },
+                                { name: nav("services"), href: "/services" },
+                                { name: nav("about"), href: "/about" },
+                                { name: nav("portfolio"), href: "/portfolio" },
+                                { name: nav("blog"), href: "/blog" },
+                                { name: a("badge") || "Uygulamalar", href: "/abonelikler" },
+                                { name: nav("contact"), href: "/contact" },
+                            ].map((link) => (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="text-xl font-semibold text-[#1e293b] py-4 border-b border-gray-100"
+                                >
+                                    {link.name}
+                                </Link>
+                            ))}
+                        </div>
+                        <div className="mt-8 flex flex-col gap-3">
+                            {session ? (
+                                <>
+                                    <Link href="/dashboard" className="bg-[#e6c800] text-[#1e293b] py-4 px-6 rounded-xl font-bold text-center block" onClick={() => setIsMobileMenuOpen(false)}>
+                                        Panel
+                                    </Link>
+                                    <button onClick={() => { signOut(); setIsMobileMenuOpen(false); }} className="bg-red-50 text-red-500 py-4 px-6 rounded-xl font-bold text-center block w-full transition-colors">
+                                        Çıkış Yap
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link href="/login" className="bg-slate-100 hover:bg-slate-200 text-slate-950 py-4 px-6 rounded-xl font-bold text-center block transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
+                                        {nav("login")}
+                                    </Link>
+                                    <Link href="/register" className="bg-[#e6c800] text-[#1e293b] py-4 px-6 rounded-xl font-bold text-center block" onClick={() => setIsMobileMenuOpen(false)}>
+                                        {nav("register")}
+                                    </Link>
+                                </>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </>
+    );
+}
