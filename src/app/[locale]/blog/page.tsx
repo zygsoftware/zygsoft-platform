@@ -6,34 +6,22 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import Link from "next/link";
 import { Calendar, User, ArrowRight, BookOpen, Clock } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { useInView } from "framer-motion";
-import { useRef } from "react";
+import { useTranslations, useLocale } from "next-intl";
+import { BlockReveal, TextReveal } from "@/components/ui/reveal";
 
 type Post = {
     id: string;
     title: string;
     slug: string;
     excerpt: string;
-    coverImage: string | null;
-    publishedAt: string | null;
-    tags?: string[];
-    author: { name: string };
+    image: string | null;
+    createdAt: string;
+    author: string;
 };
-
-function AnimIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
-    const ref = useRef(null);
-    const inView = useInView(ref, { once: true, margin: "-60px" });
-    return (
-        <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94], delay }} className={className}>
-            {children}
-        </motion.div>
-    );
-}
 
 export default function BlogPage() {
     const t = useTranslations("Blog");
+    const locale = useLocale();
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -94,15 +82,15 @@ export default function BlogPage() {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {posts.map((post, i) => (
-                                    <AnimIn key={post.id} delay={i * 0.1}>
-                                        <Link href={`/blog/${post.slug}`} className="block h-full group">
+                                    <BlockReveal key={post.id} delay={i * 0.08}>
+                                        <Link href={locale === "tr" ? `/blog/${post.slug}` : `/${locale}/blog/${post.slug}`} className="block h-full group">
                                             <div className="h-full flex flex-col glass rounded-xl overflow-hidden hover-glow transition-all duration-300 hover:-translate-y-2">
 
                                                 {/* Cover */}
                                                 <div className="relative h-56 w-full bg-[#f3f0ea] overflow-hidden">
-                                                    {post.coverImage ? (
+                                                    {post.image ? (
                                                         <img
-                                                            src={post.coverImage}
+                                                            src={post.image}
                                                             alt={post.title}
                                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                         />
@@ -111,24 +99,16 @@ export default function BlogPage() {
                                                             <BookOpen size={48} />
                                                         </div>
                                                     )}
-                                                    {post.tags && post.tags.length > 0 && (
-                                                        <div className="absolute bottom-4 left-5">
-                                                            <span className="tag-yellow text-[10px] shadow-sm">{post.tags[0]}</span>
-                                                        </div>
-                                                    )}
                                                 </div>
 
                                                 {/* Content */}
                                                 <div className="p-8 flex flex-col flex-1">
                                                     <div className="flex items-center gap-3 text-xs text-[#888] mb-4 font-medium uppercase tracking-wide">
-                                                        <span className="flex items-center gap-1.5"><User size={12} /> {post.author.name}</span>
+                                                        <span className="flex items-center gap-1.5"><User size={12} /> {post.author}</span>
                                                         <span className="w-1 h-1 rounded-full bg-black/15" />
                                                         <span className="flex items-center gap-1.5">
                                                             <Clock size={12} />
-                                                            {post.publishedAt
-                                                                ? new Date(post.publishedAt).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })
-                                                                : t("newStatus")
-                                                            }
+                                                            {new Date(post.createdAt).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })}
                                                         </span>
                                                     </div>
 
@@ -150,7 +130,7 @@ export default function BlogPage() {
 
                                             </div>
                                         </Link>
-                                    </AnimIn>
+                                    </BlockReveal>
                                 ))}
                             </div>
                         )}
@@ -160,15 +140,21 @@ export default function BlogPage() {
                 {/* ── CTA ── */}
                 <section className="py-20" style={{ background: "#f9f7f3" }}>
                     <div className="container mx-auto px-6 max-w-7xl text-center">
-                        <AnimIn>
-                            <span className="section-label">Bizimle Öğrenin</span>
-                            <h2 className="font-display font-extrabold text-[#0e0e0e] mt-4 mb-8" style={{ fontSize: "clamp(32px,4vw,56px)" }}>
-                                Gelişmelerden Haberdar Olun
-                            </h2>
-                            <Link href="/contact" className="btn-primary inline-flex">
-                                Bültene Abone Ol
-                            </Link>
-                        </AnimIn>
+                        <BlockReveal>
+                            <TextReveal delay={0.08}>
+                                <span className="section-label">Bizimle Öğrenin</span>
+                            </TextReveal>
+                            <TextReveal delay={0.16}>
+                                <h2 className="font-display font-extrabold text-[#0e0e0e] mt-4 mb-8" style={{ fontSize: "clamp(32px,4vw,56px)" }}>
+                                    Gelişmelerden Haberdar Olun
+                                </h2>
+                            </TextReveal>
+                            <BlockReveal delay={0.12}>
+                                <Link href="/contact" className="btn-primary inline-flex">
+                                    Bültene Abone Ol
+                                </Link>
+                            </BlockReveal>
+                        </BlockReveal>
                     </div>
                 </section>
 

@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "node prisma/seed.js",
-    "db:seed": "node prisma/seed.js"
+    "db:seed": "node prisma/seed.js",
+    "migrate:legal-toolkit": "node scripts/migrate-legal-toolkit.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -21,15 +22,20 @@
     "@react-three/fiber": "^9.5.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/three": "^0.183.1",
+    "archiver": "^7.0.1",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.6.2",
     "clsx": "^2.1.1",
+    "docx": "^9.6.1",
     "framer-motion": "^12.35.0",
+    "jszip": "^3.10.1",
     "lenis": "^1.3.18",
     "lucide-react": "^0.577.0",
     "next": "16.1.6",
     "next-auth": "^4.24.13",
     "next-intl": "^4.8.3",
+    "nodemailer": "^7.0.13",
+    "pdf-lib": "^1.17.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hot-toast": "^2.6.0",
@@ -40,14 +46,17 @@
   "devDependencies": {
     "@prisma/engines": "^7.4.2",
     "@tailwindcss/postcss": "^4",
+    "@types/archiver": "^7.0.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "prisma": "^7.4.2",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

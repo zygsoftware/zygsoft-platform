@@ -30,7 +30,7 @@ export default function DashboardLayout({
     }
 
     return (
-        <div className="min-h-screen flex bg-slate-50 font-sans">
+        <div className="min-h-screen flex bg-[var(--bg-2)] font-sans">
             <DashboardSidebar />
             <main className="flex-1 min-w-0">
                 <div className="h-full p-8 lg:p-12 overflow-y-auto">

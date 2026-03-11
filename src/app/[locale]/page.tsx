@@ -10,29 +10,12 @@ import { Footer } from "@/components/layout/Footer";
 import { BlogSlider } from "@/components/home/BlogSlider";
 import { AppStoreShowcase } from "@/components/home/AppStoreShowcase";
 import { HeroSection } from "@/components/home/HeroSection";
+import { DocToUdfDemo } from "@/components/home/DocToUdfDemo";
 import { ContactInquiryForm } from "@/components/forms/ContactInquiryForm";
 import { Magnetic } from "@/components/ui/Magnetic";
-import { GlowBlob } from "@/components/ui/GlowBlob";
 import { ParticleField } from "@/components/ui/ParticleField";
 import { createRevealUp, revealViewport, staggerContainer } from "@/components/ui/motion";
-
-/* ── AnimIn helper ─────────────────────────────────────────────── */
-function AnimIn({ children, className = "", delay = 0, y = 40 }: {
-  children: React.ReactNode; className?: string; delay?: number; y?: number;
-}) {
-  const reducedMotion = !!useReducedMotion();
-  return (
-    <motion.div
-      variants={createRevealUp(reducedMotion, y, 8)}
-      initial="hidden"
-      whileInView="visible"
-      viewport={revealViewport}
-      transition={{ delay }}
-      className={className}>
-      {children}
-    </motion.div>
-  );
-}
+import { BlockReveal, TextReveal } from "@/components/ui/reveal";
 
 export default function Home() {
   const t = useTranslations("Homepage");
@@ -52,157 +35,180 @@ export default function Home() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
+  // Section-based scroll snapping (homepage only, CSS-only, removed on unmount)
+  useEffect(() => {
+    document.documentElement.classList.add("home-scroll-snap");
+    return () => document.documentElement.classList.remove("home-scroll-snap");
+  }, []);
+
   return (
     <div ref={containerRef} className="relative min-h-screen bg-white text-[#0a0c10] selection:bg-[#e6c800] selection:text-[#0a0c10] overflow-x-hidden">
-      {/* Premium Texture Overlay */}
-      <div className="fixed inset-0 pointer-events-none z-[9999] opacity-[0.03] mix-blend-multiply" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-      }} />
-
       <Header />
 
       <main className="relative z-10">
 
-        <HeroSection />
+        <div className="home-snap-section">
+          <HeroSection />
+        </div>
 
+        {/* ── PRODUCT DEMO: DOCX → UDF ────────────────────────── */}
+        <section className="home-snap-section bg-[#fafafc] -mt-8">
+          <DocToUdfDemo />
+        </section>
 
         {/* ── SECTION 02: TRUSTED PARTNER ────────────────────────── */}
-        <section className="py-36 bg-[#fafafc] relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute -top-20 left-1/3 h-72 w-72 rounded-full bg-[#e6c800]/10 blur-[90px]" />
-            <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-[#0a0c10]/[0.04] blur-[90px]" />
-          </div>
+        <section className="home-snap-section py-24 md:py-28 bg-[#fafafc] relative overflow-hidden">
           <div className="container mx-auto px-6">
-            <div className="max-w-4xl mb-24">
-              <AnimIn y={60}>
-                <span className="text-xs font-black uppercase tracking-[0.4em] text-[#e6c800] mb-6 block">{t("partnerSection.tag")}</span>
-                <h2 className="text-4xl md:text-6xl font-display font-black leading-[1] tracking-tighter mb-8 text-[#0a0c10]" dangerouslySetInnerHTML={{ __html: t.raw("partnerSection.title") }} />
-                <p className="text-[#0a0c10]/60 text-xl font-medium leading-relaxed max-w-2xl">
-                  {t("partnerSection.description")}
-                </p>
-              </AnimIn>
+            <div className="max-w-4xl mb-16">
+              <BlockReveal>
+                <TextReveal delay={0.05}>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#0a0c10]/45 mb-5 block">{t("partnerSection.tag")}</span>
+                </TextReveal>
+                <TextReveal delay={0.12}>
+                  <h2 className="text-4xl md:text-5xl font-display font-black leading-[1.02] tracking-tighter mb-6 text-[#0a0c10]" dangerouslySetInnerHTML={{ __html: t.raw("partnerSection.title") }} />
+                </TextReveal>
+                <TextReveal delay={0.2}>
+                  <p className="text-[#0a0c10]/55 text-[17px] font-medium leading-relaxed max-w-xl">
+                    {t("partnerSection.description")}
+                  </p>
+                </TextReveal>
+              </BlockReveal>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
               {t.raw("partnerSection.pillars").map((pillar: any, i: number) => (
-                <AnimIn key={i} delay={i * 0.15}>
+                <BlockReveal key={i} delay={i * 0.08}>
                   <motion.div
-                    whileHover={{ y: -10 }}
-                    className="group relative p-10 bg-white border border-[#0a0c10]/5 rounded-[2rem] shadow-sm hover:shadow-2xl hover:shadow-black/5 transition-all duration-700 h-full overflow-hidden"
+                    whileHover={{ y: -3 }}
+                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                    className="group relative p-7 bg-white border border-[#0a0c10]/[0.05] rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] transition-all duration-300 h-full overflow-hidden"
                   >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#e6c800]/0 group-hover:bg-[#e6c800]/5 rounded-full transition-all duration-700 -translate-y-1/2 translate-x-1/2" />
-                    <div className="w-16 h-16 rounded-2xl bg-[#fafafc] border border-[#0a0c10]/5 flex items-center justify-center mb-10 group-hover:bg-[#e6c800] group-hover:border-[#e6c800] transition-all duration-500">
-                      {[<BarChart3 size={24} />, <Sparkles size={24} />, <Cpu size={24} />, <Rocket size={24} />][i]}
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#0a0c10]/0 group-hover:bg-[#0a0c10]/[0.03] rounded-full transition-all duration-400 -translate-y-1/2 translate-x-1/2" />
+                    <div className="w-12 h-12 rounded-lg bg-[#fafafc] border border-[#0a0c10]/5 flex items-center justify-center mb-5 group-hover:bg-[#e6c800]/90 group-hover:border-[#e6c800] transition-colors duration-300">
+                      {[<BarChart3 size={22} />, <Sparkles size={22} />, <Cpu size={22} />, <Rocket size={22} />][i]}
                     </div>
-                    <h3 className="text-2xl font-black uppercase tracking-tight mb-4">{pillar.t}</h3>
-                    <p className="text-[#0a0c10]/50 font-medium leading-relaxed">{pillar.d}</p>
+                    <h3 className="text-lg font-black uppercase tracking-tight mb-2">{pillar.t}</h3>
+                    <p className="text-[#0a0c10]/52 text-[14px] font-medium leading-relaxed">{pillar.d}</p>
                   </motion.div>
-                </AnimIn>
+                </BlockReveal>
               ))}
             </div>
           </div>
         </section>
 
-        <div className="h-24 bg-gradient-to-b from-[#fafafc] via-white to-white" />
+        {/* Transition: off-white → white */}
+        <div className="h-12 bg-gradient-to-b from-[#fafafc] to-white" aria-hidden />
 
         {/* ── SECTION 03: SERVICES ────────────────────────── */}
-        <section className="py-44 bg-white overflow-hidden relative">
-          <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #0a0c10 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+        <section className="home-snap-section py-24 md:py-28 bg-white overflow-hidden relative">
           <div className="container mx-auto px-6">
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-12 mb-32">
-              <AnimIn className="max-w-3xl" y={60}>
-                <span className="text-xs font-black uppercase tracking-[0.4em] text-[#e6c800] mb-6 block">{t("servicesSection.tag")}</span>
-                <h2 className="text-5xl md:text-7xl font-display font-black leading-[0.92] tracking-tighter text-[#0a0c10]" dangerouslySetInnerHTML={{ __html: t.raw("servicesSection.title") }} />
-              </AnimIn>
-              <AnimIn delay={0.2} className="max-w-md lg:text-right">
-                <p className="text-[#0a0c10]/50 text-xl font-medium mb-10">
-                  {t("servicesSection.description")}
-                </p>
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-20">
+              <BlockReveal className="max-w-3xl">
+                <TextReveal delay={0.05}>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#0a0c10]/45 mb-5 block">{t("servicesSection.tag")}</span>
+                </TextReveal>
+                <TextReveal delay={0.12}>
+                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-black leading-[0.94] tracking-tighter text-[#0a0c10]" dangerouslySetInnerHTML={{ __html: t.raw("servicesSection.title") }} />
+                </TextReveal>
+              </BlockReveal>
+              <BlockReveal delay={0.12} className="max-w-md lg:text-right">
+                <TextReveal delay={0.18}>
+                  <p className="text-[#0a0c10]/52 text-[17px] font-medium mb-8 max-w-sm">
+                    {t("servicesSection.description")}
+                  </p>
+                </TextReveal>
                 <Link href="/services" className="inline-flex items-center gap-4 font-black text-sm uppercase tracking-widest group">
                   {t("servicesSection.viewAll")} <div className="w-12 h-px bg-[#0a0c10] group-hover:w-20 transition-all duration-500" />
                 </Link>
-              </AnimIn>
+              </BlockReveal>
             </div>
 
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 gap-12"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={revealViewport}
-            >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
               {Object.entries(t.raw("servicesSection.items")).map(([key, item]: [string, any], i: number) => (
-                <motion.div key={key} variants={createRevealUp(reducedMotion, 40, 8)}>
+                <BlockReveal key={key} delay={i * 0.08}>
                   <Link href={`/services#${key}`} className="block group">
                     <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      className="relative bg-[#fafafc] border border-[#0a0c10]/10 rounded-[3rem] p-16 h-full overflow-hidden transition-all duration-700 hover:shadow-[0_80px_160px_rgba(0,0,0,0.08)] hover:bg-white"
+                      whileHover={{ y: -3 }}
+                      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                      className="relative bg-[#fafafc] border border-[#0a0c10]/[0.05] rounded-xl p-10 h-full overflow-hidden transition-all duration-300 hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] hover:bg-white"
                     >
-                      {/* Depth visual background */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#e6c800]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#0a0c10]/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                       <div className="flex flex-col h-full justify-between relative z-10">
-                        <div className="mb-32 flex justify-between items-start">
-                          <div className="w-24 h-24 rounded-[2rem] bg-white border border-[#0a0c10]/5 flex items-center justify-center text-[#0a0c10] shadow-sm group-hover:scale-110 group-hover:bg-[#e6c800] group-hover:border-[#e6c800] transition-all duration-700">
-                            {[<Globe size={40} />, <Zap size={40} />, <Cpu size={40} />, <Code size={40} />][i]}
+                        <div className="mb-16 flex justify-between items-start">
+                          <div className="w-16 h-16 rounded-xl bg-white border border-[#0a0c10]/5 flex items-center justify-center text-[#0a0c10] shadow-[0_1px_2px_rgba(0,0,0,0.04)] group-hover:bg-[#e6c800]/90 group-hover:border-[#e6c800] transition-all duration-300">
+                            {[<Globe size={28} />, <Zap size={28} />, <Cpu size={28} />, <Code size={28} />][i]}
                           </div>
-                          <div className="w-16 h-16 rounded-full border-2 border-[#0a0c10]/5 flex items-center justify-center group-hover:border-[#e6c800] group-hover:bg-[#e6c800] group-hover:text-[#0a0c10] transition-all duration-500">
-                            <ArrowUpRight size={24} className="opacity-40 group-hover:opacity-100 transition-all" />
+                          <div className="w-10 h-10 rounded-full border border-[#0a0c10]/8 flex items-center justify-center group-hover:border-[#e6c800] group-hover:bg-[#e6c800] group-hover:text-[#0a0c10] transition-all duration-300">
+                            <ArrowUpRight size={18} className="opacity-50 group-hover:opacity-100 transition-opacity duration-200" />
                           </div>
                         </div>
                         <div>
-                          <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tighter mb-5 leading-[0.92]">{item.t}</h3>
-                          <p className="text-[#0a0c10]/50 text-xl font-medium max-w-sm leading-snug">{item.d}</p>
+                          <h3 className="text-xl md:text-2xl font-black uppercase tracking-tighter mb-3 leading-[0.94]">{item.t}</h3>
+                          <p className="text-[#0a0c10]/52 text-[15px] font-medium max-w-sm leading-relaxed">{item.d}</p>
                         </div>
                       </div>
                     </motion.div>
                   </Link>
-                </motion.div>
+                </BlockReveal>
               ))}
-            </motion.div>
+            </div>
           </div>
         </section>
 
-        <div className="h-24 bg-gradient-to-b from-white via-[#f3f4f6] to-[#0a0c10]" />
+        {/* Transition: white → dark (neutral gradient, no yellow) */}
+        <div
+          className="h-24 md:h-28"
+          style={{
+            background: "linear-gradient(to bottom, #ffffff 0%, #f0f0f2 25%, #d8d8dc 50%, #909098 75%, #2a2c30 90%, #0a0c10 100%)",
+          }}
+          aria-hidden
+        />
 
         {/* ── SECTION 04: PROCESS ────────────────────────── */}
-        <section className="py-44 bg-[#0a0c10] text-white relative overflow-hidden">
+        <section className="home-snap-section py-24 md:py-28 bg-[#0a0c10] text-white relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
-            <ParticleField variant="dark" count={22} opacity={0.6} />
+            <ParticleField variant="dark" count={12} opacity={0.35} />
           </div>
           <div className="container mx-auto px-6">
-            <div className="flex flex-col lg:flex-row items-end justify-between gap-12 mb-32">
-              <AnimIn className="max-w-3xl" y={60}>
-                <span className="text-xs font-black uppercase tracking-[0.4em] text-[#e6c800] mb-6 block">{t("processSection.tag")}</span>
-                <h2 className="text-4xl md:text-6xl font-display font-black leading-[0.92] tracking-tighter uppercase text-white" dangerouslySetInnerHTML={{ __html: t.raw("processSection.title") }} />
-              </AnimIn>
-              <AnimIn delay={0.2} className="max-w-md lg:text-right">
-                <p className="text-white/40 text-lg font-medium italic">
-                  {t("processSection.description")}
-                </p>
-              </AnimIn>
+            <div className="flex flex-col lg:flex-row items-end justify-between gap-12 mb-24">
+              <BlockReveal className="max-w-3xl">
+                <TextReveal delay={0.05}>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-white/45 mb-5 block">{t("processSection.tag")}</span>
+                </TextReveal>
+                <TextReveal delay={0.12}>
+                  <h2 className="text-4xl md:text-5xl font-display font-black leading-[0.94] tracking-tighter uppercase text-white" dangerouslySetInnerHTML={{ __html: t.raw("processSection.title") }} />
+                </TextReveal>
+              </BlockReveal>
+              <BlockReveal delay={0.12} className="max-w-md lg:text-right">
+                <TextReveal delay={0.18}>
+                  <p className="text-white/45 text-[16px] font-medium italic max-w-sm">
+                    {t("processSection.description")}
+                  </p>
+                </TextReveal>
+              </BlockReveal>
             </div>
 
             <motion.div
-              className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8 relative"
+              className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 relative"
               variants={staggerContainer}
               initial="hidden"
               whileInView="visible"
               viewport={revealViewport}
             >
-              {/* Connecting line for desktop */}
-              <div className="absolute top-1/2 left-0 w-full h-px bg-white/10 hidden lg:block -translate-y-1/2 -z-10" />
+              <div className="absolute top-1/2 left-0 w-full h-px bg-white/[0.08] hidden lg:block -translate-y-1/2 -z-10" />
 
               {t.raw("processSection.steps").map((step: any, i: number) => (
-                <motion.div key={i} variants={createRevealUp(reducedMotion, 44, 8)}>
+                <motion.div key={i} variants={createRevealUp(reducedMotion, 36, 6)}>
                   <motion.div
-                    whileHover={{ y: -10, borderColor: "rgba(230,200,0,0.45)", backgroundColor: "rgba(255,255,255,0.07)" }}
-                    className="home-card-dark group relative rounded-[2.5rem] p-12 h-full flex flex-col justify-between transition-all duration-500 shadow-[0_25px_60px_rgba(0,0,0,0.25)]"
+                    whileHover={{ y: -3, borderColor: "rgba(230,200,0,0.2)", backgroundColor: "rgba(255,255,255,0.05)" }}
+                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                    className="home-card-dark group relative rounded-xl p-10 h-full flex flex-col justify-between transition-all duration-300"
                   >
-                    <span className="text-6xl font-black text-white/18 group-hover:text-[#e6c800]/55 transition-colors leading-none mb-10">{step.n}</span>
+                    <span className="text-5xl font-black text-white/15 group-hover:text-[#e6c800]/40 transition-colors leading-none mb-8">{step.n}</span>
                     <div>
-                      <h4 className="text-2xl font-black uppercase mb-5 tracking-tight text-white transition-colors">{step.t}</h4>
-                      <p className="text-white/72 font-medium transition-colors leading-relaxed">{step.d}</p>
+                      <h4 className="text-xl font-black uppercase mb-4 tracking-tight text-white transition-colors">{step.t}</h4>
+                      <p className="text-white/65 font-medium transition-colors leading-relaxed text-[15px]">{step.d}</p>
                     </div>
                   </motion.div>
                 </motion.div>
@@ -211,19 +217,30 @@ export default function Home() {
           </div>
         </section>
 
-        <div className="h-24 bg-gradient-to-b from-[#0a0c10] via-[#12141a] to-[#0a0c10]" />
+        {/* Process and AppStore share same dark bg — no divider needed */}
 
         {/* ── SECTION 04B: DIGITAL PRODUCTS & UDF FLAGSHIP ────────────────────────── */}
-        <AppStoreShowcase />
+        <div className="home-snap-section">
+          <AppStoreShowcase />
+        </div>
+
+        {/* Transition: dark → light (neutral gradient, cinematic) */}
+        <div
+          className="h-24 md:h-28"
+          style={{
+            background: "linear-gradient(to bottom, #0a0c10 0%, #1a1c22 15%, #2a2c32 30%, #50545a 50%, #a8acb0 75%, #e8e8ec 90%, #ffffff 100%)",
+          }}
+          aria-hidden
+        />
 
         {/* ── SECTION 05: WHY CHOOSE US ────────────────────────── */}
-        <section className="py-48 bg-white overflow-hidden">
+        <section className="home-snap-section py-24 md:py-28 bg-white overflow-hidden">
           <div className="container mx-auto px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-24 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-14 lg:gap-16 items-center">
               <div className="lg:col-span-7">
-                <AnimIn y={60}>
-                  <span className="text-xs font-black uppercase tracking-[0.5em] text-[#e6c800] mb-10 block">{t("whyChooseUs.tag")}</span>
-                  <h2 className="text-4xl md:text-5xl font-display font-black leading-[0.9] tracking-tighter mb-12 text-[#0a0c10]" dangerouslySetInnerHTML={{ __html: t.raw("whyChooseUs.title") }} />
+                <BlockReveal>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#0a0c10]/45 mb-8 block">{t("whyChooseUs.tag")}</span>
+                  <h2 className="text-4xl md:text-5xl font-display font-black leading-[0.92] tracking-tighter mb-10 text-[#0a0c10] max-w-xl" dangerouslySetInnerHTML={{ __html: t.raw("whyChooseUs.title") }} />
                   <motion.div
                     className="grid grid-cols-1 md:grid-cols-2 gap-12"
                     variants={staggerContainer}
@@ -234,28 +251,29 @@ export default function Home() {
                     {t.raw("whyChooseUs.items").map((item: any, i: number) => (
                       <motion.div
                         key={i}
-                        variants={createRevealUp(reducedMotion, 36, 8)}
-                        whileHover={{ x: 10 }}
-                        className="flex flex-col gap-6 group p-8 rounded-3xl hover:bg-[#fafafc] transition-all duration-500"
+                        variants={createRevealUp(reducedMotion, 28, 6)}
+                        whileHover={{ x: 6 }}
+                        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                        className="flex flex-col gap-5 group p-7 rounded-2xl hover:bg-[#fafafc] transition-all duration-300"
                       >
-                        <div className="w-14 h-14 shrink-0 rounded-2xl bg-[#0a0c10] flex items-center justify-center text-[#e6c800] shadow-xl">
-                          <CheckCircle2 size={24} />
+                        <div className="w-12 h-12 shrink-0 rounded-xl bg-[#0a0c10] flex items-center justify-center text-[#e6c800] shadow-lg">
+                          <CheckCircle2 size={22} />
                         </div>
                         <div>
-                          <h4 className="text-2xl font-black uppercase tracking-tight mb-3 leading-none">{item.t}</h4>
-                          <p className="text-[#0a0c10]/40 font-medium leading-snug">{item.d}</p>
+                          <h4 className="text-xl font-black uppercase tracking-tight mb-2 leading-none">{item.t}</h4>
+                          <p className="text-[#0a0c10]/48 font-medium leading-relaxed text-[15px] max-w-xs">{item.d}</p>
                         </div>
                       </motion.div>
                     ))}
                   </motion.div>
-                </AnimIn>
+                </BlockReveal>
               </div>
 
               <div className="lg:col-span-5 relative">
-                <AnimIn delay={0.3} className="relative z-10">
+                <BlockReveal delay={0.12} className="relative z-10">
                   <motion.div
-                    style={{ y: mousePos.y * 30, x: mousePos.x * 20 }}
-                    className="aspect-[4/5] bg-[#0a0c10] rounded-[4rem] overflow-hidden relative shadow-[0_80px_160px_rgba(0,0,0,0.2)] p-12 flex flex-col justify-center gap-12"
+                    style={{ y: mousePos.y * 24, x: mousePos.x * 16 }}
+                    className="aspect-[4/5] bg-[#0a0c10] rounded-[3rem] overflow-hidden relative shadow-[0_48px_96px_rgba(0,0,0,0.18)] p-10 flex flex-col justify-center gap-10"
                   >
                     {/* Visual Metric Scene */}
                     <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -279,8 +297,8 @@ export default function Home() {
                       </div>
                     ))}
 
-                    <div className="mt-12 pt-12 border-t border-white/10 flex items-center gap-8">
-                      <div className="w-20 h-20 rounded-full bg-[#e6c800] flex items-center justify-center text-[#0a0c10] shadow-[0_0_50px_rgba(230,200,0,0.3)]">
+                    <div className="mt-10 pt-10 border-t border-white/10 flex items-center gap-6">
+                      <div className="w-16 h-16 rounded-full bg-[#e6c800] flex items-center justify-center text-[#0a0c10] shadow-[0_0_32px_rgba(230,200,0,0.2)]">
                         <Zap size={32} />
                       </div>
                       <div>
@@ -289,26 +307,34 @@ export default function Home() {
                       </div>
                     </div>
                   </motion.div>
-                </AnimIn>
-                {/* Decorative element behind */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#e6c800]/5 blur-[100px] rounded-full -z-10" />
+                </BlockReveal>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] bg-[#0a0c10]/[0.02] blur-[60px] rounded-full -z-10" />
               </div>
             </div>
           </div>
         </section>
 
+        {/* Transition: white → off-white (Why Choose Us → Capabilities) */}
+        <div className="h-8 bg-gradient-to-b from-white to-[#fafafc]" aria-hidden />
+
         {/* ── SECTION 06: CAPABILITIES (TECH STACK) ────────────────────────── */}
-        <section className="py-24 bg-[#fafafc] border-y border-[#0a0c10]/5 overflow-hidden">
-          <div className="container mx-auto px-6 mb-20 text-center">
-            <AnimIn y={60}>
-              <span className="text-xs font-black uppercase tracking-[0.4em] text-[#e6c800] mb-6 block">{t("capabilities.tag")}</span>
-              <h2 className="text-4xl md:text-6xl font-display font-black leading-[0.95] tracking-tighter text-[#0a0c10] uppercase mb-8">
-                {t("capabilities.title1")}<br />{t("capabilities.title2")}
-              </h2>
-              <p className="text-[#0a0c10]/50 text-xl font-medium max-w-xl mx-auto">
-                {t("capabilities.desc")}
-              </p>
-            </AnimIn>
+        <section className="home-snap-section py-20 md:py-24 bg-[#fafafc] border-y border-[#0a0c10]/[0.04] overflow-hidden">
+          <div className="container mx-auto px-6 mb-16 text-center">
+            <BlockReveal>
+              <TextReveal delay={0.05}>
+                <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#0a0c10]/45 mb-5 block">{t("capabilities.tag")}</span>
+              </TextReveal>
+              <TextReveal delay={0.12}>
+                <h2 className="text-4xl md:text-5xl font-display font-black leading-[0.96] tracking-tighter text-[#0a0c10] uppercase mb-6 max-w-2xl mx-auto">
+                  {t("capabilities.title1")}<br />{t("capabilities.title2")}
+                </h2>
+              </TextReveal>
+              <TextReveal delay={0.2}>
+                <p className="text-[#0a0c10]/52 text-[17px] font-medium max-w-lg mx-auto">
+                  {t("capabilities.desc")}
+                </p>
+              </TextReveal>
+            </BlockReveal>
           </div>
 
           <div className="flex whitespace-nowrap animate-marquee py-10 opacity-30 select-none pointer-events-none">
@@ -322,33 +348,31 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── SECTION 07: SOCIAL MEDIA SERVICES ────────────────────────── */}
-        <section className="py-40 bg-white">
-          <div className="container mx-auto px-6">
-            <div className="bg-[#0a0c10] rounded-[4rem] p-16 md:p-32 overflow-hidden relative shadow-[0_120px_240px_rgba(0,0,0,0.2)]">
-              {/* Immersive Background Scene Mock */}
-              <div className="absolute inset-0 opacity-20 pointer-events-none">
-                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#e6c800]/20 blur-[150px] rounded-full translate-x-1/3 -translate-y-1/3" />
-                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-white/10 blur-[120px] rounded-full -translate-x-1/3 translate-y-1/3" />
-                <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 1px)', backgroundSize: '40px 40px', opacity: 0.1 }} />
-              </div>
+        {/* Transition: off-white → white (Capabilities → Social) */}
+        <div className="h-8 bg-gradient-to-b from-[#fafafc] to-white" aria-hidden />
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center relative z-10 text-white">
-                <AnimIn y={60}>
-                  <span className="text-xs font-black uppercase tracking-[0.5em] text-[#e6c800] mb-10 block">{t("socialServices.tag")}</span>
-                  <h2 className="text-4xl md:text-5xl font-display font-black leading-[0.9] tracking-tight mb-10 text-white uppercase" dangerouslySetInnerHTML={{ __html: t.raw("socialServices.title") }} />
-                  <p className="text-white/60 text-xl md:text-2xl font-medium leading-snug max-w-md mb-16">
+        {/* ── SECTION 07: SOCIAL MEDIA SERVICES ────────────────────────── */}
+        <section className="home-snap-section py-24 md:py-28 bg-white">
+          <div className="container mx-auto px-6">
+            <div className="bg-[#0a0c10] rounded-[2.5rem] md:rounded-[3rem] p-12 md:p-20 overflow-hidden relative shadow-[0_48px_96px_rgba(0,0,0,0.12)]">
+              <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-18 items-center relative z-10 text-white">
+                <BlockReveal>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-white/50 mb-8 block">{t("socialServices.tag")}</span>
+                  <h2 className="text-4xl md:text-5xl font-display font-black leading-[0.92] tracking-tight mb-8 text-white uppercase max-w-lg" dangerouslySetInnerHTML={{ __html: t.raw("socialServices.title") }} />
+                  <p className="text-white/58 text-[17px] md:text-lg font-medium leading-relaxed max-w-md mb-12">
                     {t("socialServices.desc")}
                   </p>
-                  <Magnetic strength={20}>
-                    <Link href="/contact" className="home-btn-primary-yellow inline-flex items-center gap-6 px-10 py-6 font-black uppercase tracking-[0.32em] text-[11px] rounded-2xl hover:scale-[1.03] active:scale-95 transition-all shadow-2xl shadow-[#e6c800]/20">
+                  <Magnetic strength={16}>
+                    <Link href="/contact" className="home-btn-primary-yellow inline-flex items-center gap-3 px-7 py-3.5 font-black uppercase tracking-[0.22em] text-[11px] rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/20">
                       {t("socialServices.cta")}
-                      <div className="w-12 h-px bg-[#0a0c10]" />
+                      <div className="w-10 h-px bg-[#0a0c10]" />
                     </Link>
                   </Magnetic>
-                </AnimIn>
+                </BlockReveal>
 
-                <AnimIn delay={0.4} className="grid grid-cols-2 gap-6">
+                <BlockReveal delay={0.12} className="grid grid-cols-2 gap-5">
                   <motion.div
                     className="contents"
                     variants={staggerContainer}
@@ -359,106 +383,85 @@ export default function Home() {
                   {t.raw("socialServices.features").map((feat: string, i: number) => (
                     <motion.div
                       key={i}
-                      variants={createRevealUp(reducedMotion, 30, 8)}
-                      whileHover={{ y: -5, backgroundColor: "rgba(255,255,255,0.12)", borderColor: "rgba(230,200,0,0.45)" }}
-                      className="home-card-dark rounded-[2.5rem] p-10 transition-all duration-500"
+                      variants={createRevealUp(reducedMotion, 24, 6)}
+                      whileHover={{ y: -3, backgroundColor: "rgba(255,255,255,0.08)", borderColor: "rgba(230,200,0,0.25)" }}
+                      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                      className="home-card-dark rounded-2xl p-8 transition-all duration-300"
                     >
-                      <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-[#e6c800] mb-12 shadow-xl">
+                      <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-[#e6c800] mb-8">
                         {[<MessageSquare size={28} />, <Globe size={28} />, <BarChart3 size={28} />, <Sparkles size={28} />][i]}
                       </div>
-                      <span className="text-sm font-black uppercase tracking-widest leading-snug block text-white">{feat}</span>
+                      <span className="text-[13px] font-black uppercase tracking-[0.12em] leading-snug block text-white">{feat}</span>
                     </motion.div>
                   ))}
                   </motion.div>
-                </AnimIn>
+                </BlockReveal>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ── SECTION 08: PORTFOLIO PREVIEW ────────────────────────── */}
-        <div className="bg-[#fafafc] py-48 overflow-hidden">
-          <div className="container mx-auto px-6 mb-32 flex flex-col md:flex-row items-end justify-between gap-12">
-            <AnimIn className="max-w-4xl" y={60}>
-              <span className="text-xs font-black uppercase tracking-[0.6em] text-[#e6c800] mb-8 block">{t("portfolioPreview.tag")}</span>
-              <h2 className="text-4xl md:text-6xl font-display font-black leading-[0.88] tracking-tight text-[#0a0c10] uppercase" dangerouslySetInnerHTML={{ __html: t.raw("portfolioPreview.title") }} />
-            </AnimIn>
-            <AnimIn delay={0.2}>
-              <Link href="/portfolio" className="home-btn-secondary-dark inline-flex px-8 py-4 rounded-full text-xs font-black tracking-widest transition-all duration-500 hover:-translate-y-0.5">
-                {t("portfolioPreview.exploreMore")}
-              </Link>
-            </AnimIn>
-          </div>
-
-          <div className="container mx-auto px-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24">
-              {[1, 2].map((project, i) => (
-                <AnimIn key={i} delay={i * 0.2}>
-                  <Link href="/portfolio" className="block group relative">
-                    <motion.div whileHover={{ y: -20 }}>
-                    <div className="aspect-[16/11] bg-white rounded-[3.5rem] border border-[#0a0c10]/10 overflow-hidden mb-12 relative shadow-[0_40px_100px_rgba(0,0,0,0.05)]">
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0a0c10]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-700 translate-y-8 group-hover:translate-y-0">
-                        <div className="px-12 py-6 bg-white rounded-full shadow-2xl text-[10px] font-black uppercase tracking-[0.5em] text-[#0a0c10] hover:bg-[#e6c800] transition-colors">
-                          {t("portfolioPreview.viewProject")}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="px-4">
-                      <span className="text-[10px] font-black uppercase tracking-[0.6em] text-[#e6c800] mb-4 block">Enterprise_Systems // 2025</span>
-                      <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tighter group-hover:text-[#e6c800] transition-colors leading-[0.9]">{i === 0 ? "Global Logistics Hub" : "AI Driven Analytics"}</h3>
-                    </div>
-                    </motion.div>
-                  </Link>
-                </AnimIn>
-              ))}
-            </div>
-          </div>
-        </div>
+        {/* Transition: white → warm neutral (Social → Blog) */}
+        <div className="h-12 bg-gradient-to-b from-white via-[#fafafc] to-[#f3f0ea]" aria-hidden />
 
         {/* ── SECTION 09: BLOG ────────────────────────── */}
-        <BlogSlider />
+        <div className="home-snap-section">
+          <BlogSlider />
+        </div>
+
+        {/* Transition: cream → off-white (Blog → Contact) */}
+        <div className="h-8 bg-gradient-to-b from-[#f3f0ea] to-[#fafafc]" aria-hidden />
 
         {/* ── SECTION 09.5: CONTACT INQUIRY ────────────────────────── */}
-        <section className="py-28 bg-[#fafafc] border-y border-[#0a0c10]/8">
+        <section className="home-snap-section py-20 md:py-24 bg-[#fafafc] border-y border-[#0a0c10]/[0.06]">
           <div className="container mx-auto px-6 max-w-5xl">
-            <AnimIn y={60}>
+            <BlockReveal>
               <ContactInquiryForm
                 title={t("contactStrip.title")}
                 subtitle={t("contactStrip.subtitle")}
               />
-            </AnimIn>
+            </BlockReveal>
           </div>
         </section>
 
+        {/* Transition: light → dark (Contact → CTA, cinematic) */}
+        <div
+          className="h-24 md:h-28"
+          style={{
+            background: "linear-gradient(to bottom, #fafafc 0%, #f0f0f2 20%, #d8d8dc 45%, #909098 70%, #2a2c30 88%, #0a0c10 100%)",
+          }}
+          aria-hidden
+        />
+
         {/* ── SECTION 10: CINEMATIC CTA ────────────────────────── */}
-        <section className="relative py-48 lg:py-64 bg-[#0a0c10] overflow-hidden">
-          {/* Background Visual Effects */}
-          <div className="absolute inset-0 opacity-40">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vw] border-[0.5px] border-white/5 rounded-full" />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#0a0c10] via-transparent to-[#0a0c10]" />
-            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 1px)', backgroundSize: '60px 60px', opacity: 0.05 }} />
-          </div>
+        <section className="home-snap-section relative py-28 md:py-36 lg:py-40 bg-[#0a0c10] overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 1px)', backgroundSize: '64px 64px' }} />
 
           <div className="container mx-auto px-6 relative z-10 text-center">
-            <AnimIn className="flex flex-col items-center" y={60}>
-              <span className="text-xs font-black uppercase tracking-[0.8em] text-[#e6c800] mb-12 block">{t("ctaSection.tag")}</span>
-              <h2 className="text-4xl md:text-6xl font-display font-black leading-[0.86] tracking-tight text-white uppercase mb-14 max-w-5xl mx-auto" dangerouslySetInnerHTML={{ __html: t.raw("ctaSection.title") }} />
+            <BlockReveal className="flex flex-col items-center">
+              <TextReveal delay={0.05}>
+                <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50 mb-6 block">{t("ctaSection.tag")}</span>
+              </TextReveal>
+              <TextReveal delay={0.12}>
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-black leading-[0.94] tracking-tight text-white uppercase mb-10 max-w-3xl mx-auto" dangerouslySetInnerHTML={{ __html: t.raw("ctaSection.title") }} />
+              </TextReveal>
 
-              <div className="flex flex-col md:flex-row items-center gap-12">
-                <Magnetic strength={30}>
-                  <Link href="/contact" className="home-btn-primary-yellow group relative px-14 py-6 font-black uppercase tracking-[0.3em] text-[12px] rounded-full overflow-hidden transition-all hover:scale-[1.03] active:scale-95 shadow-[0_40px_120px_rgba(230,200,0,0.3)]">
+              <TextReveal delay={0.2}>
+              <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+                <Magnetic strength={20}>
+                  <Link href="/contact" className="home-btn-primary-yellow group relative px-9 py-3.5 font-black uppercase tracking-[0.22em] text-[11px] rounded-xl overflow-hidden transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-[0_16px_48px_rgba(230,200,0,0.2)]">
                     <span className="relative z-10">{t("ctaSection.cta") || t("ctaSection.button")}</span>
-                    <div className="absolute inset-0 border border-white/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute inset-0 border border-white/30 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </Link>
                 </Magnetic>
 
-                <Link href="/portfolio" className="group flex items-center gap-8 text-white font-black uppercase tracking-[0.4em] text-[12px] hover:text-[#e6c800] transition-colors">
+                <Link href="/portfolio" className="group flex items-center gap-4 text-white/90 font-bold uppercase tracking-[0.24em] text-[11px] hover:text-[#e6c800] transition-colors duration-200">
                   <span>{t("ctaSection.ctaSecondary") || "Explore Portfolio"}</span>
-                  <div className="w-12 h-px bg-white group-hover:bg-[#e6c800] group-hover:w-20 transition-all duration-500" />
+                  <div className="w-8 h-px bg-white/50 group-hover:bg-[#e6c800] group-hover:w-12 transition-all duration-300" />
                 </Link>
               </div>
-            </AnimIn>
+              </TextReveal>
+            </BlockReveal>
           </div>
         </section>
 

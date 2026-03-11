@@ -4,21 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Mail, MapPin, ChevronDown } from "lucide-react";
-import { useState, useRef } from "react";
-import { useInView } from "framer-motion";
+import { useState } from "react";
 import { ContactInquiryForm } from "@/components/forms/ContactInquiryForm";
 import { useLocale, useTranslations } from "next-intl";
-
-function AnimIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
-    const ref = useRef(null);
-    const inView = useInView(ref, { once: true, margin: "-60px" });
-    return (
-        <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94], delay }} className={className}>
-            {children}
-        </motion.div>
-    );
-}
+import { BlockReveal } from "@/components/ui/reveal";
 
 export default function Contact() {
     const locale = useLocale();
@@ -65,15 +54,15 @@ export default function Contact() {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
 
                             {/* Form */}
-                            <AnimIn>
+                            <BlockReveal>
                                 <ContactInquiryForm
                                     title={t("formTitle")}
                                     subtitle={t("infoDesc")}
                                 />
-                            </AnimIn>
+                            </BlockReveal>
 
                             {/* Info */}
-                            <AnimIn delay={0.15}>
+                            <BlockReveal delay={0.12}>
                                 <h2 className="font-display font-bold text-[#0e0e0e] text-2xl mb-8">{t("infoTitle")}</h2>
                                 <div className="space-y-5 mb-10">
                                     {[
@@ -122,7 +111,7 @@ export default function Contact() {
                                         </div>
                                     ))}
                                 </div>
-                            </AnimIn>
+                            </BlockReveal>
                         </div>
                     </div>
                 </section>

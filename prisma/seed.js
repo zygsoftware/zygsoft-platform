@@ -44,33 +44,15 @@ async function main() {
         console.log("✓ Müşteri kullanıcı zaten mevcut.");
     }
 
-    // 3. Products
+    // 3. Products — only legal-toolkit (single subscription product)
     const productsData = [
         {
-            name: "Hukuk UDF Dönüştürücü",
-            slug: "doc-to-udf",
-            description: "DOCX dosyalarınızı UYAP uyumlu UDF formatına saniyeler içinde dönüştürün. KVKK uyumlu, toplu işlem destekli.",
-            category: "hukuk",
-            price: 499,
+            name: "Hukuk Araçları Paketi",
+            slug: "legal-toolkit",
+            description: "UYAP ve belge iş akışları için geliştirilmiş profesyonel belge araçları paketi.",
+            category: "legal",
+            price: 3000,
             iconType: "file-text",
-            isActive: true,
-        },
-        {
-            name: "PDF Birleştirici",
-            slug: "pdf-merge",
-            description: "Birden fazla PDF dosyasını tek bir çıktı halinde birleştiren hukuk odaklı yardımcı araç.",
-            category: "hukuk",
-            price: 199,
-            iconType: "layers",
-            isActive: true,
-        },
-        {
-            name: "Kurumsal Otomasyon Paketi",
-            slug: "enterprise-automation",
-            description: "İş süreçlerinizi otomatikleştiren kurumsal yazılım paketi. Raporlama, bildirim ve entegrasyon dahil.",
-            category: "web",
-            price: 2499,
-            iconType: "blocks",
             isActive: true,
         },
     ];
@@ -85,46 +67,37 @@ async function main() {
     console.log("✓ Ürünler kontrol edildi.");
 
     // 4. Get product IDs for subscriptions and payments
-    const udfProduct = await prisma.product.findUnique({ where: { slug: "doc-to-udf" } });
-    const pdfProduct = await prisma.product.findUnique({ where: { slug: "pdf-merge" } });
+    const legalProduct = await prisma.product.findUnique({ where: { slug: "legal-toolkit" } });
 
     // 5. Subscriptions
-    if (udfProduct && customer) {
+    if (legalProduct && customer) {
         const existingSub = await prisma.subscription.findFirst({
-            where: { userId: customer.id, productId: udfProduct.id },
+            where: { userId: customer.id, productId: legalProduct.id },
         });
         if (!existingSub) {
             const endDate = new Date();
-            endDate.setMonth(endDate.getMonth() + 1);
+            endDate.setFullYear(endDate.getFullYear() + 1);
             await prisma.subscription.create({
                 data: {
                     userId: customer.id,
-                    productId: udfProduct.id,
+                    productId: legalProduct.id,
                     status: "active",
                     endsAt: endDate,
                 },
             });
-            console.log("✓ Abonelik oluşturuldu: Müşteri → UDF Dönüştürücü");
+            console.log("✓ Abonelik oluşturuldu: Müşteri → Hukuk Araçları Paketi");
         }
     }
 
     // 6. Payments
     const paymentCount = await prisma.payment.count();
-    if (paymentCount === 0 && customer && udfProduct) {
+    if (paymentCount === 0 && customer && legalProduct) {
         await prisma.payment.create({
             data: {
                 userId: customer.id,
-                productId: udfProduct.id,
-                amount: 499,
+                productId: legalProduct.id,
+                amount: 3000,
                 status: "approved",
-            },
-        });
-        await prisma.payment.create({
-            data: {
-                userId: customer.id,
-                productId: udfProduct.id,
-                amount: 499,
-                status: "pending",
             },
         });
         console.log("✓ Ödeme kayıtları eklendi.");

@@ -11,7 +11,8 @@ import {
     CreditCard,
     ChevronRight,
     LogOut,
-    ArrowLeft
+    ArrowLeft,
+    Wrench,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { signOut } from "next-auth/react";
@@ -22,15 +23,16 @@ export function DashboardSidebar() {
     const t = useTranslations("Dashboard.sidebar");
 
     const menuItems = [
-        { name: t("overview"), href: "/dashboard", icon: LayoutDashboard },
-        { name: t("products"), href: "/dashboard/products", icon: Box },
-        { name: t("services"), href: "/dashboard/services", icon: Briefcase },
-        { name: t("support"), href: "/dashboard/support", icon: LifeBuoy },
-        { name: t("billing"), href: "/dashboard/billing", icon: CreditCard },
+        { name: t("overview"),  href: "/dashboard",          icon: LayoutDashboard },
+        { name: t("products"),  href: "/dashboard/products",  icon: Box },
+        { name: t("tools"),     href: "/dashboard/tools",     icon: Wrench },
+        { name: t("services"),  href: "/dashboard/services",  icon: Briefcase },
+        { name: t("support"),   href: "/dashboard/support",   icon: LifeBuoy },
+        { name: t("billing"),   href: "/dashboard/billing",   icon: CreditCard },
     ];
 
     return (
-        <aside className="w-72 bg-white border-r border-slate-100 flex flex-col h-screen sticky top-0">
+        <aside className="w-72 bg-[var(--surface)] border-r border-[var(--border)] flex flex-col h-screen sticky top-0">
             <div className="p-8">
                 <Link href="/" className="flex items-center gap-0 group">
                     <span className="font-display text-2xl font-black tracking-[-0.03em] text-slate-950">
@@ -51,13 +53,16 @@ export function DashboardSidebar() {
 
             <nav className="flex-1 px-4 space-y-1">
                 {menuItems.map((item) => {
-                    const isActive = pathname === item.href;
+                    const isActive =
+                        item.href === "/dashboard"
+                            ? pathname.endsWith("/dashboard")
+                            : pathname.includes(item.href);
                     return (
                         <Link
                             key={item.href}
                             href={item.href}
-                            className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all group ${isActive
-                                ? "bg-slate-950 text-white shadow-lg shadow-slate-200"
+                            className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
+                                ? "bg-[var(--surface-dark)] text-white shadow-sm"
                                 : "text-slate-500 hover:bg-slate-50 hover:text-slate-950"
                                 }`}
                         >
@@ -75,7 +80,7 @@ export function DashboardSidebar() {
                 })}
             </nav>
 
-            <div className="p-4 border-t border-slate-100 space-y-1">
+            <div className="p-4 border-t border-[var(--border)] space-y-1">
                 <Link
                     href="/dashboard/account"
                     className="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-950 rounded-xl transition-all group"

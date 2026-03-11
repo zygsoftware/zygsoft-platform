@@ -39,8 +39,29 @@ model User {
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
-  payments      Payment[]
-  subscriptions Subscription[]
+  payments        Payment[]
+  subscriptions   Subscription[]
+  supportTickets  SupportTicket[]
+  toolUsages      ToolUsage[]
+  letterhead      UserLetterhead?
+}
+
+model UserLetterhead {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  filePath  String
+  createdAt DateTime @default(now())
+}
+
+model ToolUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  toolSlug  String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model Account {
@@ -132,6 +153,17 @@ model BlogPost {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+model SupportTicket {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  subject   String
+  message   String
+  status    String   @default("open") // "open" | "in_progress" | "answered" | "closed"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model ContactMessage {
   id        String   @id @default(cuid())
   name      String
@@ -139,5 +171,7 @@ model ContactMessage {
   phone     String?
   subject   String?
   message   String
+  status    String   @default("new") // "new" | "read" | "archived"
+  adminNote String?
   createdAt DateTime @default(now())
 }

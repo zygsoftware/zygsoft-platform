@@ -1,31 +1,64 @@
-import { MetadataRoute } from 'next';
-import { prisma } from '@/lib/prisma';
+import { MetadataRoute } from "next";
+import { prisma } from "@/lib/prisma";
+
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://zygsoft.com";
+
+/* Known service slugs */
+const SERVICE_SLUGS = [
+    "web-ve-uygulama-gelistirme",
+    "sosyal-medya-yonetimi",
+    "marka-kimligi-ve-grafik-tasarim",
+    "dijital-strateji-ve-pazarlama",
+    "hedef-kitle-analizi",
+];
+
+/* Helper — add both TR (default, no prefix) and EN versions of a path */
+function both(
+    path: string,
+    opts: { changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]; priority: number }
+): MetadataRoute.Sitemap {
+    return [
+        { url: `${BASE}${path}`,      lastModified: new Date(), ...opts },
+        { url: `${BASE}/en${path}`,   lastModified: new Date(), ...opts },
+    ];
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://zygsoft.com';
+    /* ── Static top-level pages ── */
+    const staticRoutes: MetadataRoute.Sitemap = [
+        ...both("/",             { changeFrequency: "weekly",  priority: 1.0 }),
+        ...both("/about",        { changeFrequency: "monthly", priority: 0.8 }),
+        ...both("/services",     { changeFrequency: "weekly",  priority: 0.9 }),
+        ...both("/portfolio",    { changeFrequency: "weekly",  priority: 0.8 }),
+        ...both("/blog",         { changeFrequency: "weekly",  priority: 0.8 }),
+        ...both("/contact",      { changeFrequency: "monthly", priority: 0.7 }),
+        ...both("/abonelikler",  { changeFrequency: "weekly",  priority: 0.8 }),
+        ...both("/terms",        { changeFrequency: "yearly",  priority: 0.3 }),
+        ...both("/kvkk",         { changeFrequency: "yearly",  priority: 0.3 }),
+    ];
 
-    // Static Routes
-    const staticRoutes = ['', '/about', '/services', '/portfolio', '/blog', '/contact', '/store'].map(
-        (route) => ({
-            url: `${baseUrl}${route}`,
-            lastModified: new Date(),
-            changeFrequency: 'weekly' as const,
-            priority: route === '' ? 1 : 0.8,
-        })
+    /* ── Service detail pages ── */
+    const serviceRoutes: MetadataRoute.Sitemap = SERVICE_SLUGS.flatMap((slug) =>
+        both(`/services/${slug}`, { changeFrequency: "monthly", priority: 0.7 })
     );
 
-    // Dynamic Blog Routes
-    const posts = await prisma.blogPost.findMany({
-        where: { published: true },
-        select: { slug: true, updatedAt: true },
-    });
+    /* ── Dynamic blog post pages ── */
+    let blogRoutes: MetadataRoute.Sitemap = [];
+    try {
+        const posts = await prisma.blogPost.findMany({
+            where:  { published: true },
+            select: { slug: true, updatedAt: true },
+        });
+        blogRoutes = posts.flatMap((post) =>
+            both(`/blog/${post.slug}`, { changeFrequency: "monthly", priority: 0.7 })
+        ).map((entry, i) => ({
+            ...entry,
+            // Use actual post updatedAt for accuracy
+            lastModified: posts[Math.floor(i / 2)]?.updatedAt ?? new Date(),
+        }));
+    } catch {
+        // Sitemap should not crash the build if DB is unavailable
+    }
 
-    const blogRoutes = posts.map((post) => ({
-        url: `${baseUrl}/blog/${post.slug}`,
-        lastModified: post.updatedAt,
-        changeFrequency: 'monthly' as const,
-        priority: 0.7,
-    }));
-
-    return [...staticRoutes, ...blogRoutes];
+    return [...staticRoutes, ...serviceRoutes, ...blogRoutes];
 }

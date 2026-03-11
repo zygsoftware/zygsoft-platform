@@ -17,15 +17,20 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Tutar, dekont görüntüsü ve ürün seçimi zorunludur." }, { status: 400 });
         }
 
-        let dbProduct = await prisma.product.findUnique({ where: { slug: productId } });
+        // Reject oversized receipt uploads (base64 ~4/3 of binary — cap at ~8 MB)
+        if (typeof receiptImage === "string" && receiptImage.length > 11_000_000) {
+            return NextResponse.json({ error: "Dekont dosyası çok büyük (maks. 8 MB)." }, { status: 400 });
+        }
+
+        const parsedAmount = parseFloat(amount);
+        if (isNaN(parsedAmount) || parsedAmount <= 0) {
+            return NextResponse.json({ error: "Geçersiz tutar." }, { status: 400 });
+        }
+
+        // Only accept known product slugs — never create products from user input
+        const dbProduct = await prisma.product.findUnique({ where: { slug: String(productId).trim() } });
         if (!dbProduct) {
-            dbProduct = await prisma.product.create({
-                data: {
-                    name: productId,
-                    slug: productId,
-                    description: "Hizmet/Ürün"
-                }
-            });
+            return NextResponse.json({ error: "Seçilen ürün bulunamadı." }, { status: 404 });
         }
 
         // Check if there is already a pending payment for this specific product
@@ -45,7 +50,7 @@ export async function POST(req: Request) {
             data: {
                 userId: session.user.id,
                 productId: dbProduct.id,
-                amount: parseFloat(amount),
+                amount: parsedAmount,
                 receiptImage,
                 status: "pending",
             },

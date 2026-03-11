@@ -4,7 +4,6 @@ import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Blocks, Zap, Shield, FileText, Workflow, CheckCircle2, Sparkles, Layers, FileStack } from "lucide-react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { ParticleField } from "@/components/ui/ParticleField";
 import { TiltCard } from "@/components/ui/TiltCard";
 import { createHeadingReveal, createRevealUp, revealViewport, staggerContainer } from "@/components/ui/motion";
 
@@ -34,34 +33,20 @@ export function AppStoreShowcase() {
 
     const previewProducts = [
         {
-            id: "udf-toolkit",
-            name: t("services.udfToolkitShortName") || "Hukuk UDF Dönüştürücü",
-            desc: t("services.udfToolkitShortDesc") || "DOCX dosyalarınızı UYAP uyumlu UDF formatına saniyeler içinde dönüştürün.",
-            price: "₺499",
-            period: t("services.udfToolkitPeriod") || "/ay",
+            id: "legal-toolkit",
+            name: t("services.legalToolkitName") || "Hukuk Araçları Paketi",
+            desc: t("services.legalToolkitDesc") || "UYAP ve belge iş akışları için profesyonel belge araçları paketi. Tek yıllık abonelik, tüm araçlar dahil.",
+            price: "₺3.000",
+            period: t("services.legalToolkitPeriod") || "/yıl",
             icon: <FileText size={36} className="text-[#e6c800]" />,
-            tag: t("udfFlagshipBadge") || "Bayrak Ürün",
+            tag: t("flagshipBadge") || "Bayrak Ürün",
             flagship: true
         },
-        {
-            id: "pdf-merge",
-            name: "PDF Birlestirici",
-            desc: "Birden fazla PDF dosyasini tek bir cikti halinde birlestiren hukuk odakli yardimci arac.",
-            price: "Yakinda",
-            period: "",
-            icon: <FileStack size={36} className="text-white/70" />,
-            tag: "Yardimci Arac"
-        }
     ];
 
     return (
-        <section className="py-36 lg:py-44 bg-[#0a0c10] relative overflow-hidden">
-            <div className="absolute inset-0 pointer-events-none">
-                <ParticleField variant="dark" count={44} opacity={0.85} className="opacity-70" />
-                <div className="absolute top-0 right-0 w-[780px] h-[780px] bg-[#e6c800]/14 blur-[130px] rounded-full -translate-y-1/3 translate-x-1/3" />
-                <div className="absolute bottom-0 left-0 w-[520px] h-[520px] bg-[#e6c800]/8 blur-[120px] rounded-full -translate-x-1/3 translate-y-1/3" />
-                <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "56px 56px" }} />
-            </div>
+        <section className="py-24 md:py-28 bg-[#0a0c10] relative overflow-hidden">
+            <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
 
             <div className="container mx-auto px-6 max-w-7xl relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-16 items-start">
@@ -102,9 +87,9 @@ export function AppStoreShowcase() {
                                 <motion.div
                                     key={idx}
                                     variants={createRevealUp(reducedMotion, 32, 8)}
-                                    className="home-card-dark group flex items-start gap-4 rounded-2xl p-4 hover:bg-white/[0.09] hover:border-[#e6c800]/40 transition-all duration-500"
+                                    className="home-card-dark group flex items-start gap-4 rounded-xl p-5 hover:bg-white/[0.06] hover:border-[#e6c800]/25 transition-all duration-300"
                                 >
-                                    <div className="shrink-0 w-11 h-11 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center group-hover:bg-[#e6c800]/15 group-hover:border-[#e6c800]/40 transition-colors">
+                                    <div className="shrink-0 w-11 h-11 rounded-lg bg-white/10 border border-white/12 flex items-center justify-center group-hover:bg-[#e6c800]/12 group-hover:border-[#e6c800]/30 transition-colors">
                                         {feat.icon}
                                     </div>
                                     <div>
@@ -131,7 +116,7 @@ export function AppStoreShowcase() {
 
                         <Link
                             href="/abonelikler"
-                            className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-5 font-black uppercase tracking-[0.3em] text-[12px] rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-[#e6c800]/30"
+                            className="home-btn-primary-yellow inline-flex items-center gap-2.5 px-8 py-4 font-black uppercase tracking-[0.24em] text-[11px] rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
                         >
                             {t("viewStoreButton")} <ArrowRight size={18} />
                         </Link>
@@ -154,7 +139,7 @@ export function AppStoreShowcase() {
                                         <Sparkles size={12} />
                                         {previewProducts[0].tag}
                                     </div>
-                                    <span className="text-white/50 text-[10px] uppercase tracking-[0.2em] font-black">Legal-Tech Suite</span>
+                                    <span className="text-white/50 text-[10px] uppercase tracking-[0.2em] font-black">{isTr ? "Belge Araçları Paketi" : "Document Tools Package"}</span>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -168,10 +153,10 @@ export function AppStoreShowcase() {
                                     </div>
                                     <div className="space-y-3">
                                         {[
-                                            { icon: <Workflow size={14} />, text: isTr ? "DOCX yukle > UDF indir" : "Upload DOCX > Download UDF" },
-                                            { icon: <Shield size={14} />, text: isTr ? "KVKK uyumlu isleme katmani" : "Privacy-compliant processing layer" },
-                                            { icon: <Layers size={14} />, text: isTr ? "Gelecek modullerle genisleme" : "Scales with upcoming modules" },
-                                            { icon: <CheckCircle2 size={14} />, text: isTr ? "Panel uzerinden aninda erisim" : "Instant access from dashboard" },
+                                            { icon: <Workflow size={14} />, text: isTr ? "8 belge araci, tek yillik abonelik" : "8 document tools, one annual subscription" },
+                                            { icon: <Shield size={14} />, text: isTr ? "KVKK uyumlu, belgeler islem sonrasi silinir" : "KVKK-compliant, documents deleted after processing" },
+                                            { icon: <Layers size={14} />, text: isTr ? "UYAP, PDF, OCR — hepsi dahil" : "UYAP, PDF, OCR — all included" },
+                                            { icon: <CheckCircle2 size={14} />, text: isTr ? "Ayrı satın alma yok, tüm araçlar dahil" : "No separate purchases, all tools included" },
                                         ].map((row, i) => (
                                             <motion.div key={i} whileHover={{ x: 4 }} className="rounded-xl border border-white/10 bg-white/[0.04] p-3 flex items-center gap-3 text-white/85">
                                                 <span className="text-[#e6c800]">{row.icon}</span>
@@ -199,33 +184,35 @@ export function AppStoreShowcase() {
                                         {isTr ? "Aboneligi gor" : "View plans"}
                                         <ArrowRight size={14} />
                                     </Link>
-                                    <Link href="/dashboard/tools/doc-to-udf" className="home-btn-outline-light inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-colors">
+                                    <Link href="/dashboard/tools" className="home-btn-outline-light inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-colors">
                                         {isTr ? "Araci incele" : "Explore tool"}
                                     </Link>
                                 </div>
                             </div>
                         </TiltCard>
 
-                        <motion.div
-                            variants={staggerContainer}
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={revealViewport}
-                            className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3"
-                        >
-                            {previewProducts.slice(1).map((prod) => (
-                                <Link key={prod.id} href="/dashboard/tools/pdf-merge" className="block">
-                                    <motion.div variants={createRevealUp(reducedMotion, 28, 8)} whileHover={{ y: -4 }} className="home-card-dark rounded-2xl p-4 hover:border-[#e6c800]/45 transition-colors">
-                                        <div className="flex items-center gap-3 mb-3 text-white">
-                                            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">{prod.icon}</div>
-                                            <p className="font-bold">{prod.name}</p>
-                                        </div>
-                                        <p className="text-white/55 text-sm line-clamp-2">{prod.desc}</p>
-                                        <div className="mt-3 text-xs font-bold text-[#e6c800]/90">{prod.price}</div>
-                                    </motion.div>
-                                </Link>
-                            ))}
-                        </motion.div>
+                        {previewProducts.length > 1 && (
+                            <motion.div
+                                variants={staggerContainer}
+                                initial="hidden"
+                                whileInView="visible"
+                                viewport={revealViewport}
+                                className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3"
+                            >
+                                {previewProducts.slice(1).map((prod) => (
+                                    <Link key={prod.id} href="/dashboard/tools" className="block">
+                                        <motion.div variants={createRevealUp(reducedMotion, 28, 8)} whileHover={{ y: -3 }} transition={{ duration: 0.2 }} className="home-card-dark rounded-2xl p-4 hover:border-[#e6c800]/40 transition-colors duration-200">
+                                            <div className="flex items-center gap-3 mb-3 text-white">
+                                                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">{prod.icon}</div>
+                                                <p className="font-bold">{prod.name}</p>
+                                            </div>
+                                            <p className="text-white/55 text-sm line-clamp-2">{prod.desc}</p>
+                                            <div className="mt-3 text-xs font-bold text-[#e6c800]/90">{prod.price}</div>
+                                        </motion.div>
+                                    </Link>
+                                ))}
+                            </motion.div>
+                        )}
                     </motion.div>
                 </div>
             </div>

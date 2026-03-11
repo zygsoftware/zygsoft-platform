@@ -183,10 +183,18 @@ def _process_document_elements(docx_path: str):
     return "\n".join(elements), "".join(content)
 
 def convert_docx_to_udf(docx_file: str, udf_file: str, template_xml_path: str = "calisanudfcontent.xml"):
+    import logging
+    _log = logging.getLogger(__name__)
+    _log.info("[main.convert_docx_to_udf] template_xml_path=%s", template_xml_path)
+
     elements_xml, content_text = _process_document_elements(docx_file)
 
     with open(template_xml_path, "r", encoding="utf-8", errors="ignore") as f:
         tpl_xml = f.read()
+
+    tpl_bg_match = re.search(r'bgImageData\s*=\s*["\']([^"\']*)["\']', tpl_xml, re.I)
+    tpl_bg_len = len(tpl_bg_match.group(1)) if tpl_bg_match else 0
+    _log.info("[main.convert_docx_to_udf] template bgImageData length=%d", tpl_bg_len)
 
     xml = tpl_xml
 
@@ -223,6 +231,12 @@ def convert_docx_to_udf(docx_file: str, udf_file: str, template_xml_path: str = 
             f'\\1\n<elements resolver="hvl-default">\n{elements_xml}\n</elements>',
             xml, count=1, flags=re.I
         )
+
+    out_bg_match = re.search(r'bgImageData\s*=\s*["\']([^"\']*)["\']', xml, re.I)
+    out_bg_len = len(out_bg_match.group(1)) if out_bg_match else 0
+    _log.info("[main.convert_docx_to_udf] final xml bgImageData length=%d before write", out_bg_len)
+    if tpl_bg_len > 0 and out_bg_len == 0:
+        _log.warning("[main.convert_docx_to_udf] bgImageData LOST: template had %d chars, output has 0", tpl_bg_len)
 
     with zipfile.ZipFile(udf_file, "w", compression=zipfile.ZIP_STORED) as z:
         z.writestr("content.xml", xml.encode("utf-8"))

@@ -11,6 +11,13 @@ export function Preloader() {
     const pathname = usePathname();
 
     useEffect(() => {
+        // Authenticated panel areas don't need the intro preloader.
+        // Navigating between dashboard / admin sub-pages should feel instant.
+        if (pathname.includes("/dashboard") || pathname.includes("/admin")) {
+            setIsLoading(false);
+            return;
+        }
+
         setIsLoading(true);
         setCounter(0);
         setPhase("initial");

@@ -25,7 +25,6 @@ export function Header() {
 
     const nav = useTranslations("Navigation");
     const s = useTranslations("Services");
-    const a = useTranslations("AppStore");
 
     const servicesLinks = [
         { name: s("socialMedia"), href: "/services/sosyal-medya-yonetimi" },
@@ -38,13 +37,13 @@ export function Header() {
     return (
         <>
             <header
-                className={`fixed top-0 left-0 w-full z-[100] transition-all duration-500 border-b ${isScrolled
-                    ? "bg-white/70 backdrop-blur-2xl border-[#0a0c10]/10 py-3 shadow-[0_12px_32px_rgba(10,12,16,0.08)]"
-                    : "bg-white/30 backdrop-blur-xl border-transparent py-5"
+                className={`fixed top-0 left-0 w-full z-[100] transition-all duration-300 border-b ${isScrolled
+                    ? "bg-white/80 backdrop-blur-xl border-slate-100 py-3 shadow-[0_1px_0_0_rgba(0,0,0,0.04),0_8px_24px_rgba(0,0,0,0.06)]"
+                    : "bg-white/40 backdrop-blur-xl border-transparent py-4"
                     }`}
             >
-                <div className={`absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#e6c800]/50 to-transparent transition-opacity ${isScrolled ? "opacity-100" : "opacity-0"}`} />
-                <div className="container mx-auto px-6 flex items-center justify-between h-14">
+                <div className={`absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#e6c800]/40 to-transparent transition-opacity duration-300 ${isScrolled ? "opacity-100" : "opacity-0"}`} />
+                <div className="container mx-auto px-6 lg:px-8 flex items-center justify-between h-[52px]">
                     {/* Logo - Defined as Outfit/Syne in globals.css */}
                     <Link href="/" className="flex items-center gap-0 group">
                         <span className="font-heading text-[26px] font-black tracking-[-0.03em] text-slate-950">
@@ -52,13 +51,13 @@ export function Header() {
                         </span>
                     </Link>
 
-                    {/* Nav - Defined as Inter/Sans in globals.css */}
-                    <nav className="hidden md:flex items-center gap-7 xl:gap-8">
+                    {/* Nav */}
+                    <nav className="hidden md:flex items-center gap-6 xl:gap-8">
                         <NavLink href="/" active={pathname === "/" || pathname === "/tr" || pathname === "/en"}>{nav("home")}</NavLink>
 
                         {/* Services dropdown */}
                         <div className="relative" onMouseEnter={() => setIsServicesOpen(true)} onMouseLeave={() => setIsServicesOpen(false)}>
-                            <button className={`flex items-center gap-1.5 text-[14px] font-bold tracking-tight transition-colors ${pathname.includes("/services") ? "text-slate-950" : "text-slate-700 hover:text-slate-950"}`}>
+                            <button className={`flex items-center gap-1.5 text-[13px] font-bold tracking-tight transition-colors duration-200 ${pathname.includes("/services") ? "text-slate-950" : "text-slate-600 hover:text-slate-950"}`}>
                                 {nav("services")} <ChevronDown size={14} className={`transition-transform duration-300 ${isServicesOpen ? "rotate-180" : ""}`} />
                             </button>
                             <AnimatePresence>
@@ -85,24 +84,21 @@ export function Header() {
                             </AnimatePresence>
                         </div>
 
+                        <NavLink href="/abonelikler" active={pathname.includes("/abonelikler")}>{nav("products")}</NavLink>
                         <NavLink href="/about" active={pathname.includes("/about")}>{nav("about")}</NavLink>
                         <NavLink href="/portfolio" active={pathname.includes("/portfolio")}>{nav("portfolio")}</NavLink>
                         <NavLink href="/blog" active={pathname.includes("/blog")}>{nav("blog")}</NavLink>
                         <NavLink href="/contact" active={pathname.includes("/contact")}>{nav("contact")}</NavLink>
-                        <Link href="/abonelikler" className="flex items-center text-slate-700 hover:text-slate-950 text-[14px] font-bold tracking-tight transition-colors">
-                            <span className="bg-[#e6c800]/25 text-[#0a0c10] px-2 py-0.5 rounded text-[10px] font-black mr-2">PRO</span>
-                            {a("badge") || "Uygulamalar"}
-                        </Link>
                     </nav>
 
                     {/* Right side */}
-                    <div className="hidden md:flex items-center gap-5">
+                    <div className="hidden md:flex items-center gap-4">
                         <LanguageSwitcher isScrolled={isScrolled} />
                         {session ? (
-                            <div className="flex items-center gap-4">
-                                <Magnetic strength={20}>
-                                    <Link href="/dashboard" className="bg-[#0a0c10] text-white text-[12px] font-black uppercase tracking-[0.18em] py-3 px-7 rounded-full hover:bg-[#e6c800] hover:text-[#0a0c10] transition-all duration-500 shadow-xl shadow-[#0a0c10]/15 border border-[#0a0c10]/10" data-magnetic="true">
-                                        PANEL
+                            <div className="flex items-center gap-3">
+                                <Magnetic strength={18}>
+                                    <Link href="/dashboard" className="bg-slate-950 text-white text-[11px] font-black uppercase tracking-[0.2em] py-2.5 px-6 rounded-full hover:bg-[#e6c800] hover:text-slate-950 transition-all duration-200 shadow-lg shadow-slate-900/10" data-magnetic="true">
+                                        Panel
                                     </Link>
                                 </Magnetic>
                                 <button onClick={() => signOut()} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
@@ -110,15 +106,13 @@ export function Header() {
                                 </button>
                             </div>
                         ) : (
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-3">
+                                <Link href="/login" className="text-slate-600 hover:text-slate-950 text-[13px] font-bold transition-colors px-3 py-2 rounded-lg hover:bg-slate-50/80">
+                                    Giriş
+                                </Link>
                                 <Magnetic strength={20}>
-                                    <Link href="/login" className="text-slate-950 hover:text-[#0a0c10] text-[13px] font-black uppercase tracking-[0.14em] transition-colors px-4" data-magnetic="true">
-                                        Giriş
-                                    </Link>
-                                </Magnetic>
-                                <Magnetic strength={30}>
-                                    <Link href="/register" className="bg-[#0a0c10] text-white text-[12px] font-black uppercase tracking-[0.16em] py-3.5 px-8 rounded-full hover:bg-[#e6c800] hover:text-[#0a0c10] transition-all duration-500 shadow-xl shadow-slate-900/20 border border-[#0a0c10]/10" data-magnetic="true">
-                                        KAYIT OL
+                                    <Link href="/register" className="bg-slate-950 text-white text-[11px] font-black uppercase tracking-[0.2em] py-2.5 px-6 rounded-full hover:bg-[#e6c800] hover:text-slate-950 transition-all duration-200 shadow-lg shadow-slate-900/10" data-magnetic="true">
+                                        Kayıt Ol
                                     </Link>
                                 </Magnetic>
                             </div>
@@ -150,10 +144,10 @@ export function Header() {
                             {[
                                 { name: nav("home"), href: "/" },
                                 { name: nav("services"), href: "/services" },
+                                { name: nav("products"), href: "/abonelikler" },
                                 { name: nav("about"), href: "/about" },
                                 { name: nav("portfolio"), href: "/portfolio" },
                                 { name: nav("blog"), href: "/blog" },
-                                { name: a("badge") || "Uygulamalar", href: "/abonelikler" },
                                 { name: nav("contact"), href: "/contact" },
                             ].map((link) => (
                                 <Link
@@ -199,10 +193,10 @@ function NavLink({ href, active, children }: { href: string; active?: boolean; c
         <Link
             href={href}
             aria-current={active ? "page" : undefined}
-            className={`group relative text-[14px] font-bold tracking-tight transition-colors ${active ? "text-slate-950" : "text-slate-700 hover:text-slate-950"}`}
+            className={`group relative text-[13px] font-bold tracking-tight transition-colors duration-200 ${active ? "text-slate-950" : "text-slate-600 hover:text-slate-950"}`}
         >
             {children}
-            <span className={`absolute -bottom-2 left-0 h-px bg-[#e6c800] transition-all duration-300 ${active ? "w-full opacity-100" : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"}`} />
+            <span className={`absolute -bottom-1 left-0 h-0.5 rounded-full bg-[#e6c800] transition-all duration-200 ${active ? "w-full opacity-100" : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"}`} />
         </Link>
     );
 }

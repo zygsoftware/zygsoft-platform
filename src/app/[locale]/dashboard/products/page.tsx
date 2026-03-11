@@ -20,28 +20,28 @@ const tools = [
         desc: "Word (DOC/DOCX) dosyalarınızı saniyeler içinde UYAP uyumlu UDF formatına dönüştürün.",
         icon: <FileText size={24} />,
         href: "/dashboard/tools/doc-to-udf",
-        slug: "udf-toolkit"
+        slug: "legal-toolkit"
     },
     {
         title: "PDF Birleştirici",
         desc: "Birden fazla PDF dökümanını tek bir dosya altında birleştirin.",
         icon: <Layers size={24} />,
         href: "/dashboard/tools/pdf-merge",
-        slug: "udf-toolkit"
+        slug: "legal-toolkit"
     },
     {
         title: "TIFF / JPG to PDF",
         desc: "Resim formatındaki dosyalarınızı tek tıkla PDF kitapçığına çevirin.",
         icon: <FileImage size={24} />,
         href: "/dashboard/tools/image-to-pdf",
-        slug: "udf-toolkit"
+        slug: "legal-toolkit"
     },
     {
         title: "AI Karar Özeti",
         desc: "Dava dosyalarını yapay zeka ile analiz edin ve özetleyin.",
         icon: <BrainCircuit size={24} />,
         href: "/dashboard/tools/ai-summary",
-        slug: "udf-toolkit"
+        slug: "legal-toolkit"
     }
 ];
 
@@ -53,8 +53,8 @@ export default function ProductsPage() {
     return (
         <div className="space-y-10">
             <div>
-                <h1 className="text-3xl font-heading font-black text-slate-950 mb-2">Ürünlerim & Yazılımlar</h1>
-                <p className="text-slate-500 font-medium font-sans">Sahip olduğunuz tüm yazılımları ve araçları buradan yönetin.</p>
+                <h1 className="text-3xl font-heading font-black text-slate-950 mb-2">Ürünlerim</h1>
+                <p className="text-slate-500 font-medium font-sans">Hukuk Araçları Paketi ve abonelikleriniz.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -104,12 +104,12 @@ export default function ProductsPage() {
                     <div className="w-20 h-20 bg-[#fafafc] rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[#0a0c10]/5">
                         <Box size={32} className="text-[#0a0c10]/30" />
                     </div>
-                    <h2 className="text-2xl font-display font-black text-[#0a0c10] mb-4">Henüz bir ürününüz yok mu?</h2>
+                    <h2 className="text-2xl font-display font-black text-[#0a0c10] mb-4">Henüz Hukuk Araçları Paketi aboneliğiniz yok mu?</h2>
                     <p className="text-[#0a0c10]/60 font-medium mb-8 max-w-md mx-auto">
-                        Hukuk teknolojilerinden dijital araçlara—Zygsoft Mağazasındaki premium yazılımları keşfedin.
+                        Tüm belge araçlarına erişmek için Hukuk Araçları Paketi'ne abone olun. Tek yıllık ödeme, tüm araçlar dahil.
                     </p>
                     <Link href="/abonelikler" className="inline-flex items-center gap-2 bg-[#e6c800] text-[#0a0c10] px-10 py-4 rounded-2xl text-sm font-black hover:bg-[#c9ad00] transition-all shadow-xl shadow-[#e6c800]/20">
-                        MAĞAZAYA GİT <ArrowRight size={18} />
+                        PAKETİ İNCELE <ArrowRight size={18} />
                     </Link>
                 </div>
             )}

@@ -5,32 +5,23 @@ import { motion } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ExternalLink, Code2 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
-import { useInView } from "framer-motion";
-import { useRef } from "react";
+import { BlockReveal, TextReveal } from "@/components/ui/reveal";
 
 type Project = {
     id: string;
     title: string;
     description: string;
-    client?: string;
-    link?: string;
+    image?: string | null;
+    client?: string | null;
+    link?: string | null;
+    slug: string;
 };
-
-function AnimIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
-    const ref = useRef(null);
-    const inView = useInView(ref, { once: true, margin: "-60px" });
-    return (
-        <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94], delay }} className={className}>
-            {children}
-        </motion.div>
-    );
-}
 
 export default function Portfolio() {
     const t = useTranslations("Portfolio");
+    const locale = useLocale();
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -95,49 +86,58 @@ export default function Portfolio() {
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                {projects.map((p, i) => (
-                                    <AnimIn key={p.id} delay={i * 0.1}>
-                                        <div className="group block overflow-hidden rounded-xl glass hover-glow transition-all duration-300">
-                                            <motion.div
-                                                className="aspect-[4/3] flex flex-col justify-end relative overflow-hidden"
-                                                style={{ background: i % 2 === 0 ? "#0e0e0e" : "#f9f7f3" }}
-                                                whileHover={{ scale: 1.02 }}
-                                                transition={{ duration: 0.4 }}
-                                            >
+                                {projects.map((p, i) => {
+                                    const detailHref = locale === "en"
+                                        ? `/en/portfolio/${p.slug}`
+                                        : `/portfolio/${p.slug}`;
+
+                                    return (
+                                        <BlockReveal key={p.id} delay={i * 0.08}>
+                                            <Link href={detailHref} className="group block overflow-hidden rounded-xl glass hover-glow transition-all duration-300">
                                                 <motion.div
-                                                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                                                    style={{ background: i % 2 === 0 ? "linear-gradient(135deg, rgba(230,200,0,0.08) 0%, transparent 60%)" : "linear-gradient(135deg, rgba(230,200,0,0.06) 0%, transparent 60%)" }} />
-                                                <div className="absolute inset-0 flex items-center justify-center">
-                                                    <Code2 size={100} style={{ color: i % 2 === 0 ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)" }} />
+                                                    className="aspect-[4/3] flex flex-col justify-end relative overflow-hidden"
+                                                    style={{ background: i % 2 === 0 ? "#0e0e0e" : "#f9f7f3" }}
+                                                    whileHover={{ scale: 1.02 }}
+                                                    transition={{ duration: 0.4 }}
+                                                >
+                                                    {p.image ? (
+                                                        <img src={p.image} alt={p.title} className="absolute inset-0 w-full h-full object-cover" />
+                                                    ) : (
+                                                        <>
+                                                            <motion.div
+                                                                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                                                style={{ background: i % 2 === 0 ? "linear-gradient(135deg, rgba(230,200,0,0.08) 0%, transparent 60%)" : "linear-gradient(135deg, rgba(230,200,0,0.06) 0%, transparent 60%)" }} />
+                                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                                <Code2 size={100} style={{ color: i % 2 === 0 ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)" }} />
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </motion.div>
+
+                                                <div className="p-8 relative">
+                                                    <motion.div className="absolute top-0 left-0 h-1"
+                                                        style={{ background: "#e6c800" }}
+                                                        initial={{ width: "0%" }}
+                                                        whileHover={{ width: "100%" }}
+                                                        transition={{ duration: 0.4 }} />
+
+                                                    <span className="text-xs font-bold uppercase tracking-widest text-[#888] mb-3 block">
+                                                        {p.client ? `${p.client}` : "ZYGSOFT"}
+                                                    </span>
+                                                    <h3 className="font-display font-bold text-2xl text-[#0e0e0e] mb-4 group-hover:text-[#c9ad00] transition-colors">
+                                                        {p.title}
+                                                    </h3>
+                                                    <p className="text-[#666] leading-relaxed mb-6 line-clamp-3">
+                                                        {p.description}
+                                                    </p>
+                                                    <span className="inline-flex items-center gap-2 text-sm font-bold text-[#e6c800] uppercase tracking-wider">
+                                                        {locale === "en" ? "View Case Study" : "Detayları Gör"} <ExternalLink size={16} />
+                                                    </span>
                                                 </div>
-                                            </motion.div>
-
-                                            <div className="p-8 relative">
-                                                <motion.div className="absolute top-0 left-0 h-1"
-                                                    style={{ background: "#e6c800" }}
-                                                    initial={{ width: "0%" }}
-                                                    whileHover={{ width: "100%" }}
-                                                    transition={{ duration: 0.4 }} />
-
-                                                <span className="text-xs font-bold uppercase tracking-widest text-[#888] mb-3 block">
-                                                    {p.client ? `${p.client} / 2024` : "2024"}
-                                                </span>
-                                                <h3 className="font-display font-bold text-2xl text-[#0e0e0e] mb-4">
-                                                    {p.title}
-                                                </h3>
-                                                <p className="text-[#666] leading-relaxed mb-6 line-clamp-3">
-                                                    {p.description}
-                                                </p>
-                                                {p.link && (
-                                                    <a href={p.link} target="_blank" rel="noopener noreferrer"
-                                                        className="inline-flex items-center gap-2 text-sm font-bold text-[#e6c800] hover:text-[#c9ad00] transition-colors uppercase tracking-wider relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-[#e6c800] hover:after:w-full after:transition-all after:duration-300 mt-4">
-                                                        Projeyi İncele <ExternalLink size={16} />
-                                                    </a>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </AnimIn>
-                                ))}
+                                            </Link>
+                                        </BlockReveal>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
@@ -146,15 +146,21 @@ export default function Portfolio() {
                 {/* ── CTA ── */}
                 <section className="py-20" style={{ background: "#0e0e0e" }}>
                     <div className="container mx-auto px-6 max-w-7xl text-center">
-                        <AnimIn>
-                            <span className="section-label" style={{ color: "#e6c800", borderColor: "#e6c800" }}>Benzer Bir Proje?</span>
-                            <h2 className="font-display font-extrabold text-white mt-4 mb-8" style={{ fontSize: "clamp(32px,4vw,56px)" }}>
-                                Sizin Projenizi De Konuşalım
-                            </h2>
-                            <Link href="/contact" className="btn-yellow inline-flex">
-                                İletişime Geç
-                            </Link>
-                        </AnimIn>
+                        <BlockReveal>
+                            <TextReveal delay={0.08}>
+                                <span className="section-label" style={{ color: "#e6c800", borderColor: "#e6c800" }}>Benzer Bir Proje?</span>
+                            </TextReveal>
+                            <TextReveal delay={0.16}>
+                                <h2 className="font-display font-extrabold text-white mt-4 mb-8" style={{ fontSize: "clamp(32px,4vw,56px)" }}>
+                                    Sizin Projenizi De Konuşalım
+                                </h2>
+                            </TextReveal>
+                            <BlockReveal delay={0.12}>
+                                <Link href="/contact" className="btn-yellow inline-flex">
+                                    İletişime Geç
+                                </Link>
+                            </BlockReveal>
+                        </BlockReveal>
                     </div>
                 </section>
             </main>

@@ -4,20 +4,8 @@ import { motion } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Target, Eye, Heart, Zap, Users, Code2, Globe, Award, ArrowRight } from "lucide-react";
-import { useRef } from "react";
-import { useInView } from "framer-motion";
 import Link from "next/link";
-
-function AnimIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
-    const ref = useRef(null);
-    const inView = useInView(ref, { once: true, margin: "-60px" });
-    return (
-        <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94], delay }} className={className}>
-            {children}
-        </motion.div>
-    );
-}
+import { BlockReveal, TextReveal } from "@/components/ui/reveal";
 
 export default function About() {
     const values = [
@@ -54,7 +42,7 @@ export default function About() {
                         backgroundSize: "40px 40px"
                     }} />
 
-                    {/* Visual background image with fade */}
+                    {/* Decorative background panel */}
                     <div className="absolute right-0 top-0 w-1/2 h-full hidden lg:block pointer-events-none">
                         <motion.div
                             initial={{ opacity: 0, x: 50 }}
@@ -62,10 +50,11 @@ export default function About() {
                             transition={{ duration: 1.2 }}
                             className="w-full h-full"
                         >
-                            <img
-                                src="file:///Users/gunesai/.gemini/antigravity/brain/f86ca286-fc44-40fe-b0ce-6cf989e2c8b3/team_modern_office_1772719461089.png"
-                                alt="Studio"
-                                className="w-full h-full object-cover rounded-l-[100px]"
+                            <div
+                                className="w-full h-full rounded-l-[100px]"
+                                style={{
+                                    background: "linear-gradient(135deg, #e8e3d9 0%, #f0ece0 40%, #e8dfc8 70%, #ddd5bc 100%)",
+                                }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-r from-[#f9f7f3] to-transparent w-full" />
                         </motion.div>
@@ -89,18 +78,18 @@ export default function About() {
                 <section className="py-24 bg-white border-y border-black/8">
                     <div className="container mx-auto px-6 max-w-7xl">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-                            <AnimIn>
+                            <BlockReveal>
                                 <h2 className="font-display font-extrabold text-[#0e0e0e] mb-6" style={{ fontSize: "clamp(28px,3vw,44px)" }}>
                                     Yazılım ve dijital dönüşümde güvenilir ortağınız
                                 </h2>
                                 <p className="text-[#666] leading-relaxed mb-6">
                                     Zygsoft, 2019'dan bu yana Türkiye'nin önde gelen yazılım şirketleri ve hukuk bürolarına özelleştirilmiş çözümler sunmaktadır. Küçük bir atölyeden başlayan yolculuğumuz, bugün 30'dan fazla mutlu müşteriyle devam etmektedir.
                                 </p>
-                                <p className="text-[#888] leading-relaxed">
-                                    Web geliştirmeden marka kimliğine, kurumsal yazılımlardan dijital pazarlamaya kadar her alanda tam kapsamlı hizmetler sunuyoruz. Teknoloji ve tasarımı harmanlayan yaklaşımımızla, her projeyi başarıya taşıyoruz.
-                                </p>
-                            </AnimIn>
-                            <AnimIn delay={0.15} className="grid grid-cols-2 gap-4">
+                                    <p className="text-[#888] leading-relaxed">
+                                        Web geliştirmeden marka kimliğine, kurumsal yazılımlardan dijital pazarlamaya kadar her alanda tam kapsamlı hizmetler sunuyoruz. Teknoloji ve tasarımı harmanlayan yaklaşımımızla, her projeyi başarıya taşıyoruz.
+                                    </p>
+                            </BlockReveal>
+                            <BlockReveal delay={0.12} className="grid grid-cols-2 gap-4">
                                 {[
                                     { num: "50+", label: "Tamamlanan Proje" },
                                     { num: "30+", label: "Mutlu Müşteri" },
@@ -114,7 +103,7 @@ export default function About() {
                                         <p className={`text-sm ${i % 2 === 0 ? "text-white/50" : "text-[#888]"}`}>{s.label}</p>
                                     </motion.div>
                                 ))}
-                            </AnimIn>
+                            </BlockReveal>
                         </div>
                     </div>
                 </section>
@@ -122,15 +111,19 @@ export default function About() {
                 {/* ── Values ── */}
                 <section className="py-24" style={{ background: "#f9f7f3" }}>
                     <div className="container mx-auto px-6 max-w-7xl">
-                        <AnimIn className="mb-14">
-                            <span className="section-label">Değerlerimiz</span>
-                            <h2 className="font-display font-extrabold text-[#0e0e0e] mt-2" style={{ fontSize: "clamp(28px,3vw,44px)" }}>
-                                Bizi Biz Yapan Değerler
-                            </h2>
-                        </AnimIn>
+                        <BlockReveal className="mb-14">
+                            <TextReveal delay={0.05}>
+                                <span className="section-label">Değerlerimiz</span>
+                            </TextReveal>
+                            <TextReveal delay={0.12}>
+                                <h2 className="font-display font-extrabold text-[#0e0e0e] mt-2" style={{ fontSize: "clamp(28px,3vw,44px)" }}>
+                                    Bizi Biz Yapan Değerler
+                                </h2>
+                            </TextReveal>
+                        </BlockReveal>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                             {values.map((v, i) => (
-                                <AnimIn key={i} delay={i * 0.07}>
+                                <BlockReveal key={i} delay={i * 0.08}>
                                     <motion.div className="glass p-8 rounded-xl relative overflow-hidden hover-glow"
                                         whileHover={{ y: -6, transition: { duration: 0.2 } }}>
                                         <motion.div className="absolute bottom-0 left-0 h-1 bg-[#e6c800]"
@@ -144,7 +137,7 @@ export default function About() {
                                         <h3 className="font-display font-bold text-[#0e0e0e] text-lg mb-3">{v.title}</h3>
                                         <p className="text-[#888] text-sm leading-relaxed">{v.desc}</p>
                                     </motion.div>
-                                </AnimIn>
+                                </BlockReveal>
                             ))}
                         </div>
                     </div>
@@ -153,22 +146,26 @@ export default function About() {
                 {/* ── Timeline ── */}
                 <section className="py-24 bg-[#0e0e0e]">
                     <div className="container mx-auto px-6 max-w-7xl">
-                        <AnimIn className="mb-14">
-                            <span className="section-label" style={{ color: "#e6c800" }}>Yolculuğumuz</span>
-                            <h2 className="font-display font-extrabold text-white mt-2" style={{ fontSize: "clamp(28px,3vw,44px)" }}>
-                                Nasıl Büyüdük?
-                            </h2>
-                        </AnimIn>
+                        <BlockReveal className="mb-14">
+                            <TextReveal delay={0.05}>
+                                <span className="section-label" style={{ color: "#e6c800" }}>Yolculuğumuz</span>
+                            </TextReveal>
+                            <TextReveal delay={0.12}>
+                                <h2 className="font-display font-extrabold text-white mt-2" style={{ fontSize: "clamp(28px,3vw,44px)" }}>
+                                    Nasıl Büyüdük?
+                                </h2>
+                            </TextReveal>
+                        </BlockReveal>
                         <div className="relative border-l-2 border-white/10 ml-8 pl-8 space-y-12">
                             {milestones.map((m, i) => (
-                                <AnimIn key={i} delay={i * 0.1}>
+                                <BlockReveal key={i} delay={i * 0.08}>
                                     <div className="relative">
                                         <div className="absolute -left-[41px] w-4 h-4 rounded-full bg-[#e6c800] border-2 border-[#0e0e0e] mt-1" />
                                         <span className="font-display font-extrabold text-[#e6c800] text-sm">{m.year}</span>
                                         <h3 className="font-display font-bold text-white text-xl mt-1 mb-2">{m.title}</h3>
                                         <p className="text-white/50 text-sm leading-relaxed">{m.desc}</p>
                                     </div>
-                                </AnimIn>
+                                </BlockReveal>
                             ))}
                         </div>
                     </div>
@@ -177,15 +174,19 @@ export default function About() {
                 {/* ── Team ── */}
                 <section className="py-24" style={{ background: "#f3f0ea" }}>
                     <div className="container mx-auto px-6 max-w-7xl">
-                        <AnimIn className="mb-14">
-                            <span className="section-label">Ekibimiz</span>
-                            <h2 className="font-display font-extrabold text-[#0e0e0e] mt-2" style={{ fontSize: "clamp(28px,3vw,44px)" }}>
-                                Sahne Arkasındaki Dahiler
-                            </h2>
-                        </AnimIn>
+                        <BlockReveal className="mb-14">
+                            <TextReveal delay={0.05}>
+                                <span className="section-label">Ekibimiz</span>
+                            </TextReveal>
+                            <TextReveal delay={0.12}>
+                                <h2 className="font-display font-extrabold text-[#0e0e0e] mt-2" style={{ fontSize: "clamp(28px,3vw,44px)" }}>
+                                    Sahne Arkasındaki Dahiler
+                                </h2>
+                            </TextReveal>
+                        </BlockReveal>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {team.map((member, i) => (
-                                <AnimIn key={i} delay={i * 0.1}>
+                                <BlockReveal key={i} delay={i * 0.08}>
                                     <motion.div className="glass p-8 rounded-xl text-center hover-glow"
                                         whileHover={{ y: -6, transition: { duration: 0.25 } }}>
                                         <div className="w-16 h-16 rounded-full bg-[#0e0e0e] flex items-center justify-center mx-auto mb-5 shadow-[0_4px_20px_rgba(230,200,0,0.3)] border border-[#e6c800]/20">
@@ -194,7 +195,7 @@ export default function About() {
                                         <h3 className="font-display font-bold text-[#0e0e0e] text-lg">{member.name}</h3>
                                         <p className="text-[#888] text-sm mt-1">{member.role}</p>
                                     </motion.div>
-                                </AnimIn>
+                                </BlockReveal>
                             ))}
                         </div>
                     </div>
@@ -203,15 +204,21 @@ export default function About() {
                 {/* ── CTA ── */}
                 <section className="py-20" style={{ background: "#f9f7f3" }}>
                     <div className="container mx-auto px-6 max-w-7xl text-center">
-                        <AnimIn>
-                            <h2 className="font-display font-extrabold text-[#0e0e0e] mb-6" style={{ fontSize: "clamp(32px,4vw,56px)" }}>
-                                Birlikte Çalışalım
-                            </h2>
-                            <p className="text-[#888] text-lg mb-8">Projeniz için ücretsiz danışmanlık alın.</p>
-                            <Link href="/contact" className="btn-primary inline-flex">
-                                İletişime Geç <ArrowRight size={16} />
-                            </Link>
-                        </AnimIn>
+                        <BlockReveal>
+                            <TextReveal delay={0.08}>
+                                <h2 className="font-display font-extrabold text-[#0e0e0e] mb-6" style={{ fontSize: "clamp(32px,4vw,56px)" }}>
+                                    Birlikte Çalışalım
+                                </h2>
+                            </TextReveal>
+                            <TextReveal delay={0.16}>
+                                <p className="text-[#888] text-lg mb-8">Projeniz için ücretsiz danışmanlık alın.</p>
+                            </TextReveal>
+                            <BlockReveal delay={0.12}>
+                                <Link href="/contact" className="btn-primary inline-flex">
+                                    İletişime Geç <ArrowRight size={16} />
+                                </Link>
+                            </BlockReveal>
+                        </BlockReveal>
                     </div>
                 </section>
 

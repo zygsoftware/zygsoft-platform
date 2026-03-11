@@ -1,568 +1,826 @@
 {
-    "Dashboard": {
-        "sidebar": {
-            "overview": "Overview",
-            "products": "My Products",
-            "services": "My Services",
-            "support": "Support Tickets",
-            "billing": "Payments",
-            "account": "Account Settings",
-            "logout": "Logout",
-            "backToSite": "Back to Website"
+  "Dashboard": {
+    "sidebar": {
+      "overview": "Overview",
+      "products": "My Products",
+      "tools": "My Tools",
+      "services": "My Services",
+      "support": "Support Tickets",
+      "billing": "Payments",
+      "account": "Account Settings",
+      "logout": "Logout",
+      "backToSite": "Back to Website"
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "dashboard": "Dashboard",
+      "products": "Products",
+      "services": "Services",
+      "support": "Support",
+      "billing": "Payments",
+      "account": "Profile",
+      "tools": "Tools"
+    },
+    "overview": {
+      "welcome": "Hello",
+      "subtitle": "Your account status and quick actions.",
+      "stats": {
+        "activeProducts": "Active Products",
+        "activeServices": "Active Services",
+        "supportTickets": "Support Tickets",
+        "pendingPayments": "Pending Payment"
+      },
+      "activity": {
+        "title": "Recent Activity",
+        "empty": "No activity yet.",
+        "emptyHint": "Get started by submitting a payment notification or creating a support request.",
+        "payment": "Payment",
+        "ticket": "Support Ticket",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "daysAgo": "{count} days ago"
+      },
+      "onboarding": {
+        "pendingPayment": "Your payment is under review. Track its status here.",
+        "pendingPaymentCta": "View Payment Status",
+        "openTicket": "You have an open support ticket. Check your response here.",
+        "openTicketCta": "View Tickets",
+        "noProducts": "You don't have a Legal Toolkit subscription yet. Subscribe to access all document tools.",
+        "noProductsCta": "View Package",
+        "hasTools": "Your Legal Toolkit is active. Access all document tools.",
+        "hasToolsCta": "Go to Document Tools"
+      },
+      "quickActions": {
+        "title": "Quick Actions",
+        "tools": "Document Tools",
+        "billing": "Payment Notification",
+        "support": "Create Support Request",
+        "services": "My Services",
+        "subscriptions": "Browse Subscriptions"
+      },
+      "sections": {
+        "apps": "My Active Software",
+        "support": "Recent Support Tickets",
+        "viewAll": "View All",
+        "start": "START",
+        "noApps": "You don't have a Legal Toolkit subscription yet.",
+        "browseStore": "View Package",
+        "noTickets": "You have no active or pending tickets.",
+        "newTicket": "Create New Ticket",
+        "openTicketsCount": "You have {count} open ticket(s)",
+        "openTicketsHint": "Check responses or create a new ticket."
+      },
+      "tools": {
+        "onboardingLocked": "Legal Toolkit subscription required. Subscribe to access all document tools.",
+        "onboardingLockedCta": "View Package",
+        "onboardingReady": "Your Legal Toolkit is active. Access all document tools.",
+        "onboardingReadyCta": "Use Tool",
+        "hubTitle": "Document Tools",
+        "hubSubtitle": "8 tools included in your Legal Toolkit. One yearly subscription, unlimited access to all.",
+        "groupDocument": "Document Tools",
+        "groupDocumentDesc": "One package, 8 tools — UYAP, PDF, OCR and batch processing all included",
+        "packageBadge": "Included in Legal Toolkit",
+        "toolsActiveCount": "{count} tools active in your package",
+        "toolsExploreHint": "8 tools with one yearly package — subscribe to access",
+        "groupAutomation": "Automation Tools",
+        "groupAutomationDesc": "Coming soon",
+        "automationPlaceholder": "Workflow automation and batch processing tools coming soon.",
+        "browseOther": "Browse other tools",
+        "backToHub": "Back to Tools Hub",
+        "allTools": "All document tools",
+        "docToUdf": {
+          "uploadHint": "Drag and drop or click to add your DOCX files",
+          "uploadFormat": "Only .docx • Batch processing supported",
+          "tip1": "Convert your documents with this tool before uploading to UYAP.",
+          "tip2": "You can add multiple files and convert them in sequence."
         },
-        "breadcrumb": {
-            "home": "Home",
-            "dashboard": "Dashboard",
-            "products": "Products",
-            "services": "Services",
-            "support": "Support",
-            "billing": "Payments",
-            "account": "Profile",
-            "tools": "Tools"
+        "imageToPdf": {
+          "uploadHint": "Drag or click to add JPG, PNG or TIFF images",
+          "tip1": "Images appear in the PDF in the order they are added.",
+          "successTitle": "Successfully Created!",
+          "successDesc": "All your images have been merged into a single PDF.",
+          "downloadButton": "Download PDF",
+          "newButton": "New Operation"
         },
-        "overview": {
-            "welcome": "Hello",
-            "subtitle": "Your account status and quick actions.",
-            "stats": {
-                "activeProducts": "Active Products",
-                "activeServices": "Active Services",
-                "supportTickets": "Support Tickets"
-            },
-            "sections": {
-                "apps": "My Active Software",
-                "support": "Recent Support Tickets",
-                "viewAll": "View All",
-                "start": "START",
-                "noApps": "You don't have any active software yet.",
-                "browseStore": "Browse App Store",
-                "noTickets": "You have no active or pending tickets.",
-                "newTicket": "Create New Ticket"
-            },
-            "cta": {
-                "title": "Grow Your Business with Zygsoft",
-                "desc": "Make a difference in the digital world with our custom software solutions, mobile app development, and corporate SEO services.",
-                "button": "BROWSE SERVICES"
-            }
+        "pdfMerge": {
+          "uploadHint": "Drag or click to add your PDF files",
+          "tip1": "Use drag-and-drop to reorder the merge sequence.",
+          "successTitle": "Merge Complete!",
+          "successDesc": "Your PDFs have been merged into a single file.",
+          "downloadButton": "Download PDF",
+          "newButton": "New Operation"
         },
-        "billing": {
-            "title": "Payment Notification & Invoice",
-            "subtitle": "Report your Bank Transfer / EFT transactions here to activate your subscription.",
-            "bankInfo": "Bank Information",
-            "bankName": "Bank Name",
-            "receiverName": "Receiver Name",
-            "iban": "IBAN",
-            "note": "Including your account email in the description helps speed up the process.",
-            "formTitle": "Create New Notification",
-            "selectProduct": "Product / Service Paid",
-            "placeholder": "Please select a service",
-            "amount": "Amount Deposited (TL)",
-            "date": "Date",
-            "receipt": "Receipt Image",
-            "upload": "Click to Upload Image",
-            "formats": "JPG, PNG, GIF or PDF",
-            "submit": "Send Notification",
-            "sending": "Sending...",
-            "successTitle": "Notification Received!",
-            "successDesc": "Your payment notification has reached our team. Your account will be activated automatically after the receipt is reviewed.",
-            "newNotice": "Send New Notification",
-            "errorRequired": "Please select a product and upload a receipt image.",
-            "products": {
-                "udf_toolkit": "Legal UDF Converter (₺499/mo)",
-                "web_dev": "Corporate Web Project",
-                "social_media": "Social Media Management (₺15,000/mo)",
-                "other": "Other / Custom Agreement"
-            }
+        "pdfSplit": {
+          "title": "PDF Split Tool",
+          "description": "Extract specific pages from your PDF to create a new document.",
+          "uploadTitle": "Upload PDF",
+          "uploadHint": "Drag and drop or click to add a single PDF file",
+          "pageRangeLabel": "Page Range",
+          "pageRangePlaceholder": "e.g. 1-3, 5, 7-10",
+          "pageRangeHelp": "Single: 5 | Range: 1-5 | Mixed: 1,3,5-7",
+          "tip1": "Page numbers start at 1. Use commas to separate multiple pages or ranges.",
+          "tip2": "Page order is preserved as entered.",
+          "splitButton": "Split",
+          "successTitle": "Split Complete!",
+          "successDesc": "Selected pages have been extracted into a new PDF.",
+          "downloadButton": "Download",
+          "newButton": "New Operation",
+          "errorNoFile": "Please upload a PDF file.",
+          "errorNoPageRange": "Enter a page range.",
+          "errorService": "Conversion service is currently unavailable. Please contact support.",
+          "errorGeneric": "An error occurred."
         },
-        "account": {
-            "title": "My Account",
-            "subtitle": "Manage your membership details and subscription status here.",
-            "goToPanel": "Go to Tool Panel",
-            "profileDetails": "Profile Details",
-            "email": "Email Address",
-            "accountType": "Account Type",
-            "admin": "Administrator (Admin)",
-            "customer": "Standard Customer",
-            "subsTitle": "My Subscriptions & Apps",
-            "subsSubtitle": "Your Zygsoft Service Store access packages.",
-            "buyNew": "Get New App",
-            "statusActive": "Active",
-            "statusPending": "Pending Approval",
-            "statusInactive": "Inactive",
-            "noSubs": "You don't have any active subscriptions or apps yet.",
-            "noSubsDesc": "You can browse our software by visiting the Zygsoft Store.",
-            "notifyPayment": "Report Bank/EFT Payment",
-            "security": "Account Security",
-            "securityDesc": "You can contact our support team to change your password or secure your account.",
-            "contactSupport": "Contact Support"
+        "pdfToImage": {
+          "title": "PDF → Image Converter",
+          "description": "Convert PDF pages to PNG or JPG images. Output is downloaded as a ZIP file.",
+          "uploadTitle": "Upload PDF",
+          "uploadHint": "Drag and drop or click to add a single PDF file",
+          "formatLabel": "Output Format",
+          "pageRangeLabel": "Page Range",
+          "optional": "optional",
+          "pageRangePlaceholder": "e.g. 1-3, 5, 7-10 (empty = all pages)",
+          "pageRangeHelp": "Single: 5 | Range: 1-5 | Mixed: 1,3,5-7 | Leave empty to convert all pages.",
+          "tip1": "PNG is lossless, JPG produces smaller file sizes.",
+          "tip2": "If you leave page range empty, all pages will be converted.",
+          "convertButton": "Convert",
+          "successTitle": "Conversion Complete!",
+          "successDesc": "Selected pages have been converted to images. Download the ZIP file.",
+          "downloadButton": "Download ZIP",
+          "newButton": "New Operation",
+          "errorNoFile": "Please upload a PDF file.",
+          "errorService": "Conversion service is currently unavailable. Please contact support.",
+          "errorGeneric": "An error occurred."
+        },
+        "tiffToPdf": {
+          "hubName": "TIFF → PDF",
+          "hubDescription": "Convert your TIFF/TIF files into a single PDF.",
+          "title": "TIFF → PDF Converter",
+          "description": "Convert your TIFF or TIF files into a single PDF document. Multi-page TIFF supported.",
+          "uploadTitle": "Upload TIFF Files",
+          "uploadHint": "Drag and drop or click to add TIFF/TIF files (max 10 files)",
+          "fileList": "File List",
+          "emptyList": "No files added yet",
+          "tip1": "Only .tif and .tiff formats are accepted. Multi-page TIFF files are supported.",
+          "tip2": "Use drag-and-drop to reorder. Files are added to the PDF in this order.",
+          "convertButton": "Create PDF",
+          "successTitle": "Conversion Complete!",
+          "successDesc": "Your TIFF files have been merged into a single PDF.",
+          "downloadButton": "Download",
+          "newButton": "New Operation",
+          "errorNoFile": "Please upload at least one TIFF file.",
+          "errorService": "Conversion service is currently unavailable. Please contact support.",
+          "errorGeneric": "An error occurred."
+        },
+        "ocrText": {
+          "hubName": "OCR Text Extraction",
+          "hubDescription": "Extract text from PDFs and images. Turkish and English supported.",
+          "title": "OCR Text Extraction",
+          "description": "Extract text from PDF, PNG, JPG, JPEG, TIF, and TIFF files. OCR with Turkish or English language option.",
+          "uploadTitle": "Upload File",
+          "uploadHint": "Drag and drop or click to add a PDF, PNG, JPG, or TIFF file (single file, max 20 MB)",
+          "languageLabel": "Text Language",
+          "langTr": "Turkish",
+          "langEn": "English",
+          "noFile": "No file selected",
+          "emptyHint": "No file uploaded yet",
+          "tip1": "PDF, PNG, JPG, JPEG, TIF, and TIFF formats are supported. Single file, max 20 MB.",
+          "tip2": "Language selection improves OCR accuracy. Choose Turkish or English based on document language.",
+          "extractButton": "Extract Text",
+          "successTitle": "Text Extracted!",
+          "successDesc": "Text was successfully extracted from the document.",
+          "copyButton": "Copy",
+          "downloadButton": "Download TXT",
+          "newButton": "New Operation",
+          "errorNoFile": "Please upload a file.",
+          "errorService": "OCR service is currently unavailable. Please contact support.",
+          "errorGeneric": "An error occurred."
+        },
+        "resultPanel": {
+          "conversionTime": "Conversion time",
+          "fileCount": "files",
+          "fileCountOne": "file",
+          "pageCount": "pages",
+          "pageCountOne": "page",
+          "downloadDocx": "Download DOCX"
+        },
+        "batchConvert": {
+          "hubName": "Batch Document Converter",
+          "hubDescription": "Convert multiple documents at once. Download as ZIP.",
+          "title": "Batch Document Converter",
+          "description": "Convert multiple documents in a single operation.",
+          "uploadTitle": "Upload Files",
+          "uploadHint": "Max 20 files, 20 MB each",
+          "toolSelectorLabel": "Conversion Type",
+          "languageLabel": "Text Language (OCR)",
+          "langTr": "Turkish",
+          "langEn": "English",
+          "fileList": "File List",
+          "emptyList": "No files added yet",
+          "tip1": "Select conversion type first, then upload compatible files. Max 20 files, 20 MB each.",
+          "tip2": "All converted files are downloaded in a single ZIP archive.",
+          "convertButton": "Convert",
+          "successTitle": "Conversion Complete!",
+          "successDesc": "All files have been converted. Download the ZIP file.",
+          "downloadButton": "Download ZIP",
+          "newButton": "New Operation",
+          "errorNoFile": "Please upload at least one file.",
+          "errorService": "Conversion service is currently unavailable. Please contact support.",
+          "errorGeneric": "An error occurred."
         }
+      },
+      "cta": {
+        "title": "Grow Your Business with Zygsoft",
+        "desc": "Make a difference in the digital world with our custom software solutions, mobile app development, and corporate SEO services.",
+        "button": "BROWSE SERVICES"
+      }
     },
-    "Navigation": {
-        "home": "Home",
-        "about": "About Us",
-        "services": "Services",
-        "portfolio": "Portfolio",
-        "blog": "Blog",
-        "contact": "Contact",
-        "getQuote": "Get a Quote",
-        "login": "Login",
-        "register": "Register"
+    "billing": {
+      "title": "Payment Notification & Invoice",
+      "subtitle": "Report your Bank Transfer / EFT transactions here to activate your subscription.",
+      "bankInfo": "Bank Information",
+      "bankName": "Bank Name",
+      "receiverName": "Receiver Name",
+      "iban": "IBAN",
+      "note": "Including your account email in the description helps speed up the process.",
+      "formTitle": "Create New Notification",
+      "selectProduct": "Product / Service Paid",
+      "placeholder": "Please select a service",
+      "amount": "Amount Deposited (TL)",
+      "date": "Date",
+      "receipt": "Receipt Image",
+      "upload": "Click to Upload Image",
+      "formats": "JPG, PNG, GIF or PDF",
+      "submit": "Send Notification",
+      "sending": "Sending...",
+      "successTitle": "Notification Received!",
+      "successDesc": "Your payment notification has reached our team. Your account will be activated automatically after the receipt is reviewed.",
+      "newNotice": "Send New Notification",
+      "errorRequired": "Please select a product and upload a receipt image.",
+      "historyEmptyTitle": "No payment records yet",
+      "historyEmptyDesc": "After making a bank transfer, submit a receipt notification. Your subscription will be activated automatically once reviewed.",
+      "historyEmptyCta": "Submit Receipt",
+      "products": {
+        "legal_toolkit": "Legal Toolkit (₺3,000/year)",
+        "web_dev": "Corporate Web Project",
+        "social_media": "Social Media Management (₺15,000/mo)",
+        "other": "Other / Custom Agreement"
+      }
     },
-    "Homepage": {
-        "viewStoreButton": "Explore App Store",
-        "hero": {
-            "ctaProducts": "DIGITAL PRODUCTS",
-            "tag": "/ DIGITAL TRANSFORMATION PARTNER",
-            "title1": "BUILD THE",
-            "title2": "FUTURE-READY",
-            "title3": "DIGITAL SYSTEMS.",
-            "description": "Zygsoft is an Antalya-based technology company that grows businesses with technology, automates processes, and designs scalable digital infrastructures. Meet your professional partner.",
-            "cta": "START TRANSFORMATION",
-            "ctaSecondary": "OUR SERVICES",
-            "scroll": "EXPLORE"
-        },
-        "partnerSection": {
-            "tag": "/ TRUSTED PARTNER",
-            "title": "Starting with Strategy, <br /> Growing with Technology.",
-            "description": "We are not just a software house; we are a solution partner designing the digital future of your business.",
-            "pillars": [
-                {
-                    "t": "Strategy",
-                    "d": "Technological roadmap aligned with your business goals."
-                },
-                {
-                    "t": "Design",
-                    "d": "Premium aesthetics focused on user experience."
-                },
-                {
-                    "t": "Technology",
-                    "d": "Modern, fast, and scalable software infrastructure."
-                },
-                {
-                    "t": "Execution",
-                    "d": "Result-oriented development process with precision."
-                }
-            ]
-        },
-        "servicesSection": {
-            "tag": "/ OUR SERVICES",
-            "title": "Our Digital <br /> Capabilities.",
-            "description": "We transform complex business problems into simple and effective digital solutions.",
-            "viewAll": "EXPLORE ALL",
-            "items": {
-                "web": {
-                    "t": "Web Design & Development",
-                    "d": "High-performance, SEO-driven, and modern web experiences."
-                },
-                "trans": {
-                    "t": "Digital Transformation",
-                    "d": "Optimizing traditional processes with the power of digital."
-                },
-                "auto": {
-                    "t": "Automation Systems",
-                    "d": "Smart workflows that reduce errors and save time."
-                },
-                "soft": {
-                    "t": "Custom Software",
-                    "d": "Scalable enterprise solutions tailored to your needs."
-                }
-            }
-        },
-        "processSection": {
-            "tag": "/ OUR PROCESS",
-            "title": "Systematic <br/> Road To Success.",
-            "description": "We provide a disciplined and transparent workflow to turn your ideas into reality.",
-            "steps": [
-                {
-                    "n": "01",
-                    "t": "Discovery & Analysis",
-                    "d": "We deeply analyze your needs and objectives."
-                },
-                {
-                    "n": "02",
-                    "t": "Strategic Planning",
-                    "d": "We define the most suitable technology and design approach."
-                },
-                {
-                    "n": "03",
-                    "t": "UI/UX Design",
-                    "d": "We design easy-to-use and visually stunning interfaces."
-                },
-                {
-                    "n": "04",
-                    "t": "Development",
-                    "d": "We bring your project to life with the latest technologies."
-                },
-                {
-                    "n": "05",
-                    "t": "Quality & Launch",
-                    "d": "We present your project to the world after meticulous testing."
-                }
-            ]
-        },
-        "whyChooseUs": {
-            "tag": "/ WHY ZYGSOFT",
-            "title": "Why Entrust Your <br /> Business to Us?",
-            "items": [
-                {
-                    "t": "Custom Solutions",
-                    "d": "Instead of templates, we create boutique solutions fully compatible with your brand's character."
-                },
-                {
-                    "t": "Modern Technology",
-                    "d": "We use the latest stacks like Next.js, React, and Cloud infrastructures."
-                },
-                {
-                    "t": "Measurable Results",
-                    "d": "We build performance-oriented systems that increase your ROI."
-                },
-                {
-                    "t": "Long-Term Partnership",
-                    "d": "We offer a support team that stands by you as long as your business grows."
-                }
-            ]
-        },
-        "capabilities": {
-            "tag": "/ TECH POWER",
-            "title1": "MODERN SYSTEMS,",
-            "title2": "LIMITLESS POTENTIAL.",
-            "desc": "Every technology we use is carefully selected for your project's speed, security, and future."
-        },
-        "portfolioPreview": {
-            "tag": "/ SELECTED PROJECTS",
-            "title": "Our Success <br /> Stories.",
-            "viewProject": "VIEW PROJECT",
-            "exploreMore": "ALL PROJECTS"
-        },
-        "blogSection": {
-            "tag": "/ BLOG & INSIGHTS",
-            "latest": "Latest Articles",
-            "allPosts": "All Posts",
-            "sampleTitle": "Automation and Efficiency in Enterprise Software",
-            "sampleExcerpt": "How modern organizations scale operations with software platforms and automation systems.",
-            "readMore": "Read More"
-        },
-        "socialServices": {
-            "tag": "/ DIGITAL VISIBILITY",
-            "title": "Take Your Brand <br /> To New Heights.",
-            "desc": "Stay in constant touch with your target audience through our social media management and digital strategies.",
-            "features": [
-                "Strategic Content Planning",
-                "Professional Design & Video",
-                "Audience & Data Analysis",
-                "Performance Marketing"
-            ],
-            "cta": "ENHANCE BRAND POWER"
-        },
-        "ctaSection": {
-            "tag": "/ START A PROJECT",
-            "title": "Let's Build Your <br /> Digital Future Together.",
-            "description": "Leave static structures behind with Zygsoft. Start your data-driven, aesthetics-focused digital infrastructure today.",
-            "cta": "GET A QUOTE",
-            "ctaSecondary": "EXPLORE PORTFOLIO",
-            "button": "GET A QUOTE",
-            "directLine": "Direct Line",
-            "features": {
-                "acceleration": {
-                    "title": "FAST DELIVERY",
-                    "desc": "Timely and flawless."
-                },
-                "resilience": {
-                    "title": "SCALABILITY",
-                    "desc": "Perfect future compatibility."
-                },
-                "precision": {
-                    "title": "SECURITY",
-                    "desc": "Your data is safe with us."
-                }
-            }
-        },
-        "contactStrip": {
-            "title": "Tell Us About Your Software Goals",
-            "subtitle": "Share your needs and we will return with a clear roadmap, scope, and proposal."
-        }
+    "supportPage": {
+      "emptyTitle": "No Support Tickets Yet",
+      "emptyDesc": "Create a new ticket for technical issues, subscription or product questions. Our team will respond as soon as possible.",
+      "emptyCta": "Create New Ticket"
     },
-    "Services": {
-        "title": "Our Services",
-        "subtitle": "Premium digital solutions tailored for your business",
-        "cta": "Get a Quote",
-        "readMore": "Learn More",
-        "webDev": "Web & App Development",
-        "socialMedia": "Social Media Management",
-        "branding": "Branding & Graphic Design",
-        "digitalStrategy": "Digital Strategy & Marketing",
-        "audienceAnalysis": "Audience Analysis"
+    "servicesPage": {
+      "emptyTitle": "No Active Services Yet",
+      "emptyDesc": "Your services will appear here after you subscribe and submit a payment notification. Choose a plan to get started, or check your payment status if you've already paid.",
+      "emptyCtaPrimary": "Browse Subscriptions",
+      "emptyCtaSecondary": "Check Payment Status",
+      "emptyCtaContact": "Contact Us"
     },
-    "ServiceDetails": {
-        "sosyal-medya-yonetimi": {
-            "title": "Social Media Management",
-            "subtitle": "Strategic and Measurable Social Media Approach",
-            "content": "Being present on social media is no longer enough. The real key is establishing effective communication with the right target audience, on the right platform, and with the right message. ZYGSOFT not only makes your brand visible but also develops social media strategies that generate engagement, conversions, and sustainable brand value. We adopt a data-driven and performance-based approach suited to the dynamics of each platform.",
-            "features": [
-                "Target audience and persona analysis",
-                "Platform-specific strategy (Instagram, Facebook, LinkedIn, etc.)",
-                "Brand tone and communication language",
-                "Competitor and industry analysis"
-            ],
-            "faq": [
-                {
-                    "q": "Why is social media management necessary?",
-                    "a": "It is vital for increasing brand awareness, building direct links with the target audience, and projecting a professional digital image."
-                },
-                {
-                    "q": "On which platforms should we be active?",
-                    "a": "We determine a custom platform strategy for you (Instagram, LinkedIn, TikTok, etc.) based on your business type and where your target audience spends time."
-                },
-                {
-                    "q": "How are posts determined?",
-                    "a": "We prepare a monthly content calendar and, following your approval, plan posts with designs tailored to your brand."
-                }
-            ]
-        },
-        "web-ve-uygulama-gelistirme": {
-            "title": "Web and Application Development",
-            "subtitle": "Fast, Secure and Scalable Digital Solutions for Your Business",
-            "content": "Your website or mobile application, which is the face of your company in the digital world, must provide excellent user experience in today's competitive conditions. At ZYGSOFT, we develop global-standard web and mobile applications tailored to your brand's needs with our Antalya-based team. We build high-performance, SEO-friendly, and scalable infrastructures using the latest technologies.",
-            "features": [
-                "User-Oriented (UI/UX) Modern Design",
-                "Responsive (Mobile Friendly) Infrastructure",
-                "Custom Software Solutions and API Integrations",
-                "High Performance and Global SEO Optimization"
-            ],
-            "faq": [
-                {
-                    "q": "How long does the process take?",
-                    "a": "Corporate sites are usually completed within 2-4 weeks, while comprehensive web applications take between 4-12 weeks."
-                },
-                {
-                    "q": "Do you provide mobile compatibility?",
-                    "a": "Yes, all our web projects are developed with the 'Mobile-First' principle to work perfectly on all devices."
-                },
-                {
-                    "q": "Do you provide hosting and domain support?",
-                    "a": "Yes, we provide the necessary server and domain infrastructure as a turnkey solution for your project to go live."
-                }
-            ]
-        },
-        "marka-kimligi-ve-grafik-tasarim": {
-            "title": "Brand Identity and Graphic Design",
-            "subtitle": "An Unforgettable Brand Story and Visual Identity Design",
-            "content": "A strong brand identity is the first step in leaving a lasting impression in the minds of your target audience. We carry out corporate identity and unique graphic design work that will distinguish you from your competitors and reflect the story of your brand. Every detail, from your logo to your color palette, is meticulously designed.",
-            "features": [
-                "Original Logo and Corporate Identity Design",
-                "Brand Guidelines",
-                "Digital Media and Print Material Designs",
-                "Modern Packaging and Catalog Design"
-            ],
-            "faq": [
-                {
-                    "q": "How many revisions does the logo design include?",
-                    "a": "For perfect results, we usually offer 3 different concepts and the right to unlimited minor corrections on the selected one."
-                },
-                {
-                    "q": "What files do you deliver for corporate identity?",
-                    "a": "We deliver print-ready PDFs, vector (AI, EPS), and PNG/JPG formats for digital use."
-                },
-                {
-                    "q": "Do you only do logo design?",
-                    "a": "Yes, but we recommend our full corporate identity package for a holistic brand perception."
-                }
-            ]
-        },
-        "dijital-strateji-ve-pazarlama": {
-            "title": "Digital Strategy and Marketing",
-            "subtitle": "Data-Driven Digital Growth and Performance Marketing",
-            "content": "Design or software alone is not enough; a proper strategy is essential for growth. As ZYGSOFT, we analyze where your brand should be in the digital world and how to reach the target audience at the lowest cost. We bring real conversions to your business with Google Ads, Meta Ads, and SEO (Search Engine Optimization).",
-            "features": [
-                "Comprehensive SEO (Search Engine Optimization) Works",
-                "Google Ads, Meta (Facebook/Instagram), and TikTok Ads",
-                "Conversion Rate Optimization (CRO)",
-                "Comprehensive Data Analysis and Regular Reporting"
-            ]
-        },
-        "hedef-kitle-analizi": {
-            "title": "Target Audience Analysis",
-            "subtitle": "Know Your Customers Closely and Increase Your Sales",
-            "content": "You cannot deliver the right message without knowing who you are communicating with. We prevent your digital marketing budget from going to waste by conducting detailed target audience and persona analyses specific to your industry. Using data analysis, we uncover the strategies that will deliver your brand's message to the potential customers who need your products the most.",
-            "features": [
-                "Detailed Demographic and Psychographic Analysis",
-                "Customer Journey Mapping",
-                "Market Trends and Potential Research",
-                "Data-Driven Communication Strategy Determination"
-            ]
-        }
-    },
-    "About": {
-        "title": "About Us",
-        "intro": "At Zygsoft, we don't just build websites — we design powerful digital experiences that inspire, engage and convert brands in the digital world.",
-        "mission": "Our Mission",
-        "missionDesc": "We work to ensure that brands make a difference in digital. We help them tell their stories effectively, increase their online visibility and achieve measurable results. We achieve this with creative digital strategies, smart design and innovative software solutions.",
-        "vision": "Our Vision",
-        "visionDesc": "As Zygsoft, our vision is to make every digital interaction meaningful by combining design, technology and storytelling. Our aim is not only to make brands visible, but to transform them into brands that make a difference in the digital world.",
-        "ctaBox": "Let's build extraordinary things together.",
-        "team": "Our Team",
-        "teamSubtitle": "We design impressive digital experiences for your brand with creative minds.",
-        "founder": "Senior Developer & Founder",
-        "bioP1": "I'm Gürkan Yavuz. I love thinking with code and transforming ideas into digital solutions. I am a graduate of Akdeniz University Computer Programming; Combining my technical infrastructure with creativity, I design powerful, modern and user-oriented digital experiences for brands.",
-        "bioP2": "Developing systems working with React, Next.js, Laravel and modern web technologies; In every project, I focus on establishing a perfect balance between design, performance and user experience. For me, every line of code is a detail that further clarifies the brand's story in the digital world.",
-        "bioP3": "Beyond software, I also believe in the impact of design on the brand. I aim for every project to be not only functional but also visually consistent and inspiring. By integrating elements such as color, typography and composition that shape the user experience into software processes, I make design a natural extension of functionality.",
-        "quote": "I see technology not just as a tool, but as a language that shapes the future of brands."
-    },
-    "Blog": {
-        "title": "Blog & Insights",
-        "subtitle": "Latest content and professional perspectives from the digital world.",
-        "readMore": "Read More",
-        "backToBlog": "Back to Blog",
-        "noPostsYet": "No blog posts yet. Content coming soon!",
-        "emptyDesc": "We will be back with brand new content about the digital world very soon.",
-        "by": "By",
-        "blogTag": "Blog & Content",
-        "blogTitle": "Our Latest Posts",
-        "blogDesc": "Rich content about software, design and the digital world.",
-        "blogButton": "View All Posts",
-        "readNow": "Read Now",
-        "new": "New",
-        "latest": "LATEST",
-        "allPosts": "VIEW ALL POSTS"
-    },
-    "Contact": {
-        "title": "Get in Touch",
-        "subtitle": "Send a message to get a free consultation or quote for your project. We'll get back to you as soon as possible.",
-        "infoTitle": "Contact Information",
-        "infoDesc": "We are with you with the right strategy and technology to grow your business in the modern world. Our team is ready to answer your questions.",
-        "officeTitle": "Headquarters",
-        "officeDesc": "Antalya, Turkey",
-        "emailTitle": "Email Support",
-        "emailDesc": "info@zygsoft.com",
-        "phoneTitle": "Phone",
-        "phoneDesc": "+90 (555) 123 45 67",
-        "formTitle": "Send a Message",
-        "formName": "Full Name",
-        "formNamePlaceholder": "John Doe",
-        "formEmail": "Email",
-        "formEmailPlaceholder": "john@example.com",
-        "formSubject": "Subject",
-        "formSubjectPlaceholder": "Project Development",
-        "formPhone": "Phone",
-        "formPhonePlaceholder": "+90 5XX XXX XX XX",
-        "formCompany": "Company",
-        "formCompanyPlaceholder": "Company name",
-        "formTopic": "Service / Topic",
-        "formTopicPlaceholder": "Select topic",
-        "formMessage": "Your Message",
-        "formMessagePlaceholder": "Tell us about your project...",
-        "formSend": "Send Message",
-        "formSending": "Sending...",
-        "formSuccess": "Sent! ✓",
-        "formSuccessDetail": "Your message has been submitted successfully. Our team will contact you shortly.",
-        "formErrorRequired": "Please fill in all required fields.",
-        "formErrorNetwork": "Message could not be sent. Please try again.",
-        "formPrivacyNote": "Submitted information is used only to respond to your inquiry and is not shared with third parties.",
-        "faqTitle": "Frequently Asked Questions",
-        "faqDesc": "Details you might be wondering about our services and processes.",
-        "faqQ1": "How long does it take to complete a web project?",
-        "faqA1": "Depending on the scope and your needs, a standard corporate website takes 2-4 weeks, while custom software solutions take 4-12 weeks to complete.",
-        "faqQ2": "What does the Zygsoft Comprehensive Legal Package include?",
-        "faqA2": "This package includes instant text extraction (OCR) from scanned case files, automatic KVKK-compliant redaction of personal data (ID, name), AI-powered case summarization, and browser-based E-Signature capabilities.",
-        "faqQ3": "How does the billing process work for Applications (SaaS)?",
-        "faqA3": "After creating your free account, you send the amount of your selected package via wire transfer/EFT and upload the receipt to the system. Our team approves it instantly, and your panel becomes active in seconds."
-    },
-    "Portfolio": {
-        "title": "Our Projects",
-        "subtitle": "Unique digital solutions we developed for our clients in various industries.",
-        "loading": "Loading projects...",
-        "emptyTitle": "No projects added yet.",
-        "emptyDesc": "You can add new projects from the admin panel.",
-        "client": "Client:",
-        "viewProject": "View Project"
-    },
-    "BlogPage": {
-        "badge": "From the Digital World",
-        "title": "Blog & Insights",
-        "subtitle": "Latest content and professional perspectives from the world of software, design, and digital marketing.",
-        "empty": "No blog posts yet. Content coming soon!",
-        "readMore": "Read More"
-    },
-    "AppStore": {
-        "storeBadge": "SaaS Products & Tools",
-        "storeTitle": "Premium Tools to Grow Your Business",
-        "storeDesc": "Explore our SaaS products and software tools designed to accelerate your operational workflows. Start your subscription and get access in seconds.",
-        "storeFeature1Title": "Ready-to-Use Tools",
-        "storeFeature1Desc": "Tested and approved premium software solutions that will accelerate your projects.",
-        "storeFeature2Title": "Instant Delivery",
-        "storeFeature2Desc": "Start seeing your tool active in your panel seconds after purchase.",
-        "storeFeature3Title": "Secure and Transparent",
-        "storeFeature3Desc": "Open-source trust-building systems. Your data is instantly destroyed after processing.",
-        "viewStoreButton": "View Products",
-        "udfFlagshipBadge": "Flagship",
-        "useTool": "Use Tool",
-        "featuresLabel": "Features",
-        "badge": "Applications",
-        "title1": "Get the Right App,",
-        "title2": "Grow Your Business.",
-        "desc": "Whether you choose our UDF converter software that takes seconds for your law firm, or our corporate web design package for your brand. Start using your tools immediately after purchase.",
-        "popular": "Most Popular",
-        "activeSub": "Subscription Active (Go to Panel)",
-        "endDate": "End Date:",
-        "buyNow": "Purchase & Notify",
-        "getInfo": "Get Info",
-        "registerNow": "Register Now",
-        "howItWorksTitle": "How It Works? (Wire Transfer / EFT)",
-        "step1": "Register via the system above.",
-        "step2": "Send the amount of your selected service via Wire Transfer or EFT to any of our banks.",
-        "step3": "Log in to your Customer (Dashboard) panel and make a <strong>Payment Notification</strong> by uploading your receipt.",
-        "step4": "Our administrator will approve your receipt in seconds and make your panel <strong>Active</strong> immediately.",
-        "createAccount": "Create Your Free Account",
-        "services": {
-            "udfToolkitShortName": "Legal UDF Converter",
-            "udfToolkitShortDesc": "Convert your DOCX files to UYAP-compatible UDF format in seconds.",
-            "udfToolkitName": "Zygsoft Comprehensive Legal Package",
-            "udfToolkitDesc": "Professional e-signature/UDF document management, research, and AI tools for lawyers and law firms.",
-            "udfToolkitPeriod": "/mo",
-            "udfToolkitF1": "OCR Scanning (Image to Text)",
-            "udfToolkitF2": "AI-Powered KVKK Auto-Redaction",
-            "udfToolkitF3": "AI-Powered Case Summarization",
-            "udfToolkitF4": "E-Signature & Mobile Signature Integration",
-            "udfToolkitF5": "Smart Petition Templates",
-            "udfToolkitF6": "TIFF/JPG and DOCX to UDF Conversion",
-            "udfProductWhat": "Convert your Word (DOCX) files to UYAP-compatible UDF format in seconds. Upload, convert, download—one click.",
-            "udfProductWho": "For lawyers, law firms, court clerks, and all professionals preparing legal documents.",
-            "udfProductFormats": "DOCX → UDF (supported)",
-            "udfProductSecurity": "Your documents are instantly deleted after processing. KVKK compliant, privacy-first infrastructure.",
-            "webDevName": "Corporate Web Site",
-            "webDevDesc": "Premium corporate identity and web site designed and coded from scratch.",
-            "webDevPrice": "Custom",
-            "webDevPeriod": " Price",
-            "webDevF1": "Next.js and React architecture",
-            "webDevF2": "Unique modern design",
-            "webDevF3": "Global and local SEO architecture",
-            "webDevF4": "Admin panel integration",
-            "webDevF5": "Performance optimization",
-            "socialMediaName": "Social Media Management",
-            "socialMediaDesc": "Monthly professional content management that makes your brand shine in the digital world.",
-            "socialMediaPeriod": "/mo",
-            "socialMediaF1": "15 custom designed posts per month",
-            "socialMediaF2": "Reels and short video production",
-            "socialMediaF3": "Strategic target audience analysis",
-            "socialMediaF4": "Meta Ads campaign management",
-            "socialMediaF5": "Monthly progress reporting"
-        }
-    },
-    "Footer": {
-        "tagline": "Powerful digital experiences for brands, designed in Antalya, delivered globally.",
-        "description": "Designing the future today at the intersection of technology and aesthetics. Visionary digital architecture from Antalya to the world.",
-        "quickLinks": "Quick Links",
-        "ourServices": "Our Services",
-        "contactInfo": "Contact",
-        "addressLabel": "Address",
-        "emailLabel": "Email",
-        "workingHoursLabel": "Working Hours",
-        "workingHours": "Mon - Fri, 09:00 - 18:00",
-        "allRightsReserved": "All rights reserved.",
-        "privacyPolicy": "Privacy Policy",
-        "termsOfService": "Terms of Service",
-        "company": "Company",
-        "services": "Services",
-        "social": "Social",
-        "copyright": "Geleceği birlikte inşa ediyoruz."
+    "account": {
+      "title": "My Account",
+      "subtitle": "Manage your membership details and subscription status here.",
+      "goToPanel": "Go to Tool Panel",
+      "profileDetails": "Profile Details",
+      "email": "Email Address",
+      "accountType": "Account Type",
+      "admin": "Administrator (Admin)",
+      "customer": "Standard Customer",
+      "subsTitle": "My Subscriptions & Apps",
+      "subsSubtitle": "Your Zygsoft Service Store access packages.",
+      "buyNew": "Get New App",
+      "statusActive": "Active",
+      "statusPending": "Pending Approval",
+      "statusInactive": "Inactive",
+      "noSubs": "You don't have any active subscriptions or apps yet.",
+      "noSubsDesc": "You can browse our software by visiting the Zygsoft Store.",
+      "notifyPayment": "Report Bank/EFT Payment",
+      "security": "Account Security",
+      "securityDesc": "You can contact our support team to change your password or secure your account.",
+      "contactSupport": "Contact Support"
     }
+  },
+  "Navigation": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Services",
+    "products": "Digital Products",
+    "portfolio": "Portfolio",
+    "blog": "Blog",
+    "contact": "Contact",
+    "getQuote": "Get a Quote",
+    "login": "Login",
+    "register": "Register"
+  },
+  "Homepage": {
+    "viewStoreButton": "Explore App Store",
+    "hero": {
+      "ctaProducts": "DIGITAL PRODUCTS",
+      "tag": "/ DIGITAL TRANSFORMATION PARTNER",
+      "eyebrow": "Software · Automation · Digital Transformation",
+      "title1": "BUILD THE",
+      "title2": "FUTURE-READY",
+      "title3": "DIGITAL SYSTEMS.",
+      "description": "Zygsoft is an Antalya-based technology company that grows businesses with technology, automates processes, and designs scalable digital infrastructures. Meet your professional partner.",
+      "subtext": "We rebuild technology infrastructure for organizations with software platforms, automation systems, and digital transformation solutions. For businesses, teams, and professionals.",
+      "cta": "START TRANSFORMATION",
+      "ctaPrimary": "Explore Digital Products",
+      "ctaSecondary": "View Our Projects",
+      "scroll": "EXPLORE"
+    },
+    "partnerSection": {
+      "tag": "/ TRUSTED PARTNER",
+      "title": "Starting with Strategy, <br /> Growing with Technology.",
+      "description": "Our software and automation platform with subscription-based digital tools; supported by project-based professional services. For businesses, teams, and professionals.",
+      "pillars": [
+        {
+          "t": "Strategy",
+          "d": "Technological roadmap aligned with your business goals."
+        },
+        {
+          "t": "Design",
+          "d": "Premium aesthetics focused on user experience."
+        },
+        {
+          "t": "Technology",
+          "d": "Modern, fast, and scalable software infrastructure."
+        },
+        {
+          "t": "Execution",
+          "d": "Result-oriented development process with precision."
+        }
+      ]
+    },
+    "servicesSection": {
+      "tag": "/ PROFESSIONAL SERVICES",
+      "title": "Project-Based <br /> Digital Services.",
+      "description": "Web development, automation, and digital strategy — professional implementation and consulting for businesses.",
+      "viewAll": "EXPLORE ALL",
+      "items": {
+        "web": {
+          "t": "Web Design & Development",
+          "d": "High-performance, SEO-driven, and modern web experiences."
+        },
+        "trans": {
+          "t": "Digital Transformation",
+          "d": "Optimizing traditional processes with the power of digital."
+        },
+        "auto": {
+          "t": "Automation Systems",
+          "d": "Smart workflows that reduce errors and save time."
+        },
+        "soft": {
+          "t": "Custom Software",
+          "d": "Scalable enterprise solutions tailored to your needs."
+        }
+      }
+    },
+    "processSection": {
+      "tag": "/ OUR PROCESS",
+      "title": "Systematic <br/> Road To Success.",
+      "description": "We provide a disciplined and transparent workflow to turn your ideas into reality.",
+      "steps": [
+        {
+          "n": "01",
+          "t": "Discovery & Analysis",
+          "d": "We deeply analyze your needs and objectives."
+        },
+        {
+          "n": "02",
+          "t": "Strategic Planning",
+          "d": "We define the most suitable technology and design approach."
+        },
+        {
+          "n": "03",
+          "t": "UI/UX Design",
+          "d": "We design easy-to-use and visually stunning interfaces."
+        },
+        {
+          "n": "04",
+          "t": "Development",
+          "d": "We bring your project to life with the latest technologies."
+        },
+        {
+          "n": "05",
+          "t": "Quality & Launch",
+          "d": "We present your project to the world after meticulous testing."
+        }
+      ]
+    },
+    "whyChooseUs": {
+      "tag": "/ WHY ZYGSOFT",
+      "title": "Why Entrust Your <br /> Business to Us?",
+      "items": [
+        {
+          "t": "Custom Solutions",
+          "d": "Instead of templates, we create boutique solutions fully compatible with your brand's character."
+        },
+        {
+          "t": "Modern Technology",
+          "d": "We use the latest stacks like Next.js, React, and Cloud infrastructures."
+        },
+        {
+          "t": "Measurable Results",
+          "d": "We build performance-oriented systems that increase your ROI."
+        },
+        {
+          "t": "Long-Term Partnership",
+          "d": "We offer a support team that stands by you as long as your business grows."
+        }
+      ]
+    },
+    "capabilities": {
+      "tag": "/ TECH POWER",
+      "title1": "MODERN SYSTEMS,",
+      "title2": "LIMITLESS POTENTIAL.",
+      "desc": "Every technology we use is carefully selected for your project's speed, security, and future."
+    },
+    "portfolioPreview": {
+      "tag": "/ SELECTED PROJECTS",
+      "title": "Our Success <br /> Stories.",
+      "viewProject": "VIEW PROJECT",
+      "exploreMore": "ALL PROJECTS"
+    },
+    "blogSection": {
+      "tag": "/ BLOG & INSIGHTS",
+      "latest": "Latest Articles",
+      "allPosts": "All Posts",
+      "sampleTitle": "Automation and Efficiency in Enterprise Software",
+      "sampleExcerpt": "How modern organizations scale operations with software platforms and automation systems.",
+      "readMore": "Read More"
+    },
+    "socialServices": {
+      "tag": "/ DIGITAL VISIBILITY",
+      "title": "Take Your Brand <br /> To New Heights.",
+      "desc": "Stay in constant touch with your target audience through our social media management and digital strategies.",
+      "features": [
+        "Strategic Content Planning",
+        "Professional Design & Video",
+        "Audience & Data Analysis",
+        "Performance Marketing"
+      ],
+      "cta": "ENHANCE BRAND POWER"
+    },
+    "ctaSection": {
+      "tag": "/ START A PROJECT",
+      "title": "Let's Build Your <br /> Digital Future Together.",
+      "description": "Leave static structures behind with Zygsoft. Start your data-driven, aesthetics-focused digital infrastructure today.",
+      "cta": "REQUEST PROJECT QUOTE",
+      "ctaSecondary": "EXPLORE PORTFOLIO",
+      "button": "GET A QUOTE",
+      "directLine": "Direct Line",
+      "features": {
+        "acceleration": {
+          "title": "FAST DELIVERY",
+          "desc": "Timely and flawless."
+        },
+        "resilience": {
+          "title": "SCALABILITY",
+          "desc": "Perfect future compatibility."
+        },
+        "precision": {
+          "title": "SECURITY",
+          "desc": "Your data is safe with us."
+        }
+      }
+    },
+    "contactStrip": {
+      "title": "Request a Project or Service Quote",
+      "subtitle": "For professional services (web, automation, digital strategy) — we'll respond quickly with scope and proposal details."
+    }
+  },
+  "Services": {
+    "title": "Our Professional Services",
+    "subtitle": "Project-based implementation and consulting: web development, automation, brand design, digital strategy. For subscription-based software tools, see the Digital Products page.",
+    "cta": "Get a Quote",
+    "readMore": "Learn More",
+    "webDev": "Web & App Development",
+    "socialMedia": "Social Media Management",
+    "branding": "Branding & Graphic Design",
+    "digitalStrategy": "Digital Strategy & Marketing",
+    "audienceAnalysis": "Audience Analysis"
+  },
+  "ServiceDetails": {
+    "sosyal-medya-yonetimi": {
+      "title": "Social Media Management",
+      "subtitle": "Strategic and Measurable Social Media Approach",
+      "content": "Maintaining a consistent and professional presence on social media is one of the cornerstones of a strong brand identity. At ZYGSOFT we don't just produce content — we manage your brand's digital growth through platform-specific strategies, measurable campaign goals, and clear monthly reporting. From Instagram to LinkedIn and TikTok to Facebook, we take a data-driven, performance-based approach tailored to each platform's dynamics. Content calendars are built with your approval and every visual and text is crafted to match your brand tone.",
+      "features": [
+        "Monthly Content Calendar and Approval Workflow",
+        "Platform-Specific Strategy (Instagram, LinkedIn, TikTok, etc.)",
+        "Original Graphic Design and Video Content Production",
+        "Target Audience Analysis and Competitor Monitoring",
+        "Meta Ads and Paid Campaign Management",
+        "Monthly Performance Report and Growth Analysis"
+      ],
+      "faq": [
+        {
+          "q": "How many platforms do you produce content for?",
+          "a": "Instagram, Facebook and LinkedIn are covered in the base package. Additional platforms such as TikTok, X (Twitter) or YouTube can also be included."
+        },
+        {
+          "q": "How does the post approval process work?",
+          "a": "A content calendar is prepared each month and posts are scheduled only after your approval. Revision requests are handled within 24 hours."
+        },
+        {
+          "q": "Do you manage the advertising budget?",
+          "a": "Campaign setup, audience targeting and optimisation are handled by us; the ad spend is paid directly from your own Meta or Google account, ensuring full transparency."
+        }
+      ]
+    },
+    "web-ve-uygulama-gelistirme": {
+      "title": "Web and Application Development",
+      "subtitle": "Fast, Secure and Scalable Digital Solutions for Your Business",
+      "content": "Digital transformation goes far beyond having a website. At ZYGSOFT we build corporate web platforms, SaaS applications, custom software systems, and automation infrastructure. Using Next.js and React-based modern frontend architectures alongside secure and scalable backend systems, we lay a solid technical foundation for your business. Every project is designed and delivered to meet performance, security, and user experience standards.",
+      "features": [
+        "Corporate Website and SaaS Platform Development",
+        "Custom Software and Business Process Automation",
+        "Modern UI/UX Design and Responsive Infrastructure",
+        "REST API Development and Third-Party Integrations",
+        "High Performance, SEO Optimization and Core Web Vitals",
+        "Turnkey Hosting, Domain and Technical Support"
+      ],
+      "faq": [
+        {
+          "q": "What technology stack do you use?",
+          "a": "We use Next.js, React, TypeScript and Node.js for our projects. On the backend we prefer PostgreSQL, Prisma and cloud infrastructure. Different technologies can be evaluated depending on project requirements."
+        },
+        {
+          "q": "How long does a project take to complete?",
+          "a": "Corporate websites are typically delivered in 2-4 weeks, while comprehensive web applications or SaaS platforms take 4-12 weeks. We provide a realistic timeline once the scope is defined."
+        },
+        {
+          "q": "Can I get support after my project goes live?",
+          "a": "Yes. We provide post-launch technical support and maintenance for all our projects. Long-term maintenance packages are available for ongoing collaboration."
+        }
+      ]
+    },
+    "marka-kimligi-ve-grafik-tasarim": {
+      "title": "Brand Identity and Graphic Design",
+      "subtitle": "An Unforgettable Brand Story and Visual Identity Design",
+      "content": "A strong brand identity is one of the most effective tools for distinguishing your business and earning the trust of your target audience. We systematically design every component of your corporate identity — from logo and colour palette to typography and brand guidelines. A brand system that appears consistent across digital channels, print materials and social platforms builds long-term recognition and credibility.",
+      "features": [
+        "Original Logo Design (3 Concept Proposals)",
+        "Comprehensive Brand Guidelines Document",
+        "Corporate Colour Palette and Typography System",
+        "Digital Media Templates (Social Media, Web)",
+        "Print Material Design (Business Cards, Brochures, Catalogues)",
+        "Vector and Print-Ready File Delivery"
+      ],
+      "faq": [
+        {
+          "q": "How many concepts do you present for logo design?",
+          "a": "The process starts with 3 different concepts. Unlimited minor revisions are offered on the selected concept. Our goal is to arrive at a result that genuinely suits the brand."
+        },
+        {
+          "q": "What file formats are included in the delivery?",
+          "a": "We deliver print-ready PDF, vector files (AI, EPS, SVG), and PNG/JPG for digital use. The brand guidelines document is also provided as a separate PDF."
+        },
+        {
+          "q": "Can you design only a logo?",
+          "a": "A standalone logo is possible; however, we recommend the full corporate identity package for a cohesive brand perception. It leads to a stronger, more consistent brand in the long run."
+        }
+      ]
+    },
+    "dijital-strateji-ve-pazarlama": {
+      "title": "Digital Strategy and Marketing",
+      "subtitle": "Data-Driven Digital Growth and Performance Marketing",
+      "content": "A great product or service is not enough on its own — you need a concrete digital strategy to reach the right people. At ZYGSOFT we build an integrated digital marketing plan by understanding your business growth objectives. We grow your organic visibility through SEO, reach your target audience directly with Google Ads and Meta Ads, and maximise the return on your ad budget through conversion rate optimisation. The entire process is made transparent through regular reports and clear analysis.",
+      "features": [
+        "Technical SEO and Keyword Strategy",
+        "Google Ads Campaign Setup and Optimisation",
+        "Meta (Facebook/Instagram) and TikTok Ad Management",
+        "Conversion Rate Optimisation (CRO)",
+        "Google Analytics and Data-Driven Decision Analysis",
+        "Monthly Performance Report and Strategy Updates"
+      ],
+      "faq": [
+        {
+          "q": "When will I start seeing results?",
+          "a": "Organic SEO results typically become noticeable within 2-3 months. With paid advertising (Google Ads, Meta Ads), you can access traffic and conversion data within the first week of a campaign going live."
+        },
+        {
+          "q": "What is the minimum advertising budget?",
+          "a": "Ad spend is paid directly to the platform account. We clarify recommended minimum budgets during the first consultation based on your industry and goals; meaningful results are generally achieved with at least ₺3,000/month."
+        },
+        {
+          "q": "Should I choose SEO or paid ads?",
+          "a": "These two channels complement each other. Paid ads deliver fast visibility in the short term, while SEO drives sustainable organic growth over the long term. We recommend an integrated strategy based on your goals."
+        }
+      ]
+    },
+    "hedef-kitle-analizi": {
+      "title": "Target Audience Analysis",
+      "subtitle": "Know Your Customers Closely and Increase Your Sales",
+      "content": "An effective digital strategy starts with targeting the right audience with the right message at the right time. At ZYGSOFT we conduct in-depth analysis of your existing and potential customer profile using demographic, psychographic, and behavioural data. The findings are converted into a concrete roadmap to optimise your ad spend, sharpen your content strategy, and shorten your sales cycle.",
+      "features": [
+        "Demographic and Psychographic Segmentation",
+        "Customer Journey Mapping",
+        "Competitor Audience Benchmarking",
+        "Market Size and Opportunity Research",
+        "Persona Profile Creation and Documentation",
+        "Data-Driven Messaging Strategy and Communication Plan"
+      ],
+      "faq": [
+        {
+          "q": "What is target audience analysis useful for?",
+          "a": "Identifying the right audience prevents ad budget waste and ensures your message reaches the people most likely to convert. Our analyses provide actionable data for both digital advertising and content strategy."
+        },
+        {
+          "q": "Which industries is this service suitable for?",
+          "a": "It has been applied in e-commerce, legal, healthcare, education, technology, real estate and many other sectors. We use industry-specific data and methodology."
+        },
+        {
+          "q": "When is the analysis delivered?",
+          "a": "Depending on project scope, a comprehensive analysis report and action plan is delivered within 5-10 business days."
+        }
+      ]
+    }
+  },
+  "About": {
+    "title": "About Us",
+    "intro": "ZYGSOFT is a software and digital transformation company based in Antalya, Turkey. We deliver corporate web platforms, SaaS applications, custom software systems, and digital marketing services. We treat technology not merely as a tool but as a strategic language that enables businesses to grow, automate operations, and stand out in a competitive market.",
+    "mission": "Our Mission",
+    "missionDesc": "We help businesses complete their digital transformation fully and sustainably. From software architecture and user interfaces to automation systems and performance marketing, we build solutions that create measurable value at every stage. Our goal is not just to build things that look good, but digital systems that genuinely work.",
+    "vision": "Our Vision",
+    "visionDesc": "At the intersection of technology and design, we build digital infrastructure that gives businesses a lasting competitive advantage. We hold product quality, development transparency, and delivery consistency as core principles. Every project is conducted as a partnership where we treat our clients' success as our own.",
+    "ctaBox": "Let's build powerful digital systems together.",
+    "team": "Our Team",
+    "teamSubtitle": "We bring every project to life through technical depth, design precision, and strategic thinking.",
+    "founder": "Senior Developer & Founder",
+    "bioP1": "I'm Gürkan Yavuz, a graduate of Akdeniz University Computer Programming. I build digital platforms that deliver real business value by combining software architecture with user experience design.",
+    "bioP2": "I work on corporate web applications, SaaS platforms and automation systems using Next.js, React, TypeScript and Node.js. I prioritise performance, security and scalability in every project. Code quality and architectural clarity are non-negotiable parts of my development process.",
+    "bioP3": "Beyond software, I believe design and functionality must be fully integrated. By weaving elements such as colour systems, typography and interface flow into the development process, I produce products that are both technically sound and visually consistent.",
+    "quote": "I see technology not just as a tool, but as a language that shapes the future of businesses."
+  },
+  "Blog": {
+    "title": "Blog & Insights",
+    "subtitle": "Latest content and professional perspectives from the digital world.",
+    "readMore": "Read More",
+    "backToBlog": "Back to Blog",
+    "noPostsYet": "No blog posts yet. Content coming soon!",
+    "emptyDesc": "We will be back with brand new content about the digital world very soon.",
+    "by": "By",
+    "blogTag": "Blog & Content",
+    "blogTitle": "Our Latest Posts",
+    "blogDesc": "Rich content about software, design and the digital world.",
+    "blogButton": "View All Posts",
+    "readNow": "Read Now",
+    "new": "New",
+    "latest": "LATEST",
+    "allPosts": "VIEW ALL POSTS"
+  },
+  "Contact": {
+    "title": "Get in Touch",
+    "subtitle": "Planning a new project? Looking to improve an existing system? Or just want to explore ideas? Fill in the form below and we'll get back to you within 1 business day.",
+    "infoTitle": "Contact Information",
+    "infoDesc": "You can reach us with any questions about web platforms, software systems, digital marketing, or brand identity. All conversations are confidential, and requesting a quote creates no obligation.",
+    "officeTitle": "Headquarters",
+    "officeDesc": "Antalya, Turkey",
+    "emailTitle": "Email Support",
+    "emailDesc": "info@zygsoft.com",
+    "phoneTitle": "Phone",
+    "phoneDesc": "+90 (555) 123 45 67",
+    "formTitle": "Send a Message",
+    "formName": "Full Name",
+    "formNamePlaceholder": "John Doe",
+    "formEmail": "Email",
+    "formEmailPlaceholder": "john@example.com",
+    "formSubject": "Subject",
+    "formSubjectPlaceholder": "Project Development",
+    "formPhone": "Phone",
+    "formPhonePlaceholder": "+90 5XX XXX XX XX",
+    "formCompany": "Company",
+    "formCompanyPlaceholder": "Company name",
+    "formTopic": "Service / Topic",
+    "formTopicPlaceholder": "Select topic",
+    "formMessage": "Your Message",
+    "formMessagePlaceholder": "Tell us about your project...",
+    "formSend": "Send Message",
+    "formSending": "Sending...",
+    "formSuccess": "Sent! ✓",
+    "formSuccessDetail": "Your message has been submitted successfully. Our team will contact you shortly.",
+    "formErrorRequired": "Please fill in all required fields.",
+    "formErrorNetwork": "Message could not be sent. Please try again.",
+    "formPrivacyNote": "Submitted information is used only to respond to your inquiry and is not shared with third parties.",
+    "faqTitle": "Frequently Asked Questions",
+    "faqDesc": "The most common questions about our services, process, and pricing.",
+    "faqQ1": "What kinds of enquiries can I send?",
+    "faqA1": "You can reach us about web or application development, SaaS platform design, automation systems, social media management, digital marketing, brand identity and logo design, UDF legal tools, or general digital transformation consulting.",
+    "faqQ2": "Is the initial consultation free?",
+    "faqA2": "Yes, completely. Project evaluation and initial consultation are free of charge. Once we understand your project and clarify the scope, we provide a tailored proposal — requesting a quote creates no obligation.",
+    "faqQ3": "How does the payment process work for SaaS products?",
+    "faqA3": "Create your free account, send the amount for your selected package via wire transfer/EFT, and upload the receipt through the system. Our team approves it promptly and your panel is activated immediately."
+  },
+  "Portfolio": {
+    "title": "Our Projects",
+    "subtitle": "Unique digital solutions we developed for our clients in various industries.",
+    "loading": "Loading projects...",
+    "emptyTitle": "No projects added yet.",
+    "emptyDesc": "You can add new projects from the admin panel.",
+    "client": "Client:",
+    "viewProject": "View Project"
+  },
+  "BlogPage": {
+    "badge": "From the Digital World",
+    "title": "Blog & Insights",
+    "subtitle": "Latest content and professional perspectives from the world of software, design, and digital marketing.",
+    "empty": "No blog posts yet. Content coming soon!",
+    "readMore": "Read More"
+  },
+  "AppStore": {
+    "storeBadge": "SaaS Products & Software Tools",
+    "storeTitle": "Software Solutions That Deliver Real Business Value",
+    "storeDesc": "From legal technology to corporate web platforms, social media management to brand design — explore our SaaS products and software packages that accelerate your operations. Create your account, notify us of your payment, and your panel is activated in minutes.",
+    "storeFeature1Title": "Ready to Use Immediately",
+    "storeFeature1Desc": "Tested and approved software tools. No complex setup, no technical knowledge required.",
+    "storeFeature2Title": "Fast Activation",
+    "storeFeature2Desc": "Upload your receipt, our team approves it — your subscription is activated instantly.",
+    "storeFeature3Title": "Secure and Privacy-First",
+    "storeFeature3Desc": "Your data is stored on our servers only during processing and permanently deleted once complete. KVKK-compliant infrastructure.",
+    "viewStoreButton": "View Products",
+    "flagshipBadge": "Featured Product",
+    "useTool": "Use Tool",
+    "featuresLabel": "Features",
+    "badge": "Products & Subscriptions",
+    "title1": "Choose the Right Software,",
+    "title2": "Grow Your Business.",
+    "desc": "Legal Toolkit: professional document processing toolkit for UYAP and court workflows. One yearly payment, 8 tools, all included. Subscribe, submit payment — start using in minutes.",
+    "popular": "Most Popular",
+    "activeSub": "Subscription Active — Go to Panel",
+    "endDate": "End Date:",
+    "buyNow": "Purchase & Notify Payment",
+    "getInfo": "Get Detailed Information",
+    "registerNow": "Register for Free",
+    "howItWorksTitle": "How Does the Payment Process Work?",
+    "step1": "Create your free account — no credit card required.",
+    "step2": "Send the amount for your selected package via Wire Transfer or EFT to our bank account.",
+    "step3": "Log in to your user panel and upload your receipt to submit a <strong>Payment Notification</strong>.",
+    "step4": "Our team confirms your receipt promptly and your service is activated <strong>immediately</strong>.",
+    "createAccount": "Create Free Account",
+    "services": {
+      "legalToolkitName": "Legal Toolkit",
+      "legalToolkitDesc": "Professional document processing toolkit for UYAP and legal workflows. One annual subscription, all tools included.",
+      "legalToolkitPeriod": "/year",
+      "legalToolkitF1": "DOCX → UDF converter",
+      "legalToolkitF2": "TIFF → PDF converter",
+      "legalToolkitF3": "JPG / PNG → PDF",
+      "legalToolkitF4": "PDF Merger",
+      "legalToolkitF5": "PDF Split",
+      "legalToolkitF6": "PDF → Image converter",
+      "legalToolkitF7": "OCR text extraction",
+      "legalToolkitF8": "Batch document tools",
+      "legalToolkitProductWhat": "Professional document processing toolkit for UYAP and court workflows. One yearly payment, 8 tools, unlimited use.",
+      "legalToolkitProductWho": "For lawyers, law firms, court clerks, and all professionals who prepare legal documents.",
+      "legalToolkitProductProblems": "UYAP upload compatibility, PDF merge/split needs, text extraction from scans, batch conversions — all solved in one package.",
+      "legalToolkitProductFormats": "DOCX→UDF, TIFF→PDF, Image→PDF, PDF merge, split, OCR and more.",
+      "legalToolkitProductSecurity": "Your documents are permanently deleted from our servers once processing is complete. KVKK-compliant, privacy-first infrastructure.",
+      "legalToolkitWhatsIncluded": "What's Included?",
+      "legalToolkitValueProp": "One yearly payment, unlimited access to all tools. No separate purchases.",
+      "legalToolkitGroupUyap": "UYAP & Legal Document Tools",
+      "legalToolkitGroupPdf": "PDF Tools",
+      "legalToolkitGroupOcr": "OCR & Batch Processing",
+      "legalToolkitCtaSubscribe": "Subscribe & Submit Payment",
+      "legalToolkitCtaUse": "Go to Tools",
+      "legalToolkitPriceNote": "Single payment, yearly access",
+      "legalToolkitToolCount": "8 tools · One package",
+      "webDevName": "Corporate Website",
+      "webDevDesc": "High-performance corporate web platform designed and coded from scratch with Next.js and React. Admin panel, SEO, and hosting included.",
+      "webDevPrice": "Custom",
+      "webDevPeriod": " Price",
+      "webDevF1": "Next.js and React architecture",
+      "webDevF2": "Original corporate design",
+      "webDevF3": "SEO optimisation (local & global)",
+      "webDevF4": "Admin panel and content management",
+      "webDevF5": "Core Web Vitals performance optimisation",
+      "socialMediaName": "Social Media Management",
+      "socialMediaDesc": "Monthly subscription that manages your brand professionally across digital platforms. Design, strategy, and reporting included.",
+      "socialMediaPeriod": "/mo",
+      "socialMediaF1": "15 custom designed posts per month",
+      "socialMediaF2": "Reels and short video production",
+      "socialMediaF3": "Audience and competitor analysis",
+      "socialMediaF4": "Meta Ads campaign management",
+      "socialMediaF5": "Monthly performance report"
+    }
+  },
+  "Footer": {
+    "tagline": "Powerful digital experiences for brands, designed in Antalya, delivered globally.",
+    "description": "Software and automation platform; we add value through digital products (subscription) and professional services (project-based).",
+    "quickLinks": "Quick Links",
+    "ourServices": "Our Services",
+    "contactInfo": "Contact",
+    "addressLabel": "Address",
+    "emailLabel": "Email",
+    "workingHoursLabel": "Working Hours",
+    "workingHours": "Mon - Fri, 09:00 - 18:00",
+    "allRightsReserved": "All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "company": "Company",
+    "products": "Digital Products",
+    "services": "Professional Services",
+    "social": "Social",
+    "copyright": "Geleceği birlikte inşa ediyoruz."
+  }
 }

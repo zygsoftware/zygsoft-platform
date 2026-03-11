@@ -11,6 +11,7 @@ export default function AdminBlog() {
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingPost, setEditingPost] = useState<any>(null);
+    const [formError, setFormError] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         title: "", slug: "", excerpt: "", content: "", image: "", author: "Gürkan Yavuz", published: false,
     });
@@ -38,12 +39,14 @@ export default function AdminBlog() {
 
     const openCreate = () => {
         setEditingPost(null);
+        setFormError(null);
         setFormData({ title: "", slug: "", excerpt: "", content: "", image: "", author: "Gürkan Yavuz", published: false });
         setIsModalOpen(true);
     };
 
     const openEdit = (post: any) => {
         setEditingPost(post);
+        setFormError(null);
         setFormData({ title: post.title, slug: post.slug, excerpt: post.excerpt, content: post.content, image: post.image || "", author: post.author, published: post.published });
         setIsModalOpen(true);
     };
@@ -51,16 +54,22 @@ export default function AdminBlog() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSubmitting(true);
+        setFormError(null);
         try {
-            if (editingPost) {
-                await fetch(`/api/blog/${editingPost.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) });
-            } else {
-                await fetch("/api/blog", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) });
+            const res = editingPost
+                ? await fetch(`/api/blog/${editingPost.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) })
+                : await fetch("/api/blog", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) });
+
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                setFormError(data.error ?? "Blog yazısı kaydedilemedi.");
+                return;
             }
+
             setIsModalOpen(false);
             fetchPosts();
         } catch (error) {
-            console.error("Blog yazısı kaydedilemedi:", error);
+            setFormError("Sunucuya bağlanılamadı. Lütfen tekrar deneyin.");
         } finally {
             setSubmitting(false);
         }
@@ -233,13 +242,20 @@ export default function AdminBlog() {
                                 </form>
                             </div>
 
-                            <div className="p-6 border-t border-slate-100 flex gap-3 justify-end shrink-0 bg-slate-50/50 rounded-b-3xl">
-                                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all text-sm">
-                                    İptal
-                                </button>
-                                <button type="submit" form="blog-form" disabled={submitting} className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 flex items-center gap-2 text-sm">
-                                    {submitting ? <><Loader2 size={16} className="animate-spin" /> Kaydediliyor...</> : "Kaydet ve Kapat"}
-                                </button>
+                            <div className="p-6 border-t border-slate-100 flex flex-col gap-3 shrink-0 bg-slate-50/50 rounded-b-3xl">
+                                {formError && (
+                                    <p className="text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                                        {formError}
+                                    </p>
+                                )}
+                                <div className="flex gap-3 justify-end">
+                                    <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all text-sm">
+                                        İptal
+                                    </button>
+                                    <button type="submit" form="blog-form" disabled={submitting} className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 flex items-center gap-2 text-sm">
+                                        {submitting ? <><Loader2 size={16} className="animate-spin" /> Kaydediliyor...</> : "Kaydet ve Kapat"}
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
                     </div>

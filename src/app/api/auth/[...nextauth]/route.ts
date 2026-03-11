@@ -57,9 +57,14 @@ export const authOptions = {
                     });
 
                     (session.user as any).subscriptions = subscriptions;
-                    // Also attach a quick boolean accessor for active product slugs
+                    // Active slugs: status must be "active" AND subscription must not be expired
+                    const now = new Date();
                     (session.user as any).activeProductSlugs = subscriptions
-                        .filter((sub: any) => sub.status === "active")
+                        .filter((sub: any) => {
+                            if (sub.status !== "active") return false;
+                            if (sub.endsAt && new Date(sub.endsAt) < now) return false;
+                            return true;
+                        })
                         .map((sub: any) => sub.product.slug);
 
                 } catch (e) {

@@ -87,7 +87,7 @@ export default function LoginPage() {
                             <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-700 mb-2 group-focus-within:text-[#e6c800] transition-colors">E-POSTA ADRESİ</label>
                             <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
                                 placeholder="name@company.com"
-                                className="w-full px-6 py-4 bg-white border-2 border-zinc-300 rounded-none text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-[#e6c800] focus:ring-2 focus:ring-[#e6c800]/25 transition-all font-medium" />
+                                className="input-base py-4" />
                         </div>
                         <div className="group">
                             <div className="flex items-center justify-between mb-2">
@@ -97,7 +97,7 @@ export default function LoginPage() {
                             <div className="relative">
                                 <input type={showPw ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)}
                                     placeholder="••••••••••••"
-                                    className="w-full px-6 py-4 pr-14 bg-white border-2 border-zinc-300 rounded-none text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-[#e6c800] focus:ring-2 focus:ring-[#e6c800]/25 transition-all font-medium" />
+                                    className="input-base py-4 pr-14" />
                                 <button type="button" onClick={() => setShowPw(!showPw)}
                                     className="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-900 transition-colors">
                                     {showPw ? <EyeOff size={18} /> : <Eye size={18} />}

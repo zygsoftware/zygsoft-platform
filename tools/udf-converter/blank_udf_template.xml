@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<template format_id="1.8" >
+<content><![CDATA[
+
+]]></content><properties><pageFormat mediaSizeName="1" leftMargin="59.527558708190924" rightMargin="42.51968479156491" topMargin="113.38582611083984" bottomMargin="85.03936958312988" paperOrientation="1" headerFOffset="20.0" footerFOffset="20.0" /><bgImage bgImageSource="" bgImageData="" bgImageBottomMargin="0" bgImageUpMargin="0" bgImageRigtMargin="0" bgImageLeftMargin="0" /></properties>
+<elements resolver="hvl-default" >
+</elements>
+<styles><style name="default" description="Geçerli" family="Dialog" size="12" bold="false" italic="false" foreground="-13421773" FONT_ATTRIBUTE_KEY="javax.swing.plaf.FontUIResource[family=Dialog,name=Dialog,style=plain,size=12]" /><style name="hvl-default" family="Times New Roman" size="12" description="Gövde" /></styles>
+</template>

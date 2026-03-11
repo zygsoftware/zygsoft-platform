@@ -38,11 +38,18 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { title, slug, excerpt, content, image, author, published } = body;
 
+        if (!slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+            return NextResponse.json({ error: "Geçersiz slug. Yalnızca küçük harf, rakam ve tire kullanın." }, { status: 400 });
+        }
+
         const post = await prisma.blogPost.create({
             data: { title, slug, excerpt, content, image, author, published },
         });
         return NextResponse.json(post);
-    } catch (error) {
-        return NextResponse.json({ error: "Failed to create blog post" }, { status: 500 });
+    } catch (error: any) {
+        if (error?.code === "P2002") {
+            return NextResponse.json({ error: `Bu slug zaten kullanımda: "${error.meta?.target?.[0] ?? "slug"}"` }, { status: 409 });
+        }
+        return NextResponse.json({ error: "Blog yazısı oluşturulamadı." }, { status: 500 });
     }
 }

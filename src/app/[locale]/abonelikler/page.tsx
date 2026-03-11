@@ -3,67 +3,16 @@
 import { motion } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { Check, ArrowRight, Zap, Shield, Layers, FileText, Image as ImageIcon, Users, FileType, Lock } from "lucide-react";
+import { Check, ArrowRight, Zap, Shield, FileText, Users, FileType, Lock, Target } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { ParticleField } from "@/components/ui/ParticleField";
-import { TiltCard } from "@/components/ui/TiltCard";
 
 export default function SubscriptionsPage() {
     const { data: session, status } = useSession();
     const t = useTranslations("AppStore");
-    const hasUdf = (session?.user as any)?.activeProductSlugs?.includes("udf-toolkit");
-
-    const services = [
-        {
-            id: "udf-toolkit",
-            name: t("services.udfToolkitName"),
-            desc: t("services.udfToolkitDesc"),
-            price: "₺499",
-            period: t("services.udfToolkitPeriod"),
-            popular: true,
-            features: [
-                t("services.udfToolkitF1"),
-                t("services.udfToolkitF2"),
-                t("services.udfToolkitF3"),
-                t("services.udfToolkitF4"),
-                t("services.udfToolkitF5"),
-                t("services.udfToolkitF6")
-            ],
-            icon: <FileText size={32} className="text-[#e6c800]" />
-        },
-        {
-            id: "web-dev",
-            name: t("services.webDevName"),
-            desc: t("services.webDevDesc"),
-            price: t("services.webDevPrice"),
-            period: t("services.webDevPeriod"),
-            features: [
-                t("services.webDevF1"),
-                t("services.webDevF2"),
-                t("services.webDevF3"),
-                t("services.webDevF4"),
-                t("services.webDevF5")
-            ],
-            icon: <Layers size={32} className="text-cyan-400" />
-        },
-        {
-            id: "social-media",
-            name: t("services.socialMediaName"),
-            desc: t("services.socialMediaDesc"),
-            price: "₺15.000",
-            period: t("services.socialMediaPeriod"),
-            features: [
-                t("services.socialMediaF1"),
-                t("services.socialMediaF2"),
-                t("services.socialMediaF3"),
-                t("services.socialMediaF4"),
-                t("services.socialMediaF5")
-            ],
-            icon: <ImageIcon size={32} className="text-purple-400" />
-        }
-    ];
+    const hasLegalToolkit = (session?.user as any)?.activeProductSlugs?.includes("legal-toolkit");
 
     return (
         <div className="min-h-screen flex flex-col font-sans bg-[#fafafc]">
@@ -105,7 +54,7 @@ export default function SubscriptionsPage() {
                         </motion.p>
                     </div>
 
-                    {/* Featured UDF Product Block */}
+                    {/* Featured Legal Toolkit Product Block */}
                     <motion.div
                         initial={{ opacity: 0, y: 24 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -126,38 +75,38 @@ export default function SubscriptionsPage() {
                                             <FileText size={28} />
                                         </div>
                                         <span className="px-3 py-1.5 rounded-full bg-[#e6c800] text-[#0a0c10] text-[10px] font-black uppercase tracking-wider">
-                                            {t("udfFlagshipBadge")}
+                                            {t("flagshipBadge")}
                                         </span>
                                     </div>
                                     <h2 className="text-3xl md:text-4xl font-display font-black text-white mb-6 leading-tight">
-                                        {t("services.udfToolkitName")}
+                                        {t("services.legalToolkitName")}
                                     </h2>
-                                    <p className="text-white/70 text-lg leading-relaxed mb-8">
-                                        {t("services.udfProductWhat")}
+                                    <p className="text-white/70 text-lg leading-relaxed mb-6">
+                                        {t("services.legalToolkitProductWhat")}
                                     </p>
 
-                                    <div className="space-y-5 mb-8">
+                                    <div className="space-y-4 mb-6">
                                         <div className="flex items-start gap-4">
                                             <Users size={20} className="text-[#e6c800] shrink-0 mt-0.5" />
-                                            <p className="text-white/80 text-sm leading-relaxed">{t("services.udfProductWho")}</p>
+                                            <p className="text-white/80 text-sm leading-relaxed">{t("services.legalToolkitProductWho")}</p>
                                         </div>
                                         <div className="flex items-start gap-4">
-                                            <FileType size={20} className="text-[#e6c800] shrink-0 mt-0.5" />
-                                            <p className="text-white/80 text-sm">{t("services.udfProductFormats")}</p>
+                                            <Target size={20} className="text-[#e6c800] shrink-0 mt-0.5" />
+                                            <p className="text-white/80 text-sm leading-relaxed">{t("services.legalToolkitProductProblems")}</p>
                                         </div>
                                         <div className="flex items-start gap-4">
                                             <Lock size={20} className="text-[#e6c800] shrink-0 mt-0.5" />
-                                            <p className="text-white/70 text-sm leading-relaxed">{t("services.udfProductSecurity")}</p>
+                                            <p className="text-white/70 text-sm leading-relaxed">{t("services.legalToolkitProductSecurity")}</p>
                                         </div>
                                     </div>
 
-                                    {status === "authenticated" && hasUdf ? (
-                                        <Link href="/dashboard/tools/doc-to-udf" className="inline-flex items-center gap-3 px-8 py-4 bg-[#e6c800] text-[#0a0c10] font-black uppercase tracking-wider text-sm rounded-2xl hover:bg-white transition-all shadow-xl shadow-[#e6c800]/20">
-                                            {t("useTool") || "Aracı Kullan"} <ArrowRight size={18} />
+                                    {status === "authenticated" && hasLegalToolkit ? (
+                                        <Link href="/dashboard/tools" className="inline-flex items-center gap-3 px-8 py-4 bg-[#e6c800] text-[#0a0c10] font-black uppercase tracking-wider text-sm rounded-2xl hover:bg-white transition-all shadow-xl shadow-[#e6c800]/20">
+                                            {t("services.legalToolkitCtaUse")} <ArrowRight size={18} />
                                         </Link>
                                     ) : status === "authenticated" ? (
-                                        <Link href="/dashboard/billing?product=udf-toolkit" className="inline-flex items-center gap-3 px-8 py-4 bg-[#e6c800] text-[#0a0c10] font-black uppercase tracking-wider text-sm rounded-2xl hover:bg-white transition-all shadow-xl shadow-[#e6c800]/20">
-                                            {t("buyNow")} <ArrowRight size={18} />
+                                        <Link href="/dashboard/billing?product=legal-toolkit" className="inline-flex items-center gap-3 px-8 py-4 bg-[#e6c800] text-[#0a0c10] font-black uppercase tracking-wider text-sm rounded-2xl hover:bg-white transition-all shadow-xl shadow-[#e6c800]/20">
+                                            {t("services.legalToolkitCtaSubscribe")} <ArrowRight size={18} />
                                         </Link>
                                     ) : (
                                         <Link href="/register" className="inline-flex items-center gap-3 px-8 py-4 bg-[#e6c800] text-[#0a0c10] font-black uppercase tracking-wider text-sm rounded-2xl hover:bg-white transition-all shadow-xl shadow-[#e6c800]/20">
@@ -167,114 +116,45 @@ export default function SubscriptionsPage() {
                                 </div>
 
                                 <div className="rounded-2xl bg-white/5 border border-white/10 p-8">
-                                    <p className="text-[10px] font-black uppercase tracking-wider text-[#e6c800] mb-6">{t("featuresLabel")}</p>
-                                    <ul className="space-y-4">
-                                        {[t("services.udfToolkitF1"), t("services.udfToolkitF2"), t("services.udfToolkitF3"), t("services.udfToolkitF4"), t("services.udfToolkitF5"), t("services.udfToolkitF6")].map((f, i) => (
-                                            <li key={i} className="flex items-center gap-3 text-white/80 text-sm">
-                                                <Check size={16} className="text-[#e6c800] shrink-0" />
-                                                {f}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                    <div className="mt-8 pt-8 border-t border-white/10 flex items-baseline gap-2">
-                                        <span className="text-4xl font-black text-white">₺499</span>
-                                        <span className="text-white/50 text-sm font-bold">{t("services.udfToolkitPeriod")}</span>
+                                    <p className="text-[10px] font-black uppercase tracking-wider text-[#e6c800] mb-2">{t("services.legalToolkitWhatsIncluded")}</p>
+                                    <p className="text-white/60 text-xs font-medium mb-5">{t("services.legalToolkitValueProp")}</p>
+                                    <div className="space-y-5">
+                                        <div>
+                                            <p className="text-white/50 text-[10px] font-black uppercase tracking-wider mb-2">{t("services.legalToolkitGroupUyap")}</p>
+                                            <ul className="space-y-2">
+                                                <li className="flex items-center gap-3 text-white/80 text-sm"><Check size={14} className="text-[#e6c800] shrink-0" />{t("services.legalToolkitF1")}</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <p className="text-white/50 text-[10px] font-black uppercase tracking-wider mb-2">{t("services.legalToolkitGroupPdf")}</p>
+                                            <ul className="space-y-2">
+                                                <li className="flex items-center gap-3 text-white/80 text-sm"><Check size={14} className="text-[#e6c800] shrink-0" />{t("services.legalToolkitF2")}</li>
+                                                <li className="flex items-center gap-3 text-white/80 text-sm"><Check size={14} className="text-[#e6c800] shrink-0" />{t("services.legalToolkitF3")}</li>
+                                                <li className="flex items-center gap-3 text-white/80 text-sm"><Check size={14} className="text-[#e6c800] shrink-0" />{t("services.legalToolkitF4")}</li>
+                                                <li className="flex items-center gap-3 text-white/80 text-sm"><Check size={14} className="text-[#e6c800] shrink-0" />{t("services.legalToolkitF5")}</li>
+                                                <li className="flex items-center gap-3 text-white/80 text-sm"><Check size={14} className="text-[#e6c800] shrink-0" />{t("services.legalToolkitF6")}</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <p className="text-white/50 text-[10px] font-black uppercase tracking-wider mb-2">{t("services.legalToolkitGroupOcr")}</p>
+                                            <ul className="space-y-2">
+                                                <li className="flex items-center gap-3 text-white/80 text-sm"><Check size={14} className="text-[#e6c800] shrink-0" />{t("services.legalToolkitF7")}</li>
+                                                <li className="flex items-center gap-3 text-white/80 text-sm"><Check size={14} className="text-[#e6c800] shrink-0" />{t("services.legalToolkitF8")}</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div className="mt-8 pt-8 border-t border-white/10">
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-4xl font-black text-white">₺3.000</span>
+                                            <span className="text-white/50 text-sm font-bold">{t("services.legalToolkitPeriod")}</span>
+                                        </div>
+                                        <p className="text-white/40 text-[10px] font-medium mt-2">{t("services.legalToolkitPriceNote")}</p>
+                                        <p className="text-white/50 text-[10px] font-bold mt-1">{t("services.legalToolkitToolCount")}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </motion.div>
-
-                    {/* Other Products Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                        {services.filter(s => s.id !== "udf-toolkit").map((service, index) => (
-                            <motion.div
-                                key={service.id}
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 * index }}
-                                className="relative flex flex-col h-full"
-                            >
-                                <TiltCard maxTilt={5} className="h-full">
-                                <div className="relative flex flex-col h-full rounded-[2rem] p-8 bg-white border border-[#0a0c10]/[0.06] shadow-sm hover:shadow-xl hover:border-[#0a0c10]/[0.1] hover:-translate-y-1 transition-all duration-500 hover-lift">
-                                <div className="mb-8 flex justify-between items-start">
-                                    <div className="w-16 h-16 rounded-2xl bg-[#0a0c10] text-[#e6c800] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-300">
-                                        {service.icon}
-                                    </div>
-                                </div>
-
-                                <h3 className="text-2xl font-display font-black text-[#0a0c10] mb-3">{service.name}</h3>
-                                <p className="text-[#0a0c10]/60 text-sm leading-relaxed mb-6 font-medium">{service.desc}</p>
-
-                                <div className="mb-8 flex items-end gap-1">
-                                    <span className="text-3xl font-display font-black text-[#0a0c10] tracking-tight">{service.price}</span>
-                                    {service.period && <span className="text-[#0a0c10]/50 font-bold mb-1 ml-1 text-sm">{service.period}</span>}
-                                </div>
-
-                                <div className="flex-1 space-y-4 mb-8">
-                                    {service.features.map((feature, i) => (
-                                        <div key={i} className="flex items-start gap-3">
-                                            <div className="mt-1 w-5 h-5 rounded-full bg-[#0a0c10] text-[#e6c800] flex items-center justify-center shrink-0">
-                                                <Check size={12} strokeWidth={3} />
-                                            </div>
-                                            <span className="text-sm text-[#0a0c10]/70 font-medium leading-relaxed">{feature}</span>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <div className="mt-auto">
-                                    {status === "authenticated" ? (
-                                        service.id === "udf-toolkit" ? (
-                                            ((session?.user as any)?.activeProductSlugs || []).includes(service.id) ? (
-                                                <div className="flex flex-col gap-2">
-                                                    <Link
-                                                        href="/dashboard"
-                                                        className="w-full py-4 px-6 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all duration-300 bg-[#e6c800] text-[#0a0c10] hover:bg-[#c9ad00] shadow-md shadow-[#e6c800]/20"
-                                                    >
-                                                        Panelinize Gidin <ArrowRight size={18} />
-                                                    </Link>
-                                                    {((session?.user as any)?.subscriptions || []).find((s: any) => s.product.slug === service.id)?.endsAt && (
-                                                        <p className="text-center text-xs text-[#888] font-bold">
-                                                            {t("endDate")} {new Date(((session?.user as any)?.subscriptions || []).find((s: any) => s.product.slug === service.id).endsAt).toLocaleDateString("tr-TR")}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <Link
-                                                    href={`/dashboard/billing?product=${service.id}`}
-                                                    className={`w-full py-4 px-6 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all duration-300 ${service.popular
-                                                        ? "bg-[#0a0c10] text-white hover:bg-[#0a0c10]/90 shadow-lg"
-                                                        : "bg-[#0a0c10] text-white hover:bg-[#0a0c10]/90 shadow-md"
-                                                        }`}
-                                                >
-                                                    {t("buyNow")} <ArrowRight size={18} />
-                                                </Link>
-                                            )
-                                        ) : (
-                                            <Link
-                                                href="/contact"
-                                                className="w-full py-4 px-6 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all duration-300 bg-white text-[#0a0c10] hover:bg-[#fafafc] border border-[#0a0c10]/10 shadow-sm"
-                                            >
-                                                {t("getInfo")} <ArrowRight size={18} />
-                                            </Link>
-                                        )
-                                    ) : (
-                                        <Link
-                                            href="/register"
-                                            className={`w-full py-4 px-6 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all duration-300 ${service.popular
-                                                ? "bg-[#e6c800] text-[#0a0c10] hover:bg-[#c9ad00] shadow-md shadow-[#e6c800]/20"
-                                                : "bg-[#0a0c10] text-white hover:bg-[#0a0c10]/90 shadow-lg"
-                                                }`}
-                                        >
-                                            {t("registerNow")} <ArrowRight size={18} />
-                                        </Link>
-                                    )}
-                                </div>
-                                </div>
-                                </TiltCard>
-                            </motion.div>
-                        ))}
-                    </div>
 
                     {/* Info Section */}
                     <motion.div

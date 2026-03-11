@@ -3,23 +3,11 @@
 import { motion } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import { servicesData } from "@/lib/servicesData";
 import { ArrowRight, Globe, Megaphone, Palette, BarChart3, Layers, Code2 } from "lucide-react";
-import { useRef } from "react";
-import { useInView } from "framer-motion";
-
-function AnimIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
-    const ref = useRef(null);
-    const inView = useInView(ref, { once: true, margin: "-60px" });
-    return (
-        <motion.div ref={ref} initial={{ opacity: 0, y: 30 }} animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94], delay }} className={className}>
-            {children}
-        </motion.div>
-    );
-}
+import { BlockReveal, TextReveal } from "@/components/ui/reveal";
 
 const icons: Record<string, React.ReactNode> = {
     "web-ve-uygulama-gelistirme": <Globe size={32} />,
@@ -30,7 +18,8 @@ const icons: Record<string, React.ReactNode> = {
 
 export default function Services() {
     const t = useTranslations("Services");
-    const d = useTranslations("ServiceDetails");
+    const locale = useLocale();
+    const lang = locale === "en" ? "en" : "tr";
 
     return (
         <>
@@ -66,16 +55,17 @@ export default function Services() {
                     <div className="container mx-auto px-6 max-w-7xl">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {Object.keys(servicesData).map((slug, index) => {
-                                const title = d(`${slug}.title`);
-                                const subtitle = d(`${slug}.subtitle`);
+                                const entry = servicesData[slug][lang];
+                                const title = entry.title;
+                                const subtitle = entry.subtitle;
                                 const icon = icons[slug] || <Code2 size={32} />;
 
                                 return (
-                                    <AnimIn key={slug} delay={index * 0.1} className="h-full">
+                                    <BlockReveal key={slug} delay={index * 0.08} className="h-full">
                                         <Link href={`/services/${slug}`} className="block h-full outline-none">
                                             <motion.div
-                                                className="glass p-10 h-full flex flex-col relative overflow-hidden group rounded-xl hover-glow"
-                                                whileHover={{ y: -8, transition: { duration: 0.25 } }}>
+                                                className="glass p-10 h-full flex flex-col relative overflow-hidden group hover-glow"
+                                                whileHover={{ y: -4, transition: { duration: 0.2 } }}>
 
                                                 {/* Animated BG on hover */}
                                                 <motion.div
@@ -99,7 +89,7 @@ export default function Services() {
                                                 </div>
                                             </motion.div>
                                         </Link>
-                                    </AnimIn>
+                                    </BlockReveal>
                                 );
                             })}
                         </div>
@@ -109,17 +99,23 @@ export default function Services() {
                 {/* ── CTA ── */}
                 <section className="py-20" style={{ background: "#f9f7f3" }}>
                     <div className="container mx-auto px-6 max-w-7xl text-center">
-                        <AnimIn>
-                            <h2 className="font-display font-extrabold text-[#0e0e0e] mb-6" style={{ fontSize: "clamp(32px,3.5vw,48px)" }}>
-                                Sizin İçin Neler Yapabiliriz?
-                            </h2>
-                            <p className="text-[#888] text-lg mb-8 max-w-2xl mx-auto">
-                                İşletmenizin ihtiyaçlarına özel stratejiler geliştiriyoruz. Bizimle iletişime geçin, hedeflerinize nasıl ulaşacağınızı planlayalım.
-                            </p>
-                            <Link href="/contact" className="btn-primary inline-flex">
-                                Ücretsiz Danışmanlık Alın <ArrowRight size={16} />
-                            </Link>
-                        </AnimIn>
+                        <BlockReveal>
+                            <TextReveal delay={0.08}>
+                                <h2 className="font-display font-extrabold text-[#0e0e0e] mb-6" style={{ fontSize: "clamp(32px,3.5vw,48px)" }}>
+                                    Projenizi Birlikte Hayata Geçirelim
+                                </h2>
+                            </TextReveal>
+                            <TextReveal delay={0.16}>
+                                <p className="text-[#888] text-lg mb-8 max-w-2xl mx-auto">
+                                    Hangi hizmete ihtiyacınız olduğundan emin değilseniz sorun değil. İşletmenizi anlayarak size en uygun dijital stratejiyi birlikte belirleyelim.
+                                </p>
+                            </TextReveal>
+                            <BlockReveal delay={0.12}>
+                                <Link href="/contact" className="btn-primary inline-flex">
+                                    Ücretsiz Ön Görüşme Talep Edin <ArrowRight size={16} />
+                                </Link>
+                            </BlockReveal>
+                        </BlockReveal>
                     </div>
                 </section>
 

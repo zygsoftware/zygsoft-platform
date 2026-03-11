@@ -21,6 +21,9 @@ export function Footer() {
             { label: nav("blog"), href: "/blog" },
             { label: nav("contact"), href: "/contact" },
         ],
+        products: [
+            { label: t("products"), href: "/abonelikler" },
+        ],
         services: [
             { label: s("webDev"), href: "/services/web-ve-uygulama-gelistirme" },
             { label: s("socialMedia"), href: "/services/sosyal-medya-yonetimi" },
@@ -40,7 +43,7 @@ export function Footer() {
             <div className="container mx-auto px-6 max-w-[1400px]">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 lg:gap-8 mb-32">
                     {/* Brand col */}
-                    <div className="lg:col-span-5">
+                    <div className="lg:col-span-4">
                         <Link href="/" className="inline-block mb-10 group">
                             <span className="font-display text-4xl font-black tracking-[-0.05em] group-hover:text-[#e6c800] transition-colors duration-500">
                                 ZYG<span className="text-[#e6c800] group-hover:text-slate-950 transition-colors duration-500">SOFT</span>
@@ -73,7 +76,20 @@ export function Footer() {
                         </ul>
                     </div>
 
-                    <div className="lg:col-span-3">
+                    <div className="lg:col-span-2">
+                        <h4 className="font-display font-black text-xs uppercase tracking-[0.3em] text-[#e6c800] mb-10">{t("products")}</h4>
+                        <ul className="space-y-4">
+                            {links.products.map(l => (
+                                <li key={l.href}>
+                                    <Link href={l.href} className="text-slate-600 hover:text-slate-950 text-base font-bold transition-all flex items-center group">
+                                        {l.label} <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-1 transition-all" />
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    <div className="lg:col-span-2">
                         <h4 className="font-display font-black text-xs uppercase tracking-[0.3em] text-[#e6c800] mb-10">{t("services")}</h4>
                         <ul className="space-y-4">
                             {links.services.map(l => (

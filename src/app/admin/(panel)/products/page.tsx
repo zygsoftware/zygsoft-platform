@@ -272,7 +272,7 @@ export default function AdminProductsPage() {
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Slug *</label>
-                                            <input type="text" required value={currentProduct.slug} onChange={(e) => setCurrentProduct({ ...currentProduct, slug: e.target.value })} className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="doc-to-udf" />
+                                            <input type="text" required value={currentProduct.slug} onChange={(e) => setCurrentProduct({ ...currentProduct, slug: e.target.value })} className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white" placeholder="legal-toolkit" />
                                         </div>
                                     </div>
                                     <div>

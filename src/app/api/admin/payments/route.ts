@@ -37,10 +37,15 @@ export async function PUT(req: Request) {
             return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 403 });
         }
 
-        const { paymentId, status } = await req.json(); // status can be "approved" or "rejected"
+        const { paymentId, status } = await req.json();
 
         if (!paymentId || !status) {
             return NextResponse.json({ error: "Eksik parametre." }, { status: 400 });
+        }
+
+        const ALLOWED_PAYMENT_STATUSES = ["approved", "rejected", "pending"];
+        if (!ALLOWED_PAYMENT_STATUSES.includes(status)) {
+            return NextResponse.json({ error: "Geçersiz ödeme durumu." }, { status: 400 });
         }
 
         const payment = await prisma.payment.findUnique({ where: { id: paymentId } });

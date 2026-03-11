@@ -28,13 +28,21 @@ export async function PUT(req: Request, props: { params: Promise<{ id: string }>
         }
         const params = await props.params;
         const body = await req.json();
+
+        if (body.slug !== undefined && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(body.slug)) {
+            return NextResponse.json({ error: "Geçersiz slug. Yalnızca küçük harf, rakam ve tire kullanın." }, { status: 400 });
+        }
+
         const post = await prisma.blogPost.update({
             where: { id: params.id },
             data: body,
         });
         return NextResponse.json(post);
-    } catch (error) {
-        return NextResponse.json({ error: "Failed to update post" }, { status: 500 });
+    } catch (error: any) {
+        if (error?.code === "P2002") {
+            return NextResponse.json({ error: `Bu slug zaten kullanımda: "${error.meta?.target?.[0] ?? "slug"}"` }, { status: 409 });
+        }
+        return NextResponse.json({ error: "Blog yazısı güncellenemedi." }, { status: 500 });
     }
 }
 

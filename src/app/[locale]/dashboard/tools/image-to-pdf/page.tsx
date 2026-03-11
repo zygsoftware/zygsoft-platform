@@ -13,17 +13,30 @@ import {
     Image as ImageIcon,
     Plus,
     FileText,
-    Zap
+    Zap,
+    ShieldAlert
 } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
+import { ToolPageHint } from "@/components/dashboard/ToolPageHint";
+import { ConversionResultPanel } from "@/components/dashboard/ConversionResultPanel";
+import { PdfPreview } from "@/components/dashboard/PdfPreview";
+import { getPdfPageCount } from "@/lib/pdf-utils";
 
 export default function ImageToPdfTool() {
+    const t = useTranslations("Dashboard.overview.tools");
+    const tImg = useTranslations("Dashboard.overview.tools.imageToPdf");
     const { data: session } = useSession();
+    const hasSubscription = session?.user &&
+        (((session.user as any).activeProductSlugs?.includes("legal-toolkit")) || (session.user as any).role === "admin");
     const [files, setFiles] = useState<{ id: string; file: File; previewUrl: string }[]>([]);
     const [isDragging, setIsDragging] = useState(false);
     const [loading, setLoading] = useState(false);
     const [resultUrl, setResultUrl] = useState<string | null>(null);
+    const [resultBlob, setResultBlob] = useState<Blob | null>(null);
+    const [conversionTimeMs, setConversionTimeMs] = useState<number | null>(null);
+    const [pageCount, setPageCount] = useState<number | null>(null);
 
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
@@ -72,6 +85,7 @@ export default function ImageToPdfTool() {
     const handleProcess = async () => {
         if (files.length === 0) return;
         setLoading(true);
+        const start = Date.now();
 
         try {
             const formData = new FormData();
@@ -94,6 +108,10 @@ export default function ImageToPdfTool() {
             const blob = await res.blob();
             const downloadUrl = window.URL.createObjectURL(blob);
             setResultUrl(downloadUrl);
+            setResultBlob(blob);
+            setConversionTimeMs(Date.now() - start);
+            const count = await getPdfPageCount(blob);
+            setPageCount(count);
         } catch (err: any) {
             console.error(err);
             alert(err.message || "Bir hata oluştu.");
@@ -102,14 +120,51 @@ export default function ImageToPdfTool() {
         }
     };
 
+    const reset = () => {
+        files.forEach((f) => URL.revokeObjectURL(f.previewUrl));
+        if (resultUrl) window.URL.revokeObjectURL(resultUrl);
+        setFiles([]);
+        setResultUrl(null);
+        setResultBlob(null);
+        setConversionTimeMs(null);
+        setPageCount(null);
+    };
+
+    if (!hasSubscription && session?.user) {
+        return (
+            <div className="relative">
+                <div className="max-w-5xl relative z-10">
+                    <Link href="/dashboard/tools" className="inline-flex items-center gap-2 text-[#888] hover:text-[#0e0e0e] transition-colors mb-8 text-sm font-bold uppercase tracking-wider">
+                        <ArrowLeft size={16} /> {t("backToHub")}
+                    </Link>
+                    <div className="bg-white rounded-[2.5rem] p-12 md:p-16 border border-slate-200 text-center shadow-sm relative overflow-hidden">
+                        <div className="w-24 h-24 mx-auto bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-8 border border-amber-100">
+                            <ShieldAlert size={48} />
+                        </div>
+                        <h2 className="text-3xl font-display font-black text-[#0a0c10] mb-4">Erişim Kısıtlı</h2>
+                        <p className="text-[#0a0c10]/60 font-medium text-lg mb-10 max-w-md mx-auto leading-relaxed">
+                            Bu aracı kullanabilmek için aktif bir <strong>Hukuk Araçları Paketi</strong> aboneliğinizin olması gerekmektedir.
+                        </p>
+                        <div className="flex flex-wrap gap-4 justify-center">
+                            <Link href="/abonelikler" className="bg-[#e6c800] text-[#0a0c10] px-10 py-4 rounded-2xl font-black uppercase tracking-wider hover:bg-[#c9ad00] transition-all shadow-sm inline-flex items-center gap-3">
+                                Paketi İncele <Zap size={18} fill="currentColor" />
+                            </Link>
+                            <Link href="/dashboard/billing?product=legal-toolkit" className="bg-[#0a0c10] text-white px-10 py-4 rounded-2xl font-black uppercase tracking-wider hover:bg-[#0a0c10]/90 transition-all shadow-xl inline-flex items-center gap-3">
+                                Ödeme Bildir
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="relative">
             <div className="max-w-5xl relative z-10">
-                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-                    <Link href="/dashboard" className="inline-flex items-center gap-2 text-[#888] hover:text-[#0e0e0e] transition-colors mb-8 text-sm font-bold uppercase tracking-wider">
-                        <ArrowLeft size={16} /> Panoya Dön
-                    </Link>
-                </motion.div>
+                <Link href="/dashboard/tools" className="inline-flex items-center gap-2 text-[#888] hover:text-[#0e0e0e] transition-colors mb-8 text-sm font-bold uppercase tracking-wider">
+                    <ArrowLeft size={16} /> {t("backToHub")}
+                </Link>
 
                 <div className="mb-12">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -122,6 +177,14 @@ export default function ImageToPdfTool() {
                     </div>
                 </div>
 
+                {/* Usage tip */}
+                <div className="mb-4">
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 border border-slate-100 text-sm text-slate-600">
+                        <span className="text-amber-500 font-black">•</span>
+                        {tImg("tip1")}
+                    </div>
+                </div>
+
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-1">
                         <div
@@ -129,7 +192,7 @@ export default function ImageToPdfTool() {
                             onDragLeave={handleDrag}
                             onDragOver={handleDrag}
                             onDrop={handleDrop}
-                            className={`glass rounded-3xl border-2 border-dashed p-10 text-center cursor-pointer transition-all h-full flex flex-col justify-center items-center relative ${isDragging ? "border-[#e6c800] bg-[#e6c800]/5 scale-95" : "border-black/5 hover:border-black/10 hover:bg-white/40"
+                            className={`glass rounded-3xl border-2 border-dashed p-10 text-center cursor-pointer transition-all h-full flex flex-col justify-center items-center relative ${isDragging ? "border-amber-400 bg-amber-50/50 scale-[0.99]" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/50"
                                 }`}
                         >
                             <input
@@ -144,13 +207,13 @@ export default function ImageToPdfTool() {
                             </div>
                             <h3 className="text-xl font-display font-bold text-[#0e0e0e] mb-2">Resim Ekleyin</h3>
                             <p className="text-[#888] text-sm font-medium leading-relaxed">
-                                Tıklayarak veya dosyalarınızı <br /> bu alana sürükleyerek yükleyin.
+                                {tImg("uploadHint")}
                             </p>
                         </div>
                     </div>
 
                     <div className="lg:col-span-2">
-                        <div className="glass rounded-3xl border border-black/5 p-8 h-full flex flex-col">
+                        <div className="glass rounded-3xl border border-slate-200 p-8 h-full flex flex-col">
                             {!resultUrl ? (
                                 <>
                                     <div className="flex items-center justify-between mb-8">
@@ -180,7 +243,7 @@ export default function ImageToPdfTool() {
                                             <Reorder.Group axis="y" values={files} onReorder={setFiles} className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                                 <AnimatePresence>
                                                     {files.map((item, index) => (
-                                                        <Reorder.Item key={item.id} value={item} className="relative group cursor-grab active:cursor-grabbing bg-white border border-black/5 rounded-2xl overflow-hidden aspect-[3/4] flex flex-col shadow-sm">
+                                                        <Reorder.Item key={item.id} value={item} className="relative group cursor-grab active:cursor-grabbing bg-white border border-slate-200 rounded-2xl overflow-hidden aspect-[3/4] flex flex-col shadow-sm">
                                                             <div className="absolute top-2 left-2 w-6 h-6 bg-[#0e0e0e] rounded-lg flex items-center justify-center text-[10px] font-black text-[#e6c800] z-10">
                                                                 {index + 1}
                                                             </div>
@@ -193,7 +256,7 @@ export default function ImageToPdfTool() {
                                                             <div className="flex-1 relative">
                                                                 <img src={item.previewUrl} alt={item.file.name} className="absolute inset-0 w-full h-full object-cover" />
                                                             </div>
-                                                            <div className="bg-white p-2 text-[10px] font-bold text-[#0e0e0e] truncate border-t border-black/5">
+                                                            <div className="bg-white p-2 text-[10px] font-bold text-[#0e0e0e] truncate border-t border-slate-100">
                                                                 {item.file.name}
                                                             </div>
                                                         </Reorder.Item>
@@ -203,35 +266,38 @@ export default function ImageToPdfTool() {
                                         )}
                                     </div>
                                 </>
-                            ) : (
-                                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex-1 flex flex-col items-center justify-center text-center py-10">
-                                    <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-[2rem] flex items-center justify-center mb-6 shadow-sm">
-                                        <CheckCircle2 size={40} />
-                                    </div>
-                                    <h3 className="text-2xl font-display font-black text-[#0e0e0e] mb-2">Başarıyla Oluşturuldu!</h3>
-                                    <p className="text-[#888] font-medium mb-10 max-w-sm">
-                                        Tüm resimleriniz sıralamaya uygun şekilde tek bir PDF içerisine aktarıldı.
-                                    </p>
-
-                                    <div className="flex gap-4 w-full justify-center">
-                                        <a
-                                            href={resultUrl}
-                                            download="zygsoft_pdf_kitapcigi.pdf"
-                                            className="bg-[#0e0e0e] text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-black/10 flex items-center gap-2"
-                                        >
-                                            <Download size={18} /> İndir
-                                        </a>
-                                        <button
-                                            onClick={() => { setFiles([]); setResultUrl(null); }}
-                                            className="bg-white border border-black/10 text-[#0e0e0e] px-8 py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-[#f3f1ed] transition-all shadow-sm flex items-center gap-2"
-                                        >
-                                            Yeni İşlem
-                                        </button>
-                                    </div>
+                            ) : resultUrl && resultBlob ? (
+                                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex-1 flex flex-col">
+                                    <ConversionResultPanel
+                                        filename="zygsoft_pdf_kitapcigi.pdf"
+                                        fileSize={resultBlob.size}
+                                        conversionType="Image → PDF"
+                                        conversionTimeMs={conversionTimeMs ?? undefined}
+                                        pageCount={pageCount ?? undefined}
+                                        pageCountLabel={pageCount === 1 ? t("resultPanel.pageCountOne") : t("resultPanel.pageCount")}
+                                        preview={<PdfPreview url={resultUrl} />}
+                                        downloadOptions={
+                                            <a
+                                                href={resultUrl}
+                                                download="zygsoft_pdf_kitapcigi.pdf"
+                                                className="bg-[#0e0e0e] text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-black transition-all flex items-center gap-2"
+                                            >
+                                                <Download size={16} /> {tImg("downloadButton")}
+                                            </a>
+                                        }
+                                        onReset={reset}
+                                        successTitle={tImg("successTitle")}
+                                        successDesc={tImg("successDesc")}
+                                        newButtonLabel={tImg("newButton")}
+                                    />
                                 </motion.div>
-                            )}
+                            ) : null}
                         </div>
                     </div>
+                </div>
+
+                <div className="mt-10">
+                    <ToolPageHint />
                 </div>
             </div>
         </div>

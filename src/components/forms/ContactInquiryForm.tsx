@@ -93,9 +93,9 @@ export function ContactInquiryForm({
         ];
 
     return (
-        <div className={`rounded-[2rem] border border-[#0a0c10]/10 bg-white p-7 md:p-9 shadow-sm ${className}`}>
+        <div className={`rounded-2xl border border-[#0a0c10]/[0.06] bg-white p-8 md:p-10 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] ${className}`}>
             <h3 className="text-2xl md:text-3xl font-display font-black text-[#0a0c10] mb-2">{title}</h3>
-            <p className="text-[#0a0c10]/60 text-sm md:text-base mb-7">{subtitle}</p>
+            <p className="text-[#0a0c10]/55 text-sm md:text-base mb-8">{subtitle}</p>
 
             <form onSubmit={onSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -131,14 +131,14 @@ export function ContactInquiryForm({
                 </div>
 
                 <div>
-                    <label className="block text-[11px] font-black uppercase tracking-[0.16em] text-[#0a0c10]/55 mb-2">
+                    <label className="input-label">
                         {t("formTopic")} *
                     </label>
                     <select
                         required
                         value={form.subject}
                         onChange={(e) => onChange("subject", e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-[#0a0c10]/12 bg-white text-sm text-[#0a0c10] focus:outline-none focus:ring-4 focus:ring-[#e6c800]/20 focus:border-[#e6c800] transition-all"
+                        className="input-base"
                     >
                         <option value="">{t("formTopicPlaceholder")}</option>
                         {topicOptions.map((opt) => (
@@ -159,14 +159,14 @@ export function ContactInquiryForm({
                         value={form.message}
                         onChange={(e) => onChange("message", e.target.value)}
                         placeholder={t("formMessagePlaceholder")}
-                        className="w-full px-4 py-3 rounded-xl border border-[#0a0c10]/12 bg-white text-sm text-[#0a0c10] placeholder:text-[#0a0c10]/40 focus:outline-none focus:ring-4 focus:ring-[#e6c800]/20 focus:border-[#e6c800] transition-all resize-none"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-950 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#e6c800]/30 focus:border-[#e6c800] transition-all duration-200 resize-none"
                     />
                 </div>
 
                 <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="group w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[#0a0c10] text-white text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#e6c800] hover:text-[#0a0c10] transition-colors disabled:opacity-70"
+                    className="group w-full btn-primary py-4 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                     {isSubmitting ? (
                         <>
@@ -216,7 +216,7 @@ function Field({
 }) {
     return (
         <div>
-            <label className="block text-[11px] font-black uppercase tracking-[0.16em] text-[#0a0c10]/55 mb-2">
+            <label className="input-label">
                 {label}
             </label>
             <input
@@ -224,7 +224,7 @@ function Field({
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
-                className="w-full px-4 py-3 rounded-xl border border-[#0a0c10]/12 bg-white text-sm text-[#0a0c10] placeholder:text-[#0a0c10]/40 focus:outline-none focus:ring-4 focus:ring-[#e6c800]/20 focus:border-[#e6c800] transition-all"
+                className="input-base"
             />
         </div>
     );
