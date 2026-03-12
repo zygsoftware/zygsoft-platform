@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Check, X, Eye, Receipt, Clock, Loader2, RefreshCw, AlertCircle } from "lucide-react";
+import { AdminPageHeader, AdminCard, AdminEmptyState, AdminBadge } from "@/components/admin";
 
 type Payment = {
     id: string;
@@ -77,85 +78,87 @@ export default function AdminPaymentsPage() {
     const pendingCount = payments.filter(p => p.status === "pending").length;
 
     return (
-        <div>
-            <div className="flex justify-between items-end mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Ödeme Onayları</h1>
-                    <p className="text-slate-500 dark:text-slate-400">Müşterilerden gelen HAVALE/EFT dekont bildirimlerini inceleyin.</p>
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2">
-                        <Clock size={16} /> {pendingCount} Bekleyen
+        <div className="space-y-8">
+            <AdminPageHeader
+                title="Ödeme Onayları"
+                subtitle="Müşterilerden gelen HAVALE/EFT dekont bildirimlerini inceleyin."
+                actions={
+                    <div className="flex items-center gap-3">
+                        {pendingCount > 0 && (
+                            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200/60 text-sm font-semibold">
+                                <Clock size={16} /> {pendingCount} Bekleyen
+                            </span>
+                        )}
+                        <button onClick={fetchPayments} className="p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors" title="Yenile">
+                            <RefreshCw size={20} />
+                        </button>
                     </div>
-                    <button onClick={fetchPayments} className="p-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-lg transition-colors">
-                        <RefreshCw size={20} />
-                    </button>
-                </div>
-            </div>
+                }
+            />
 
             {error && (
-                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-xl flex items-center gap-2">
+                <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center gap-2 text-sm">
                     <AlertCircle size={18} /> {error}
                 </div>
             )}
 
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+            <AdminCard padding="none">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                    <table className="admin-table w-full text-left">
                         <thead>
-                            <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-sm">
-                                <th className="px-6 py-4 font-medium">Kullanıcı (E-posta)</th>
-                                <th className="px-6 py-4 font-medium">Tutar</th>
-                                <th className="px-6 py-4 font-medium">Tarih</th>
-                                <th className="px-6 py-4 font-medium">Durum</th>
-                                <th className="px-6 py-4 font-medium">Dekont</th>
-                                <th className="px-6 py-4 font-medium text-right">İşlem</th>
+                            <tr>
+                                <th>Kullanıcı (E-posta)</th>
+                                <th>Tutar</th>
+                                <th>Tarih</th>
+                                <th>Durum</th>
+                                <th>Dekont</th>
+                                <th className="text-right">İşlem</th>
                             </tr>
                         </thead>
                         <tbody>
                             {payments.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-16 text-center">
-                                        <Receipt className="mx-auto mb-4 text-slate-300 dark:text-slate-600" size={40} />
-                                        <p className="text-slate-500 dark:text-slate-400 font-medium">Henüz veri yok.</p>
-                                        <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">Ödeme bildirimi bulunmuyor.</p>
+                                    <td colSpan={6}>
+                                        <AdminEmptyState
+                                            icon={<Receipt size={40} />}
+                                            title="Henüz ödeme bildirimi yok"
+                                            description="Müşterilerden gelen HAVALE/EFT dekont bildirimleri burada listelenecek."
+                                        />
                                     </td>
                                 </tr>
                             ) : (
                                 payments.map((payment) => (
-                                    <tr key={payment.id} className="border-b border-slate-50 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                                        <td className="px-6 py-4">
-                                            <div className="font-medium text-slate-900 dark:text-white">{payment.user?.email || "—"}</div>
-                                            <div className="text-xs text-slate-500 mt-1">Ürün: {payment.product?.name || "Bilinmiyor"}</div>
+                                    <tr key={payment.id}>
+                                        <td>
+                                            <div className="font-medium text-slate-900">{payment.user?.email || "—"}</div>
+                                            <div className="text-xs text-slate-500 mt-0.5">Ürün: {payment.product?.name || "Bilinmiyor"}</div>
                                         </td>
-                                        <td className="px-6 py-4 font-semibold text-slate-900 dark:text-white">₺{payment.amount}</td>
-                                        <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{new Date(payment.createdAt).toLocaleDateString("tr-TR")}</td>
-                                        <td className="px-6 py-4">
-                                            {payment.status === "pending" && <span className="px-2.5 py-1 text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-lg">Bekliyor</span>}
-                                            {payment.status === "approved" && <span className="px-2.5 py-1 text-xs font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-lg">Onaylandı</span>}
-                                            {payment.status === "rejected" && <span className="px-2.5 py-1 text-xs font-semibold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-lg">Reddedildi</span>}
+                                        <td className="font-semibold text-slate-900">₺{payment.amount}</td>
+                                        <td className="text-sm text-slate-600">{new Date(payment.createdAt).toLocaleDateString("tr-TR")}</td>
+                                        <td>
+                                            <AdminBadge variant={payment.status === "pending" ? "pending" : payment.status === "approved" ? "approved" : "rejected"} label={payment.status === "pending" ? "Bekliyor" : payment.status === "approved" ? "Onaylandı" : "Reddedildi"} />
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td>
                                             {payment.receiptImage ? (
-                                                <button onClick={() => setSelectedReceipt(payment.receiptImage!)} className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400 px-3 py-1.5 rounded-lg transition-colors">
+                                                <button onClick={() => setSelectedReceipt(payment.receiptImage!)} className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors">
                                                     <Eye size={16} /> Görüntüle
                                                 </button>
                                             ) : (
                                                 <span className="text-sm text-slate-400">—</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 text-right">
+                                        <td className="text-right">
                                             {payment.status === "pending" ? (
                                                 <div className="flex justify-end gap-2">
-                                                    <button disabled={actionLoading === payment.id} onClick={() => handleAction(payment.id, "approved")} className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 rounded-md transition-colors disabled:opacity-50" title="Onayla">
+                                                    <button disabled={actionLoading === payment.id} onClick={() => handleAction(payment.id, "approved")} className="p-2 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors disabled:opacity-50" title="Onayla">
                                                         {actionLoading === payment.id ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
                                                     </button>
-                                                    <button disabled={actionLoading === payment.id} onClick={() => handleAction(payment.id, "rejected")} className="p-1.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50 rounded-md transition-colors disabled:opacity-50" title="Reddet">
+                                                    <button disabled={actionLoading === payment.id} onClick={() => handleAction(payment.id, "rejected")} className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors disabled:opacity-50" title="Reddet">
                                                         <X size={18} />
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <span className="text-sm text-slate-400">İşlem Tamamlandı</span>
+                                                <span className="text-sm text-slate-400">—</span>
                                             )}
                                         </td>
                                     </tr>
@@ -164,15 +167,15 @@ export default function AdminPaymentsPage() {
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </AdminCard>
 
             {selectedReceipt && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm" onClick={() => setSelectedReceipt(null)}>
-                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative max-w-3xl w-full max-h-[90vh] bg-white dark:bg-slate-900 rounded-2xl p-2 shadow-2xl" onClick={e => e.stopPropagation()}>
-                        <button onClick={() => setSelectedReceipt(null)} className="absolute -top-4 -right-4 w-10 h-10 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-full shadow-lg flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors z-10">
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative max-w-3xl w-full max-h-[90vh] bg-white rounded-2xl p-2 shadow-2xl border border-slate-200" onClick={e => e.stopPropagation()}>
+                        <button onClick={() => setSelectedReceipt(null)} className="absolute -top-4 -right-4 w-10 h-10 bg-white text-slate-900 rounded-full shadow-lg flex items-center justify-center hover:bg-slate-100 transition-colors z-10 border border-slate-200">
                             <X size={20} />
                         </button>
-                        <div className="w-full h-full overflow-hidden rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
+                        <div className="w-full h-full overflow-hidden rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center">
                             {selectedReceipt.startsWith("data:image") ? (
                                 <img src={selectedReceipt} alt="Dekont" className="max-w-full max-h-[85vh] object-contain" />
                             ) : selectedReceipt.startsWith("data:application/pdf") ? (

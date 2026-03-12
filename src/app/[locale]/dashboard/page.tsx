@@ -21,6 +21,10 @@ import {
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { ActivityTimeline } from "@/components/dashboard/ActivityTimeline";
+import { TrialCountdownCard, formatTimeLeftCompact } from "@/components/dashboard/TrialCountdownCard";
+import { OnboardingChecklist } from "@/components/dashboard/OnboardingChecklist";
+import { TrialRequestCTA } from "@/components/trial/TrialRequestCTA";
+import { hasToolAccess } from "@/lib/trial-access-client";
 
 type Summary = {
     activeProducts: number;
@@ -57,7 +61,8 @@ export default function DashboardPage() {
         if (session) fetchSummary();
     }, [session, fetchSummary]);
 
-    const hasLegalToolkitAccess = activeProductSlugs.includes("legal-toolkit");
+    const hasLegalToolkitAccess = hasToolAccess(user);
+    const hasPaidSubscription = activeProductSlugs.includes("legal-toolkit") || user?.role === "admin";
 
     const stats = [
         {
@@ -99,7 +104,7 @@ export default function DashboardPage() {
         { label: t("quickActions.billing"),   href: "/dashboard/billing",   icon: Receipt },
         { label: t("quickActions.support"),  href: "/dashboard/support",   icon: MessageSquare },
         { label: t("quickActions.services"), href: "/dashboard/services",   icon: Briefcase },
-        { label: t("quickActions.subscriptions"), href: "/abonelikler", icon: ShoppingCart },
+        { label: t("quickActions.subscriptions"), href: "/dijital-urunler/hukuk-araclari-paketi", icon: ShoppingCart },
     ];
 
     return (
@@ -115,11 +120,54 @@ export default function DashboardPage() {
                         {t("subtitle")}
                     </p>
                 </div>
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl">
-                    <Sparkles size={13} className="text-amber-500" />
-                    Kontrol Panelinize Hoş Geldiniz
+                <div className="flex items-center gap-2 flex-wrap">
+                    {!hasLegalToolkitAccess && (user?.role === "customer" || !user?.role) && (
+                        <TrialRequestCTA
+                            emailVerified={user?.emailVerified ?? false}
+                            trialStatus={user?.trialStatus ?? "none"}
+                            hasSubscription={hasLegalToolkitAccess}
+                            compact
+                            source="dashboard"
+                        />
+                    )}
+                    {!hasLegalToolkitAccess && user?.trialStatus === "active" && (
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-xl">
+                            <Sparkles size={13} className="text-amber-500" />
+                            Demo: {formatTimeLeftCompact(user?.trialEndsAt ?? null)}
+                        </div>
+                    )}
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl">
+                        <Sparkles size={13} className="text-amber-500" />
+                        Kontrol Panelinize Hoş Geldiniz
+                    </div>
                 </div>
             </div>
+
+            {/* ── Onboarding checklist (when no subscription & not completed) ── */}
+            {!hasLegalToolkitAccess &&
+                (user?.role === "customer" || !user?.role) &&
+                !user?.onboardingCompleted && (
+                    <OnboardingChecklist
+                        emailVerified={user?.emailVerified ?? false}
+                        trialStatus={user?.trialStatus ?? "none"}
+                        trialOperationsUsed={user?.trialOperationsUsed ?? 0}
+                        hasSubscription={hasLegalToolkitAccess}
+                        onDismiss={() => {}}
+                    />
+                )}
+
+            {/* ── Trial countdown card (when no subscription) ── */}
+            {!hasPaidSubscription && (user?.role === "customer" || !user?.role) && (
+                <TrialCountdownCard
+                    trialStatus={user?.trialStatus ?? "none"}
+                    trialStartedAt={user?.trialStartedAt ?? null}
+                    trialEndsAt={user?.trialEndsAt ?? null}
+                    trialOperationsUsed={user?.trialOperationsUsed ?? 0}
+                    trialOperationsLimit={user?.trialOperationsLimit ?? 20}
+                    hasSubscription={hasPaidSubscription}
+                    emailVerified={user?.emailVerified ?? false}
+                />
+            )}
 
             {/* ── Onboarding strip (context-aware next step) ── */}
             {!loading && summary && (
@@ -172,7 +220,7 @@ export default function DashboardPage() {
                     if (ap === 0) {
                         return (
                             <Link
-                                href={`/${locale}/abonelikler`}
+                                href={locale === "en" ? "/en/dijital-urunler/hukuk-araclari-paketi" : "/dijital-urunler/hukuk-araclari-paketi"}
                                 className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-slate-100/80 transition-colors group"
                             >
                                 <div className="flex items-center gap-3">
@@ -332,12 +380,22 @@ export default function DashboardPage() {
                                 <p className="text-slate-400 text-sm font-medium mb-4">
                                     {t("sections.noApps")}
                                 </p>
-                                <Link
-                                    href="/abonelikler"
-                                    className="inline-flex items-center gap-2 bg-[#e6c800] text-slate-950 px-6 py-2.5 rounded-xl text-xs font-black hover:bg-[#d4b800] transition-all shadow-sm"
-                                >
-                                    {t("sections.browseStore")}
-                                </Link>
+                                <div className="flex flex-wrap gap-3 justify-center">
+                                    {!hasLegalToolkitAccess && (user?.role === "customer" || !user?.role) && (
+                                        <TrialRequestCTA
+                                            emailVerified={user?.emailVerified ?? false}
+                                            trialStatus={user?.trialStatus ?? "none"}
+                                            hasSubscription={hasLegalToolkitAccess}
+                                            source="dashboard"
+                                        />
+                                    )}
+                                    <Link
+                                        href={locale === "en" ? "/en/dijital-urunler/hukuk-araclari-paketi" : "/dijital-urunler/hukuk-araclari-paketi"}
+                                        className="inline-flex items-center gap-2 bg-slate-950 text-white px-6 py-2.5 rounded-xl text-xs font-black hover:bg-slate-800 transition-all shadow-sm"
+                                    >
+                                        {t("sections.browseStore")}
+                                    </Link>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -395,12 +453,23 @@ export default function DashboardPage() {
                                 <p className="text-slate-400 text-sm font-medium mb-4">
                                     {t("sections.noTickets")}
                                 </p>
-                                <Link
-                                    href="/dashboard/support"
-                                    className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-950 text-white text-xs font-black rounded-xl hover:bg-slate-700 transition-colors"
-                                >
-                                    {t("sections.newTicket")}
-                                </Link>
+                                <div className="flex flex-wrap gap-3 justify-center">
+                                    {!hasLegalToolkitAccess && (user?.role === "customer" || !user?.role) && (
+                                        <TrialRequestCTA
+                                            emailVerified={user?.emailVerified ?? false}
+                                            trialStatus={user?.trialStatus ?? "none"}
+                                            hasSubscription={hasLegalToolkitAccess}
+                                            compact
+                                            source="dashboard"
+                                        />
+                                    )}
+                                    <Link
+                                        href={`/${locale}/dashboard/support`}
+                                        className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-950 text-white text-xs font-black rounded-xl hover:bg-slate-700 transition-colors"
+                                    >
+                                        {t("sections.newTicket")}
+                                    </Link>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -466,7 +535,7 @@ export default function DashboardPage() {
                         </p>
                     </div>
                     <Link
-                        href="/abonelikler"
+                        href="/dijital-urunler/hukuk-araclari-paketi"
                         className="
                             bg-[#e6c800] text-slate-950 px-10 py-4 rounded-2xl
                             text-sm font-black hover:bg-white transition-all

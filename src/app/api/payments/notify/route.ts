@@ -11,6 +11,14 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Oturum açmanız gerekiyor." }, { status: 401 });
         }
 
+        const user = session.user as any;
+        if (user.role !== "admin" && !user.emailVerified) {
+            return NextResponse.json(
+                { error: "Ödeme bildirimi yapmak için e-posta adresinizi doğrulamanız gerekiyor." },
+                { status: 403 }
+            );
+        }
+
         const { amount, receiptImage, productId } = await req.json();
 
         if (!amount || !receiptImage || !productId) {

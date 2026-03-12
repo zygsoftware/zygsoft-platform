@@ -91,6 +91,28 @@ export default function AccountPage() {
                                                 </p>
                                             </div>
                                         </div>
+
+                                        {user?.role !== "admin" && (
+                                            <div className={`flex items-start gap-4 p-5 rounded-2xl border text-left ${
+                                                user?.emailVerified
+                                                    ? "bg-emerald-50 border-emerald-200"
+                                                    : "bg-amber-50 border-amber-200"
+                                            }`}>
+                                                <Mail size={18} className={`mt-1 ${user?.emailVerified ? "text-emerald-600" : "text-amber-600"}`} />
+                                                <div>
+                                                    <p className={`text-[10px] font-black uppercase tracking-widest mb-1.5 ${
+                                                        user?.emailVerified ? "text-emerald-700" : "text-amber-700"
+                                                    }`}>
+                                                        {t("emailVerification")}
+                                                    </p>
+                                                    <p className={`text-sm font-black ${
+                                                        user?.emailVerified ? "text-emerald-800" : "text-amber-800"
+                                                    }`}>
+                                                        {user?.emailVerified ? t("verified") : t("notVerified")}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </motion.div>
@@ -113,7 +135,7 @@ export default function AccountPage() {
                                         <p className="text-slate-500 font-medium text-sm italic opacity-80">{t("subsSubtitle")}</p>
                                     </div>
                                     <Link
-                                        href="/abonelikler"
+                                        href="/dijital-urunler/hukuk-araclari-paketi"
                                         className="px-6 py-3 bg-[#e6c800] text-slate-950 font-black rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#e6c800]/20 text-sm flex items-center gap-2"
                                     >
                                         <ArrowRight size={18} className="order-last" /> {t("buyNew")}

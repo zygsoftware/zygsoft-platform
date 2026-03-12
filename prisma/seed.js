@@ -10,21 +10,33 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
     console.log("🌱 ZYGSOFT seed başlatılıyor...\n");
 
-    // 1. Admin user
-    let admin = await prisma.user.findUnique({ where: { email: "admin@zygsoft.com" } });
+    // 1. Admin user — use env vars if set, else defaults
+    const adminEmail = process.env.ADMIN_EMAIL?.trim() || "admin@zygsoft.com";
+    const adminPassword = process.env.ADMIN_PASSWORD || process.env.ADMIN_INITIAL_PASSWORD || "Zygsoft2024!";
+    const adminName = process.env.ADMIN_NAME?.trim() || "Gürkan Yavuz";
+
+    let admin = await prisma.user.findFirst({ where: { role: "admin" } });
     if (!admin) {
-        const hash = await bcrypt.hash("Zygsoft2024!", 12);
-        admin = await prisma.user.create({
-            data: {
-                email: "admin@zygsoft.com",
-                name: "Gürkan Yavuz",
-                password: hash,
-                role: "admin",
-            },
-        });
-        console.log("✓ Admin kullanıcı oluşturuldu: admin@zygsoft.com / Zygsoft2024!");
+        const existingByEmail = await prisma.user.findUnique({ where: { email: adminEmail } });
+        if (existingByEmail && existingByEmail.role !== "admin") {
+            console.log("⚠ E-posta zaten müşteri olarak kayıtlı:", adminEmail, "- admin atlanıyor.");
+        } else if (!existingByEmail) {
+            const hash = await bcrypt.hash(adminPassword, 12);
+            admin = await prisma.user.create({
+                data: {
+                    email: adminEmail,
+                    name: adminName,
+                    password: hash,
+                    role: "admin",
+                },
+            });
+            console.log("✓ Admin kullanıcı oluşturuldu:", adminEmail, "/ (şifre env'den veya varsayılan)");
+        }
+    }
+    if (admin) {
+        console.log("✓ Admin kullanıcı hazır:", admin.email);
     } else {
-        console.log("✓ Admin kullanıcı zaten mevcut.");
+        console.log("✓ Admin kullanıcı zaten mevcut veya atlandı.");
     }
 
     // 2. Customer user
@@ -105,31 +117,66 @@ async function main() {
         console.log("✓ Ödemeler zaten mevcut.");
     }
 
-    // 7. Blog posts
+    // 7. Blog categories
+    const blogCategoriesData = [
+        { name_tr: "Hukuk Teknolojileri", name_en: "Legal Tech", slug: "hukuk-teknolojileri" },
+        { name_tr: "Dijital Dönüşüm", name_en: "Digital Transformation", slug: "dijital-donusum" },
+        { name_tr: "Yazılım", name_en: "Software", slug: "yazilim" },
+    ];
+    const categoryIds = {};
+    for (const c of blogCategoriesData) {
+        let cat = await prisma.blogCategory.findUnique({ where: { slug: c.slug } });
+        if (!cat) {
+            cat = await prisma.blogCategory.create({ data: c });
+            console.log(`✓ Blog kategorisi eklendi: ${c.name_tr}`);
+        }
+        categoryIds[c.slug] = cat.id;
+    }
+    console.log("✓ Blog kategorileri kontrol edildi.");
+
+    // 8. Blog posts (new schema)
     const blogPostsData = [
         {
-            title: "Dijital Dönüşümde Hukuk Teknolojilerinin Rolü",
             slug: "dijital-donusumde-hukuk-teknolojileri",
-            excerpt: "Hukuk büroları ve kurumlar için dijital dönüşüm sürecinde legal-tech çözümlerinin önemi.",
-            content: "Dijital dönüşüm, hukuk sektöründe de kaçınılmaz hale geldi. UYAP entegrasyonu, belge otomasyonu ve iş akışı yönetimi artık modern hukuk bürolarının olmazsa olmazı. ZYGSOFT olarak Legal UDF Dönüştürücü ile bu sürece nasıl katkı sağladığımızı anlatıyoruz.",
-            author: "Gürkan Yavuz",
+            title_tr: "Dijital Dönüşümde Hukuk Teknolojilerinin Rolü",
+            title_en: "The Role of Legal Tech in Digital Transformation",
+            excerpt_tr: "Hukuk büroları ve kurumlar için dijital dönüşüm sürecinde legal-tech çözümlerinin önemi.",
+            excerpt_en: "The importance of legal-tech solutions for law firms and institutions in the digital transformation process.",
+            content_tr: "<p>Dijital dönüşüm, hukuk sektöründe de kaçınılmaz hale geldi. UYAP entegrasyonu, belge otomasyonu ve iş akışı yönetimi artık modern hukuk bürolarının olmazsa olmazı. ZYGSOFT olarak Legal UDF Dönüştürücü ile bu sürece nasıl katkı sağladığımızı anlatıyoruz.</p>",
+            content_en: "<p>Digital transformation has become inevitable in the legal sector too. UYAP integration, document automation and workflow management are now essential for modern law firms. We explain how ZYGSOFT contributes to this process with the Legal UDF Converter.</p>",
+            category_id: categoryIds["hukuk-teknolojileri"],
+            is_featured: true,
             published: true,
+            published_at: new Date(),
+            reading_time_min: 3,
         },
         {
-            title: "Kurumsal Otomasyon: Nereden Başlamalı?",
             slug: "kurumsal-otomasyon-nereden-baslamali",
-            excerpt: "İşletmelerin otomasyon yolculuğunda ilk adımlar ve öncelik belirleme.",
-            content: "Otomasyon projelerinde başarı, doğru başlangıç noktası seçimine bağlıdır. Tekrarlayan işlerden başlayarak adım adım ilerlemek, hem ROI hem de ekip adaptasyonu açısından kritiktir.",
-            author: "Gürkan Yavuz",
+            title_tr: "Kurumsal Otomasyon: Nereden Başlamalı?",
+            title_en: "Corporate Automation: Where to Start?",
+            excerpt_tr: "İşletmelerin otomasyon yolculuğunda ilk adımlar ve öncelik belirleme.",
+            excerpt_en: "First steps and priority setting in the automation journey of businesses.",
+            content_tr: "<p>Otomasyon projelerinde başarı, doğru başlangıç noktası seçimine bağlıdır. Tekrarlayan işlerden başlayarak adım adım ilerlemek, hem ROI hem de ekip adaptasyonu açısından kritiktir.</p>",
+            content_en: "<p>Success in automation projects depends on choosing the right starting point. Starting with repetitive tasks and progressing step by step is critical for both ROI and team adaptation.</p>",
+            category_id: categoryIds["dijital-donusum"],
+            is_featured: false,
             published: true,
+            published_at: new Date(),
+            reading_time_min: 2,
         },
         {
-            title: "Belge Yönetimi ve KVKK Uyumluluğu",
             slug: "belge-yonetimi-kvkk-uyumluluk",
-            excerpt: "Hassas belgelerin işlenmesinde KVKK uyumluluğu nasıl sağlanır?",
-            content: "Hukuk büroları ve kurumlar, müşteri belgelerini işlerken KVKK gerekliliklerine uymak zorundadır. Sunucu tarafında geçici işleme, otomatik silme ve şifreleme gibi teknik önlemler bu süreçte hayati önem taşır.",
-            author: "Gürkan Yavuz",
+            title_tr: "Belge Yönetimi ve KVKK Uyumluluğu",
+            title_en: "Document Management and KVKK Compliance",
+            excerpt_tr: "Hassas belgelerin işlenmesinde KVKK uyumluluğu nasıl sağlanır?",
+            excerpt_en: "How to ensure KVKK compliance when processing sensitive documents?",
+            content_tr: "<p>Hukuk büroları ve kurumlar, müşteri belgelerini işlerken KVKK gerekliliklerine uymak zorundadır. Sunucu tarafında geçici işleme, otomatik silme ve şifreleme gibi teknik önlemler bu süreçte hayati önem taşır.</p>",
+            content_en: "<p>Law firms and institutions must comply with KVKK requirements when processing client documents. Technical measures such as temporary processing on the server, automatic deletion and encryption are vital in this process.</p>",
+            category_id: categoryIds["hukuk-teknolojileri"],
+            is_featured: false,
             published: true,
+            published_at: new Date(),
+            reading_time_min: 2,
         },
     ];
 
@@ -137,12 +184,12 @@ async function main() {
         const existing = await prisma.blogPost.findUnique({ where: { slug: post.slug } });
         if (!existing) {
             await prisma.blogPost.create({ data: post });
-            console.log(`✓ Blog yazısı eklendi: ${post.title}`);
+            console.log(`✓ Blog yazısı eklendi: ${post.title_tr}`);
         }
     }
     console.log("✓ Blog yazıları kontrol edildi.");
 
-    // 8. Projects (for portfolio)
+    // 9. Projects (for portfolio)
     const projectsData = [
         {
             title: "Global Lojistik Hub",
@@ -174,7 +221,7 @@ async function main() {
     console.log("✓ Projeler kontrol edildi.");
 
     console.log("\n✅ Seed tamamlandı!");
-    console.log("\nAdmin giriş: admin@zygsoft.com / Zygsoft2024!");
+    console.log("\nAdmin giriş:", adminEmail, "— şifre .env'de veya varsayılan: Zygsoft2024!");
 }
 
 main()

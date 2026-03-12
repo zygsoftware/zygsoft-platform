@@ -17,6 +17,9 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://zygsoft.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  icons: {
+    icon: "/brand/favicon.png",
+  },
   title: {
     default:  "ZYGSOFT | Antalya Yazılım Şirketi ve Dijital Ajans",
     template: "%s | ZYGSOFT",
@@ -80,7 +83,7 @@ const organizationJsonLd = {
       "url": SITE_URL,
       "logo": {
         "@type": "ImageObject",
-        "url": `${SITE_URL}/og-default.png`,
+        "url": `${SITE_URL}/brand/logo.png`,
       },
       "contactPoint": {
         "@type": "ContactPoint",

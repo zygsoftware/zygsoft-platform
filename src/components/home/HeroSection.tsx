@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import {
     motion,
     useMotionValue,
@@ -277,7 +277,7 @@ export function HeroSection() {
                     {/* Primary — yellow */}
                     <Magnetic strength={16}>
                         <Link
-                            href="/abonelikler"
+                            href="/dijital-urunler/hukuk-araclari-paketi"
                             className="group inline-flex items-center gap-2.5 px-8 py-4 rounded-2xl bg-[#e6c800] text-[#0a0c10] text-[11px] font-black uppercase tracking-[0.22em] shadow-[0_12px_40px_rgba(230,200,0,0.28)] hover:shadow-[0_16px_48px_rgba(230,200,0,0.35)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                         >
                             {t("ctaPrimary")}

@@ -32,7 +32,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ...both("/portfolio",    { changeFrequency: "weekly",  priority: 0.8 }),
         ...both("/blog",         { changeFrequency: "weekly",  priority: 0.8 }),
         ...both("/contact",      { changeFrequency: "monthly", priority: 0.7 }),
-        ...both("/abonelikler",  { changeFrequency: "weekly",  priority: 0.8 }),
+        ...both("/dijital-urunler",  { changeFrequency: "weekly",  priority: 0.8 }),
+        ...both("/dijital-urunler/hukuk-araclari-paketi", { changeFrequency: "weekly", priority: 0.9 }),
         ...both("/terms",        { changeFrequency: "yearly",  priority: 0.3 }),
         ...both("/kvkk",         { changeFrequency: "yearly",  priority: 0.3 }),
     ];
@@ -44,21 +45,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     /* ── Dynamic blog post pages ── */
     let blogRoutes: MetadataRoute.Sitemap = [];
+    let categoryRoutes: MetadataRoute.Sitemap = [];
+    let tagRoutes: MetadataRoute.Sitemap = [];
     try {
         const posts = await prisma.blogPost.findMany({
             where:  { published: true },
-            select: { slug: true, updatedAt: true },
+            select: { slug: true, updated_at: true },
         });
         blogRoutes = posts.flatMap((post) =>
             both(`/blog/${post.slug}`, { changeFrequency: "monthly", priority: 0.7 })
         ).map((entry, i) => ({
             ...entry,
-            // Use actual post updatedAt for accuracy
-            lastModified: posts[Math.floor(i / 2)]?.updatedAt ?? new Date(),
+            lastModified: posts[Math.floor(i / 2)]?.updated_at ?? new Date(),
         }));
+
+        const categories = await prisma.blogCategory.findMany({ select: { slug: true } });
+        categoryRoutes = categories.flatMap((c) =>
+            both(`/blog/category/${c.slug}`, { changeFrequency: "weekly", priority: 0.6 })
+        );
+
+        const tags = await prisma.blogTag.findMany({ select: { slug: true } });
+        tagRoutes = tags.flatMap((t) =>
+            both(`/blog/tag/${t.slug}`, { changeFrequency: "weekly", priority: 0.5 })
+        );
     } catch {
         // Sitemap should not crash the build if DB is unavailable
     }
 
-    return [...staticRoutes, ...serviceRoutes, ...blogRoutes];
+    return [...staticRoutes, ...serviceRoutes, ...blogRoutes, ...categoryRoutes, ...tagRoutes];
 }

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { PDFDocument } from "pdf-lib";
 import { prisma } from "@/lib/prisma";
+import { checkToolAccess, incrementTrialUsage } from "@/lib/trial-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -84,16 +85,10 @@ function parsePageRange(
 /* ── Route handler ──────────────────────────────────────────────── */
 export async function POST(req: Request) {
     try {
-        /* Auth */
+        const guard = await checkToolAccess();
+        if (!guard.allowed) return guard.response;
+
         const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: "Oturum açmanız gerekiyor." }, { status: 401 });
-        }
-        const activeSlugs = (session.user as any).activeProductSlugs || [];
-        const isAdmin = (session.user as any).role === "admin";
-        if (!activeSlugs.includes("legal-toolkit") && !isAdmin) {
-            return NextResponse.json({ error: "Bu araç için Hukuk Araçları Paketi aboneliği gereklidir." }, { status: 403 });
-        }
 
         /* Parse multipart */
         let formData: FormData;
@@ -165,8 +160,11 @@ export async function POST(req: Request) {
         const pdfBytes = await outDoc.save();
 
         /* Log usage */
-        const userId = session.user.id as string;
+        const userId = session!.user!.id as string;
         prisma.toolUsage.create({ data: { userId, toolSlug: "pdf-split" } }).catch(() => {});
+        if (guard.incrementTrial && guard.userId) {
+            incrementTrialUsage(guard.userId).catch(() => {});
+        }
 
         return new NextResponse(Buffer.from(pdfBytes), {
             status: 200,

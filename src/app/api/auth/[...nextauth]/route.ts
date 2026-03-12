@@ -29,6 +29,12 @@ export const authOptions = {
                         id: user.id,
                         email: user.email,
                         role: user.role,
+                        emailVerified: user.emailVerified,
+                        trialStatus: user.trialStatus,
+                        trialEndsAt: user.trialEndsAt,
+                        trialOperationsUsed: user.trialOperationsUsed,
+                        trialOperationsLimit: user.trialOperationsLimit,
+                        onboardingCompleted: user.onboardingCompleted ?? false,
                     };
                 }
 
@@ -41,6 +47,12 @@ export const authOptions = {
             if (user) {
                 token.id = user.id;
                 token.role = (user as any).role;
+                token.emailVerified = (user as any).emailVerified;
+                token.trialStatus = (user as any).trialStatus;
+                token.trialEndsAt = (user as any).trialEndsAt;
+                token.trialOperationsUsed = (user as any).trialOperationsUsed;
+                token.trialOperationsLimit = (user as any).trialOperationsLimit;
+                token.onboardingCompleted = (user as any).onboardingCompleted ?? false;
             }
             return token;
         },
@@ -48,6 +60,45 @@ export const authOptions = {
             if (session.user && token.id) {
                 session.user.id = token.id as string;
                 (session.user as any).role = token.role;
+
+                // Fetch fresh user data (emailVerified, trial, subscriptions)
+                try {
+                    const dbUser = await prisma.user.findUnique({
+                        where: { id: token.id },
+                        select: {
+                            name: true,
+                            email: true,
+                            phone: true,
+                            company: true,
+                            emailVerified: true,
+                            trialStatus: true,
+                            trialStartedAt: true,
+                            trialEndsAt: true,
+                            trialOperationsUsed: true,
+                            trialOperationsLimit: true,
+                            onboardingCompleted: true,
+                        },
+                    });
+                    (session.user as any).name = dbUser?.name ?? session.user?.name ?? null;
+                    (session.user as any).email = dbUser?.email ?? session.user?.email ?? null;
+                    (session.user as any).phone = dbUser?.phone ?? null;
+                    (session.user as any).company = dbUser?.company ?? null;
+                    (session.user as any).emailVerified = dbUser?.emailVerified ?? false;
+                    (session.user as any).trialStatus = dbUser?.trialStatus ?? "none";
+                    (session.user as any).trialStartedAt = dbUser?.trialStartedAt ?? null;
+                    (session.user as any).trialEndsAt = dbUser?.trialEndsAt ?? null;
+                    (session.user as any).trialOperationsUsed = dbUser?.trialOperationsUsed ?? 0;
+                    (session.user as any).trialOperationsLimit = dbUser?.trialOperationsLimit ?? 20;
+                    (session.user as any).onboardingCompleted = dbUser?.onboardingCompleted ?? false;
+                } catch {
+                    (session.user as any).emailVerified = token.emailVerified ?? false;
+                    (session.user as any).trialStatus = token.trialStatus ?? "none";
+                    (session.user as any).trialStartedAt = token.trialStartedAt ?? null;
+                    (session.user as any).trialEndsAt = token.trialEndsAt ?? null;
+                    (session.user as any).trialOperationsUsed = token.trialOperationsUsed ?? 0;
+                    (session.user as any).trialOperationsLimit = token.trialOperationsLimit ?? 20;
+                    (session.user as any).onboardingCompleted = token.onboardingCompleted ?? false;
+                }
 
                 // Fetch fresh subscriptions from DB
                 try {

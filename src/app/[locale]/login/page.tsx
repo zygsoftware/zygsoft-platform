@@ -1,19 +1,44 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import { Eye, EyeOff, Loader2, ArrowRight, Lock } from "lucide-react";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations, useLocale } from "next-intl";
+import { motion, AnimatePresence } from "framer-motion";
+import { Mail } from "lucide-react";
+import {
+    AuthShell,
+    AuthFormPanel,
+    AuthInput,
+    PasswordField,
+    AuthHeroPanel,
+    AuthStatus,
+    AuthActions,
+} from "@/components/auth";
 
-export default function LoginPage() {
+function getForgotPath(locale: string) {
+    return locale === "en" ? "/en/forgot-password" : "/forgot-password";
+}
+
+function LoginPageContent() {
+    const t = useTranslations("Auth.login");
+    const locale = useLocale();
+    const searchParams = useSearchParams();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [showPw, setShowPw] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [resetSuccess, setResetSuccess] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        if (searchParams.get("reset") === "success") {
+            setResetSuccess(true);
+        }
+    }, [searchParams]);
+
+    const registered = searchParams.get("registered") === "true";
+    const verified = searchParams.get("verified") === "success";
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -21,7 +46,7 @@ export default function LoginPage() {
         setError("");
         const result = await signIn("credentials", { email, password, redirect: false });
         if (!result?.ok) {
-            setError("E-posta veya şifre hatalı. Lütfen tekrar deneyin.");
+            setError(t("errorInvalid"));
             setLoading(false);
         } else {
             router.push("/dashboard");
@@ -29,99 +54,115 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex bg-[#f9f7f3] selection:bg-[#e6c800] selection:text-[#0e0e0e] relative z-10">
-            {/* Noise Overlay — behind content */}
-            <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.03] mix-blend-overlay" style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
-            }} />
-
-            {/* Left decorative panel (Hidden on mobile) */}
-            <div className="hidden lg:flex lg:w-[45%] flex-shrink-0 flex-col justify-between p-20 bg-[#0e0e0e] relative overflow-hidden">
-                <div className="absolute top-[-10%] right-[-10%] w-[80%] h-[80%] bg-[#e6c800] opacity-[0.07] blur-[150px] animate-pulse" />
-                <div className="absolute bottom-[-20%] left-[-20%] w-[100%] h-[100%] bg-[#e6c800] opacity-[0.03] blur-[200px]" />
-
-                <Link href="/" className="font-display text-4xl font-black text-white tracking-tighter">
-                    ZYG<span className="text-[#e6c800]">SOFT.</span>
-                </Link>
-
-                <div className="relative z-10 scale-110 origin-left">
-                    <h2 className="font-display font-black text-white mb-8 leading-[0.9] tracking-tighter text-7xl">
-                        Yarınları <br /><span className="text-[#e6c800]">Tasarlayın.</span>
-                    </h2>
-                    <p className="text-white/40 text-lg font-medium max-w-sm leading-relaxed">
-                        Zygsoft ekosistemine giriş yapın ve projelerinizin verimliliğini üst düzeye taşıyın.
-                    </p>
-                </div>
-
-                <div className="flex items-center gap-6">
-                    <div className="flex -space-x-3">
-                        {[1, 2, 3].map(i => (
-                            <div key={i} className="w-10 h-10 rounded-full border-2 border-[#0e0e0e] bg-[#222]" />
-                        ))}
-                    </div>
-                    <span className="text-xs font-black uppercase tracking-widest text-white/30">/ TOPLULUĞA KATILIN</span>
-                </div>
-            </div>
-
-            {/* Right — form section (scrollable when content overflows) */}
-            <div className="flex-1 min-h-0 flex items-center justify-center p-8 md:p-12 overflow-y-auto">
-                <div className="w-full max-w-[440px] py-4">
-                    <div className="mb-12">
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="w-8 h-px bg-[#e6c800]" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#e6c800]">GİRİŞ YAP</span>
+        <AuthShell
+            hero={
+                <AuthHeroPanel
+                    title="Tekrar hoş geldiniz."
+                    titleAccent="Giriş yapın."
+                    subtitle="ZYGSOFT ekosistemine giriş yapın ve projelerinizin verimliliğini üst düzeye taşıyın."
+                    features={[
+                        { label: "Belge Araçları", value: "8+" },
+                        { label: "Güvenli Erişim", value: "✓" },
+                        { label: "7/24 Panel", value: "✓" },
+                    ]}
+                    footer={
+                        <div className="flex items-center gap-3 text-white/50 text-[11px] font-bold uppercase tracking-wider">
+                            <span>ANTALYA</span>
+                            <span className="w-1 h-1 rounded-full bg-[#e6c800]/60" />
+                            <span>GLOBAL</span>
                         </div>
-                        <h1 className="text-5xl md:text-6xl font-display font-black tracking-tighter text-[#0e0e0e] mb-4">Hoş Geldiniz.</h1>
-                        <p className="text-[#666] font-medium italic">Devam etmek için kimlik bilgilerinizi girin.</p>
+                    }
+                />
+            }
+        >
+            <AuthFormPanel>
+                <div className="mb-8">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-6 h-px bg-[#e6c800]" />
+                        <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#e6c800]">
+                            GİRİŞ YAP
+                        </span>
                     </div>
+                    <h1 className="text-2xl md:text-3xl font-display font-black tracking-tight text-[#0a0c10] mb-2">
+                        {t("title")}
+                    </h1>
+                    <p className="text-zinc-600 text-[14px] font-medium">{t("subtitle")}</p>
+                </div>
 
-                    {error && (
-                        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-                            className="mb-8 p-5 bg-black border-l-4 border-[#e6c800] text-white text-xs font-bold uppercase tracking-widest">
-                            {error}
+                <AnimatePresence mode="wait">
+                    {(resetSuccess || registered || verified) && (
+                        <motion.div
+                            key="success"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="mb-6 overflow-hidden"
+                        >
+                            <AuthStatus type="success">
+                                {resetSuccess
+                                    ? (locale === "en" ? "Your password has been reset. You can now sign in." : "Şifreniz başarıyla güncellendi. Giriş yapabilirsiniz.")
+                                    : verified
+                                        ? (locale === "en" ? "Your email has been verified. You can now sign in." : "E-posta adresiniz doğrulandı. Giriş yapabilirsiniz.")
+                                        : (locale === "en" ? "Account created. Please verify your email address. Check your inbox." : "Hesabınız oluşturuldu. E-posta adresinizi doğrulamanız gerekiyor. Gelen kutunuzu kontrol edin.")}
+                            </AuthStatus>
                         </motion.div>
                     )}
+                    {error && (
+                        <motion.div
+                            key="error"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="mb-6 overflow-hidden"
+                        >
+                            <AuthStatus type="error">{error}</AuthStatus>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="group">
-                            <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-700 mb-2 group-focus-within:text-[#e6c800] transition-colors">E-POSTA ADRESİ</label>
-                            <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
-                                placeholder="name@company.com"
-                                className="input-base py-4" />
-                        </div>
-                        <div className="group">
-                            <div className="flex items-center justify-between mb-2">
-                                <label className="block text-[10px] font-black uppercase tracking-[0.3em] text-zinc-700 group-focus-within:text-[#e6c800] transition-colors">ŞİFRE</label>
-                                <button type="button" className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 transition-colors">UNUTTUM?</button>
-                            </div>
-                            <div className="relative">
-                                <input type={showPw ? "text" : "password"} required value={password} onChange={e => setPassword(e.target.value)}
-                                    placeholder="••••••••••••"
-                                    className="input-base py-4 pr-14" />
-                                <button type="button" onClick={() => setShowPw(!showPw)}
-                                    className="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-900 transition-colors">
-                                    {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
-                                </button>
-                            </div>
-                        </div>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <AuthInput
+                        label={t("emailLabel")}
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder={t("emailPlaceholder")}
+                        icon={<Mail size={18} />}
+                    />
+                    <PasswordField
+                        label={t("passwordLabel")}
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        forgotLink={getForgotPath(locale)}
+                    />
+                    <AuthActions
+                        submitLabel={t("submit")}
+                        loading={loading}
+                        footerLinks={[
+                            {
+                                href: "/register",
+                                label: (
+                                    <>
+                                        {t("noAccount")} <span className="accent">{t("registerLink")}</span>
+                                    </>
+                                ),
+                            },
+                            { href: "/", label: t("backToHome") },
+                        ]}
+                    />
+                </form>
+            </AuthFormPanel>
+        </AuthShell>
+    );
+}
 
-                        <motion.button type="submit" disabled={loading}
-                            className="w-full py-6 bg-[#0e0e0e] text-white font-black uppercase tracking-[0.3em] text-[12px] hover:bg-[#e6c800] hover:text-[#0e0e0e] transition-all duration-500 shadow-2xl shadow-black/10 flex items-center justify-center gap-4 group disabled:opacity-70 disabled:cursor-not-allowed"
-                            whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                            {loading ? <Loader2 size={18} className="animate-spin" /> : <><Lock size={18} className="group-hover:rotate-12 transition-transform" /> OTURUM AÇ</>}
-                        </motion.button>
-                    </form>
-
-                    <div className="mt-12 flex flex-col gap-4 text-[11px] font-black uppercase tracking-widest text-zinc-600 text-center">
-                        <Link href="/register" className="hover:text-zinc-900 transition-colors">
-                            HESABINIZ YOK MU? <span className="text-[#e6c800]">KAYIT OLUN</span>
-                        </Link>
-                        <Link href="/" className="inline-flex items-center justify-center gap-2 text-zinc-500 hover:text-zinc-800 transition-colors">
-                            ANA SAYFAYA DÖN
-                        </Link>
-                    </div>
-                </div>
-            </div>
-        </div>
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<AuthShell><AuthFormPanel><div className="py-16 text-center"><AuthStatus type="loading" /></div></AuthFormPanel></AuthShell>}>
+            <LoginPageContent />
+        </Suspense>
     );
 }

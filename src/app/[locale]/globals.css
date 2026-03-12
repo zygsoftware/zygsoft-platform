@@ -533,6 +533,47 @@ h4 {
   background: var(--text-muted);
 }
 
+/* ─── Admin panel (unified design language) ─────────────────────────── */
+.admin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
+}
+.admin-table {
+  border-collapse: collapse;
+}
+.admin-table th {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(248, 250, 252, 0.6);
+}
+.admin-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+.admin-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+.admin-table tbody tr:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.admin-badge-published { background: rgba(16, 185, 129, 0.12); color: #047857; border: 1px solid rgba(16, 185, 129, 0.25); }
+.admin-badge-draft { background: rgba(245, 158, 11, 0.12); color: #b45309; border: 1px solid rgba(245, 158, 11, 0.25); }
+.admin-badge-featured { background: rgba(139, 92, 246, 0.12); color: #6d28d9; border: 1px solid rgba(139, 92, 246, 0.25); }
+.admin-btn-primary { background: #0e0e0e; color: white; border-radius: 12px; }
+.admin-btn-primary:hover { background: #1a1a1a; }
+.admin-btn-gold { background: var(--brand); color: #0e0e0e; border-radius: 12px; }
+.admin-btn-gold:hover { background: var(--brand-hover); }
+
 /* ─── Premium motion (respect reduced-motion) ────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -746,3 +787,93 @@ html.home-scroll-snap .home-snap-section {
   ) {
   color: #0a0c10 !important;
 }
+
+/* ─── Blog Article Prose (readability) ───────────────────── */
+.prose-article {
+  --prose-text: #444;
+  --prose-headings: #0e0e0e;
+  --prose-links: #e6c800;
+  --prose-quote-border: #e6c800;
+  --prose-code-bg: rgba(10, 12, 16, 0.06);
+}
+.prose-article p {
+  margin-bottom: 1.25em;
+  line-height: 1.8;
+}
+.prose-article p:last-child { margin-bottom: 0; }
+.prose-article h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-top: 2.5em;
+  margin-bottom: 0.75em;
+  color: var(--prose-headings);
+  line-height: 1.3;
+}
+.prose-article h2:first-child { margin-top: 0; }
+.prose-article h3 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+  color: var(--prose-headings);
+}
+.prose-article h4 { font-size: 1.1rem; margin-top: 1.5em; margin-bottom: 0.5em; }
+.prose-article a {
+  color: var(--prose-links);
+  text-decoration: none;
+  font-weight: 500;
+}
+.prose-article a:hover { text-decoration: underline; }
+.prose-article ul, .prose-article ol {
+  margin: 1.25em 0;
+  padding-left: 1.5em;
+}
+.prose-article li { margin-bottom: 0.5em; line-height: 1.7; }
+.prose-article blockquote {
+  margin: 1.5em 0;
+  padding: 1em 1.25em 1em 1.5em;
+  border-left: 4px solid var(--prose-quote-border);
+  background: rgba(230, 200, 0, 0.06);
+  border-radius: 0 12px 12px 0;
+  font-style: italic;
+  color: #555;
+}
+.prose-article pre, .prose-article code {
+  font-family: ui-monospace, 'SF Mono', Monaco, monospace;
+  font-size: 0.9em;
+}
+.prose-article code {
+  padding: 0.2em 0.4em;
+  background: var(--prose-code-bg);
+  border-radius: 6px;
+}
+.prose-article pre {
+  margin: 1.5em 0;
+  padding: 1.25em 1.5em;
+  background: rgba(10, 12, 16, 0.04);
+  border-radius: 12px;
+  overflow-x: auto;
+}
+.prose-article pre code {
+  padding: 0;
+  background: none;
+}
+.prose-article img {
+  margin: 1.5em 0;
+  border-radius: 12px;
+  max-width: 100%;
+  height: auto;
+}
+.prose-article table {
+  width: 100%;
+  margin: 1.5em 0;
+  border-collapse: collapse;
+}
+.prose-article th, .prose-article td {
+  padding: 0.6em 0.75em;
+  border: 1px solid rgba(10, 12, 16, 0.08);
+}
+.prose-article th { background: rgba(10, 12, 16, 0.04); font-weight: 600; }
+.prose-article hr { margin: 2em 0; border: none; border-top: 1px solid rgba(10, 12, 16, 0.1); }

@@ -289,7 +289,7 @@ function EmptyState() {
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-3">
                 <Link
-                    href="/abonelikler"
+                    href="/dijital-urunler/hukuk-araclari-paketi"
                     className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-950 text-white text-sm font-black hover:bg-slate-700 transition-colors"
                 >
                     <ShoppingCart size={14} />
@@ -448,7 +448,7 @@ export default function ServicesPage() {
                     </div>
                     <div className="flex items-center gap-3">
                         <Link
-                            href="/abonelikler"
+                            href="/dijital-urunler/hukuk-araclari-paketi"
                             className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-950 text-white text-xs font-black hover:bg-slate-700 transition-colors"
                         >
                             Paketi İncele

@@ -177,3 +177,31 @@ export function registerRateLimit(request: Request): RateLimitResult {
 export function supportRateLimit(request: Request): RateLimitResult {
     return rateLimit(request, "support", { windowMs: 60 * 60_000, max: 10 });
 }
+
+/**
+ * 5 requests per hour — for forgot password.
+ */
+export function forgotPasswordRateLimit(request: Request): RateLimitResult {
+    return rateLimit(request, "forgot-password", { windowMs: 60 * 60_000, max: 5 });
+}
+
+/**
+ * 5 requests per hour — for reset password submit.
+ */
+export function resetPasswordRateLimit(request: Request): RateLimitResult {
+    return rateLimit(request, "reset-password", { windowMs: 60 * 60_000, max: 5 });
+}
+
+/**
+ * 5 requests per hour — for send verification email (resend).
+ */
+export function verificationEmailRateLimit(request: Request): RateLimitResult {
+    return rateLimit(request, "verification-email", { windowMs: 60 * 60_000, max: 5 });
+}
+
+/**
+ * 5 requests per hour — for trial start.
+ */
+export function trialStartRateLimit(request: Request): RateLimitResult {
+    return rateLimit(request, "trial-start", { windowMs: 60 * 60_000, max: 5 });
+}

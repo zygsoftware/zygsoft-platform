@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FolderKanban, Network, LogOut, BookOpen, Users, ChevronRight, Receipt, Package, MessageSquare, LifeBuoy } from "lucide-react";
+import { LayoutDashboard, FolderKanban, Network, LogOut, BookOpen, Users, ChevronRight, Receipt, Package, MessageSquare, LifeBuoy, BarChart3 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 const navGroups = [
@@ -10,6 +10,7 @@ const navGroups = [
         label: "Genel",
         items: [
             { href: "/admin/dashboard", label: "Gösterge Paneli", icon: LayoutDashboard },
+            { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
         ],
     },
     {
@@ -45,9 +46,13 @@ export function AdminSidebar() {
             {/* Logo */}
             <div className="px-6 py-8 border-b border-slate-200/60">
                 <Link href="/admin/dashboard" className="flex items-center gap-3 group">
-                    <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform duration-300">
-                        <span className="text-base font-black text-white">Z</span>
-                    </div>
+                    <img
+                        src="/brand/logo-icon.svg"
+                        alt="ZYGSOFT"
+                        className="w-10 h-10 shrink-0"
+                        width={40}
+                        height={40}
+                    />
                     <div>
                         <span className="text-sm font-bold text-slate-900 block tracking-tight">Zygsoft</span>
                         <span className="text-xs font-medium text-slate-500 uppercase tracking-widest">Admin Panel</span>
@@ -71,13 +76,13 @@ export function AdminSidebar() {
                                         key={item.href}
                                         href={item.href}
                                         className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 group ${isActive
-                                            ? "bg-slate-900 text-white shadow-xl shadow-slate-900/10"
+                                            ? "bg-[#0e0e0e] text-white shadow-lg"
                                             : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
                                             }`}
                                     >
-                                        <Icon size={18} className={isActive ? "text-emerald-400" : "text-slate-400 group-hover:text-slate-600 transition-colors"} />
+                                        <Icon size={18} className={isActive ? "text-[#e6c800]" : "text-slate-400 group-hover:text-slate-600 transition-colors"} />
                                         <span className="flex-1">{item.label}</span>
-                                        {isActive && <ChevronRight size={14} className="text-emerald-400" />}
+                                        {isActive && <ChevronRight size={14} className="text-[#e6c800]" />}
                                     </Link>
                                 );
                             })}

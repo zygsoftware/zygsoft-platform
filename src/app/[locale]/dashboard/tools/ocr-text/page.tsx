@@ -10,7 +10,6 @@ import {
     Download,
     CheckCircle2,
     Zap,
-    ShieldAlert,
     Copy,
     FileText,
     Languages
@@ -19,6 +18,8 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { ToolPageHint } from "@/components/dashboard/ToolPageHint";
+import { ToolLockedGate } from "@/components/dashboard/ToolLockedGate";
+import { hasToolAccess } from "@/lib/trial-access-client";
 
 const ACCEPT = ".pdf,.png,.jpg,.jpeg,.tif,.tiff,image/tiff,application/pdf";
 
@@ -31,8 +32,7 @@ export default function OcrTextTool() {
     const t = useTranslations("Dashboard.overview.tools");
     const tOcr = useTranslations("Dashboard.overview.tools.ocrText");
     const { data: session } = useSession();
-    const hasSubscription = session?.user &&
-        (((session.user as any).activeProductSlugs?.includes("legal-toolkit")) || (session.user as any).role === "admin");
+    const hasSubscription = session?.user && hasToolAccess(session.user as any);
 
     const [file, setFile] = useState<File | null>(null);
     const [language, setLanguage] = useState<"tr" | "en">("tr");
@@ -161,23 +161,7 @@ export default function OcrTextTool() {
                     <Link href="/dashboard/tools" className="inline-flex items-center gap-2 text-[#888] hover:text-[#0e0e0e] transition-colors mb-8 text-sm font-bold uppercase tracking-wider">
                         <ArrowLeft size={16} /> {t("backToHub")}
                     </Link>
-                    <div className="bg-white rounded-[2.5rem] p-12 md:p-16 border border-slate-200 text-center shadow-sm relative overflow-hidden">
-                        <div className="w-24 h-24 mx-auto bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-8 border border-amber-100">
-                            <ShieldAlert size={48} />
-                        </div>
-                        <h2 className="text-3xl font-display font-black text-[#0a0c10] mb-4">Erişim Kısıtlı</h2>
-                        <p className="text-[#0a0c10]/60 font-medium text-lg mb-10 max-w-md mx-auto leading-relaxed">
-                            Bu aracı kullanabilmek için aktif bir <strong>Hukuk Araçları Paketi</strong> aboneliğinizin olması gerekmektedir.
-                        </p>
-                        <div className="flex flex-wrap gap-4 justify-center">
-                            <Link href="/abonelikler" className="bg-[#e6c800] text-[#0a0c10] px-10 py-4 rounded-2xl font-black uppercase tracking-wider hover:bg-[#c9ad00] transition-all shadow-sm inline-flex items-center gap-3">
-                                Paketi İncele <Zap size={18} fill="currentColor" />
-                            </Link>
-                            <Link href="/dashboard/billing?product=legal-toolkit" className="bg-[#0a0c10] text-white px-10 py-4 rounded-2xl font-black uppercase tracking-wider hover:bg-[#0a0c10]/90 transition-all shadow-xl inline-flex items-center gap-3">
-                                Ödeme Bildir
-                            </Link>
-                        </div>
-                    </div>
+                    <ToolLockedGate session={session} />
                 </div>
             </div>
         );

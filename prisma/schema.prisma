@@ -28,22 +28,50 @@ model ApiConnection {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          String    @default("admin")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-  payments        Payment[]
-  subscriptions   Subscription[]
-  supportTickets  SupportTicket[]
-  toolUsages      ToolUsage[]
-  letterhead      UserLetterhead?
+  id               String    @id @default(cuid())
+  name             String?
+  email            String?   @unique
+  emailVerified    Boolean   @default(false)
+  image            String?
+  password         String?
+  role             String    @default("admin") // admin | staff | customer
+  status           String    @default("active") // active | suspended | pending
+  phone            String?
+  company          String?
+  locale           String?   @default("tr")
+  notes            String?   // admin-only notes
+  lastLoginAt      DateTime? @map("lastLoginAt")
+  trialStatus      String    @default("none")
+  trialStartedAt  DateTime?
+  trialEndsAt      DateTime?
+  trialOperationsUsed  Int    @default(0)
+  trialOperationsLimit Int    @default(20)
+  onboardingCompleted Boolean @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  accounts         Account[]
+  sessions         Session[]
+  payments         Payment[]
+  subscriptions    Subscription[]
+  supportTickets   SupportTicket[]
+  toolUsages         ToolUsage[]
+  letterhead         UserLetterhead?
+  blogComments       BlogComment[]
+  blogLikes          BlogLike[]
+  passwordResetTokens PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+  trialStartEvents TrialStartEvent[]
+}
+
+model TrialStartEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source    String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([source])
 }
 
 model UserLetterhead {
@@ -99,6 +127,31 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   // bcrypt hash of the token
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
 model Payment {
   id           String   @id @default(cuid())
   userId       String
@@ -113,18 +166,19 @@ model Payment {
 }
 
 model Product {
-  id          String         @id @default(cuid())
-  name        String
-  slug        String         @unique
-  description String
-  category    String         @default("software")
-  price       Float          @default(0)
-  iconType    String         @default("box")
-  isActive    Boolean        @default(true)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  payments    Payment[]
-  subscribers Subscription[]
+  id            String         @id @default(cuid())
+  name          String
+  slug          String         @unique
+  description   String
+  price         Float          @default(0)
+  billingPeriod String         @default("yearly") // yearly | monthly
+  category      String         @default("legal")  // legal | automation | ai | document
+  iconType      String         @default("box")
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  payments      Payment[]
+  subscribers   Subscription[]
 }
 
 model Subscription {
@@ -141,27 +195,117 @@ model Subscription {
   @@unique([userId, productId])
 }
 
+model BlogCategory {
+  id             String    @id @default(cuid())
+  name_tr        String
+  name_en        String
+  slug           String    @unique
+  description_tr String?   @map("descriptionTr")
+  description_en String?   @map("descriptionEn")
+  created_at     DateTime  @default(now()) @map("createdAt")
+  updated_at     DateTime  @default(now()) @updatedAt @map("updatedAt")
+  posts          BlogPost[]
+
+  @@map("blog_categories")
+}
+
+model BlogTag {
+  id    String        @id @default(cuid())
+  name  String
+  slug  String        @unique
+  posts BlogPostTag[]
+
+  @@map("blog_tags")
+}
+
+model BlogPostTag {
+  post_id String   @map("postId")
+  tag_id  String   @map("tagId")
+  post    BlogPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  tag     BlogTag  @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+
+  @@id([post_id, tag_id])
+  @@map("blog_post_tags")
+}
+
 model BlogPost {
-  id          String   @id @default(cuid())
-  title       String
-  slug        String   @unique
-  excerpt     String
-  content     String
-  image       String?
-  author      String   @default("Gürkan Yavuz")
-  published   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                 String        @id @default(cuid())
+  slug               String        @unique
+  title_tr           String        @map("titleTr")
+  title_en           String        @map("titleEn")
+  excerpt_tr         String        @map("excerptTr")
+  excerpt_en         String        @map("excerptEn")
+  content_tr         String        @map("contentTr")
+  content_en         String        @map("contentEn")
+  cover_image        String?       @map("coverImage")
+  seo_title_tr       String?       @map("seoTitleTr")
+  seo_title_en       String?       @map("seoTitleEn")
+  seo_description_tr String?       @map("seoDescriptionTr")
+  seo_description_en String?       @map("seoDescriptionEn")
+  seo_keywords_tr    String?       @map("seoKeywordsTr")
+  seo_keywords_en    String?       @map("seoKeywordsEn")
+  og_image           String?       @map("ogImage")
+  canonical_url      String?       @map("canonicalUrl")
+  category_id        String?       @map("categoryId")
+  category           BlogCategory? @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  is_featured        Boolean       @default(false) @map("isFeatured")
+  published          Boolean       @default(false)
+  allow_comments     Boolean       @default(true) @map("allowComments")
+  view_count         Int           @default(0) @map("viewCount")
+  author             String        @default("ZYGSOFT")
+  published_at       DateTime?     @map("publishedAt")
+  reading_time_min   Int?          @map("readingTimeMin")
+  created_at         DateTime      @default(now()) @map("createdAt")
+  updated_at         DateTime      @updatedAt @map("updatedAt")
+  tags               BlogPostTag[]
+  comments           BlogComment[]
+  likes              BlogLike[]
+
+  @@map("blog_posts")
+}
+
+model BlogComment {
+  id        String    @id @default(cuid())
+  post_id   String    @map("postId")
+  post      BlogPost  @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  user_id   String?   @map("userId")
+  user      User?     @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  name      String?
+  email     String?
+  content   String
+  status    String    @default("pending") // pending | approved | rejected
+  parent_id String?   @map("parentId")
+  parent    BlogComment?  @relation("CommentReplies", fields: [parent_id], references: [id], onDelete: Cascade)
+  replies   BlogComment[] @relation("CommentReplies")
+  created_at DateTime @default(now()) @map("createdAt")
+  updated_at DateTime @updatedAt @map("updatedAt")
+
+  @@map("blog_comments")
+}
+
+model BlogLike {
+  id        String   @id @default(cuid())
+  post_id   String   @map("postId")
+  post      BlogPost @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  user_id   String   @map("userId")
+  user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  created_at DateTime @default(now()) @map("createdAt")
+
+  @@unique([post_id, user_id])
+  @@map("blog_likes")
 }
 model SupportTicket {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  subject   String
-  message   String
-  status    String   @default("open") // "open" | "in_progress" | "answered" | "closed"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id])
+  subject        String
+  message        String
+  status         String    @default("open") // "open" | "in_progress" | "answered" | "closed"
+  ticketCode     String?   @unique
+  adminReply     String?
+  lastRepliedAt  DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 model ContactMessage {

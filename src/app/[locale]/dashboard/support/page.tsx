@@ -18,6 +18,9 @@ type Ticket = {
     subject: string;
     message: string;
     status: TicketStatus;
+    ticketCode?: string | null;
+    lastRepliedAt?: string | null;
+    adminReply?: string | null;
     createdAt: string;
     updatedAt: string;
 };
@@ -41,7 +44,7 @@ function StatusBadge({ status }: { status: string }) {
 
 /* ── New ticket form ───────────────────────────────────────────── */
 
-function NewTicketForm({ onSuccess, onClose }: { onSuccess: () => void; onClose: () => void }) {
+function NewTicketForm({ onSuccess, onClose }: { onSuccess: (ticket?: { ticketCode?: string }) => void; onClose: () => void }) {
     const [subject, setSubject] = useState("");
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
@@ -65,7 +68,7 @@ function NewTicketForm({ onSuccess, onClose }: { onSuccess: () => void; onClose:
             if (!res.ok) {
                 setError(data.error ?? "Bir hata oluştu.");
             } else {
-                onSuccess();
+                onSuccess(data.ticket);
             }
         } catch {
             setError("Bağlantı hatası. Lütfen tekrar deneyin.");
@@ -257,6 +260,9 @@ function TicketList({ refreshKey, onNew }: { refreshKey: number; onNew: () => vo
                                     <StatusBadge status={ticket.status} />
                                 </div>
                                 <p className="text-xs text-slate-400 font-mono flex items-center gap-1.5">
+                                    {ticket.ticketCode && (
+                                        <span className="font-bold text-[#e6c800]">#{ticket.ticketCode}</span>
+                                    )}
                                     <Calendar size={10} />
                                     {new Date(ticket.createdAt).toLocaleDateString("tr-TR", {
                                         day: "numeric", month: "long", year: "numeric",
@@ -284,9 +290,15 @@ function TicketList({ refreshKey, onNew }: { refreshKey: number; onNew: () => vo
                                         <div className="ml-13 bg-slate-50 rounded-2xl p-5 text-sm text-slate-600 leading-relaxed whitespace-pre-wrap border border-slate-100">
                                             {ticket.message}
                                         </div>
+                                        {ticket.adminReply && (
+                                            <div className="ml-13 mt-4 p-5 bg-slate-950/5 rounded-2xl border border-slate-200 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
+                                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Destek Yanıtı</p>
+                                                {ticket.adminReply}
+                                            </div>
+                                        )}
                                         <p className="ml-13 mt-2 text-[10px] text-slate-300 font-mono">
-                                            Son güncelleme:{" "}
-                                            {new Date(ticket.updatedAt).toLocaleDateString("tr-TR", {
+                                            {ticket.lastRepliedAt ? "Son yanıt: " : "Son güncelleme: "}
+                                            {new Date(ticket.lastRepliedAt || ticket.updatedAt).toLocaleDateString("tr-TR", {
                                                 day: "numeric", month: "short", year: "numeric",
                                             })}
                                         </p>
@@ -304,12 +316,17 @@ function TicketList({ refreshKey, onNew }: { refreshKey: number; onNew: () => vo
 /* ── Main page ─────────────────────────────────────────────────── */
 
 export default function SupportPage() {
-    const [showForm,   setShowForm]   = useState(false);
-    const [refreshKey, setRefreshKey] = useState(0);
+    const [showForm,    setShowForm]    = useState(false);
+    const [refreshKey,  setRefreshKey]  = useState(0);
+    const [successTicket, setSuccessTicket] = useState<{ ticketCode?: string } | null>(null);
 
-    const handleSuccess = () => {
+    const handleSuccess = (ticket?: { ticketCode?: string }) => {
         setShowForm(false);
         setRefreshKey((k) => k + 1);
+        if (ticket?.ticketCode) {
+            setSuccessTicket(ticket);
+            setTimeout(() => setSuccessTicket(null), 8000);
+        }
     };
 
     return (
@@ -342,6 +359,27 @@ export default function SupportPage() {
                     {showForm ? "Formu Kapat" : "Yeni Talep Oluştur"}
                 </button>
             </div>
+
+            {/* ── Success toast with ticket code ── */}
+            <AnimatePresence>
+                {successTicket?.ticketCode && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="mb-6 p-5 rounded-2xl border border-emerald-200 bg-emerald-50 flex items-center gap-4"
+                    >
+                        <CheckCircle2 size={24} className="text-emerald-600 shrink-0" />
+                        <div>
+                            <p className="font-black text-slate-950 text-sm">Destek talebiniz oluşturuldu.</p>
+                            <p className="text-slate-600 text-sm font-mono mt-1">
+                                Talep numaranız: <span className="font-black text-[#e6c800]">#{successTicket.ticketCode}</span>
+                            </p>
+                            <p className="text-xs text-slate-500 mt-1">Onay e-postası gönderildi. Detayları aşağıda görebilirsiniz.</p>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* ── New ticket form (toggle-triggered animation, safe) ── */}
             <AnimatePresence>

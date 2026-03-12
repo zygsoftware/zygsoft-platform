@@ -1,11 +1,12 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, Blocks, Zap, Shield, FileText, Workflow, CheckCircle2, Sparkles, Layers, FileStack } from "lucide-react";
-import Link from "next/link";
+import { ArrowRight, Blocks, Zap, Shield, FileText, Workflow, CheckCircle2, Sparkles, Layers } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { TiltCard } from "@/components/ui/TiltCard";
 import { createHeadingReveal, createRevealUp, revealViewport, staggerContainer } from "@/components/ui/motion";
+
 
 export function AppStoreShowcase() {
     const locale = useLocale();
@@ -42,6 +43,13 @@ export function AppStoreShowcase() {
             tag: t("flagshipBadge") || "Bayrak Ürün",
             flagship: true
         },
+    ];
+
+    const featureRows = [
+        { icon: Workflow, text: isTr ? "8 belge aracı, tek yıllık abonelik" : "8 document tools, one annual subscription", detail: isTr ? "Tüm araçlara sınırsız erişim" : "Unlimited access" },
+        { icon: Shield, text: isTr ? "KVKK uyumlu, belgeler işlem sonrası silinir" : "KVKK-compliant, documents deleted after processing", detail: isTr ? "Güvenli altyapı" : "Secure infrastructure" },
+        { icon: Layers, text: isTr ? "UYAP, PDF, OCR — hepsi dahil" : "UYAP, PDF, OCR — all included", detail: isTr ? "Tek paket" : "Single package" },
+        { icon: CheckCircle2, text: isTr ? "Ayrı satın alma yok, tüm araçlar dahil" : "No separate purchases, all tools included", detail: isTr ? "Şeffaf fiyatlandırma" : "Transparent pricing" },
     ];
 
     return (
@@ -100,22 +108,8 @@ export function AppStoreShowcase() {
                             ))}
                         </motion.div>
 
-                        <div className="grid grid-cols-3 gap-3 mb-10">
-                            {[
-                                { k: "01", t: "Module", d: "UDF Core" },
-                                { k: "02", t: "Roadmap", d: "Next: PDF/AI" },
-                                { k: "03", t: "Audience", d: "Law Firms" },
-                            ].map((item) => (
-                                <div key={item.k} className="home-card-dark rounded-2xl p-4">
-                                    <p className="text-[#e6c800] text-xl font-black leading-none">{item.k}</p>
-                                    <p className="text-white/75 text-[10px] uppercase tracking-[0.2em] mt-2 font-black">{item.t}</p>
-                                    <p className="text-white text-sm font-semibold mt-1">{item.d}</p>
-                                </div>
-                            ))}
-                        </div>
-
                         <Link
-                            href="/abonelikler"
+                            href="/dijital-urunler/hukuk-araclari-paketi"
                             className="home-btn-primary-yellow inline-flex items-center gap-2.5 px-8 py-4 font-black uppercase tracking-[0.24em] text-[11px] rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
                         >
                             {t("viewStoreButton")} <ArrowRight size={18} />
@@ -130,62 +124,101 @@ export function AppStoreShowcase() {
                         className="lg:col-span-6"
                     >
                         <TiltCard maxTilt={7} className="h-full">
-                            <div className="relative rounded-[2.3rem] border border-[#e6c800]/35 bg-gradient-to-b from-white/[0.09] to-white/[0.03] p-7 md:p-8 shadow-[0_50px_120px_rgba(0,0,0,0.38)] overflow-hidden">
-                                <div className="absolute -top-20 -right-16 h-60 w-60 rounded-full bg-[#e6c800]/25 blur-3xl" />
-                                <div className="absolute inset-0 opacity-[0.08]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #fff 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+                            <div className="relative rounded-[2.3rem] border border-white/10 bg-gradient-to-b from-white/[0.09] to-white/[0.03] p-7 md:p-8 shadow-[0_50px_120px_rgba(0,0,0,0.38)] overflow-hidden">
+                                <div className="absolute -top-20 -right-16 h-60 w-60 rounded-full bg-[#e6c800]/15 blur-3xl pointer-events-none" />
+                                <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #fff 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
 
-                                <div className="relative z-10 flex items-start justify-between mb-7">
+                                <div className="relative z-10 flex items-start justify-between mb-6">
                                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e6c800] text-[#0a0c10] text-[10px] font-black uppercase tracking-[0.24em]">
                                         <Sparkles size={12} />
                                         {previewProducts[0].tag}
                                     </div>
-                                    <span className="text-white/50 text-[10px] uppercase tracking-[0.2em] font-black">{isTr ? "Belge Araçları Paketi" : "Document Tools Package"}</span>
+                                    <span className="text-white/70 text-[10px] uppercase tracking-[0.2em] font-bold">{isTr ? "Belge Araçları Paketi" : "Document Tools Package"}</span>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                    <div className="rounded-2xl bg-[#0a0c10] border border-white/10 p-5">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                                    {/* Main product card */}
+                                    <div className="rounded-2xl bg-[#0a0c10]/90 border border-white/10 p-5">
                                         <div className="w-12 h-12 rounded-xl bg-[#e6c800]/20 text-[#e6c800] flex items-center justify-center mb-4">
                                             {previewProducts[0].icon}
                                         </div>
                                         <h3 className="text-2xl font-black text-white leading-tight mb-2">{previewProducts[0].name}</h3>
-                                        <p className="text-white/55 text-sm leading-relaxed mb-4">{previewProducts[0].desc}</p>
-                                        <p className="text-white text-3xl font-black">{previewProducts[0].price}<span className="text-base text-white/50">{previewProducts[0].period}</span></p>
+                                        <p className="text-white/75 text-sm leading-relaxed mb-5">{previewProducts[0].desc}</p>
+                                        {/* Price with subtle shine sweep */}
+                                        <div className="relative rounded-xl bg-white/[0.08] border border-white/10 px-4 py-3 overflow-hidden">
+                                            <span className="relative z-10 text-white text-2xl font-black">{previewProducts[0].price}<span className="text-base text-white/70 font-bold ml-0.5">{previewProducts[0].period}</span></span>
+                                            {!reducedMotion && (
+                                                <motion.div
+                                                    className="absolute inset-0 z-0 pointer-events-none"
+                                                    initial={{ x: "-100%" }}
+                                                    animate={{ x: "200%" }}
+                                                    transition={{
+                                                        duration: 3,
+                                                        repeat: Infinity,
+                                                        ease: [0.4, 0, 0.2, 1],
+                                                    }}
+                                                    style={{
+                                                        background: "linear-gradient(90deg, transparent 0%, rgba(230,200,0,0.1) 30%, rgba(255,255,255,0.14) 50%, rgba(230,200,0,0.1) 70%, transparent 100%)",
+                                                        width: "60%",
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
                                     </div>
+
+                                    {/* Feature cards — interactive */}
                                     <div className="space-y-3">
-                                        {[
-                                            { icon: <Workflow size={14} />, text: isTr ? "8 belge araci, tek yillik abonelik" : "8 document tools, one annual subscription" },
-                                            { icon: <Shield size={14} />, text: isTr ? "KVKK uyumlu, belgeler islem sonrasi silinir" : "KVKK-compliant, documents deleted after processing" },
-                                            { icon: <Layers size={14} />, text: isTr ? "UYAP, PDF, OCR — hepsi dahil" : "UYAP, PDF, OCR — all included" },
-                                            { icon: <CheckCircle2 size={14} />, text: isTr ? "Ayrı satın alma yok, tüm araçlar dahil" : "No separate purchases, all tools included" },
-                                        ].map((row, i) => (
-                                            <motion.div key={i} whileHover={{ x: 4 }} className="rounded-xl border border-white/10 bg-white/[0.04] p-3 flex items-center gap-3 text-white/85">
-                                                <span className="text-[#e6c800]">{row.icon}</span>
-                                                <span className="text-sm font-medium">{row.text}</span>
-                                            </motion.div>
-                                        ))}
+                                        {featureRows.map((row, i) => {
+                                            const Icon = row.icon;
+                                            return (
+                                                <motion.div
+                                                    key={i}
+                                                    className="group/card rounded-xl border border-white/10 bg-white/[0.04] p-3 flex items-start gap-3 cursor-default overflow-hidden"
+                                                    initial={false}
+                                                    whileHover={reducedMotion ? {} : {
+                                                        scale: 1.02,
+                                                        y: -2,
+                                                        borderColor: "rgba(255,255,255,0.2)",
+                                                        backgroundColor: "rgba(255,255,255,0.08)",
+                                                        boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
+                                                    }}
+                                                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                                                >
+                                                    <span className="shrink-0 mt-0.5 text-[#e6c800] group-hover/card:text-[#e6c800] transition-colors">
+                                                        <Icon size={16} className="group-hover/card:scale-110 transition-transform duration-300" />
+                                                    </span>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-[13px] font-medium text-white/95 leading-snug">{row.text}</p>
+                                                        <p className="text-[11px] text-white/60 mt-1 opacity-100 md:opacity-0 md:group-hover/card:opacity-100 transition-opacity duration-300 ease-out">
+                                                            {row.detail}
+                                                        </p>
+                                                    </div>
+                                                </motion.div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
 
-                                <div className="relative rounded-2xl border border-white/12 bg-white/[0.03] p-4">
-                                    <div className="absolute inset-y-0 left-4 w-px bg-gradient-to-b from-transparent via-[#e6c800]/60 to-transparent" />
+                                <div className="relative rounded-2xl border border-white/12 bg-white/[0.05] p-4">
+                                    <div className="absolute inset-y-0 left-4 w-px bg-gradient-to-b from-transparent via-[#e6c800]/40 to-transparent" />
                                     <div className="pl-7 space-y-3">
                                         {[
-                                            isTr ? "1. Belgeleri yukleyin" : "1. Upload your documents",
-                                            isTr ? "2. Otomatik donusum kuyrugunu calistirin" : "2. Run automated conversion queue",
-                                            isTr ? "3. UYAP uyumlu ciktiyi indirin" : "3. Download UYAP-compatible output",
+                                            isTr ? "1. Belgeleri yükleyin" : "1. Upload your documents",
+                                            isTr ? "2. Otomatik dönüşüm kuyruğunu çalıştırın" : "2. Run automated conversion queue",
+                                            isTr ? "3. UYAP uyumlu çıktıyı indirin" : "3. Download UYAP-compatible output",
                                         ].map((item, i) => (
-                                            <p key={i} className="text-white/70 text-sm">{item}</p>
+                                            <p key={i} className="text-white/85 text-sm">{item}</p>
                                         ))}
                                     </div>
                                 </div>
 
                                 <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                                    <Link href="/abonelikler" className="home-btn-primary-yellow inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-colors">
-                                        {isTr ? "Aboneligi gor" : "View plans"}
+                                    <Link href="/dijital-urunler/hukuk-araclari-paketi" className="home-btn-primary-yellow inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-colors">
+                                        {isTr ? "Aboneliği gör" : "View plans"}
                                         <ArrowRight size={14} />
                                     </Link>
                                     <Link href="/dashboard/tools" className="home-btn-outline-light inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-colors">
-                                        {isTr ? "Araci incele" : "Explore tool"}
+                                        {isTr ? "Aracı incele" : "Explore tool"}
                                     </Link>
                                 </div>
                             </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useState, useEffect } from "react";
 import { Menu, X, ChevronDown, LogOut, ArrowUpRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -44,11 +44,15 @@ export function Header() {
             >
                 <div className={`absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#e6c800]/40 to-transparent transition-opacity duration-300 ${isScrolled ? "opacity-100" : "opacity-0"}`} />
                 <div className="container mx-auto px-6 lg:px-8 flex items-center justify-between h-[52px]">
-                    {/* Logo - Defined as Outfit/Syne in globals.css */}
-                    <Link href="/" className="flex items-center gap-0 group">
-                        <span className="font-heading text-[26px] font-black tracking-[-0.03em] text-slate-950">
-                            ZYG<span className="text-[#e6c800]">SOFT</span>
-                        </span>
+                    {/* Logo */}
+                    <Link href="/" className="flex items-center gap-0 group" aria-label="ZYGSOFT Ana Sayfa">
+                        <img
+                            src="/brand/logo.svg"
+                            alt="ZYGSOFT"
+                            className="h-8 w-auto"
+                            width={176}
+                            height={32}
+                        />
                     </Link>
 
                     {/* Nav */}
@@ -84,7 +88,7 @@ export function Header() {
                             </AnimatePresence>
                         </div>
 
-                        <NavLink href="/abonelikler" active={pathname.includes("/abonelikler")}>{nav("products")}</NavLink>
+                        <NavLink href="/dijital-urunler" active={pathname.includes("/dijital-urunler")}>{nav("products")}</NavLink>
                         <NavLink href="/about" active={pathname.includes("/about")}>{nav("about")}</NavLink>
                         <NavLink href="/portfolio" active={pathname.includes("/portfolio")}>{nav("portfolio")}</NavLink>
                         <NavLink href="/blog" active={pathname.includes("/blog")}>{nav("blog")}</NavLink>
@@ -144,7 +148,7 @@ export function Header() {
                             {[
                                 { name: nav("home"), href: "/" },
                                 { name: nav("services"), href: "/services" },
-                                { name: nav("products"), href: "/abonelikler" },
+                                { name: nav("products"), href: "/dijital-urunler" },
                                 { name: nav("about"), href: "/about" },
                                 { name: nav("portfolio"), href: "/portfolio" },
                                 { name: nav("blog"), href: "/blog" },

@@ -8,8 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "seed": "node prisma/seed.js",
+    "seed:admin": "node seed-admin.js",
     "db:seed": "node prisma/seed.js",
-    "migrate:legal-toolkit": "node scripts/migrate-legal-toolkit.js"
+    "migrate:legal-toolkit": "node scripts/migrate-legal-toolkit.js",
+    "generate:logo": "node scripts/generate-logo-png.mjs"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -20,6 +22,12 @@
     "@prisma/client": "^7.4.2",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
+    "@tiptap/extension-image": "^3.20.1",
+    "@tiptap/extension-link": "^3.20.1",
+    "@tiptap/extension-placeholder": "^3.20.1",
+    "@tiptap/pm": "^3.20.1",
+    "@tiptap/react": "^3.20.1",
+    "@tiptap/starter-kit": "^3.20.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/three": "^0.183.1",
     "archiver": "^7.0.1",
@@ -39,6 +47,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hot-toast": "^2.6.0",
+    "recharts": "^3.8.0",
     "swiper": "^12.1.2",
     "tailwind-merge": "^3.5.0",
     "three": "^0.183.2"
@@ -55,6 +64,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "prisma": "^7.4.2",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"

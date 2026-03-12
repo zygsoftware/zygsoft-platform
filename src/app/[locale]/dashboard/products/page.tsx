@@ -64,7 +64,7 @@ export default function ProductsPage() {
                         <div key={idx} className="relative group">
                             <TiltCard maxTilt={5} className="h-full">
                             <Link
-                                href={isLocked ? "/abonelikler" : tool.href}
+                                href={isLocked ? "/dijital-urunler/hukuk-araclari-paketi" : tool.href}
                                 className={`block h-full bg-white p-8 rounded-[2rem] border transition-all duration-300 hover-lift ${isLocked
                                     ? "border-[#0a0c10]/[0.06] hover:border-[#e6c800]/40 hover:shadow-xl shadow-sm"
                                     : "border-[#0a0c10]/[0.06] hover:shadow-xl hover:-translate-y-1 shadow-sm"
@@ -108,7 +108,7 @@ export default function ProductsPage() {
                     <p className="text-[#0a0c10]/60 font-medium mb-8 max-w-md mx-auto">
                         Tüm belge araçlarına erişmek için Hukuk Araçları Paketi'ne abone olun. Tek yıllık ödeme, tüm araçlar dahil.
                     </p>
-                    <Link href="/abonelikler" className="inline-flex items-center gap-2 bg-[#e6c800] text-[#0a0c10] px-10 py-4 rounded-2xl text-sm font-black hover:bg-[#c9ad00] transition-all shadow-xl shadow-[#e6c800]/20">
+                    <Link href="/dijital-urunler/hukuk-araclari-paketi" className="inline-flex items-center gap-2 bg-[#e6c800] text-[#0a0c10] px-10 py-4 rounded-2xl text-sm font-black hover:bg-[#c9ad00] transition-all shadow-xl shadow-[#e6c800]/20">
                         PAKETİ İNCELE <ArrowRight size={18} />
                     </Link>
                 </div>

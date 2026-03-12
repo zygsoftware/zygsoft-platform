@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Twitter, Instagram, Linkedin, ArrowUpRight, Mail, MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Magnetic } from "@/components/ui/Magnetic";
@@ -22,7 +22,7 @@ export function Footer() {
             { label: nav("contact"), href: "/contact" },
         ],
         products: [
-            { label: t("products"), href: "/abonelikler" },
+            { label: t("products"), href: "/dijital-urunler/hukuk-araclari-paketi" },
         ],
         services: [
             { label: s("webDev"), href: "/services/web-ve-uygulama-gelistirme" },
@@ -44,10 +44,14 @@ export function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 lg:gap-8 mb-32">
                     {/* Brand col */}
                     <div className="lg:col-span-4">
-                        <Link href="/" className="inline-block mb-10 group">
-                            <span className="font-display text-4xl font-black tracking-[-0.05em] group-hover:text-[#e6c800] transition-colors duration-500">
-                                ZYG<span className="text-[#e6c800] group-hover:text-slate-950 transition-colors duration-500">SOFT</span>
-                            </span>
+                        <Link href="/" className="inline-block mb-10 group" aria-label="ZYGSOFT Ana Sayfa">
+                            <img
+                                src="/brand/logo.svg"
+                                alt="ZYGSOFT"
+                                className="h-10 w-auto"
+                                width={220}
+                                height={40}
+                            />
                         </Link>
                         <p className="text-slate-400 text-xl font-medium leading-tight max-w-sm mb-12">
                             {t("description")}

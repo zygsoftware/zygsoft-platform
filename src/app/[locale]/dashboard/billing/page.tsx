@@ -9,8 +9,11 @@ import { motion } from "framer-motion";
 import {
     Receipt, CheckCircle, UploadCloud, Building, Calendar,
     ArrowRight, Loader2, Info, AlertCircle, Clock, XCircle,
-    Eye, FileText, History, Package, CreditCard,
+    Eye, FileText, History, Package, CreditCard, Copy,
 } from "lucide-react";
+
+const BANK_IBAN = "TR060006701000000077732201";
+const BANK_IBAN_DISPLAY = "TR06 0006 7010 0000 0077 7322 01";
 
 /* ── Types ───────────────────────────────────────────────────────── */
 
@@ -58,6 +61,64 @@ function PaymentStatusBadge({ status }: { status: string }) {
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${cfg.badge}`}>
             {cfg.icon} {cfg.label}
         </span>
+    );
+}
+
+function BankInfoBlock() {
+    const t = useTranslations("Dashboard.billing");
+    const [copied, setCopied] = useState(false);
+
+    const handleCopyIban = async () => {
+        try {
+            await navigator.clipboard.writeText(BANK_IBAN);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch {
+            // fallback for older browsers
+            const ta = document.createElement("textarea");
+            ta.value = BANK_IBAN;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            document.body.removeChild(ta);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    return (
+        <>
+            <div>
+                <div className="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-1">
+                    {t("bankName")}
+                </div>
+                <div className="text-slate-950 font-black">YapıKredi Bankası</div>
+            </div>
+            <div className="pt-4 border-t border-slate-50">
+                <div className="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-1">
+                    {t("receiverName")}
+                </div>
+                <div className="text-slate-950 font-black">Gürkan Yavuz</div>
+            </div>
+            <div className="pt-4 border-t border-slate-50">
+                <div className="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-1">
+                    {t("iban")}
+                </div>
+                <div className="flex items-center gap-2 mt-1.5">
+                    <div className="flex-1 text-slate-950 font-mono tracking-tighter bg-slate-50 p-4 rounded-xl border border-slate-100 break-all text-[12px] font-black select-all">
+                        {BANK_IBAN_DISPLAY}
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleCopyIban}
+                        className="shrink-0 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-2 text-xs font-bold text-slate-600"
+                    >
+                        <Copy size={14} />
+                        {copied ? "Kopyalandı" : "Kopyala"}
+                    </button>
+                </div>
+            </div>
+        </>
     );
 }
 
@@ -418,26 +479,7 @@ export default function BillingPage() {
                             </div>
 
                             <div className="space-y-5 text-sm">
-                                <div>
-                                    <div className="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-1">
-                                        {t("bankName")}
-                                    </div>
-                                    <div className="text-slate-950 font-black">Garanti BBVA</div>
-                                </div>
-                                <div className="pt-4 border-t border-slate-50">
-                                    <div className="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-1">
-                                        {t("receiverName")}
-                                    </div>
-                                    <div className="text-slate-950 font-black">Zygsoft Yazılım Çözümleri</div>
-                                </div>
-                                <div className="pt-4 border-t border-slate-50">
-                                    <div className="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-1">
-                                        {t("iban")}
-                                    </div>
-                                    <div className="text-slate-950 font-mono tracking-tighter bg-slate-50 p-4 rounded-xl border border-slate-100 break-all text-[12px] font-black mt-1.5 select-all">
-                                        TR99 0006 2000 0000 0000 0000 00
-                                    </div>
-                                </div>
+                                <BankInfoBlock />
                                 <div className="pt-5 border-t border-slate-50">
                                     <div className="flex items-start gap-3 bg-blue-50/60 border border-blue-100/60 p-4 rounded-xl text-blue-900">
                                         <Info size={16} className="mt-0.5 shrink-0 text-blue-500" />

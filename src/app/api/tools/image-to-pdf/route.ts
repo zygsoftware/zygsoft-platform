@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { PDFDocument } from "pdf-lib";
+import { prisma } from "@/lib/prisma";
+import { checkToolAccess, incrementTrialUsage } from "@/lib/trial-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -30,17 +32,10 @@ function fitIntoA4(imgW: number, imgH: number): { x: number; y: number; w: numbe
 /* ── Route handler ──────────────────────────────────────────────── */
 export async function POST(req: Request) {
     try {
-        /* Auth */
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: "Oturum açmanız gerekiyor." }, { status: 401 });
-        }
-        const activeSlugs = (session.user as any).activeProductSlugs || [];
-        const isAdmin = (session.user as any).role === "admin";
-        if (!activeSlugs.includes("legal-toolkit") && !isAdmin) {
-            return NextResponse.json({ error: "Bu araç için Hukuk Araçları Paketi aboneliği gereklidir." }, { status: 403 });
-        }
+        const guard = await checkToolAccess();
+        if (!guard.allowed) return guard.response;
 
+        const session = await getServerSession(authOptions);
         /* Parse multipart */
         let formData: FormData;
         try {
@@ -115,6 +110,10 @@ export async function POST(req: Request) {
         }
 
         const pdfBytes = await pdfDoc.save();
+
+        if (guard.incrementTrial) {
+            incrementTrialUsage(guard.userId).catch(() => {});
+        }
 
         return new NextResponse(Buffer.from(pdfBytes), {
             status: 200,

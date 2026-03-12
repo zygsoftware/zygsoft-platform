@@ -7,10 +7,10 @@ import { ArrowRight, ArrowUpRight, Code, Globe, Shield, Zap, Sparkles, MonitorSm
 import { useTranslations } from "next-intl";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { BlogSlider } from "@/components/home/BlogSlider";
+import { HomepageBlogSection } from "@/components/blog/HomepageBlogSection";
 import { AppStoreShowcase } from "@/components/home/AppStoreShowcase";
 import { HeroSection } from "@/components/home/HeroSection";
-import { DocToUdfDemo } from "@/components/home/DocToUdfDemo";
+import { PanelShowcase } from "@/components/home/PanelShowcase";
 import { ContactInquiryForm } from "@/components/forms/ContactInquiryForm";
 import { Magnetic } from "@/components/ui/Magnetic";
 import { ParticleField } from "@/components/ui/ParticleField";
@@ -51,10 +51,10 @@ export default function Home() {
           <HeroSection />
         </div>
 
-        {/* ── PRODUCT DEMO: DOCX → UDF ────────────────────────── */}
-        <section className="home-snap-section bg-[#fafafc] -mt-8">
-          <DocToUdfDemo />
-        </section>
+        {/* ── PRODUCT DEMO: Dashboard Showcase ────────────────────────── */}
+        <div className="home-snap-section -mt-8">
+          <PanelShowcase />
+        </div>
 
         {/* ── SECTION 02: TRUSTED PARTNER ────────────────────────── */}
         <section className="home-snap-section py-24 md:py-28 bg-[#fafafc] relative overflow-hidden">
@@ -406,7 +406,7 @@ export default function Home() {
 
         {/* ── SECTION 09: BLOG ────────────────────────── */}
         <div className="home-snap-section">
-          <BlogSlider />
+          <HomepageBlogSection />
         </div>
 
         {/* Transition: cream → off-white (Blog → Contact) */}

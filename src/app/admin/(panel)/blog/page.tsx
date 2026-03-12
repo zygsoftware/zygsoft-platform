@@ -1,266 +1,559 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Edit, CheckCircle, Clock, Loader2, BookOpen, X } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import {
+  Plus,
+  Trash2,
+  Edit,
+  CheckCircle,
+  Clock,
+  Loader2,
+  BookOpen,
+  ExternalLink,
+  FolderOpen,
+  Tag,
+  MessageSquare,
+  Star,
+  StarOff,
+  Send,
+  EyeOff,
+  AlertTriangle,
+  Search,
+  Eye,
+  Copy,
+} from "lucide-react";
+import Link from "next/link";
+import { AdminCard, AdminStatsCard, AdminPageHeader, AdminBadge } from "@/components/admin";
 
-export default function AdminBlog() {
-    const [posts, setPosts] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [submitting, setSubmitting] = useState(false);
-    const [deletingId, setDeletingId] = useState<string | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingPost, setEditingPost] = useState<any>(null);
-    const [formError, setFormError] = useState<string | null>(null);
-    const [formData, setFormData] = useState({
-        title: "", slug: "", excerpt: "", content: "", image: "", author: "Gürkan Yavuz", published: false,
-    });
+type Post = {
+  id: string;
+  slug: string;
+  title_tr: string;
+  title_en: string;
+  excerpt_tr: string;
+  excerpt_en: string;
+  content_tr: string;
+  content_en: string;
+  seo_title_tr: string | null;
+  seo_title_en: string | null;
+  seo_description_tr: string | null;
+  seo_description_en: string | null;
+  published: boolean;
+  is_featured: boolean;
+  allow_comments: boolean;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+  view_count: number;
+  category: { id: string; name_tr: string; name_en: string; slug: string } | null;
+  tags: { tag: { id: string; name: string; slug: string } }[];
+  _count?: { comments: number; likes: number };
+};
 
-    const fetchPosts = async () => {
-        try {
-            const res = await fetch("/api/blog?all=true");
-            const data = await res.json();
-            if (Array.isArray(data)) {
-                setPosts(data);
-            } else if (data.posts) {
-                setPosts(data.posts);
-            } else {
-                setPosts([]);
-            }
-        } catch (error) {
-            console.error("Blog yazıları yüklenirken hata:", error);
-            setPosts([]);
-        } finally {
-            setLoading(false);
-        }
-    };
+type Category = { id: string; name_tr: string; name_en: string; slug: string };
 
-    useEffect(() => { fetchPosts(); }, []);
+export default function AdminBlogPage() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
+  const [actionId, setActionId] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<"all" | "published" | "draft">("all");
+  const [featuredFilter, setFeaturedFilter] = useState<"all" | "yes" | "no">("all");
+  const [commentsFilter, setCommentsFilter] = useState<"all" | "on" | "off">("all");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [missingEnFilter, setMissingEnFilter] = useState(false);
+  const [missingSeoFilter, setMissingSeoFilter] = useState(false);
+  const [sortBy, setSortBy] = useState<"newest" | "updated" | "popular">("newest");
+  const [search, setSearch] = useState("");
 
-    const openCreate = () => {
-        setEditingPost(null);
-        setFormError(null);
-        setFormData({ title: "", slug: "", excerpt: "", content: "", image: "", author: "Gürkan Yavuz", published: false });
-        setIsModalOpen(true);
-    };
+  const fetchPosts = async () => {
+    try {
+      const params = new URLSearchParams();
+      params.set("all", "true");
+      params.set("limit", "200");
+      if (categoryFilter) params.set("category", categoryFilter);
+      if (featuredFilter === "yes") params.set("featured", "true");
+      if (commentsFilter === "on") params.set("allow_comments", "true");
+      if (commentsFilter === "off") params.set("allow_comments", "false");
+      params.set("sort", sortBy === "updated" ? "updated" : sortBy === "popular" ? "popular" : "published");
+      if (search.trim()) params.set("search", search.trim());
+      const res = await fetch(`/api/blog?${params}`);
+      const data = await res.json();
+      setPosts(data.posts ?? []);
+    } catch {
+      setPosts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const openEdit = (post: any) => {
-        setEditingPost(post);
-        setFormError(null);
-        setFormData({ title: post.title, slug: post.slug, excerpt: post.excerpt, content: post.content, image: post.image || "", author: post.author, published: post.published });
-        setIsModalOpen(true);
-    };
+  useEffect(() => {
+    fetch("/api/blog/categories")
+      .then((r) => r.json())
+      .then((d) => setCategories(Array.isArray(d) ? d : []))
+      .catch(() => setCategories([]));
+  }, []);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSubmitting(true);
-        setFormError(null);
-        try {
-            const res = editingPost
-                ? await fetch(`/api/blog/${editingPost.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) })
-                : await fetch("/api/blog", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(formData) });
+  useEffect(() => {
+    const t = setTimeout(() => fetchPosts(), search ? 300 : 0);
+    return () => clearTimeout(t);
+  }, [categoryFilter, featuredFilter, commentsFilter, sortBy, search]);
 
-            if (!res.ok) {
-                const data = await res.json().catch(() => ({}));
-                setFormError(data.error ?? "Blog yazısı kaydedilemedi.");
-                return;
-            }
+  const handleDelete = async (id: string) => {
+    if (!confirm("Bu içeriği kalıcı olarak silmek istediğinizden emin misiniz?")) return;
+    setDeletingId(id);
+    try {
+      await fetch(`/api/blog/${id}`, { method: "DELETE" });
+      fetchPosts();
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
-            setIsModalOpen(false);
-            fetchPosts();
-        } catch (error) {
-            setFormError("Sunucuya bağlanılamadı. Lütfen tekrar deneyin.");
-        } finally {
-            setSubmitting(false);
-        }
-    };
+  const handleDuplicate = async (id: string) => {
+    setDuplicatingId(id);
+    try {
+      const res = await fetch("/api/blog/duplicate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sourceId: id }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        window.location.href = `/admin/blog/edit/${data.id}`;
+      } else {
+        const err = await res.json().catch(() => ({}));
+        alert(err.error || "Kopyalama başarısız");
+      }
+    } finally {
+      setDuplicatingId(null);
+    }
+  };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm("Bu içeriği kalıcı olarak silmek istediğinizden emin misiniz?")) return;
-        setDeletingId(id);
-        try {
-            await fetch(`/api/blog/${id}`, { method: "DELETE" });
-            fetchPosts();
-        } catch (error) {
-            console.error("Blog yazısı silinemedi:", error);
-        } finally {
-            setDeletingId(null);
-        }
-    };
+  const handleQuickAction = async (id: string, action: "publish" | "unpublish" | "feature" | "unfeature") => {
+    setActionId(id);
+    try {
+      const body =
+        action === "publish"
+          ? { published: true }
+          : action === "unpublish"
+            ? { published: false }
+            : action === "feature"
+              ? { is_featured: true }
+              : { is_featured: false };
+      const res = await fetch(`/api/blog/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) fetchPosts();
+    } finally {
+      setActionId(null);
+    }
+  };
 
-    const generateSlug = (title: string) => title.toLowerCase().replace(/[^a-z0-9ğüşıöç]+/gi, "-").replace(/^-|-$/g, "").replace(/[ğ]/g, "g").replace(/[ü]/g, "u").replace(/[ş]/g, "s").replace(/[ı]/g, "i").replace(/[ö]/g, "o").replace(/[ç]/g, "c");
-
-    return (
-        <div>
-            {/* Header */}
-            <div className="flex justify-between items-start mb-8 gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Blog Yönetimi</h1>
-                    <p className="text-slate-500 mt-1 text-sm">Zygsoft içgörüsü ve genel makaleleri yönetin.</p>
-                </div>
-                <button
-                    onClick={openCreate}
-                    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-lg shadow-emerald-500/20 shrink-0"
-                >
-                    <Plus size={18} /> Yeni Yazı
-                </button>
-            </div>
-
-            {/* Content Table */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                {loading ? (
-                    <div className="p-12 text-center flex items-center justify-center gap-3 text-slate-400">
-                        <Loader2 size={24} className="animate-spin text-emerald-500" />
-                        <span className="font-medium">Blog Yazıları Yükleniyor...</span>
-                    </div>
-                ) : posts.length === 0 ? (
-                    <div className="p-16 text-center">
-                        <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
-                            <BookOpen size={32} />
-                        </div>
-                        <p className="text-slate-500 font-medium text-lg">Henüz hiç blog yazısı bulunmuyor.</p>
-                        <p className="text-slate-400 text-sm mt-1">Hemen sağ üstten ilk yazınızı ekleyin!</p>
-                    </div>
-                ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                <tr>
-                                    <th className="px-6 py-4">Başlık</th>
-                                    <th className="px-6 py-4 hidden sm:table-cell">Yazar</th>
-                                    <th className="px-6 py-4">Durum</th>
-                                    <th className="px-6 py-4 hidden md:table-cell">Tarih</th>
-                                    <th className="px-6 py-4 text-right">İşlemler</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {posts.map((post: any) => (
-                                    <tr key={post.id} className="hover:bg-slate-50 transition-colors group">
-                                        <td className="px-6 py-4">
-                                            <p className="font-bold text-slate-900">{post.title}</p>
-                                            <p className="text-xs text-slate-400 font-mono mt-1">/blog/{post.slug}</p>
-                                        </td>
-                                        <td className="px-6 py-4 hidden sm:table-cell text-slate-600 font-medium text-sm">
-                                            {post.author}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {post.published ? (
-                                                <span className="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200">
-                                                    <CheckCircle size={12} /> Yayında
-                                                </span>
-                                            ) : (
-                                                <span className="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                                    <Clock size={12} /> Taslak
-                                                </span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 hidden md:table-cell text-slate-500 text-sm font-medium">
-                                            {new Date(post.createdAt).toLocaleDateString("tr-TR")}
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button onClick={() => openEdit(post)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
-                                                    <Edit size={18} />
-                                                </button>
-                                                <button onClick={() => handleDelete(post.id)} disabled={deletingId === post.id} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50">
-                                                    {deletingId === post.id ? <Loader2 size={18} className="animate-spin" /> : <Trash2 size={18} />}
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-            </div>
-
-            {/* Modal */}
-            <AnimatePresence>
-                {isModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
-                        <motion.div
-                            initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                            className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative z-10"
-                        >
-                            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 rounded-t-3xl shrink-0">
-                                <h2 className="text-xl font-bold text-slate-900">{editingPost ? "Yazıyı Düzenle" : "Yeni Blog Yazısı"}</h2>
-                                <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 flex items-center justify-center text-slate-400 hover:bg-slate-200 hover:text-slate-600 rounded-full transition-colors">
-                                    <X size={18} />
-                                </button>
-                            </div>
-
-                            <div className="overflow-y-auto p-6">
-                                <form id="blog-form" onSubmit={handleSubmit} className="space-y-5">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Başlık</label>
-                                            <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value, slug: generateSlug(e.target.value) })}
-                                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium" placeholder="Blog yazısı başlığı" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">URL Slug</label>
-                                            <input type="text" required value={formData.slug} onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-mono text-slate-500" />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Özet (Excerpt)</label>
-                                        <textarea required rows={2} value={formData.excerpt} onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium resize-none" placeholder="Kısa özet..." />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">İçerik (Markdown Destekli)</label>
-                                        <textarea required rows={8} value={formData.content} onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium resize-none" placeholder="Blog içeriği..." />
-                                    </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Görsel (URL)</label>
-                                            <input type="url" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium" placeholder="https://..." />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Yazar</label>
-                                            <input type="text" value={formData.author} onChange={(e) => setFormData({ ...formData, author: e.target.value })}
-                                                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium" />
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-3 p-4 bg-emerald-50/50 border border-emerald-100 rounded-xl">
-                                        <input type="checkbox" id="published" checked={formData.published} onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
-                                            className="w-4 h-4 rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500" />
-                                        <div>
-                                            <label htmlFor="published" className="text-sm font-bold text-emerald-900 cursor-pointer select-none">Hemen Yayınla</label>
-                                            <p className="text-xs text-emerald-700 mt-0.5">Seçilmezse taslak olarak kaydedilir.</p>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div className="p-6 border-t border-slate-100 flex flex-col gap-3 shrink-0 bg-slate-50/50 rounded-b-3xl">
-                                {formError && (
-                                    <p className="text-sm font-semibold text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                                        {formError}
-                                    </p>
-                                )}
-                                <div className="flex gap-3 justify-end">
-                                    <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all text-sm">
-                                        İptal
-                                    </button>
-                                    <button type="submit" form="blog-form" disabled={submitting} className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 flex items-center gap-2 text-sm">
-                                        {submitting ? <><Loader2 size={16} className="animate-spin" /> Kaydediliyor...</> : "Kaydet ve Kapat"}
-                                    </button>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-        </div>
+  const isEnComplete = (p: Post) => !!(p.title_en?.trim() && p.excerpt_en?.trim() && p.content_en?.trim());
+  const hasSeo = (p: Post) =>
+    !!(
+      (p.seo_title_tr?.trim() || p.seo_title_en?.trim()) &&
+      (p.seo_description_tr?.trim() || p.seo_description_en?.trim())
     );
+
+  const filtered = posts.filter((p) => {
+    if (statusFilter === "published" && !p.published) return false;
+    if (statusFilter === "draft" && p.published) return false;
+    if (featuredFilter === "yes" && !p.is_featured) return false;
+    if (featuredFilter === "no" && p.is_featured) return false;
+    if (commentsFilter === "on" && !p.allow_comments) return false;
+    if (commentsFilter === "off" && p.allow_comments) return false;
+    if (missingEnFilter && isEnComplete(p)) return false;
+    if (missingSeoFilter && hasSeo(p)) return false;
+    return true;
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === "updated") return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+    if (sortBy === "popular") return (b.view_count ?? 0) - (a.view_count ?? 0);
+    return new Date(b.published_at || b.created_at).getTime() - new Date(a.published_at || a.created_at).getTime();
+  });
+
+  const stats = useMemo(
+    () => ({
+      total: posts.length,
+      published: posts.filter((p) => p.published).length,
+      draft: posts.filter((p) => !p.published).length,
+      featured: posts.filter((p) => p.is_featured).length,
+      totalViews: posts.reduce((s, p) => s + (p.view_count ?? 0), 0),
+      totalComments: posts.reduce((s, p) => s + (p._count?.comments ?? 0), 0),
+    }),
+    [posts]
+  );
+
+  return (
+    <div className="space-y-8">
+      <AdminPageHeader
+        title="Blog Yönetimi"
+        subtitle="Blog yazılarını yönetin, filtreleyin ve düzenleyin."
+        actions={
+          <>
+            <Link
+              href="/admin/blog/new"
+              className="inline-flex items-center gap-2 bg-[#0e0e0e] hover:bg-[#1a1a1a] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm"
+            >
+              <Plus size={18} /> Yeni Yazı
+            </Link>
+            <Link
+              href="/admin/blog/categories"
+              className="inline-flex items-center gap-2 border border-slate-200 hover:bg-slate-50 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+            >
+              <FolderOpen size={18} /> Kategoriler
+            </Link>
+            <Link
+              href="/admin/blog/tags"
+              className="inline-flex items-center gap-2 border border-slate-200 hover:bg-slate-50 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+            >
+              <Tag size={18} /> Etiketler
+            </Link>
+            <Link
+              href="/admin/blog/comments"
+              className="inline-flex items-center gap-2 border border-slate-200 hover:bg-slate-50 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+            >
+              <MessageSquare size={18} /> Yorumlar
+            </Link>
+          </>
+        }
+      />
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <AdminStatsCard
+          label="Toplam"
+          value={stats.total}
+          icon={<BookOpen size={20} />}
+          accent="slate"
+        />
+        <AdminStatsCard
+          label="Yayında"
+          value={stats.published}
+          icon={<CheckCircle size={20} />}
+          accent="emerald"
+        />
+        <AdminStatsCard
+          label="Taslak"
+          value={stats.draft}
+          icon={<Clock size={20} />}
+          accent="default"
+        />
+        <AdminStatsCard
+          label="Öne Çıkan"
+          value={stats.featured}
+          icon={<Star size={20} />}
+          accent="violet"
+        />
+        <AdminStatsCard
+          label="Görüntülenme"
+          value={stats.totalViews}
+          icon={<Eye size={20} />}
+          accent="gold"
+        />
+        <AdminStatsCard
+          label="Yorum"
+          value={stats.totalComments}
+          icon={<MessageSquare size={20} />}
+          accent="emerald"
+        />
+      </div>
+
+      {/* Filter bar */}
+      <AdminCard padding="md">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <input
+                type="text"
+                placeholder="Başlık veya özet ara..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#e6c800]/30 focus:border-[#e6c800]/50 transition-all"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {(["all", "published", "draft"] as const).map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setStatusFilter(s)}
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                    statusFilter === s
+                      ? "bg-[#0e0e0e] text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  {s === "all" ? "Tüm Durum" : s === "published" ? "Yayında" : "Taslak"}
+                </button>
+              ))}
+              {(["all", "yes", "no"] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFeaturedFilter(f)}
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                    featuredFilter === f ? "bg-[#0e0e0e] text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  {f === "all" ? "Öne Çıkan" : f === "yes" ? "Evet" : "Hayır"}
+                </button>
+              ))}
+              {(["all", "on", "off"] as const).map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setCommentsFilter(c)}
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                    commentsFilter === c ? "bg-[#0e0e0e] text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  Yorum {c === "all" ? "" : c === "on" ? "Açık" : "Kapalı"}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="px-3 py-2 border border-slate-200 rounded-xl text-sm font-medium bg-white min-w-[160px]"
+            >
+              <option value="">Tüm Kategoriler</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name_tr}
+                </option>
+              ))}
+            </select>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              className="px-3 py-2 border border-slate-200 rounded-xl text-sm font-medium bg-white"
+            >
+              <option value="newest">En Yeni</option>
+              <option value="updated">Son Güncelleme</option>
+              <option value="popular">En Çok Görüntülenen</option>
+            </select>
+            <label className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white cursor-pointer hover:bg-slate-50">
+              <input
+                type="checkbox"
+                checked={missingEnFilter}
+                onChange={(e) => setMissingEnFilter(e.target.checked)}
+                className="rounded"
+              />
+              <span className="flex items-center gap-1 text-amber-600">
+                <AlertTriangle size={14} /> EN eksik
+              </span>
+            </label>
+            <label className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white cursor-pointer hover:bg-slate-50">
+              <input
+                type="checkbox"
+                checked={missingSeoFilter}
+                onChange={(e) => setMissingSeoFilter(e.target.checked)}
+                className="rounded"
+              />
+              <span className="flex items-center gap-1 text-amber-600">
+                <AlertTriangle size={14} /> SEO eksik
+              </span>
+            </label>
+          </div>
+        </div>
+      </AdminCard>
+
+      {/* Table */}
+      <AdminCard padding="none">
+        {loading ? (
+          <div className="p-16 text-center flex items-center justify-center gap-3 text-slate-400">
+            <Loader2 size={24} className="animate-spin text-[#e6c800]" />
+            <span className="font-medium">Yükleniyor...</span>
+          </div>
+        ) : sorted.length === 0 ? (
+          <div className="p-16 text-center">
+            <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
+              <BookOpen size={32} />
+            </div>
+            <p className="text-slate-500 font-medium text-lg">
+              {filtered.length === 0 && posts.length > 0
+                ? "Filtrelere uygun yazı bulunamadı."
+                : "Henüz blog yazısı yok."}
+            </p>
+            {posts.length === 0 && (
+              <Link
+                href="/admin/blog/new"
+                className="inline-flex items-center gap-2 mt-4 text-[#0e0e0e] font-semibold hover:text-[#e6c800] transition-colors"
+              >
+                <Plus size={18} /> İlk yazıyı ekle
+              </Link>
+            )}
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="admin-table w-full text-left">
+              <thead>
+                <tr className="border-b border-slate-200/80 bg-slate-50/50">
+                  <th className="px-6 py-4">Başlık</th>
+                  <th className="px-6 py-4">Durum</th>
+                  <th className="px-6 py-4 hidden lg:table-cell">Kategori</th>
+                  <th className="px-6 py-4 hidden xl:table-cell text-center">Öne Çıkan</th>
+                  <th className="px-6 py-4 hidden xl:table-cell text-center">TR/EN</th>
+                  <th className="px-6 py-4 hidden xl:table-cell text-center">SEO</th>
+                  <th className="px-6 py-4 hidden xl:table-cell text-center">Yorum Ayarı</th>
+                  <th className="px-6 py-4 hidden md:table-cell text-center">Görüntülenme</th>
+                  <th className="px-6 py-4 hidden md:table-cell text-center">Yorum</th>
+                  <th className="px-6 py-4 hidden md:table-cell text-center">Beğeni</th>
+                  <th className="px-6 py-4 hidden lg:table-cell">Güncelleme</th>
+                  <th className="px-6 py-4 text-right">İşlemler</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {sorted.map((post) => (
+                  <tr key={post.id} className="transition-colors">
+                    <td className="px-6 py-4">
+                      <p className="font-semibold text-slate-900">{post.title_tr}</p>
+                      <p className="text-xs text-slate-400 font-mono mt-0.5">/blog/{post.slug}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <AdminBadge variant={post.published ? "published" : "draft"} label={post.published ? "Yayında" : "Taslak"} />
+                    </td>
+                    <td className="px-6 py-4 hidden lg:table-cell text-slate-600 text-sm">
+                      {post.category?.name_tr ?? "—"}
+                    </td>
+                    <td className="px-6 py-4 hidden xl:table-cell text-center">
+                      {post.is_featured ? (
+                        <AdminBadge variant="featured" label="Öne Çıkan" />
+                      ) : (
+                        <span className="text-slate-400 text-xs">—</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 hidden xl:table-cell">
+                      <span className="flex items-center gap-1.5 justify-center text-xs">
+                        <span
+                          className={
+                            post.title_tr?.trim() ? "text-emerald-600 font-medium" : "text-amber-600 font-medium"
+                          }
+                        >
+                          TR
+                        </span>
+                        <span
+                          className={
+                            post.title_en?.trim() ? "text-emerald-600 font-medium" : "text-amber-600 font-medium"
+                          }
+                        >
+                          EN
+                        </span>
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 hidden xl:table-cell text-center">
+                      {hasSeo(post) ? (
+                        <span className="text-emerald-600 text-xs font-medium">✓</span>
+                      ) : (
+                        <span className="text-amber-600 text-xs font-medium">—</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 hidden xl:table-cell text-center text-slate-500 text-sm">
+                      {post.allow_comments ? "Açık" : "Kapalı"}
+                    </td>
+                    <td className="px-6 py-4 hidden md:table-cell text-center text-slate-600 text-sm font-medium">
+                      {post.view_count ?? 0}
+                    </td>
+                    <td className="px-6 py-4 hidden md:table-cell text-center text-slate-600 text-sm font-medium">
+                      {post._count?.comments ?? 0}
+                    </td>
+                    <td className="px-6 py-4 hidden md:table-cell text-center text-slate-600 text-sm font-medium">
+                      {post._count?.likes ?? 0}
+                    </td>
+                    <td className="px-6 py-4 hidden lg:table-cell text-slate-500 text-sm">
+                      {new Date(post.updated_at).toLocaleDateString("tr-TR")}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-wrap justify-end gap-1">
+                        <button
+                          onClick={() =>
+                            handleQuickAction(post.id, post.published ? "unpublish" : "publish")
+                          }
+                          disabled={actionId === post.id}
+                          className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
+                          title={post.published ? "Taslağa al" : "Yayınla"}
+                        >
+                          {actionId === post.id ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : post.published ? (
+                            <EyeOff size={16} />
+                          ) : (
+                            <Send size={16} />
+                          )}
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleQuickAction(post.id, post.is_featured ? "unfeature" : "feature")
+                          }
+                          disabled={actionId === post.id}
+                          className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
+                          title={post.is_featured ? "Öne çıkarmayı kaldır" : "Öne çıkar"}
+                        >
+                          {post.is_featured ? <StarOff size={16} /> : <Star size={16} />}
+                        </button>
+                        <a
+                          href={`/blog/${post.slug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                          title="Önizle"
+                        >
+                          <ExternalLink size={16} />
+                        </a>
+                        <Link
+                          href={`/admin/blog/edit/${post.id}`}
+                          className="p-2 text-[#0e0e0e] hover:bg-slate-100 rounded-lg transition-colors"
+                          title="Düzenle"
+                        >
+                          <Edit size={16} />
+                        </Link>
+                        <button
+                          onClick={() => handleDuplicate(post.id)}
+                          disabled={duplicatingId === post.id}
+                          className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
+                          title="Kopyala"
+                        >
+                          {duplicatingId === post.id ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : (
+                            <Copy size={16} />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(post.id)}
+                          disabled={deletingId === post.id}
+                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                        >
+                          {deletingId === post.id ? (
+                            <Loader2 size={16} className="animate-spin" />
+                          ) : (
+                            <Trash2 size={16} />
+                          )}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {sorted.length > 0 && (
+          <div className="px-6 py-3 border-t border-slate-100 text-xs text-slate-500 flex justify-between items-center bg-slate-50/30">
+            <span>
+              {sorted.length} / {posts.length} yazı gösteriliyor
+            </span>
+          </div>
+        )}
+      </AdminCard>
+    </div>
+  );
 }

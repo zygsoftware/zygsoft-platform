@@ -1,163 +1,220 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import Link from "next/link";
-import { Calendar, User, ArrowRight, BookOpen, Clock } from "lucide-react";
+import { ArrowRight, BookOpen, Search } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
-import { BlockReveal, TextReveal } from "@/components/ui/reveal";
-
-type Post = {
-    id: string;
-    title: string;
-    slug: string;
-    excerpt: string;
-    image: string | null;
-    createdAt: string;
-    author: string;
-};
+import { BlogPostCard, type BlogPostCardData } from "@/components/blog/BlogPostCard";
+import { createRevealUp } from "@/components/ui/motion";
 
 export default function BlogPage() {
     const t = useTranslations("Blog");
     const locale = useLocale();
-    const [posts, setPosts] = useState<Post[]>([]);
+    const isTr = locale === "tr";
+    const reducedMotion = !!useReducedMotion();
+    const [posts, setPosts] = useState<BlogPostCardData[]>([]);
+    const [featured, setFeatured] = useState<BlogPostCardData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState("");
+    const [searchInput, setSearchInput] = useState("");
+    const [categories, setCategories] = useState<{ id: string; name_tr: string; name_en: string; slug: string }[]>([]);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [sortBy, setSortBy] = useState<"newest" | "popular">("newest");
 
     useEffect(() => {
-        fetch("/api/blog?published=true")
+        const t = setTimeout(() => setSearch(searchInput.trim()), 350);
+        return () => clearTimeout(t);
+    }, [searchInput]);
+
+    useEffect(() => {
+        const params = new URLSearchParams();
+        params.set("limit", "9");
+        params.set("page", String(page));
+        if (search) params.set("search", search);
+        params.set("sort", sortBy === "popular" ? "popular" : "published");
+
+        fetch(`/api/blog?${params}`)
             .then((res) => res.json())
             .then((data) => {
-                const arr = Array.isArray(data) ? data : (data.posts ?? []);
-                setPosts(arr);
-                setLoading(false);
+                const list = data.posts ?? [];
+                const feat = list.find((p: BlogPostCardData) => p.is_featured) || null;
+                setFeatured(feat);
+                setPosts(feat ? list.filter((p: BlogPostCardData) => p.id !== feat.id) : list);
+                setTotalPages(data.totalPages ?? 1);
             })
-            .catch(() => setLoading(false));
+            .catch(() => setPosts([]))
+            .finally(() => setLoading(false));
+    }, [page, search, sortBy]);
+
+    useEffect(() => {
+        fetch("/api/blog/categories")
+            .then((res) => res.json())
+            .then((data) => setCategories(Array.isArray(data) ? data : []))
+            .catch(() => setCategories([]));
     }, []);
+
 
     return (
         <>
             <Header />
-            <main style={{ background: "#f9f7f3" }} className="min-h-screen">
-
-                {/* ── Hero ── */}
-                <section className="pt-40 pb-24 relative overflow-hidden" style={{ background: "linear-gradient(160deg, #f9f7f3 60%, #f0ece0 100%)" }}>
-                    <div className="absolute inset-0 pointer-events-none" style={{
-                        backgroundImage: "radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px)",
-                        backgroundSize: "40px 40px"
-                    }} />
-                    <motion.div className="absolute left-20 top-20 w-72 h-72 rounded-full pointer-events-none"
-                        animate={{ y: [0, 20, 0], scale: [1, 1.05, 1] }}
-                        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-                        style={{ background: "radial-gradient(circle, rgba(230,200,0,0.1) 0%, transparent 70%)" }} />
-                    <div className="container mx-auto px-6 max-w-7xl">
-                        <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-2xl">
-                            <span className="section-label">{t("blogTag")}</span>
-                            <h1 className="font-display font-extrabold text-[#0e0e0e] mt-4 mb-6"
-                                style={{ fontSize: "clamp(44px,6vw,88px)", lineHeight: 1.03 }}>
+            <main className="min-h-screen bg-[#fafafc]">
+                <section className="pt-32 pb-16 md:pt-40 md:pb-24 relative overflow-hidden">
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#0a0c10 1px, transparent 1px), linear-gradient(90deg, #0a0c10 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
+                    <div className="container mx-auto px-6 max-w-7xl relative z-10">
+                        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-2xl">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#0a0c10]/50 mb-4 block">{t("blogTag")}</span>
+                            <h1 className="font-display font-extrabold text-[#0e0e0e] text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight mb-4">
                                 {t("title")}
                             </h1>
-                            <p className="text-[#666] text-xl leading-relaxed">
-                                {t("subtitle")}
-                            </p>
+                            <p className="text-[#0a0c10]/60 text-lg leading-relaxed">{t("subtitle")}</p>
                         </motion.div>
                     </div>
                 </section>
 
-                {/* ── Posts Grid ── */}
-                <section className="py-24 bg-white border-y border-black/8">
+                <section className="pb-16 md:pb-24">
                     <div className="container mx-auto px-6 max-w-7xl">
+                        <div className="flex flex-col gap-6 mb-10">
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="relative flex-1">
+                                    <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#0a0c10]/40" />
+                                    <input
+                                        type="text"
+                                        placeholder={isTr ? "Başlık veya özet ara..." : "Search by title or excerpt..."}
+                                        value={searchInput}
+                                        onChange={(e) => { setSearchInput(e.target.value); setPage(1); }}
+                                        className="w-full pl-12 pr-4 py-3 border border-[#0a0c10]/[0.08] rounded-xl bg-white focus:ring-2 focus:ring-[#e6c800]/30 focus:border-[#e6c800]/50 outline-none shadow-[0_1px_2px_rgba(0,0,0,0.03)] transition-shadow"
+                                    />
+                                </div>
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => { setSortBy(e.target.value as "newest" | "popular"); setPage(1); }}
+                                    className="px-4 py-3 border border-[#0a0c10]/[0.08] rounded-xl bg-white min-w-[160px] shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
+                                >
+                                    <option value="newest">{isTr ? "En Yeni" : "Newest"}</option>
+                                    <option value="popular">{isTr ? "En Popüler" : "Most Popular"}</option>
+                                </select>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                <Link
+                                    href={locale === "tr" ? "/blog" : `/${locale}/blog`}
+                                    className="px-4 py-2 rounded-full text-sm font-medium bg-[#e6c800] text-[#0a0c10]"
+                                >
+                                    {isTr ? "Tümü" : "All"}
+                                </Link>
+                                {categories.map((c) => (
+                                    <Link
+                                        key={c.id}
+                                        href={locale === "tr" ? `/blog/category/${c.slug}` : `/${locale}/blog/category/${c.slug}`}
+                                        className="px-4 py-2 rounded-full text-sm font-medium bg-white border border-[#0a0c10]/[0.08] text-[#0a0c10]/70 hover:border-[#e6c800]/50 transition-colors"
+                                    >
+                                        {isTr ? c.name_tr : c.name_en}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+
                         {loading ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {[1, 2, 3].map(n => (
-                                    <div key={n} className="h-[400px] bg-[#f9f7f3] border border-black/8 rounded-sm animate-pulse" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                                {[1, 2, 3, 4, 5, 6].map((n) => (
+                                    <div key={n} className="h-[380px] bg-white/60 border border-[#0a0c10]/[0.06] rounded-xl animate-pulse" />
                                 ))}
                             </div>
-                        ) : posts.length === 0 ? (
-                            <div className="text-center py-20 bg-[#f9f7f3] border border-black/8 border-dashed rounded-sm">
-                                <BookOpen size={48} className="mx-auto text-black/20 mb-4" />
-                                <h3 className="font-display font-bold text-2xl text-[#0e0e0e] mb-2">{t("noPostsFound")}</h3>
-                            </div>
+                        ) : featured && posts.length === 0 && !search ? (
+                            <motion.div
+                                initial={{ opacity: 0, y: 24 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                            >
+                                <BlogPostCard post={featured} locale={locale} variant="featured" index={0} />
+                            </motion.div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {posts.map((post, i) => (
-                                    <BlockReveal key={post.id} delay={i * 0.08}>
-                                        <Link href={locale === "tr" ? `/blog/${post.slug}` : `/${locale}/blog/${post.slug}`} className="block h-full group">
-                                            <div className="h-full flex flex-col glass rounded-xl overflow-hidden hover-glow transition-all duration-300 hover:-translate-y-2">
+                            <>
+                                {featured && !search && (
+                                    <div className="mb-10">
+                                        <BlogPostCard post={featured} locale={locale} variant="featured" index={0} />
+                                    </div>
+                                )}
 
-                                                {/* Cover */}
-                                                <div className="relative h-56 w-full bg-[#f3f0ea] overflow-hidden">
-                                                    {post.image ? (
-                                                        <img
-                                                            src={post.image}
-                                                            alt={post.title}
-                                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-black/15">
-                                                            <BookOpen size={48} />
-                                                        </div>
-                                                    )}
-                                                </div>
+                                {posts.length === 0 && !featured ? (
+                                    <div className="text-center py-24 px-8 bg-white rounded-2xl border border-[#0a0c10]/[0.06] shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+                                        <div className="w-20 h-20 rounded-2xl bg-[#e6c800]/10 flex items-center justify-center mx-auto mb-6">
+                                            <BookOpen size={40} className="text-[#e6c800]" />
+                                        </div>
+                                        <h3 className="font-display font-bold text-2xl text-[#0e0e0e] mb-2">
+                                            {search ? (isTr ? "Aramanıza uygun yazı bulunamadı" : "No posts match your search") : t("noPostsYet")}
+                                        </h3>
+                                        <p className="text-[#0a0c10]/60 max-w-md mx-auto mb-6">
+                                            {search
+                                                ? (isTr ? "Farklı anahtar kelimeler deneyin veya filtreleri değiştirin." : "Try different keywords or adjust filters.")
+                                                : (isTr ? "Yakında yeni içerikler eklenecek." : "New content coming soon.")}
+                                        </p>
+                                        {search && (
+                                            <button
+                                                onClick={() => { setSearchInput(""); setSearch(""); setPage(1); }}
+                                                className="text-[#e6c800] font-semibold hover:underline"
+                                            >
+                                                {isTr ? "Aramayı temizle" : "Clear search"}
+                                            </button>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <motion.div
+                                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+                                        variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.06, delayChildren: 0.02 } } }}
+                                        initial="hidden"
+                                        animate="visible"
+                                    >
+                                        {posts.map((post, i) => (
+                                            <motion.div key={post.id} variants={createRevealUp(reducedMotion, 24, 6)}>
+                                                <BlogPostCard post={post} locale={locale} variant="default" index={i} />
+                                            </motion.div>
+                                        ))}
+                                    </motion.div>
+                                )}
 
-                                                {/* Content */}
-                                                <div className="p-8 flex flex-col flex-1">
-                                                    <div className="flex items-center gap-3 text-xs text-[#888] mb-4 font-medium uppercase tracking-wide">
-                                                        <span className="flex items-center gap-1.5"><User size={12} /> {post.author}</span>
-                                                        <span className="w-1 h-1 rounded-full bg-black/15" />
-                                                        <span className="flex items-center gap-1.5">
-                                                            <Clock size={12} />
-                                                            {new Date(post.createdAt).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })}
-                                                        </span>
-                                                    </div>
-
-                                                    <h3 className="text-xl font-display font-bold text-[#0e0e0e] mb-3 line-clamp-2 group-hover:text-[#555] transition-colors leading-snug">
-                                                        {post.title}
-                                                    </h3>
-
-                                                    <p className="text-[#666] text-sm leading-relaxed line-clamp-3 mb-6 flex-1">
-                                                        {post.excerpt}
-                                                    </p>
-
-                                                    <div className="flex items-center font-bold text-[#0e0e0e] text-sm uppercase tracking-wide mt-auto group-hover:text-[#c9ad00] transition-colors">
-                                                        {t("readMore")}
-                                                        <span className="ml-2 w-8 h-8 rounded-full flex items-center justify-center bg-[#f9f7f3] group-hover:bg-[#e6c800] group-hover:text-[#0e0e0e] transition-all duration-300 shadow-sm group-hover:shadow-[0_4px_15px_rgba(230,200,0,0.3)]">
-                                                            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </Link>
-                                    </BlockReveal>
-                                ))}
-                            </div>
+                                {totalPages > 1 && (
+                                    <motion.div
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        className="flex justify-center gap-2 mt-14"
+                                    >
+                                        <button
+                                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                            disabled={page <= 1}
+                                            className="px-5 py-2.5 rounded-xl border border-[#0a0c10]/[0.08] font-bold text-sm text-[#0a0c10] hover:bg-[#0a0c10]/[0.04] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                        >
+                                            ←
+                                        </button>
+                                        <span className="px-5 py-2.5 text-sm font-medium text-[#0a0c10]/70">
+                                            {page} / {totalPages}
+                                        </span>
+                                        <button
+                                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                            disabled={page >= totalPages}
+                                            className="px-5 py-2.5 rounded-xl border border-[#0a0c10]/[0.08] font-bold text-sm text-[#0a0c10] hover:bg-[#0a0c10]/[0.04] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                                        >
+                                            →
+                                        </button>
+                                    </motion.div>
+                                )}
+                            </>
                         )}
                     </div>
                 </section>
 
-                {/* ── CTA ── */}
-                <section className="py-20" style={{ background: "#f9f7f3" }}>
-                    <div className="container mx-auto px-6 max-w-7xl text-center">
-                        <BlockReveal>
-                            <TextReveal delay={0.08}>
-                                <span className="section-label">Bizimle Öğrenin</span>
-                            </TextReveal>
-                            <TextReveal delay={0.16}>
-                                <h2 className="font-display font-extrabold text-[#0e0e0e] mt-4 mb-8" style={{ fontSize: "clamp(32px,4vw,56px)" }}>
-                                    Gelişmelerden Haberdar Olun
-                                </h2>
-                            </TextReveal>
-                            <BlockReveal delay={0.12}>
-                                <Link href="/contact" className="btn-primary inline-flex">
-                                    Bültene Abone Ol
-                                </Link>
-                            </BlockReveal>
-                        </BlockReveal>
+                <section className="py-20 bg-[#0a0c10]">
+                    <div className="container mx-auto px-6 max-w-4xl text-center">
+                        <h2 className="font-display font-extrabold text-white text-2xl md:text-3xl mb-4">{isTr ? "Gelişmelerden Haberdar Olun" : "Stay Updated"}</h2>
+                        <p className="text-white/70 mb-8">{isTr ? "Yazılım ve dijital dünyadan güncel içerikler." : "Latest content from software and digital world."}</p>
+                        <Link href="/contact" className="inline-flex items-center gap-2 px-8 py-4 bg-[#e6c800] text-[#0a0c10] font-bold rounded-xl hover:bg-white transition-colors">
+                            {isTr ? "Bültene Abone Ol" : "Subscribe"} <ArrowRight size={18} />
+                        </Link>
                     </div>
                 </section>
-
             </main>
             <Footer />
         </>

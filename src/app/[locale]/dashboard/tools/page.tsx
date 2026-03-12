@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
+import { hasToolAccess } from "@/lib/trial-access-client";
 import {
     FileText,
     FileImage,
@@ -156,11 +157,14 @@ function resolveAccess(
     tool:               ToolDef,
     activeProductSlugs: string[],
     isAdmin:            boolean,
+    user: any,
 ): AccessLevel {
     if (tool.requiredSlugs.length === 0) return "login_only_active";
     if (isAdmin) return "active";
     const hasAccess = tool.requiredSlugs.some((s) => activeProductSlugs.includes(s));
-    return hasAccess ? "active" : "subscription_required";
+    if (hasAccess) return "active";
+    if (hasToolAccess(user)) return "active";
+    return "subscription_required";
 }
 
 const ACCESS_CFG = {
@@ -254,7 +258,7 @@ function ToolCard({
                 {/* CTA */}
                 {isLocked ? (
                     <Link
-                        href="/abonelikler"
+                        href="/dijital-urunler/hukuk-araclari-paketi"
                         className="
                             inline-flex items-center justify-center gap-2 w-full
                             px-4 py-3 rounded-xl
@@ -359,7 +363,7 @@ function FeaturedToolCard({
                     {isLocked ? (
                         <>
                             <Link
-                                href="/abonelikler"
+                                href="/dijital-urunler/hukuk-araclari-paketi"
                                 className="
                                     inline-flex items-center justify-center gap-2
                                     px-6 py-3.5 rounded-xl
@@ -415,7 +419,7 @@ export default function ToolsHubPage() {
     const isAdmin           = user?.role === "admin";
 
     const featuredTool   = TOOLS.find((tool) => tool.featured)!;
-    const featuredAccess = resolveAccess(featuredTool, activeProductSlugs, isAdmin);
+    const featuredAccess = resolveAccess(featuredTool, activeProductSlugs, isAdmin, user);
 
     const documentTools   = TOOLS.filter((tool) => tool.group === "document");
 
@@ -428,7 +432,7 @@ export default function ToolsHubPage() {
             {/* ── Onboarding strip ── */}
             {showLockedStrip && (
                 <Link
-                    href={`/${locale}/abonelikler`}
+                    href={locale === "en" ? "/en/dijital-urunler/hukuk-araclari-paketi" : "/dijital-urunler/hukuk-araclari-paketi"}
                     className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-amber-50 border border-amber-100 hover:bg-amber-100/80 transition-colors group"
                 >
                     <div className="flex items-center gap-3">
@@ -477,8 +481,8 @@ export default function ToolsHubPage() {
                 </div>
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
                     <Sparkles size={14} className="text-amber-500" />
-                    {activeProductSlugs.length > 0
-                        ? t("toolsActiveCount", { count: TOOLS.filter((tool) => resolveAccess(tool, activeProductSlugs, isAdmin) !== "subscription_required").length })
+                    {activeProductSlugs.length > 0 || hasToolAccess(user)
+                        ? t("toolsActiveCount", { count: TOOLS.filter((tool) => resolveAccess(tool, activeProductSlugs, isAdmin, user) !== "subscription_required").length })
                         : t("toolsExploreHint")}
                 </div>
             </div>
@@ -503,7 +507,7 @@ export default function ToolsHubPage() {
                         <ToolCard
                             key={tool.id}
                             tool={tool}
-                            access={resolveAccess(tool, activeProductSlugs, isAdmin)}
+                            access={resolveAccess(tool, activeProductSlugs, isAdmin, user)}
                         />
                     ))}
                 </div>

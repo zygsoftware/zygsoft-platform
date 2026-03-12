@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
+import { checkToolAccess, incrementTrialUsage } from "@/lib/trial-guard";
 import { existsSync } from "fs";
 import path from "path";
 
@@ -41,21 +42,10 @@ function getLetterheadPath(userId: string): string {
 
 export async function POST(req: Request) {
     try {
+        const guard = await checkToolAccess();
+        if (!guard.allowed) return guard.response;
+
         const session = await getServerSession(authOptions);
-
-        if (!session || !session.user) {
-            return NextResponse.json({ error: "Oturum açmanız gerekiyor." }, { status: 401 });
-        }
-
-        const activeSlugs = (session.user as any).activeProductSlugs || [];
-        const isAdmin = (session.user as any).role === "admin";
-
-        if (!activeSlugs.includes("legal-toolkit") && !isAdmin) {
-            return NextResponse.json({
-                error: "Dönüştürme aracını kullanmak için 'Hukuk UDF Dönüştürücü' aboneliğinizin aktif olması gerekmektedir."
-            }, { status: 403 });
-        }
-
         const formData = await req.formData();
         const file = formData.get("file") as File | null;
         const targetFormat = (formData.get("format") as string) || "udf";
@@ -138,8 +128,11 @@ export async function POST(req: Request) {
 
         const isBatch = req.headers.get("X-Batch-Mode") === "1";
         if (!isBatch) {
-            const userId = session.user.id;
+            const userId = session!.user!.id;
             prisma.toolUsage.create({ data: { userId, toolSlug: "doc-to-udf" } }).catch(() => {});
+            if (guard.incrementTrial) {
+                incrementTrialUsage(userId).catch(() => {});
+            }
         }
 
         const headers = new Headers();

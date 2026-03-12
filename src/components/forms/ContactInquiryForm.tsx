@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Loader2, Send } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { usePrefillUserFields } from "@/hooks/usePrefillUserFields";
 
 type ContactInquiryFormProps = {
     title?: string;
@@ -22,21 +23,17 @@ const INITIAL_FORM = {
 };
 
 export function ContactInquiryForm({
-    title = "Projenizi Konusalim",
-    subtitle = "Detaylari iletin, 24 saat icinde geri donelim.",
+    title = "Projenizi Konuşalım",
+    subtitle = "Detayları iletin, 24 saat içinde geri dönelim.",
     className = "",
 }: ContactInquiryFormProps) {
     const locale = useLocale();
     const t = useTranslations("Contact");
     const isTr = locale === "tr";
-    const [form, setForm] = useState(INITIAL_FORM);
+    const [form, onChange, reset] = usePrefillUserFields(INITIAL_FORM, ["name", "email", "phone", "company"]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [status, setStatus] = useState<Status>("idle");
     const [errorText, setErrorText] = useState("");
-
-    const onChange = (key: keyof typeof INITIAL_FORM, value: string) => {
-        setForm((prev) => ({ ...prev, [key]: value }));
-    };
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -65,7 +62,7 @@ export function ContactInquiryForm({
             }
 
             setStatus("success");
-            setForm(INITIAL_FORM);
+            reset();
         } catch {
             setStatus("error");
             setErrorText(t("formErrorNetwork"));
@@ -76,12 +73,12 @@ export function ContactInquiryForm({
 
     const topicOptions = isTr
         ? [
-            "Web Tasarim ve Gelistirme",
-            "Ozel Yazilim ve Otomasyon",
-            "Dijital Donusum Danismanligi",
+            "Web Tasarım ve Geliştirme",
+            "Özel Yazılım ve Otomasyon",
+            "Dijital Dönüşüm Danışmanlığı",
             "Legal UDF Converter",
-            "Sosyal Medya Yonetimi",
-            "Diger",
+            "Sosyal Medya Yönetimi",
+            "Diğer",
         ]
         : [
             "Web Design and Development",

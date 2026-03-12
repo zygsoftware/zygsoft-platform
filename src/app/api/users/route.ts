@@ -13,9 +13,60 @@ export async function GET(req: Request) {
             return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 403 });
         }
 
+        const { searchParams } = new URL(req.url);
+        const search = searchParams.get("search")?.trim().toLowerCase();
+        const role = searchParams.get("role");
+        const status = searchParams.get("status");
+        const locale = searchParams.get("locale");
+        const sort = searchParams.get("sort") || "newest";
+
+        const where: Record<string, unknown> = {};
+        if (search) {
+            where.OR = [{ name: { contains: search } }, { email: { contains: search } }];
+        }
+        if (role && role !== "all") where.role = role;
+        if (status && status !== "all") where.status = status;
+        if (locale && locale !== "all") where.locale = locale;
+
+        const orderBy =
+            sort === "lastLogin"
+                ? [{ lastLoginAt: "desc" as const }, { createdAt: "desc" as const }]
+                : sort === "active"
+                    ? [{ lastLoginAt: "desc" as const }, { createdAt: "desc" as const }]
+                    : [{ createdAt: "desc" as const }];
+
         const users = await prisma.user.findMany({
-            select: { id: true, name: true, email: true, role: true, createdAt: true },
-            orderBy: { createdAt: "desc" },
+            where,
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+                role: true,
+                status: true,
+                phone: true,
+                company: true,
+                locale: true,
+                lastLoginAt: true,
+                notes: true,
+                createdAt: true,
+                emailVerified: true,
+                trialStatus: true,
+                trialStartedAt: true,
+                trialEndsAt: true,
+                trialOperationsUsed: true,
+                trialOperationsLimit: true,
+                _count: {
+                    select: {
+                        subscriptions: true,
+                        payments: true,
+                        supportTickets: true,
+                        blogComments: true,
+                        blogLikes: true,
+                    },
+                },
+            },
+            orderBy,
         });
         return NextResponse.json(users);
     } catch (error) {
@@ -40,7 +91,8 @@ export async function DELETE(req: Request) {
             return NextResponse.json({ error: "Kendi hesabınızı silemezsiniz." }, { status: 400 });
         }
 
-        // Delete related records first
+        // Delete related records first (SupportTicket has no onDelete)
+        await prisma.supportTicket.deleteMany({ where: { userId: id } });
         await prisma.payment.deleteMany({ where: { userId: id } });
         await prisma.subscription.deleteMany({ where: { userId: id } });
         await prisma.user.delete({ where: { id } });

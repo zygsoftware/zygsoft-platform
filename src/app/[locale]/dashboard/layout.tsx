@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { Breadcrumbs } from "@/components/dashboard/Breadcrumbs";
+import { EmailVerificationBanner } from "@/components/dashboard/EmailVerificationBanner";
+import { TrialConversionBanner } from "@/components/dashboard/TrialConversionBanner";
 import { Loader2 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -12,8 +14,9 @@ export default function DashboardLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const { status } = useSession();
+    const { data: session, status } = useSession();
     const router = useRouter();
+    const user = session?.user as any;
 
     useEffect(() => {
         if (status === "unauthenticated") {
@@ -35,6 +38,14 @@ export default function DashboardLayout({
             <main className="flex-1 min-w-0">
                 <div className="h-full p-8 lg:p-12 overflow-y-auto">
                     <Breadcrumbs />
+                    <EmailVerificationBanner
+                        emailVerified={user?.emailVerified}
+                        isAdmin={user?.role === "admin"}
+                    />
+                    <TrialConversionBanner
+                        trialStatus={user?.trialStatus ?? "none"}
+                        hasSubscription={((user?.activeProductSlugs as string[] | undefined)?.includes("legal-toolkit") ?? false) || user?.role === "admin"}
+                    />
                     {children}
                 </div>
             </main>

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
+import { checkToolAccess, incrementTrialUsage } from "@/lib/trial-guard";
 import { spawn } from "child_process";
 import path from "path";
 import os from "os";
@@ -23,15 +24,8 @@ export async function POST(req: Request) {
     let tempDir: string | null = null;
 
     try {
-        const session = await getServerSession(authOptions);
-        if (!session?.user?.id) {
-            return NextResponse.json({ error: "Oturum açmanız gerekiyor." }, { status: 401 });
-        }
-        const activeSlugs = (session.user as any).activeProductSlugs || [];
-        const isAdmin = (session.user as any).role === "admin";
-        if (!activeSlugs.includes("legal-toolkit") && !isAdmin) {
-            return NextResponse.json({ error: "Bu araç için Hukuk Araçları Paketi aboneliği gereklidir." }, { status: 403 });
-        }
+        const guard = await checkToolAccess();
+        if (!guard.allowed) return guard.response;
 
         const formData = await req.formData();
         const raw = formData.getAll("files");
@@ -109,7 +103,10 @@ export async function POST(req: Request) {
 
         const isBatch = req.headers.get("X-Batch-Mode") === "1";
         if (!isBatch) {
-            prisma.toolUsage.create({ data: { userId: session.user.id, toolSlug: "tiff-to-pdf" } }).catch(() => {});
+            prisma.toolUsage.create({ data: { userId: guard.userId, toolSlug: "tiff-to-pdf" } }).catch(() => {});
+            if (guard.incrementTrial) {
+                incrementTrialUsage(guard.userId).catch(() => {});
+            }
         }
 
         return new NextResponse(new Uint8Array(pdfBuffer), {

@@ -5,6 +5,7 @@ import {
     Loader2, MessageSquare, Search, AlertCircle, Calendar,
     ChevronDown, Users, LifeBuoy, CheckCircle2, Clock, XCircle,
 } from "lucide-react";
+import { AdminPageHeader, AdminStatsCard, AdminCard, AdminFilterBar, AdminEmptyState, AdminBadge } from "@/components/admin";
 
 /* ── Types ──────────────────────────────────────────────────────── */
 
@@ -15,6 +16,9 @@ type TicketEntry = {
     subject: string;
     message: string;
     status: TicketStatus;
+    ticketCode?: string | null;
+    lastRepliedAt?: string | null;
+    adminReply?: string | null;
     createdAt: string;
     user: { id: string; name: string | null; email: string | null };
 };
@@ -52,6 +56,58 @@ function StatCard({ label, value, icon, color }: { label: string; value: number;
 }
 
 /* ── Inline status selector ─────────────────────────────────────── */
+
+function ReplyForm({
+    ticket, onSent,
+}: { ticket: TicketEntry; onSent: () => void }) {
+    const [reply, setReply] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!reply.trim()) return;
+        setLoading(true);
+        setError("");
+        try {
+            const res = await fetch("/api/admin/support", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: ticket.id, reply: reply.trim(), status: "answered" }),
+            });
+            if (!res.ok) throw new Error("Gönderilemedi");
+            setSuccess(true);
+            setReply("");
+            onSent();
+        } catch {
+            setError("Yanıt gönderilirken hata oluştu.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+            <textarea
+                value={reply}
+                onChange={(e) => setReply(e.target.value)}
+                placeholder="Müşteriye gönderilecek yanıtı yazın..."
+                rows={3}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-400/40 focus:border-emerald-300 outline-none resize-none"
+            />
+            {error && <p className="text-red-500 text-xs font-bold">{error}</p>}
+            {success && <p className="text-emerald-600 text-xs font-bold">Yanıt gönderildi. Bildirim e-postası müşteriye iletildi.</p>}
+            <button
+                type="submit"
+                disabled={loading || !reply.trim()}
+                className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-xl text-sm hover:bg-emerald-700 disabled:opacity-50"
+            >
+                {loading ? "Gönderiliyor..." : "Yanıtla ve E-posta Gönder"}
+            </button>
+        </form>
+    );
+}
 
 function StatusSelector({
     id, current, onSave,
@@ -110,6 +166,16 @@ export default function AdminSupportPage() {
         }
     }, []);
 
+    const refreshTickets = useCallback(() => {
+        fetch("/api/admin/support")
+            .then(async (res) => {
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                setTickets(data.tickets ?? []);
+            })
+            .catch(() => {});
+    }, []);
+
     /* ── Stats ── */
     const counts = useMemo(() => ({
         total:       tickets.length,
@@ -135,69 +201,61 @@ export default function AdminSupportPage() {
     }, [tickets, search, statusFilter]);
 
     return (
-        <div>
-            {/* Header */}
-            <div className="flex justify-between items-start mb-8 gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Destek Talepleri</h1>
-                    <p className="text-slate-500 mt-1 text-sm">
-                        {loading ? "Yükleniyor..." : `${tickets.length} kayıt — ${counts.open} açık talep`}
-                    </p>
-                </div>
-            </div>
+        <div className="space-y-8">
+            <AdminPageHeader
+                title="Destek Talepleri"
+                subtitle={loading ? "Yükleniyor..." : `${tickets.length} kayıt — ${counts.open} açık talep`}
+            />
 
             {/* Stats */}
             {!loading && !error && (
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
-                    <StatCard label="Toplam"      value={counts.total}       icon={<Users size={18} />}      color="indigo"  />
-                    <StatCard label="Açık"         value={counts.open}        icon={<LifeBuoy size={18} />}   color="blue"    />
-                    <StatCard label="İnceleniyor"  value={counts.in_progress} icon={<Clock size={18} />}      color="amber"   />
-                    <StatCard label="Yanıtlandı"   value={counts.answered}    icon={<CheckCircle2 size={18}/>} color="emerald" />
-                    <StatCard label="Kapalı"       value={counts.closed}      icon={<XCircle size={18} />}    color="slate"   />
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                    <AdminStatsCard label="Toplam" value={counts.total} icon={<Users size={20} />} accent="slate" />
+                    <AdminStatsCard label="Açık" value={counts.open} icon={<LifeBuoy size={20} />} accent="slate" />
+                    <AdminStatsCard label="İnceleniyor" value={counts.in_progress} icon={<Clock size={20} />} accent="amber" />
+                    <AdminStatsCard label="Yanıtlandı" value={counts.answered} icon={<CheckCircle2 size={20} />} accent="emerald" />
+                    <AdminStatsCard label="Kapalı" value={counts.closed} icon={<XCircle size={20} />} accent="slate" />
                 </div>
             )}
 
             {/* Filter bar */}
             {!loading && !error && tickets.length > 0 && (
-                <div className="flex flex-col sm:flex-row gap-3 mb-4">
-                    <div className="relative flex-1 max-w-sm">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                        <input
-                            type="text"
-                            placeholder="Konu, mesaj veya kullanıcı ara..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2.5 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
-                        />
-                    </div>
-                    <div className="flex gap-1.5 flex-wrap">
-                        {(["all", ...STATUS_KEYS] as const).map((s) => {
-                            const isActive = statusFilter === s;
-                            const label    = s === "all" ? "Tümü" : STATUSES[s].label;
-                            const cnt      = s === "all" ? counts.total : counts[s as TicketStatus];
-                            return (
-                                <button
-                                    key={s}
-                                    onClick={() => setStatusFilter(s)}
-                                    className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                                        isActive
-                                            ? "bg-slate-900 text-white shadow-sm"
-                                            : "bg-white border border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700"
-                                    }`}
-                                >
-                                    {label}
-                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"}`}>
-                                        {cnt}
-                                    </span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
+                <AdminCard padding="md">
+                    <AdminFilterBar
+                        searchPlaceholder="Konu, mesaj veya kullanıcı ara..."
+                        searchValue={search}
+                        onSearchChange={setSearch}
+                        showClear={!!(search || statusFilter !== "all")}
+                        onClearFilters={() => { setSearch(""); setStatusFilter("all"); }}
+                        filters={
+                            <div className="flex gap-2 flex-wrap">
+                                {(["all", ...STATUS_KEYS] as const).map((s) => {
+                                    const isActive = statusFilter === s;
+                                    const label = s === "all" ? "Tümü" : STATUSES[s].label;
+                                    const cnt = s === "all" ? counts.total : counts[s as TicketStatus];
+                                    return (
+                                        <button
+                                            key={s}
+                                            onClick={() => setStatusFilter(s)}
+                                            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 ${
+                                                isActive ? "bg-[#0e0e0e] text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                            }`}
+                                        >
+                                            {label}
+                                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isActive ? "bg-white/20 text-white" : "bg-slate-200/80 text-slate-500"}`}>
+                                                {cnt}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        }
+                    />
+                </AdminCard>
             )}
 
             {/* Table / cards */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <AdminCard padding="none">
                 {loading ? (
                     <div className="flex items-center justify-center gap-3 text-slate-400 py-16">
                         <Loader2 size={20} className="animate-spin text-emerald-500" /> Yükleniyor...
@@ -208,29 +266,29 @@ export default function AdminSupportPage() {
                         <p className="text-red-500 font-medium">{error}</p>
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="py-16 text-center px-8">
-                        <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
-                            <MessageSquare size={32} />
-                        </div>
-                        <p className="text-slate-500 font-medium text-lg">
-                            {search || statusFilter !== "all" ? "Filtrelerle eşleşen kayıt bulunamadı." : "Henüz destek talebi yok."}
-                        </p>
-                        {(search || statusFilter !== "all") && (
-                            <button
-                                onClick={() => { setSearch(""); setStatusFilter("all"); }}
-                                className="mt-3 text-emerald-600 hover:text-emerald-700 text-sm font-medium"
-                            >
-                                Filtreleri Temizle
-                            </button>
-                        )}
-                    </div>
+                    <AdminEmptyState
+                        icon={<MessageSquare size={40} />}
+                        title={search || statusFilter !== "all" ? "Filtrelerle eşleşen kayıt bulunamadı" : "Henüz destek talebi yok"}
+                        description={search || statusFilter !== "all" ? "Farklı filtreler deneyin veya filtreleri temizleyin." : "Müşterilerden gelen destek talepleri burada listelenecek."}
+                        action={
+                            (search || statusFilter !== "all") && (
+                                <button
+                                    onClick={() => { setSearch(""); setStatusFilter("all"); }}
+                                    className="text-sm font-semibold text-[#e6c800] hover:text-[#c9ad00] transition-colors"
+                                >
+                                    Filtreleri Temizle
+                                </button>
+                            )
+                        }
+                    />
                 ) : (
                     <>
                         {/* ── Desktop table ── */}
                         <div className="hidden md:block overflow-x-auto">
-                            <table className="w-full text-left">
-                                <thead className="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                            <table className="admin-table w-full text-left">
+                                <thead>
                                     <tr>
+                                        <th className="px-6 py-4">Talep No</th>
                                         <th className="px-6 py-4">Müşteri</th>
                                         <th className="px-6 py-4">Konu</th>
                                         <th className="px-6 py-4">Mesaj</th>
@@ -245,6 +303,12 @@ export default function AdminSupportPage() {
                                                 onClick={() => setExpanded(expanded === t.id ? null : t.id)}
                                                 className={`cursor-pointer transition-colors hover:bg-slate-50 ${STATUSES[t.status]?.row ?? ""}`}
                                             >
+                                                {/* Talep No */}
+                                                <td className="px-6 py-4">
+                                                    <span className="text-xs font-mono font-bold text-slate-600">
+                                                        {t.ticketCode ? `#${t.ticketCode}` : `#${t.id.slice(-8)}`}
+                                                    </span>
+                                                </td>
                                                 {/* Müşteri */}
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">
@@ -266,7 +330,7 @@ export default function AdminSupportPage() {
                                                     <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">{t.message}</p>
                                                 </td>
                                                 {/* Durum — inline selector */}
-                                                <td className="px-6 py-4">
+                                                <td>
                                                     <StatusSelector id={t.id} current={t.status} onSave={handleStatusChange} />
                                                 </td>
                                                 {/* Tarih */}
@@ -283,9 +347,19 @@ export default function AdminSupportPage() {
 
                                             {expanded === t.id && (
                                                 <tr>
-                                                    <td colSpan={5} className="px-6 py-5 bg-slate-50/70 border-b border-slate-100">
-                                                        <div className="bg-white border border-slate-200 rounded-xl p-5 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
-                                                            {t.message}
+                                                    <td colSpan={6} className="px-6 py-5 bg-slate-50/70 border-b border-slate-100">
+                                                        <div className="space-y-4">
+                                                            <div className="bg-white border border-slate-200 rounded-xl p-5 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
+                                                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Müşteri Mesajı</p>
+                                                                {t.message}
+                                                            </div>
+                                                            {t.adminReply && (
+                                                                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
+                                                                    <p className="text-[10px] font-black text-emerald-700 uppercase tracking-widest mb-2">Admin Yanıtı</p>
+                                                                    {t.adminReply}
+                                                                </div>
+                                                            )}
+                                                            <ReplyForm ticket={t} onSent={refreshTickets} />
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -295,12 +369,12 @@ export default function AdminSupportPage() {
                                 </tbody>
                             </table>
 
-                            <div className="px-6 py-3 border-t border-slate-100 text-xs text-slate-400 flex justify-between items-center">
+                            <div className="px-6 py-3 border-t border-slate-100 text-xs text-slate-500 flex justify-between items-center bg-slate-50/30">
                                 <span>{filtered.length} / {tickets.length} kayıt gösteriliyor</span>
                                 {(search || statusFilter !== "all") && (
                                     <button
                                         onClick={() => { setSearch(""); setStatusFilter("all"); }}
-                                        className="text-emerald-600 hover:text-emerald-700 font-medium"
+                                        className="text-[#0e0e0e] hover:text-[#e6c800] font-medium transition-colors"
                                     >
                                         Filtreleri Temizle
                                     </button>
@@ -343,7 +417,7 @@ export default function AdminSupportPage() {
                         </div>
                     </>
                 )}
-            </div>
+            </AdminCard>
         </div>
     );
 }
