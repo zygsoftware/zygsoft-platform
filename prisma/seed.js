@@ -189,20 +189,31 @@ async function main() {
     }
     console.log("✓ Blog yazıları kontrol edildi.");
 
-    // 9. Projects (for portfolio)
+    // 9. Project categories
+    const projectCategoriesData = [
+        { name_tr: "Hukuk Teknolojileri", name_en: "Legal Tech", slug: "hukuk-teknolojileri", description_tr: "Hukuk sektörüne özel yazılım çözümleri", description_en: "Software solutions for the legal sector" },
+        { name_tr: "Kurumsal Web Platformları", name_en: "Enterprise Web", slug: "kurumsal-web", description_tr: "Kurumsal web uygulamaları ve portallar", description_en: "Enterprise web applications and portals" },
+        { name_tr: "Süreç Otomasyonu", name_en: "Process Automation", slug: "surec-otomasyonu", description_tr: "İş süreçlerini otomatikleştiren sistemler", description_en: "Systems that automate business processes" },
+        { name_tr: "Dashboard Sistemleri", name_en: "Dashboard Systems", slug: "dashboard-sistemleri", description_tr: "Veri görselleştirme ve raporlama", description_en: "Data visualization and reporting" },
+        { name_tr: "Özel Yazılım", name_en: "Custom Software", slug: "ozel-yazilim", description_tr: "İhtiyaca özel yazılım geliştirme", description_en: "Custom software development" },
+        { name_tr: "SaaS Ürünleri", name_en: "SaaS Products", slug: "saas-urunleri", description_tr: "Bulut tabanlı yazılım hizmetleri", description_en: "Cloud-based software services" },
+    ];
+    for (const cat of projectCategoriesData) {
+        const existing = await prisma.projectCategory.findUnique({ where: { slug: cat.slug } });
+        if (!existing) {
+            await prisma.projectCategory.create({ data: cat });
+            console.log(`✓ Proje kategorisi eklendi: ${cat.name_tr}`);
+        }
+    }
+    const webCat = await prisma.projectCategory.findUnique({ where: { slug: "kurumsal-web" } });
+    const legalCat = await prisma.projectCategory.findUnique({ where: { slug: "hukuk-teknolojileri" } });
+
+    // 10. Projects (for portfolio)
     const projectsData = [
-        {
-            title: "Global Lojistik Hub",
-            slug: "global-lojistik-hub",
-            description: "Entegre lojistik yönetim platformu. Sipariş takibi, depo yönetimi ve raporlama.",
-            client: "Lojistik A.Ş.",
-        },
-        {
-            title: "AI Driven Analytics",
-            slug: "ai-driven-analytics",
-            description: "Yapay zeka destekli iş zekası ve raporlama sistemi.",
-            client: "Finans Holding",
-        },
+        { slug: "uyap-entegrasyon", title_tr: "UYAP Entegrasyon", title_en: "UYAP Integration", excerpt_tr: "Mahkeme süreçlerini dijitalleştiren, UYAP ile entegre çalışan yazılım çözümü.", excerpt_en: "Software solution that digitizes court processes and works integrated with UYAP.", content_tr: "<p>UYAP entegrasyon sistemi, hukuk bürolarının mahkeme süreçlerini dijital ortamda yönetmesini sağlar.</p>", content_en: "<p>The UYAP integration system enables law firms to manage court processes in a digital environment.</p>", category_id: legalCat?.id, client_name: "XYZ Hukuk Bürosu", sector: "Hukuk", published: true },
+        { slug: "e-ticaret-platformu", title_tr: "E-Ticaret Platformu", title_en: "E-Commerce Platform", excerpt_tr: "Ölçeklenebilir, modern e-ticaret altyapısı. Ödeme, stok ve müşteri yönetimi.", excerpt_en: "Scalable, modern e-commerce infrastructure. Payment, inventory and customer management.", content_tr: "<p>Modern e-ticaret platformu ile satışlarınızı artırın.</p>", content_en: "<p>Increase your sales with our modern e-commerce platform.</p>", category_id: webCat?.id, client_name: "Moda Markası A.Ş.", sector: "Perakende", published: true },
+        { slug: "global-lojistik-hub", title_tr: "Global Lojistik Hub", title_en: "Global Logistics Hub", excerpt_tr: "Entegre lojistik yönetim platformu. Sipariş takibi, depo yönetimi ve raporlama.", excerpt_en: "Integrated logistics management platform. Order tracking, warehouse management and reporting.", content_tr: "<p>Lojistik operasyonlarınızı tek bir platformda yönetin.</p>", content_en: "<p>Manage your logistics operations on a single platform.</p>", category_id: webCat?.id, client_name: "Lojistik A.Ş.", sector: "Lojistik", published: true },
+        { slug: "ai-driven-analytics", title_tr: "AI Driven Analytics", title_en: "AI Driven Analytics", excerpt_tr: "Yapay zeka destekli iş zekası ve raporlama sistemi.", excerpt_en: "AI-powered business intelligence and reporting system.", content_tr: "<p>Verilerinizden anlamlı içgörüler elde edin.</p>", content_en: "<p>Get meaningful insights from your data.</p>", category_id: webCat?.id, client_name: "Finans Holding", sector: "Finans", published: true },
     ];
 
     for (const proj of projectsData) {
@@ -211,11 +222,10 @@ async function main() {
             await prisma.project.create({
                 data: {
                     ...proj,
-                    image: null,
-                    link: null,
+                    published_at: new Date(),
                 },
             });
-            console.log(`✓ Proje eklendi: ${proj.title}`);
+            console.log(`✓ Proje eklendi: ${proj.title_tr}`);
         }
     }
     console.log("✓ Projeler kontrol edildi.");

@@ -12,14 +12,14 @@ export async function generateMetadata({
     const description = isEn
         ? "Explore ZYGSOFT's project portfolio — selected web applications, software platforms, and digital products delivered for clients across Turkey and globally."
         : "ZYGSOFT proje portföyünü keşfedin — Türkiye ve dünya genelindeki müşteriler için hayata geçirilmiş web uygulamaları, yazılım platformları ve dijital ürünler.";
-    const canonical = isEn ? "/en/portfolio" : "/portfolio";
+    const canonical = isEn ? "/en/projects" : "/projeler";
 
     return {
         title,
         description,
         alternates: {
             canonical,
-            languages: { tr: "/portfolio", en: "/en/portfolio" },
+            languages: { tr: "/projeler", en: "/en/projects" },
         },
         openGraph: {
             title:       `${title} | ZYGSOFT`,

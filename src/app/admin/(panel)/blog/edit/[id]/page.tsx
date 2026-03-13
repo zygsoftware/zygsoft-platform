@@ -4,9 +4,46 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 import { BlogEditorForm } from "@/components/admin/BlogEditorForm";
 import { AdminPageHeader } from "@/components/admin";
 import type { BlogFormData } from "@/components/admin/BlogEditorForm";
+
+function estimateReadingTime(html: string): number {
+    const text = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    const words = text.split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.ceil(words / 200));
+}
+
+function normalizePayload(data: BlogFormData): Record<string, unknown> {
+    const reading_time_min = data.reading_time_min ?? Math.max(
+        estimateReadingTime(data.content_tr || ""),
+        estimateReadingTime(data.content_en || "")
+    );
+
+    return {
+        ...data,
+        category_id: data.category_id?.trim() || null,
+        cover_image: data.cover_image?.trim() || null,
+        cover_image_alt_tr: data.cover_image_alt_tr?.trim() || null,
+        cover_image_alt_en: data.cover_image_alt_en?.trim() || null,
+        cover_image_title_tr: data.cover_image_title_tr?.trim() || null,
+        cover_image_title_en: data.cover_image_title_en?.trim() || null,
+        cover_image_caption_tr: data.cover_image_caption_tr?.trim() || null,
+        cover_image_caption_en: data.cover_image_caption_en?.trim() || null,
+        seo_title_tr: data.seo_title_tr?.trim() || null,
+        seo_title_en: data.seo_title_en?.trim() || null,
+        seo_description_tr: data.seo_description_tr?.trim() || null,
+        seo_description_en: data.seo_description_en?.trim() || null,
+        seo_keywords_tr: data.seo_keywords_tr?.trim() || null,
+        seo_keywords_en: data.seo_keywords_en?.trim() || null,
+        og_image: data.og_image?.trim() || null,
+        canonical_url: data.canonical_url?.trim() || null,
+        reading_time_min,
+        allow_comments: !!data.allow_comments,
+        is_featured: !!data.is_featured,
+    };
+}
 
 export default function AdminBlogEditPage() {
     const router = useRouter();
@@ -28,6 +65,12 @@ export default function AdminBlogEditPage() {
                     content_tr: post.content_tr,
                     content_en: post.content_en,
                     cover_image: post.cover_image || "",
+                    cover_image_alt_tr: post.cover_image_alt_tr || "",
+                    cover_image_alt_en: post.cover_image_alt_en || "",
+                    cover_image_title_tr: post.cover_image_title_tr || "",
+                    cover_image_title_en: post.cover_image_title_en || "",
+                    cover_image_caption_tr: post.cover_image_caption_tr || "",
+                    cover_image_caption_en: post.cover_image_caption_en || "",
                     seo_title_tr: post.seo_title_tr || "",
                     seo_title_en: post.seo_title_en || "",
                     seo_description_tr: post.seo_description_tr || "",
@@ -50,15 +93,21 @@ export default function AdminBlogEditPage() {
     }, [id]);
 
     const handleSubmit = async (data: BlogFormData) => {
+        const payload = normalizePayload(data);
         const res = await fetch(`/api/blog/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
+            body: JSON.stringify(payload),
         });
+        const json = await res.json().catch(() => ({}));
         if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.error || "Güncelleme başarısız");
+            const msg = json.error || "Güncelleme başarısız";
+            if (process.env.NODE_ENV === "development") {
+                console.error("[Blog Edit] Update failed:", res.status, json);
+            }
+            throw new Error(msg);
         }
+        toast.success("Blog yazısı güncellendi.");
         router.push("/admin/blog");
     };
 

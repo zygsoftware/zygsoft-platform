@@ -9,6 +9,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HomepageBlogSection } from "@/components/blog/HomepageBlogSection";
 import { AppStoreShowcase } from "@/components/home/AppStoreShowcase";
+import { InstagramFeedSection } from "@/components/home/InstagramFeedSection";
 import { HeroSection } from "@/components/home/HeroSection";
 import { PanelShowcase } from "@/components/home/PanelShowcase";
 import { ContactInquiryForm } from "@/components/forms/ContactInquiryForm";
@@ -348,61 +349,14 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Transition: off-white → white (Capabilities → Social) */}
+        {/* Transition: off-white → white (Capabilities → Instagram) */}
         <div className="h-8 bg-gradient-to-b from-[#fafafc] to-white" aria-hidden />
 
-        {/* ── SECTION 07: SOCIAL MEDIA SERVICES ────────────────────────── */}
-        <section className="home-snap-section py-24 md:py-28 bg-white">
-          <div className="container mx-auto px-6">
-            <div className="bg-[#0a0c10] rounded-[2.5rem] md:rounded-[3rem] p-12 md:p-20 overflow-hidden relative shadow-[0_48px_96px_rgba(0,0,0,0.12)]">
-              <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+        {/* ── SECTION 07: INSTAGRAM FEED ────────────────────────── */}
+        <InstagramFeedSection />
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-18 items-center relative z-10 text-white">
-                <BlockReveal>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-white/50 mb-8 block">{t("socialServices.tag")}</span>
-                  <h2 className="text-4xl md:text-5xl font-display font-black leading-[0.92] tracking-tight mb-8 text-white uppercase max-w-lg" dangerouslySetInnerHTML={{ __html: t.raw("socialServices.title") }} />
-                  <p className="text-white/58 text-[17px] md:text-lg font-medium leading-relaxed max-w-md mb-12">
-                    {t("socialServices.desc")}
-                  </p>
-                  <Magnetic strength={16}>
-                    <Link href="/contact" className="home-btn-primary-yellow inline-flex items-center gap-3 px-7 py-3.5 font-black uppercase tracking-[0.22em] text-[11px] rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/20">
-                      {t("socialServices.cta")}
-                      <div className="w-10 h-px bg-[#0a0c10]" />
-                    </Link>
-                  </Magnetic>
-                </BlockReveal>
-
-                <BlockReveal delay={0.12} className="grid grid-cols-2 gap-5">
-                  <motion.div
-                    className="contents"
-                    variants={staggerContainer}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={revealViewport}
-                  >
-                  {t.raw("socialServices.features").map((feat: string, i: number) => (
-                    <motion.div
-                      key={i}
-                      variants={createRevealUp(reducedMotion, 24, 6)}
-                      whileHover={{ y: -3, backgroundColor: "rgba(255,255,255,0.08)", borderColor: "rgba(230,200,0,0.25)" }}
-                      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                      className="home-card-dark rounded-2xl p-8 transition-all duration-300"
-                    >
-                      <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-[#e6c800] mb-8">
-                        {[<MessageSquare size={28} />, <Globe size={28} />, <BarChart3 size={28} />, <Sparkles size={28} />][i]}
-                      </div>
-                      <span className="text-[13px] font-black uppercase tracking-[0.12em] leading-snug block text-white">{feat}</span>
-                    </motion.div>
-                  ))}
-                  </motion.div>
-                </BlockReveal>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Transition: white → warm neutral (Social → Blog) */}
-        <div className="h-12 bg-gradient-to-b from-white via-[#fafafc] to-[#f3f0ea]" aria-hidden />
+        {/* Transition: dark → warm neutral (Instagram → Blog) */}
+        <div className="h-12 bg-gradient-to-b from-[#0a0c10] via-[#1a1c22] to-[#f3f0ea]" aria-hidden />
 
         {/* ── SECTION 09: BLOG ────────────────────────── */}
         <div className="home-snap-section">

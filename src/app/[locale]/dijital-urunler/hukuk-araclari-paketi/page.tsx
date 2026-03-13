@@ -213,12 +213,12 @@ export default function HukukAraclariPaketiPage() {
                                     DOCX → UDF dönüştürme, PDF araçları, OCR metin çıkarma ve toplu belge işlemleri tek platformda.
                                 </p>
                                 <div className="flex flex-wrap gap-3">
-                                    <Link
+                                    <a
                                         href="#pricing"
                                         className="home-btn-primary-yellow inline-flex items-center gap-2.5 px-8 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
                                     >
                                         Hukuk Araçları Paketini İncele <ArrowRight size={18} />
-                                    </Link>
+                                    </a>
                                     <a
                                         href="#demo"
                                         className="inline-flex items-center gap-2.5 px-8 py-4 font-bold uppercase tracking-[0.2em] text-[11px] rounded-2xl border border-[#0a0c10]/[0.12] text-[#0a0c10]/80 hover:bg-[#0a0c10]/[0.04] transition-all duration-200"

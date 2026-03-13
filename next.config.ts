@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
       { source: "/abonelikler", destination: "/dijital-urunler", permanent: true },
       { source: "/en/abonelikler", destination: "/en/dijital-urunler", permanent: true },
       { source: "/en/digital-products", destination: "/en/dijital-urunler", permanent: true },
+      { source: "/portfolio", destination: "/projeler", permanent: true },
+      { source: "/portfolio/:path*", destination: "/projeler/:path*", permanent: true },
+      { source: "/en/portfolio", destination: "/en/projects", permanent: true },
+      { source: "/en/portfolio/:path*", destination: "/en/projects/:path*", permanent: true },
     ];
   },
   experimental: {

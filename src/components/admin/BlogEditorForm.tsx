@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { TipTapEditor } from "@/components/editor/TipTapEditor";
 import { Loader2, ImagePlus, Eye, Save, Send, AlertTriangle, CheckCircle } from "lucide-react";
+import toast from "react-hot-toast";
 
 function generateSlug(title: string) {
     return title
@@ -37,6 +38,12 @@ export type BlogFormData = {
     content_tr: string;
     content_en: string;
     cover_image: string;
+    cover_image_alt_tr: string;
+    cover_image_alt_en: string;
+    cover_image_title_tr: string;
+    cover_image_title_en: string;
+    cover_image_caption_tr: string;
+    cover_image_caption_en: string;
     seo_title_tr: string;
     seo_title_en: string;
     seo_description_tr: string;
@@ -63,6 +70,12 @@ const INITIAL: BlogFormData = {
     content_tr: "",
     content_en: "",
     cover_image: "",
+    cover_image_alt_tr: "",
+    cover_image_alt_en: "",
+    cover_image_title_tr: "",
+    cover_image_title_en: "",
+    cover_image_caption_tr: "",
+    cover_image_caption_en: "",
     seo_title_tr: "",
     seo_title_en: "",
     seo_description_tr: "",
@@ -113,6 +126,7 @@ export function BlogEditorForm({ initialData, onSubmit, isEdit, postId }: BlogEd
     const hasSeoTr = !!(form.seo_title_tr?.trim() || form.seo_description_tr?.trim());
     const hasSeoEn = !!(form.seo_title_en?.trim() || form.seo_description_en?.trim());
     const seoIncomplete = !hasSeoTr || !hasSeoEn;
+    const coverImageAltMissing = !!form.cover_image && !form.cover_image_alt_tr?.trim();
 
     const [lastSaved, setLastSaved] = useState<Date | null>(null);
     const [autosaveStatus, setAutosaveStatus] = useState<"idle" | "saving" | "saved">("idle");
@@ -181,7 +195,12 @@ export function BlogEditorForm({ initialData, onSubmit, isEdit, postId }: BlogEd
             };
             await onSubmit(payload);
         } catch (err: unknown) {
-            setError((err as Error)?.message || "Kaydetme başarısız");
+            const msg = (err as Error)?.message || "Kaydetme başarısız";
+            setError(msg);
+            toast.error(msg);
+            if (process.env.NODE_ENV === "development") {
+                console.error("[BlogEditorForm] Submit error:", err);
+            }
         } finally {
             setSaving(false);
         }
@@ -221,6 +240,11 @@ export function BlogEditorForm({ initialData, onSubmit, isEdit, postId }: BlogEd
                         {seoIncomplete && (
                             <span className="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200/60 flex items-center gap-1">
                                 <AlertTriangle size={12} /> SEO eksik
+                            </span>
+                        )}
+                        {coverImageAltMissing && (
+                            <span className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200/60 flex items-center gap-1">
+                                <AlertTriangle size={12} /> Görsel alt metni eksik
                             </span>
                         )}
                     </div>
@@ -385,23 +409,45 @@ export function BlogEditorForm({ initialData, onSubmit, isEdit, postId }: BlogEd
             <section className="space-y-6">
                 <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Medya</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label className="block text-xs text-slate-500 mb-2">Kapak Görseli</label>
-                        <div className="flex items-center gap-4">
-                            <label className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-medium transition-colors">
-                                <ImagePlus size={18} />
-                                {uploading ? "Yükleniyor..." : "Görsel Yükle"}
-                                <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, "cover_image")} disabled={uploading} />
-                            </label>
-                            {form.cover_image ? (
-                                <div className="relative w-32 h-20 rounded-lg overflow-hidden border border-slate-200">
-                                    <img src={form.cover_image} alt="Cover" className="w-full h-full object-cover" />
-                                    <button type="button" onClick={() => setForm((f) => ({ ...f, cover_image: "" }))} className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">×</button>
-                                </div>
-                            ) : (
-                                <div className="w-32 h-20 rounded-lg border border-dashed border-slate-200 flex items-center justify-center text-slate-400 text-xs">Boş</div>
-                            )}
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-xs text-slate-500 mb-2">Kapak Görseli</label>
+                            <div className="flex items-center gap-4">
+                                <label className="cursor-pointer flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-medium transition-colors">
+                                    <ImagePlus size={18} />
+                                    {uploading ? "Yükleniyor..." : "Görsel Yükle"}
+                                    <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, "cover_image")} disabled={uploading} />
+                                </label>
+                                {form.cover_image ? (
+                                    <div className="relative w-32 h-20 rounded-lg overflow-hidden border border-slate-200">
+                                        <img src={form.cover_image} alt={form.cover_image_alt_tr || "Cover"} className="w-full h-full object-cover" />
+                                        <button type="button" onClick={() => setForm((f) => ({ ...f, cover_image: "", cover_image_alt_tr: "", cover_image_alt_en: "", cover_image_title_tr: "", cover_image_title_en: "", cover_image_caption_tr: "", cover_image_caption_en: "" }))} className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">×</button>
+                                    </div>
+                                ) : (
+                                    <div className="w-32 h-20 rounded-lg border border-dashed border-slate-200 flex items-center justify-center text-slate-400 text-xs">Boş</div>
+                                )}
+                            </div>
                         </div>
+                        {form.cover_image && (
+                            <div className="space-y-2 pt-2 border-t border-slate-100">
+                                <div>
+                                    <label className="block text-xs text-slate-500 mb-1">Alt metin (TR) *</label>
+                                    <input type="text" value={form.cover_image_alt_tr} onChange={(e) => setForm((f) => ({ ...f, cover_image_alt_tr: e.target.value }))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="Görsel açıklaması" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-slate-500 mb-1">Alt metin (EN)</label>
+                                    <input type="text" value={form.cover_image_alt_en} onChange={(e) => setForm((f) => ({ ...f, cover_image_alt_en: e.target.value }))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="Image description" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-slate-500 mb-1">Başlık (TR)</label>
+                                    <input type="text" value={form.cover_image_title_tr} onChange={(e) => setForm((f) => ({ ...f, cover_image_title_tr: e.target.value }))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-slate-500 mb-1">Altyazı (TR)</label>
+                                    <input type="text" value={form.cover_image_caption_tr} onChange={(e) => setForm((f) => ({ ...f, cover_image_caption_tr: e.target.value }))} className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm" placeholder="Görsel altında gösterilir" />
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label className="block text-xs text-slate-500 mb-2">OG Görsel (Sosyal Paylaşım)</label>

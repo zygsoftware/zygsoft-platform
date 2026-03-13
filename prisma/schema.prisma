@@ -7,15 +7,80 @@ datasource db {
   provider = "sqlite"
 }
 
+model ProjectCategory {
+  id             String    @id @default(cuid())
+  name_tr        String
+  name_en        String
+  slug           String    @unique
+  description_tr String?   @map("descriptionTr")
+  description_en String?   @map("descriptionEn")
+  created_at     DateTime  @default(now()) @map("createdAt")
+  updated_at     DateTime  @updatedAt @map("updatedAt")
+  projects       Project[]
+
+  @@map("project_categories")
+}
+
 model Project {
-  id          String   @id @default(cuid())
-  title       String
-  description String
-  image       String?
-  client      String?
-  link        String?
-  slug        String   @unique
-  createdAt   DateTime @default(now())
+  id                     String            @id @default(cuid())
+  slug                   String            @unique
+  title_tr               String            @map("titleTr")
+  title_en               String            @map("titleEn")
+  excerpt_tr             String            @map("excerptTr")
+  excerpt_en             String            @map("excerptEn")
+  content_tr             String            @map("contentTr")
+  content_en             String            @map("contentEn")
+  category_id             String?           @map("categoryId")
+  category               ProjectCategory?  @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  sector                 String?
+  service_type           String?
+  technologies           String?            // JSON array of tech names
+  client_name            String?            @map("clientName")
+  is_anonymous_client    Boolean           @default(false) @map("isAnonymousClient")
+  project_date           DateTime?         @map("projectDate")
+  cover_image            String?            @map("coverImage")
+  cover_image_alt_tr     String?           @map("coverImageAltTr")
+  cover_image_alt_en     String?           @map("coverImageAltEn")
+  cover_image_title_tr   String?           @map("coverImageTitleTr")
+  cover_image_title_en   String?           @map("coverImageTitleEn")
+  cover_image_caption_tr String?           @map("coverImageCaptionTr")
+  cover_image_caption_en String?           @map("coverImageCaptionEn")
+  problem_tr             String?           @map("problemTr")
+  problem_en             String?           @map("problemEn")
+  solution_tr            String?           @map("solutionTr")
+  solution_en            String?           @map("solutionEn")
+  process_tr             String?           @map("processTr")
+  process_en             String?           @map("processEn")
+  result_tr              String?           @map("resultTr")
+  result_en              String?           @map("resultEn")
+  metric_label_1_tr      String?           @map("metricLabel1Tr")
+  metric_label_1_en      String?           @map("metricLabel1En")
+  metric_value_1         String?           @map("metricValue1")
+  metric_label_2_tr      String?           @map("metricLabel2Tr")
+  metric_label_2_en      String?           @map("metricLabel2En")
+  metric_value_2         String?           @map("metricValue2")
+  metric_label_3_tr      String?           @map("metricLabel3Tr")
+  metric_label_3_en      String?           @map("metricLabel3En")
+  metric_value_3         String?           @map("metricValue3")
+  live_url               String?           @map("liveUrl")
+  demo_url               String?           @map("demoUrl")
+  github_url             String?           @map("githubUrl")
+  seo_title_tr           String?           @map("seoTitleTr")
+  seo_title_en           String?           @map("seoTitleEn")
+  seo_description_tr     String?           @map("seoDescriptionTr")
+  seo_description_en     String?           @map("seoDescriptionEn")
+  seo_keywords_tr        String?           @map("seoKeywordsTr")
+  seo_keywords_en        String?           @map("seoKeywordsEn")
+  canonical_url           String?           @map("canonicalUrl")
+  og_image               String?           @map("ogImage")
+  published              Boolean           @default(false)
+  featured               Boolean           @default(false) @map("featured")
+  sort_order             Int?              @map("sortOrder")
+  published_at           DateTime?         @map("publishedAt")
+  created_at             DateTime          @default(now()) @map("createdAt")
+  updated_at             DateTime          @updatedAt @map("updatedAt")
+
+  @@map("projects")
 }
 
 model ApiConnection {
@@ -229,16 +294,22 @@ model BlogPostTag {
 }
 
 model BlogPost {
-  id                 String        @id @default(cuid())
-  slug               String        @unique
-  title_tr           String        @map("titleTr")
-  title_en           String        @map("titleEn")
-  excerpt_tr         String        @map("excerptTr")
-  excerpt_en         String        @map("excerptEn")
-  content_tr         String        @map("contentTr")
-  content_en         String        @map("contentEn")
-  cover_image        String?       @map("coverImage")
-  seo_title_tr       String?       @map("seoTitleTr")
+  id                     String        @id @default(cuid())
+  slug                   String        @unique
+  title_tr               String        @map("titleTr")
+  title_en               String        @map("titleEn")
+  excerpt_tr             String        @map("excerptTr")
+  excerpt_en             String        @map("excerptEn")
+  content_tr             String        @map("contentTr")
+  content_en             String        @map("contentEn")
+  cover_image            String?       @map("coverImage")
+  cover_image_alt_tr     String?       @map("coverImageAltTr")
+  cover_image_alt_en     String?       @map("coverImageAltEn")
+  cover_image_title_tr   String?       @map("coverImageTitleTr")
+  cover_image_title_en   String?       @map("coverImageTitleEn")
+  cover_image_caption_tr String?       @map("coverImageCaptionTr")
+  cover_image_caption_en String?       @map("coverImageCaptionEn")
+  seo_title_tr           String?       @map("seoTitleTr")
   seo_title_en       String?       @map("seoTitleEn")
   seo_description_tr String?       @map("seoDescriptionTr")
   seo_description_en String?       @map("seoDescriptionEn")

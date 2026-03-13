@@ -29,7 +29,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ...both("/",             { changeFrequency: "weekly",  priority: 1.0 }),
         ...both("/about",        { changeFrequency: "monthly", priority: 0.8 }),
         ...both("/services",     { changeFrequency: "weekly",  priority: 0.9 }),
-        ...both("/portfolio",    { changeFrequency: "weekly",  priority: 0.8 }),
+        { url: `${BASE}/projeler`,      lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
+        { url: `${BASE}/en/projects`,  lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
         ...both("/blog",         { changeFrequency: "weekly",  priority: 0.8 }),
         ...both("/contact",      { changeFrequency: "monthly", priority: 0.7 }),
         ...both("/dijital-urunler",  { changeFrequency: "weekly",  priority: 0.8 }),
@@ -42,6 +43,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const serviceRoutes: MetadataRoute.Sitemap = SERVICE_SLUGS.flatMap((slug) =>
         both(`/services/${slug}`, { changeFrequency: "monthly", priority: 0.7 })
     );
+
+    /* ── Dynamic project detail pages ── */
+    let projectRoutes: MetadataRoute.Sitemap = [];
+    try {
+        const projects = await prisma.project.findMany({
+            where:  { published: true },
+            select: { slug: true, updated_at: true },
+        });
+        projectRoutes = projects.flatMap((p) => [
+            { url: `${BASE}/projeler/${p.slug}`,      lastModified: p.updated_at ?? new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
+            { url: `${BASE}/en/projects/${p.slug}`,  lastModified: p.updated_at ?? new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
+        ]);
+    } catch {
+        // Sitemap should not crash if DB is unavailable
+    }
 
     /* ── Dynamic blog post pages ── */
     let blogRoutes: MetadataRoute.Sitemap = [];
@@ -72,5 +88,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         // Sitemap should not crash the build if DB is unavailable
     }
 
-    return [...staticRoutes, ...serviceRoutes, ...blogRoutes, ...categoryRoutes, ...tagRoutes];
+    return [...staticRoutes, ...serviceRoutes, ...projectRoutes, ...blogRoutes, ...categoryRoutes, ...tagRoutes];
 }

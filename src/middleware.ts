@@ -2,12 +2,9 @@ import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import createMiddleware from 'next-intl/middleware';
+import { routing } from './i18n/routing';
 
-const intlMiddleware = createMiddleware({
-    locales: ['en', 'tr'],
-    defaultLocale: 'tr',
-    localePrefix: 'as-needed'
-});
+const intlMiddleware = createMiddleware(routing);
 
 const VERIFY_EMAIL_REQUIRED_PATHS = ["/dashboard", "/verify-email-required"];
 const ALLOWED_UNVERIFIED_PATHS = ["/login", "/register", "/verify-email", "/forgot-password", "/reset-password", "/"];

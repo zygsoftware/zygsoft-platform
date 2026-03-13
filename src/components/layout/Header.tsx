@@ -90,7 +90,7 @@ export function Header() {
 
                         <NavLink href="/dijital-urunler" active={pathname.includes("/dijital-urunler")}>{nav("products")}</NavLink>
                         <NavLink href="/about" active={pathname.includes("/about")}>{nav("about")}</NavLink>
-                        <NavLink href="/portfolio" active={pathname.includes("/portfolio")}>{nav("portfolio")}</NavLink>
+                        <NavLink href="/portfolio" active={pathname.includes("/projeler") || pathname.includes("/projects")}>{nav("portfolio")}</NavLink>
                         <NavLink href="/blog" active={pathname.includes("/blog")}>{nav("blog")}</NavLink>
                         <NavLink href="/contact" active={pathname.includes("/contact")}>{nav("contact")}</NavLink>
                     </nav>

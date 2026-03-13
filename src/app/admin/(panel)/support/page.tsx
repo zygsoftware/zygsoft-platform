@@ -201,7 +201,7 @@ export default function AdminSupportPage() {
     }, [tickets, search, statusFilter]);
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 min-w-0 w-full max-w-full">
             <AdminPageHeader
                 title="Destek Talepleri"
                 subtitle={loading ? "Yükleniyor..." : `${tickets.length} kayıt — ${counts.open} açık talep`}
@@ -255,7 +255,7 @@ export default function AdminSupportPage() {
             )}
 
             {/* Table / cards */}
-            <AdminCard padding="none">
+            <AdminCard padding="none" className="min-w-0 w-full max-w-full overflow-hidden">
                 {loading ? (
                     <div className="flex items-center justify-center gap-3 text-slate-400 py-16">
                         <Loader2 size={20} className="animate-spin text-emerald-500" /> Yükleniyor...
@@ -284,7 +284,7 @@ export default function AdminSupportPage() {
                 ) : (
                     <>
                         {/* ── Desktop table ── */}
-                        <div className="hidden md:block overflow-x-auto">
+                        <div className="hidden md:block overflow-x-auto w-full max-w-full">
                             <table className="admin-table w-full text-left">
                                 <thead>
                                     <tr>

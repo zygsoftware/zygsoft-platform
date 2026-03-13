@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import {
   Plus,
   Trash2,
@@ -23,6 +24,7 @@ import {
   Copy,
 } from "lucide-react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import { AdminCard, AdminStatsCard, AdminPageHeader, AdminBadge } from "@/components/admin";
 
 type Post = {
@@ -53,6 +55,7 @@ type Post = {
 type Category = { id: string; name_tr: string; name_en: string; slug: string };
 
 export default function AdminBlogPage() {
+  const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -148,7 +151,14 @@ export default function AdminBlogPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (res.ok) fetchPosts();
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        fetchPosts();
+        router.refresh();
+        toast.success(action === "publish" ? "Yazı yayınlandı." : action === "unpublish" ? "Yazı taslağa alındı." : "Güncellendi.");
+      } else {
+        toast.error(data.error || "İşlem başarısız.");
+      }
     } finally {
       setActionId(null);
     }
@@ -202,7 +212,7 @@ export default function AdminBlogPage() {
               href="/admin/blog/new"
               className="inline-flex items-center gap-2 bg-[#0e0e0e] hover:bg-[#1a1a1a] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm"
             >
-              <Plus size={18} /> Yeni Yazı
+              <Plus size={18} /> Yeni Blog Yazısı
             </Link>
             <Link
               href="/admin/blog/categories"
@@ -394,149 +404,94 @@ export default function AdminBlogPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="admin-table w-full text-left">
+            <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200/80 bg-slate-50/50">
-                  <th className="px-6 py-4">Başlık</th>
-                  <th className="px-6 py-4">Durum</th>
-                  <th className="px-6 py-4 hidden lg:table-cell">Kategori</th>
-                  <th className="px-6 py-4 hidden xl:table-cell text-center">Öne Çıkan</th>
-                  <th className="px-6 py-4 hidden xl:table-cell text-center">TR/EN</th>
-                  <th className="px-6 py-4 hidden xl:table-cell text-center">SEO</th>
-                  <th className="px-6 py-4 hidden xl:table-cell text-center">Yorum Ayarı</th>
-                  <th className="px-6 py-4 hidden md:table-cell text-center">Görüntülenme</th>
-                  <th className="px-6 py-4 hidden md:table-cell text-center">Yorum</th>
-                  <th className="px-6 py-4 hidden md:table-cell text-center">Beğeni</th>
-                  <th className="px-6 py-4 hidden lg:table-cell">Güncelleme</th>
-                  <th className="px-6 py-4 text-right">İşlemler</th>
+                  <th className="px-4 py-3 text-left max-w-[320px]">Başlık</th>
+                  <th className="px-4 py-3 w-[120px]">Durum</th>
+                  <th className="px-4 py-3 w-[180px] hidden lg:table-cell">Kategori</th>
+                  <th className="px-4 py-3 w-[100px] text-center hidden md:table-cell">Görüntülenme</th>
+                  <th className="px-4 py-3 w-[100px] text-center hidden md:table-cell">Yorum</th>
+                  <th className="px-4 py-3 w-[100px] text-center hidden md:table-cell">Beğeni</th>
+                  <th className="px-4 py-3 w-[220px] text-right">İşlemler</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {sorted.map((post) => (
-                  <tr key={post.id} className="transition-colors">
-                    <td className="px-6 py-4">
-                      <p className="font-semibold text-slate-900">{post.title_tr}</p>
-                      <p className="text-xs text-slate-400 font-mono mt-0.5">/blog/{post.slug}</p>
+                  <tr
+                    key={post.id}
+                    className={`transition-colors ${!post.published ? "bg-amber-50/50" : ""}`}
+                  >
+                    <td className="px-4 py-3 max-w-[320px]">
+                      <div className="max-w-[320px]">
+                        <div className="flex items-start gap-2">
+                          <div className="font-medium text-sm line-clamp-2 min-w-0 flex-1">
+                            {post.title_tr}
+                          </div>
+                          {!post.published && (
+                            <span className="shrink-0 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">
+                              Taslak
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-slate-400 mt-1 font-mono">/blog/{post.slug}</div>
+                      </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3 w-[120px]">
                       <AdminBadge variant={post.published ? "published" : "draft"} label={post.published ? "Yayında" : "Taslak"} />
                     </td>
-                    <td className="px-6 py-4 hidden lg:table-cell text-slate-600 text-sm">
+                    <td className="px-4 py-3 w-[180px] hidden lg:table-cell text-slate-600 text-sm">
                       {post.category?.name_tr ?? "—"}
                     </td>
-                    <td className="px-6 py-4 hidden xl:table-cell text-center">
-                      {post.is_featured ? (
-                        <AdminBadge variant="featured" label="Öne Çıkan" />
-                      ) : (
-                        <span className="text-slate-400 text-xs">—</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 hidden xl:table-cell">
-                      <span className="flex items-center gap-1.5 justify-center text-xs">
-                        <span
-                          className={
-                            post.title_tr?.trim() ? "text-emerald-600 font-medium" : "text-amber-600 font-medium"
-                          }
-                        >
-                          TR
-                        </span>
-                        <span
-                          className={
-                            post.title_en?.trim() ? "text-emerald-600 font-medium" : "text-amber-600 font-medium"
-                          }
-                        >
-                          EN
-                        </span>
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 hidden xl:table-cell text-center">
-                      {hasSeo(post) ? (
-                        <span className="text-emerald-600 text-xs font-medium">✓</span>
-                      ) : (
-                        <span className="text-amber-600 text-xs font-medium">—</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 hidden xl:table-cell text-center text-slate-500 text-sm">
-                      {post.allow_comments ? "Açık" : "Kapalı"}
-                    </td>
-                    <td className="px-6 py-4 hidden md:table-cell text-center text-slate-600 text-sm font-medium">
+                    <td className="px-4 py-3 w-[100px] text-center hidden md:table-cell text-slate-600 font-medium">
                       {post.view_count ?? 0}
                     </td>
-                    <td className="px-6 py-4 hidden md:table-cell text-center text-slate-600 text-sm font-medium">
+                    <td className="px-4 py-3 w-[100px] text-center hidden md:table-cell text-slate-600 font-medium">
                       {post._count?.comments ?? 0}
                     </td>
-                    <td className="px-6 py-4 hidden md:table-cell text-center text-slate-600 text-sm font-medium">
+                    <td className="px-4 py-3 w-[100px] text-center hidden md:table-cell text-slate-600 font-medium">
                       {post._count?.likes ?? 0}
                     </td>
-                    <td className="px-6 py-4 hidden lg:table-cell text-slate-500 text-sm">
-                      {new Date(post.updated_at).toLocaleDateString("tr-TR")}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-wrap justify-end gap-1">
-                        <button
-                          onClick={() =>
-                            handleQuickAction(post.id, post.published ? "unpublish" : "publish")
-                          }
-                          disabled={actionId === post.id}
-                          className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
-                          title={post.published ? "Taslağa al" : "Yayınla"}
-                        >
-                          {actionId === post.id ? (
-                            <Loader2 size={16} className="animate-spin" />
-                          ) : post.published ? (
-                            <EyeOff size={16} />
-                          ) : (
-                            <Send size={16} />
-                          )}
-                        </button>
-                        <button
-                          onClick={() =>
-                            handleQuickAction(post.id, post.is_featured ? "unfeature" : "feature")
-                          }
-                          disabled={actionId === post.id}
-                          className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
-                          title={post.is_featured ? "Öne çıkarmayı kaldır" : "Öne çıkar"}
-                        >
-                          {post.is_featured ? <StarOff size={16} /> : <Star size={16} />}
-                        </button>
-                        <a
-                          href={`/blog/${post.slug}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-                          title="Önizle"
-                        >
-                          <ExternalLink size={16} />
-                        </a>
+                    <td className="px-4 py-3 w-[220px] text-right">
+                      <div className="flex items-center justify-end gap-2 flex-wrap">
                         <Link
                           href={`/admin/blog/edit/${post.id}`}
-                          className="p-2 text-[#0e0e0e] hover:bg-slate-100 rounded-lg transition-colors"
-                          title="Düzenle"
+                          className="px-3 py-1.5 text-xs rounded-md border border-slate-200 hover:bg-slate-50 font-medium"
                         >
-                          <Edit size={16} />
+                          Düzenle
                         </Link>
-                        <button
-                          onClick={() => handleDuplicate(post.id)}
-                          disabled={duplicatingId === post.id}
-                          className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
-                          title="Kopyala"
+                        <a
+                          href={post.published ? `/blog/${post.slug}` : `/admin/blog/preview/${post.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 text-xs rounded-md border border-slate-200 hover:bg-slate-50 font-medium"
                         >
-                          {duplicatingId === post.id ? (
-                            <Loader2 size={16} className="animate-spin" />
-                          ) : (
-                            <Copy size={16} />
-                          )}
-                        </button>
+                          Önizle
+                        </a>
+                        {!post.published && (
+                          <button
+                            onClick={() => handleQuickAction(post.id, "publish")}
+                            disabled={actionId === post.id}
+                            className="px-3 py-1.5 text-xs rounded-md bg-emerald-500 text-white hover:bg-emerald-600 font-medium disabled:opacity-50 flex items-center gap-1"
+                          >
+                            {actionId === post.id ? <Loader2 size={12} className="animate-spin" /> : (<>Yayınla</>)}
+                          </button>
+                        )}
+                        {post.published && (
+                          <button
+                            onClick={() => handleQuickAction(post.id, "unpublish")}
+                            disabled={actionId === post.id}
+                            className="px-3 py-1.5 text-xs rounded-md bg-amber-500 text-white hover:bg-amber-600 font-medium disabled:opacity-50 flex items-center gap-1"
+                          >
+                            {actionId === post.id ? <Loader2 size={12} className="animate-spin" /> : (<>Taslağa Al</>)}
+                          </button>
+                        )}
                         <button
                           onClick={() => handleDelete(post.id)}
                           disabled={deletingId === post.id}
-                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                          className="px-3 py-1.5 text-xs rounded-md bg-red-500 text-white hover:bg-red-600 font-medium disabled:opacity-50 flex items-center gap-1"
                         >
-                          {deletingId === post.id ? (
-                            <Loader2 size={16} className="animate-spin" />
-                          ) : (
-                            <Trash2 size={16} />
-                          )}
+                          {deletingId === post.id ? <Loader2 size={12} className="animate-spin" /> : (<>Sil</>)}
                         </button>
                       </div>
                     </td>

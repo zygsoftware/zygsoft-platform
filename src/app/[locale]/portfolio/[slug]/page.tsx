@@ -2,8 +2,10 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { ArrowLeft, ExternalLink, Building2, Calendar, ArrowRight, ChevronRight } from "lucide-react";
+import { ArrowLeft, ExternalLink, Building2, Calendar, ArrowRight, ChevronRight, Target, Lightbulb, GitBranch, TrendingUp } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import { StructuredContent } from "@/lib/render-content";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://zygsoft.com";
 
@@ -29,24 +31,30 @@ export default async function PortfolioDetailPage({
 }) {
     const { slug, locale } = await params;
 
-    const project = await prisma.project.findUnique({ where: { slug } });
+    const project = await prisma.project.findFirst({
+        where: { slug, published: true },
+        include: { category: true },
+    });
 
     if (!project) notFound();
 
     /* ── Related projects (up to 3 others) ── */
     const related = await prisma.project.findMany({
-        where:   { slug: { not: slug } },
-        orderBy: { createdAt: "desc" },
+        where:   { slug: { not: slug }, published: true },
+        orderBy: [{ sort_order: "asc" }, { published_at: "desc" }],
         take:    3,
-        select:  { id: true, title: true, description: true, slug: true, client: true },
+        include: { category: true },
     });
 
     const isEn       = locale === "en";
     const prefix     = isEn ? `${SITE_URL}/en` : SITE_URL;
-    const portfolioHref = isEn ? "/en/portfolio" : "/portfolio";
+    const portfolioHref = isEn ? "/en/projects" : "/projeler";
 
-    const createdDate = project.createdAt
-        ? new Date(project.createdAt).toLocaleDateString(isEn ? "en-US" : "tr-TR", {
+    const title = isEn ? project.title_en : project.title_tr;
+    const excerpt = isEn ? project.excerpt_en : project.excerpt_tr;
+    const content = isEn ? project.content_en : project.content_tr;
+    const projectDate = project.project_date || project.published_at
+        ? new Date(project.project_date || project.published_at!).toLocaleDateString(isEn ? "en-US" : "tr-TR", {
               year: "numeric", month: "long", day: "numeric",
           })
         : null;
@@ -57,24 +65,24 @@ export default async function PortfolioDetailPage({
         "@graph": [
             {
                 "@type": "CreativeWork",
-                "@id":   `${prefix}/portfolio/${slug}`,
-                "name":  project.title,
-                "description": project.description,
+                "@id":   `${prefix}${isEn ? "/projects" : "/projeler"}/${slug}`,
+                "name":  title,
+                "description": excerpt,
                 "creator": {
                     "@type": "Organization",
                     "@id":   `${SITE_URL}/#organization`,
                     "name":  "ZYGSOFT",
                 },
-                ...(project.client ? { "accountablePerson": { "@type": "Organization", "name": project.client } } : {}),
-                ...(project.link   ? { "url": project.link } : {}),
-                ...(project.image  ? { "image": project.image } : {}),
+                ...(project.client_name ? { "accountablePerson": { "@type": "Organization", "name": project.client_name } } : {}),
+                ...(project.live_url ? { "url": project.live_url } : {}),
+                ...(project.cover_image ? { "image": project.cover_image } : {}),
             },
             {
                 "@type": "BreadcrumbList",
                 "itemListElement": [
                     { "@type": "ListItem", "position": 1, "name": isEn ? "Home"      : "Ana Sayfa",  "item": prefix },
                     { "@type": "ListItem", "position": 2, "name": isEn ? "Portfolio" : "Portfolyo",  "item": `${prefix}/portfolio` },
-                    { "@type": "ListItem", "position": 3, "name": project.title, "item": `${prefix}/portfolio/${slug}` },
+                    { "@type": "ListItem", "position": 3, "name": title, "item": `${prefix}/portfolio/${slug}` },
                 ],
             },
         ],
@@ -107,10 +115,10 @@ export default async function PortfolioDetailPage({
                         {/* Breadcrumb */}
                         <nav className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#999] mb-10">
                             <Link href={portfolioHref} className="hover:text-[#0e0e0e] transition-colors">
-                                {isEn ? "Portfolio" : "Portfolyo"}
+                                {isEn ? "Projects" : "Projeler"}
                             </Link>
                             <ChevronRight size={12} />
-                            <span className="text-[#0e0e0e] truncate max-w-xs">{project.title}</span>
+                            <span className="text-[#0e0e0e] truncate max-w-xs">{title}</span>
                         </nav>
 
                         <span className="section-label">{isEn ? "Case Study" : "Proje Detayı"}</span>
@@ -119,26 +127,38 @@ export default async function PortfolioDetailPage({
                             className="font-display font-extrabold text-[#0e0e0e] mt-4 mb-6"
                             style={{ fontSize: "clamp(36px, 5vw, 72px)", lineHeight: 1.05 }}
                         >
-                            {project.title}
+                            {title}
                         </h1>
+
+                        <p className="text-lg text-[#666] max-w-2xl mt-4">{excerpt}</p>
 
                         {/* Meta chips */}
                         <div className="flex flex-wrap items-center gap-4 mt-8">
-                            {project.client && (
+                            {project.category && (
+                                <span className="inline-flex items-center gap-2 px-4 py-2 bg-[#e6c800]/20 border border-[#e6c800]/40 rounded-full text-sm font-semibold text-[#0e0e0e]">
+                                    {isEn ? project.category.name_en : project.category.name_tr}
+                                </span>
+                            )}
+                            {project.sector && (
+                                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-full text-sm font-semibold text-[#555]">
+                                    {project.sector}
+                                </span>
+                            )}
+                            {project.client_name && (
                                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-full text-sm font-semibold text-[#555]">
                                     <Building2 size={14} />
-                                    {project.client}
+                                    {project.client_name}
                                 </span>
                             )}
-                            {createdDate && (
+                            {projectDate && (
                                 <span className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-black/10 rounded-full text-sm font-semibold text-[#555]">
                                     <Calendar size={14} />
-                                    {createdDate}
+                                    {projectDate}
                                 </span>
                             )}
-                            {project.link && (
+                            {(project.live_url || project.demo_url) && (
                                 <a
-                                    href={project.link}
+                                    href={project.live_url || project.demo_url!}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 px-4 py-2 bg-[#e6c800] rounded-full text-sm font-bold text-[#0e0e0e] hover:bg-[#d4b800] transition-colors"
@@ -154,14 +174,17 @@ export default async function PortfolioDetailPage({
                 {/* ── Project Image ── */}
                 <section className="container mx-auto px-6 max-w-7xl -mt-8 relative z-20 mb-0">
                     <div
-                        className="w-full rounded-2xl overflow-hidden border border-black/8 shadow-xl"
+                        className="relative w-full rounded-2xl overflow-hidden border border-black/8 shadow-xl"
                         style={{ aspectRatio: "21/9" }}
                     >
-                        {project.image ? (
-                            <img
-                                src={project.image}
-                                alt={project.title}
-                                className="w-full h-full object-cover"
+                        {project.cover_image ? (
+                            <Image
+                                src={project.cover_image}
+                                alt={project.cover_image_alt_tr || project.cover_image_alt_en || title}
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 1280px) 100vw, 1280px"
+                                priority
                             />
                         ) : (
                             <div
@@ -172,7 +195,7 @@ export default async function PortfolioDetailPage({
                                     className="font-display font-extrabold text-white/10 select-none"
                                     style={{ fontSize: "clamp(60px, 12vw, 160px)", letterSpacing: "-0.04em" }}
                                 >
-                                    {project.title.charAt(0).toUpperCase()}
+                                    {title.charAt(0).toUpperCase()}
                                 </span>
                             </div>
                         )}
@@ -183,27 +206,114 @@ export default async function PortfolioDetailPage({
                 <section className="py-24 bg-white border-y border-black/8 mt-16">
                     <div className="container mx-auto px-6 max-w-7xl">
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+                            <div className="lg:col-span-8 space-y-20">
+                                {content && (
+                                    <div className="space-y-6">
+                                        <h2 className="font-display font-bold text-3xl text-[#0e0e0e]">
+                                            {isEn ? "About This Project" : "Proje Hakkında"}
+                                        </h2>
+                                        <div className="prose-article max-w-none text-[#555] text-lg leading-relaxed [&>p]:mb-4 [&>p:last-child]:mb-0" dangerouslySetInnerHTML={{ __html: content }} />
+                                    </div>
+                                )}
 
-                            {/* Main text */}
-                            <div className="lg:col-span-8">
-                                <h2 className="font-display font-bold text-3xl text-[#0e0e0e] mb-6">
-                                    {isEn ? "About This Project" : "Proje Hakkında"}
-                                </h2>
-                                <p className="text-[#555] text-lg leading-relaxed whitespace-pre-line">
-                                    {project.description}
-                                </p>
+                                {(isEn ? project.problem_en : project.problem_tr) && (
+                                    <div className="p-8 bg-[#f9f7f3] rounded-2xl border border-black/8 space-y-1">
+                                        <h3 className="font-display font-bold text-xl text-[#0e0e0e] mb-4 flex items-center gap-2">
+                                            <Target size={22} /> {isEn ? "Problem" : "Problem"}
+                                        </h3>
+                                        <StructuredContent
+                                            text={(isEn ? project.problem_en : project.problem_tr)!}
+                                            listClassName="list-disc pl-6 space-y-2"
+                                            itemClassName="leading-7 text-[15px] text-slate-700"
+                                        />
+                                    </div>
+                                )}
 
-                                {project.link && (
-                                    <div className="mt-12 pt-10 border-t border-black/8">
-                                        <a
-                                            href={project.link}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="btn-primary inline-flex"
-                                        >
-                                            {isEn ? "Visit Live Project" : "Canlı Projeyi Gör"}
-                                            <ExternalLink size={16} />
-                                        </a>
+                                {(isEn ? project.solution_en : project.solution_tr) && (
+                                    <div className="p-8 bg-[#f9f7f3] rounded-2xl border border-black/8 space-y-1">
+                                        <h3 className="font-display font-bold text-xl text-[#0e0e0e] mb-4 flex items-center gap-2">
+                                            <Lightbulb size={22} /> {isEn ? "Solution" : "Çözüm"}
+                                        </h3>
+                                        <StructuredContent
+                                            text={(isEn ? project.solution_en : project.solution_tr)!}
+                                            listClassName="list-disc pl-6 space-y-2"
+                                            itemClassName="leading-7 text-[15px] text-slate-700"
+                                        />
+                                    </div>
+                                )}
+
+                                {(isEn ? project.process_en : project.process_tr) && (
+                                    <div className="p-8 bg-[#f9f7f3] rounded-2xl border border-black/8 space-y-1">
+                                        <h3 className="font-display font-bold text-xl text-[#0e0e0e] mb-4 flex items-center gap-2">
+                                            <GitBranch size={22} /> {isEn ? "Process" : "Süreç"}
+                                        </h3>
+                                        <StructuredContent
+                                            text={(isEn ? project.process_en : project.process_tr)!}
+                                            listClassName="list-disc pl-6 space-y-2"
+                                            itemClassName="leading-7 text-[15px] text-slate-700"
+                                        />
+                                    </div>
+                                )}
+
+                                {(isEn ? project.result_en : project.result_tr) && (
+                                    <div className="p-8 bg-[#e6c800]/10 rounded-2xl border border-[#e6c800]/30 space-y-1">
+                                        <h3 className="font-display font-bold text-xl text-[#0e0e0e] mb-4 flex items-center gap-2">
+                                            <TrendingUp size={22} /> {isEn ? "Result" : "Sonuç"}
+                                        </h3>
+                                        <StructuredContent
+                                            text={(isEn ? project.result_en : project.result_tr)!}
+                                            listClassName="list-disc pl-6 space-y-2"
+                                            itemClassName="leading-7 text-[15px] text-slate-700"
+                                        />
+                                    </div>
+                                )}
+
+                                {(project.metric_value_1 || project.metric_value_2 || project.metric_value_3) && (
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {[1, 2, 3].map((n) => {
+                                            const val = (project as any)[`metric_value_${n}`];
+                                            const label = (project as any)[`metric_label_${n}_${isEn ? "en" : "tr"}`] || (project as any)[`metric_label_${n}_tr`];
+                                            if (!val) return null;
+                                            return (
+                                                <div key={n} className="p-6 bg-white border border-black/8 rounded-xl text-center">
+                                                    <p className="text-3xl font-display font-extrabold text-[#e6c800]">{val}</p>
+                                                    {label && <p className="text-sm text-[#666] mt-1">{label}</p>}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+
+                                {project.technologies && (
+                                    <div>
+                                        <h3 className="font-display font-bold text-xl text-[#0e0e0e] mb-4">{isEn ? "Technologies" : "Teknolojiler"}</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {project.technologies.split(",").map((t: string, i: number) => (
+                                                <span key={i} className="px-4 py-2 bg-slate-100 rounded-lg text-sm font-medium text-[#666]">
+                                                    {t.trim()}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {(project.live_url || project.demo_url) && (
+                                    <div className="pt-10 border-t border-black/8 flex flex-wrap gap-4">
+                                        {project.live_url && (
+                                            <a href={project.live_url} target="_blank" rel="noopener noreferrer" className="btn-primary inline-flex">
+                                                {isEn ? "Visit Live Project" : "Canlı Projeyi Gör"} <ExternalLink size={16} />
+                                            </a>
+                                        )}
+                                        {project.demo_url && (
+                                            <a href={project.demo_url} target="_blank" rel="noopener noreferrer" className="btn-yellow inline-flex">
+                                                {isEn ? "View Demo" : "Demo Görüntüle"} <ExternalLink size={16} />
+                                            </a>
+                                        )}
+                                        {project.github_url && (
+                                            <a href={project.github_url} target="_blank" rel="noopener noreferrer" className="px-6 py-3 border border-black/8 rounded-xl font-semibold hover:bg-slate-50 inline-flex transition-colors">
+                                                GitHub <ExternalLink size={16} />
+                                            </a>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -215,36 +325,45 @@ export default async function PortfolioDetailPage({
                                         {isEn ? "Project Details" : "Proje Bilgileri"}
                                     </h3>
 
-                                    {project.client && (
+                                    {project.category && (
+                                        <div>
+                                            <p className="text-xs font-bold uppercase tracking-widest text-[#999] mb-1">
+                                                {isEn ? "Category" : "Kategori"}
+                                            </p>
+                                            <p className="text-[#0e0e0e] font-semibold">{isEn ? project.category.name_en : project.category.name_tr}</p>
+                                        </div>
+                                    )}
+
+                                    {project.client_name && (
                                         <div>
                                             <p className="text-xs font-bold uppercase tracking-widest text-[#999] mb-1">
                                                 {isEn ? "Client" : "Müşteri"}
                                             </p>
-                                            <p className="text-[#0e0e0e] font-semibold">{project.client}</p>
+                                            <p className="text-[#0e0e0e] font-semibold">{project.client_name}</p>
                                         </div>
                                     )}
 
-                                    {createdDate && (
+                                    {projectDate && (
                                         <div>
                                             <p className="text-xs font-bold uppercase tracking-widest text-[#999] mb-1">
                                                 {isEn ? "Date" : "Tarih"}
                                             </p>
-                                            <p className="text-[#0e0e0e] font-semibold">{createdDate}</p>
+                                            <p className="text-[#0e0e0e] font-semibold">{projectDate}</p>
                                         </div>
                                     )}
 
-                                    {project.link && (
+                                    {(project.live_url || project.demo_url) && (
                                         <div>
                                             <p className="text-xs font-bold uppercase tracking-widest text-[#999] mb-1">
                                                 {isEn ? "Live URL" : "Proje Linki"}
                                             </p>
                                             <a
-                                                href={project.link}
+                                                href={project.live_url || project.demo_url!}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-[#e6c800] font-semibold text-sm hover:underline break-all inline-flex items-center gap-1"
                                             >
-                                                {project.link.replace(/^https?:\/\//, "")}
+                                                {(project.live_url || project.demo_url)!.replace(/^https?:\/\//, "")}
                                                 <ExternalLink size={12} />
                                             </a>
                                         </div>
@@ -281,24 +400,26 @@ export default async function PortfolioDetailPage({
                                 {related.map((rel) => (
                                     <Link
                                         key={rel.id}
-                                        href={`${isEn ? "/en" : ""}/portfolio/${rel.slug}`}
+                                        href={isEn ? `/en/projects/${rel.slug}` : `/projeler/${rel.slug}`}
                                         className="group block bg-white border border-black/8 rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
                                     >
-                                        {/* Mini image placeholder */}
-                                        <div
-                                            className="aspect-[16/9] w-full"
-                                            style={{ background: pickGradient(rel.slug) }}
-                                        />
+                                        {rel.cover_image ? (
+                                            <div className="relative aspect-[16/9] w-full">
+                                                <Image src={rel.cover_image} alt={isEn ? rel.title_en : rel.title_tr} fill className="object-cover group-hover:scale-105 transition-transform" sizes="33vw" />
+                                            </div>
+                                        ) : (
+                                            <div className="aspect-[16/9] w-full" style={{ background: pickGradient(rel.slug) }} />
+                                        )}
                                         <div className="p-5">
-                                            {rel.client && (
-                                                <p className="text-xs font-bold uppercase tracking-widest text-[#999] mb-1">
-                                                    {rel.client}
+                                            {rel.category && (
+                                                <p className="text-xs font-bold uppercase tracking-widest text-[#e6c800] mb-1">
+                                                    {isEn ? rel.category.name_en : rel.category.name_tr}
                                                 </p>
                                             )}
                                             <h3 className="font-display font-bold text-lg text-[#0e0e0e] group-hover:text-[#c9ad00] transition-colors mb-2">
-                                                {rel.title}
+                                                {isEn ? rel.title_en : rel.title_tr}
                                             </h3>
-                                            <p className="text-sm text-[#666] line-clamp-2">{rel.description}</p>
+                                            <p className="text-sm text-[#666] line-clamp-2">{isEn ? rel.excerpt_en : rel.excerpt_tr}</p>
                                         </div>
                                     </Link>
                                 ))}

@@ -248,7 +248,7 @@ export default function AdminUsersPage() {
   const hasFilters = search || roleFilter !== "all" || statusFilter !== "all" || localeFilter !== "all";
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 min-w-0 w-full max-w-full">
       <AdminPageHeader
         title="Kullanıcı Yönetimi"
         subtitle="Tüm kayıtlı kullanıcıları yönetin."
@@ -263,7 +263,7 @@ export default function AdminUsersPage() {
       />
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 min-w-0">
         <AdminStatsCard label="Toplam" value={stats.total} icon={<Users size={20} />} accent="slate" />
         <AdminStatsCard label="Admin" value={stats.admins} icon={<Crown size={20} />} accent="violet" />
         <AdminStatsCard label="Müşteri" value={stats.customers} icon={<UserCheck size={20} />} accent="emerald" />
@@ -375,7 +375,7 @@ export default function AdminUsersPage() {
       </AnimatePresence>
 
       {/* Filters */}
-      <AdminCard padding="md">
+      <AdminCard padding="md" className="min-w-0">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
@@ -437,7 +437,7 @@ export default function AdminUsersPage() {
       </AdminCard>
 
       {/* Table */}
-      <AdminCard padding="none">
+      <AdminCard padding="none" className="min-w-0 w-full max-w-full overflow-hidden">
         {loading ? (
           <div className="p-16 text-center flex items-center justify-center gap-3 text-slate-400">
             <Loader2 size={24} className="animate-spin text-[#e6c800]" /> Yükleniyor...
@@ -466,8 +466,8 @@ export default function AdminUsersPage() {
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="admin-table w-full">
+          <div className="overflow-x-auto w-full max-w-full">
+            <table className="admin-table w-full min-w-[900px]">
               <thead>
                 <tr className="border-b border-slate-200/80 bg-slate-50/50">
                   <th className="px-6 py-4">Kullanıcı</th>
@@ -489,8 +489,8 @@ export default function AdminUsersPage() {
               <tbody className="divide-y divide-slate-100">
                 {users.map((user) => (
                   <tr key={user.id} className="transition-colors hover:bg-slate-50/50">
-                    <td className="px-6 py-4">
-                      <Link href={`/admin/users/${user.id}`} className="flex items-center gap-3 group">
+                    <td className="px-6 py-4 min-w-0 max-w-[220px]">
+                      <Link href={`/admin/users/${user.id}`} className="flex items-center gap-3 group min-w-0">
                         <div className="relative w-10 h-10 rounded-xl overflow-hidden shrink-0 bg-slate-100">
                           {user.image ? (
                             <Image src={user.image} alt="" fill className="object-cover" sizes="40px" />
@@ -504,11 +504,11 @@ export default function AdminUsersPage() {
                             </div>
                           )}
                         </div>
-                        <div>
-                          <p className="text-sm font-semibold text-slate-900 group-hover:text-[#e6c800] transition-colors">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold text-slate-900 group-hover:text-[#e6c800] transition-colors truncate" title={user.name || user.email || undefined}>
                             {user.name || user.email || "—"}
                           </p>
-                          <p className={user.name ? "text-xs text-slate-500" : "text-xs font-medium text-slate-600"}>
+                          <p className={`truncate ${user.name ? "text-xs text-slate-500" : "text-xs font-medium text-slate-600"}`} title={user.email ?? undefined}>
                             {user.email ?? "—"}
                           </p>
                         </div>

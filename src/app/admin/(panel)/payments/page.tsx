@@ -78,7 +78,7 @@ export default function AdminPaymentsPage() {
     const pendingCount = payments.filter(p => p.status === "pending").length;
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 min-w-0 w-full max-w-full">
             <AdminPageHeader
                 title="Ödeme Onayları"
                 subtitle="Müşterilerden gelen HAVALE/EFT dekont bildirimlerini inceleyin."
@@ -102,8 +102,8 @@ export default function AdminPaymentsPage() {
                 </div>
             )}
 
-            <AdminCard padding="none">
-                <div className="overflow-x-auto">
+            <AdminCard padding="none" className="min-w-0 w-full max-w-full overflow-hidden">
+                <div className="overflow-x-auto w-full max-w-full">
                     <table className="admin-table w-full text-left">
                         <thead>
                             <tr>
@@ -129,9 +129,9 @@ export default function AdminPaymentsPage() {
                             ) : (
                                 payments.map((payment) => (
                                     <tr key={payment.id}>
-                                        <td>
-                                            <div className="font-medium text-slate-900">{payment.user?.email || "—"}</div>
-                                            <div className="text-xs text-slate-500 mt-0.5">Ürün: {payment.product?.name || "Bilinmiyor"}</div>
+                                        <td className="max-w-[200px]">
+                                            <div className="font-medium text-slate-900 truncate" title={payment.user?.email ?? undefined}>{payment.user?.email || "—"}</div>
+                                            <div className="text-xs text-slate-500 mt-0.5 truncate" title={payment.product?.name}>Ürün: {payment.product?.name || "Bilinmiyor"}</div>
                                         </td>
                                         <td className="font-semibold text-slate-900">₺{payment.amount}</td>
                                         <td className="text-sm text-slate-600">{new Date(payment.createdAt).toLocaleDateString("tr-TR")}</td>

@@ -8,8 +8,8 @@ import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { Calendar, ArrowLeft, ArrowRight, Clock, Linkedin, Twitter, Copy, Check, Heart, MessageSquare, Eye, Lock, Tag } from "lucide-react";
 import { AuthorBox } from "@/components/blog/AuthorBox";
-import { NewsletterBlock } from "@/components/blog/NewsletterBlock";
 import { RelatedServicesCTA } from "@/components/blog/RelatedServicesCTA";
+import { slugifyHeading } from "@/lib/slugify-heading";
 
 type RelatedPost = {
     id: string;
@@ -135,6 +135,7 @@ export default function BlogDetailClient({
     }, []);
 
     const [headings, setHeadings] = useState<{ level: number; text: string; id: string }[]>([]);
+    const [activeHeadingId, setActiveHeadingId] = useState<string | null>(null);
 
     useEffect(() => {
         const run = () => {
@@ -142,16 +143,54 @@ export default function BlogDetailClient({
             if (!el) return;
             const hs = el.querySelectorAll("h2, h3");
             const items: { level: number; text: string; id: string }[] = [];
-            hs.forEach((h, i) => {
-                const id = `h-${i}`;
-                h.id = id;
-                items.push({ level: h.tagName === "H2" ? 2 : 3, text: h.textContent || "", id });
+            const slugCounts: Record<string, number> = {};
+            hs.forEach((h) => {
+                const text = h.textContent || "";
+                let baseSlug = slugifyHeading(text);
+                if (!baseSlug) baseSlug = "section";
+                const count = (slugCounts[baseSlug] = (slugCounts[baseSlug] ?? 0) + 1);
+                const id = count > 1 ? `${baseSlug}-${count}` : baseSlug;
+                (h as HTMLElement).id = id;
+                items.push({ level: h.tagName === "H2" ? 2 : 3, text, id });
             });
             setHeadings(items);
+            const hash = typeof window !== "undefined" ? window.location.hash.slice(1) : "";
+            if (hash && items.some((i) => i.id === hash)) {
+                requestAnimationFrame(() => {
+                    const el = document.getElementById(hash);
+                    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+            }
         };
         const t = setTimeout(run, 100);
         return () => clearTimeout(t);
     }, [post.content]);
+
+    useEffect(() => {
+        if (headings.length === 0) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const visible = entries.filter((e) => e.isIntersecting);
+                if (visible.length === 0) return;
+                const byTop = visible
+                    .map((e) => ({ id: e.target.id, top: e.boundingClientRect.top }))
+                    .sort((a, b) => a.top - b.top);
+                const topmost = byTop[0];
+                if (topmost && topmost.top < 150) setActiveHeadingId(topmost.id);
+            },
+            { rootMargin: "-100px 0px -70% 0px", threshold: 0 }
+        );
+        headings.forEach((h) => {
+            const el = document.getElementById(h.id);
+            if (el) observer.observe(el);
+        });
+        return () => observer.disconnect();
+    }, [headings]);
+
+    const scrollToHeading = (id: string) => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
 
     const shareUrl = typeof window !== "undefined" ? window.location.href : "";
     const shareTitle = encodeURIComponent(post.title);
@@ -164,8 +203,8 @@ export default function BlogDetailClient({
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const blogHref = (slug: string) => (locale === "tr" ? `/blog/${slug}` : `/${locale}/blog/${slug}`);
-    const tagHref = (slug: string) => (locale === "tr" ? `/blog/tag/${slug}` : `/${locale}/blog/tag/${slug}`);
+    const blogHref = (slug: string) => ({ pathname: "/blog/[slug]" as const, params: { slug } });
+    const tagHref = (slug: string) => ({ pathname: "/blog/tag/[slug]" as const, params: { slug } });
     const hasPrevNext = (prev && prev.slug) || (next && next.slug);
     const postTags = post.tags?.map((t: { tag?: { id: string; name: string; slug: string } }) => t.tag).filter(Boolean) ?? [];
 
@@ -200,7 +239,7 @@ export default function BlogDetailClient({
                 <section className="relative pt-24 pb-12 md:pt-32 md:pb-16 overflow-hidden">
                     <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#0a0c10 1px, transparent 1px), linear-gradient(90deg, #0a0c10 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
                     <div className="container mx-auto px-6 max-w-4xl relative z-10">
-                        <Link href={locale === "tr" ? "/blog" : `/${locale}/blog`} className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#0a0c10]/[0.08] rounded-full text-xs font-bold uppercase tracking-wide text-[#0a0c10]/70 hover:text-[#0e0e0e] hover:bg-white/90 hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all mb-8 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+                        <Link href="/blog" className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#0a0c10]/[0.08] rounded-full text-xs font-bold uppercase tracking-wide text-[#0a0c10]/70 hover:text-[#0e0e0e] hover:bg-white/90 hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all mb-8 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
                             <ArrowLeft size={14} /> {isTr ? "Blog'a Geri Dön" : "Back to Blog"}
                         </Link>
 
@@ -244,14 +283,28 @@ export default function BlogDetailClient({
 
                 {post.cover_image && (
                     <section className="container mx-auto px-6 max-w-5xl -mt-4 mb-12">
-                        <motion.div
+                        <motion.figure
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                            className="relative aspect-video md:aspect-[21/9] bg-[#fafafc] rounded-xl overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.08)] border border-[#0a0c10]/[0.05]"
+                            className="relative"
                         >
-                            <Image src={post.cover_image} alt={post.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 1024px" priority />
-                        </motion.div>
+                            <div className="relative aspect-video md:aspect-[21/9] bg-[#fafafc] rounded-xl overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.08)] border border-[#0a0c10]/[0.05]">
+                                <Image
+                                    src={post.cover_image}
+                                    alt={post.cover_image_alt_tr || post.cover_image_alt_en || post.title}
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 1024px) 100vw, 1024px"
+                                    priority
+                                />
+                            </div>
+                            {(post.cover_image_caption_tr || post.cover_image_caption_en) && (
+                                <figcaption className="mt-3 text-center text-sm text-slate-500 font-medium">
+                                    {isTr ? (post.cover_image_caption_tr || post.cover_image_caption_en) : (post.cover_image_caption_en || post.cover_image_caption_tr)}
+                                </figcaption>
+                            )}
+                        </motion.figure>
                     </section>
                 )}
 
@@ -267,10 +320,6 @@ export default function BlogDetailClient({
                                 <p className="text-xl md:text-2xl font-medium text-[#0e0e0e] leading-relaxed mb-10 p-6 bg-white border border-[#0a0c10]/[0.05] rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.03)] border-l-4 border-l-[#e6c800]">
                                     {post.excerpt}
                                 </p>
-
-                                <div className="mb-12">
-                                    <NewsletterBlock locale={locale} variant="inline" />
-                                </div>
 
                                 <div
                                     className="prose-article max-w-none text-[var(--prose-text)]"
@@ -341,7 +390,11 @@ export default function BlogDetailClient({
                                                 <a
                                                     key={h.id}
                                                     href={`#${h.id}`}
-                                                    className={`block text-sm font-medium py-1.5 px-3 rounded-lg transition-colors border-l-2 border-transparent hover:bg-slate-50 hover:border-[#e6c800]/50 hover:text-[#0e0e0e] toc-link ${h.level === 3 ? "pl-6 text-slate-600" : "pl-3 text-slate-700 font-semibold"}`}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        scrollToHeading(h.id);
+                                                    }}
+                                                    className={`block text-sm font-medium py-1.5 px-3 rounded-lg transition-colors border-l-2 hover:bg-slate-50 hover:border-[#e6c800]/50 hover:text-[#0e0e0e] toc-link ${h.level === 3 ? "pl-6 text-slate-600" : "pl-3 text-slate-700 font-semibold"} ${activeHeadingId === h.id ? "border-[#e6c800] bg-[#e6c800]/10 text-[#0e0e0e]" : "border-transparent"}`}
                                                     data-heading-id={h.id}
                                                 >
                                                     {h.text}
@@ -427,12 +480,6 @@ export default function BlogDetailClient({
                         </div>
                     </section>
                 )}
-
-                <section className="py-16 bg-white border-t border-[#0a0c10]/[0.06]">
-                    <div className="container mx-auto px-6 max-w-3xl">
-                        <NewsletterBlock locale={locale} />
-                    </div>
-                </section>
 
                 {hasPrevNext && (
                     <section className="py-16 bg-white border-t border-[#0a0c10]/[0.06]">

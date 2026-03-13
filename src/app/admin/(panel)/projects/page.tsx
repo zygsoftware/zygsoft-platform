@@ -1,155 +1,418 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Edit, Loader2, Link as LinkIcon, ExternalLink, X, FolderKanban } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import {
+    Plus,
+    Trash2,
+    Edit,
+    CheckCircle,
+    Clock,
+    Loader2,
+    FolderKanban,
+    ExternalLink,
+    Star,
+    StarOff,
+    Search,
+    Eye,
+    AlertTriangle,
+    FolderOpen,
+} from "lucide-react";
+import Link from "next/link";
+import toast from "react-hot-toast";
+import { AdminCard, AdminStatsCard, AdminPageHeader, AdminBadge } from "@/components/admin";
 
-export default function AdminProjects() {
-    const [projects, setProjects] = useState([]);
+type Project = {
+    id: string;
+    slug: string;
+    title_tr: string;
+    title_en: string;
+    excerpt_tr: string;
+    excerpt_en: string;
+    sector: string | null;
+    category_id: string | null;
+    category: { id: string; name_tr: string; name_en: string; slug: string } | null;
+    published: boolean;
+    featured: boolean;
+    cover_image: string | null;
+    seo_title_tr: string | null;
+    seo_title_en: string | null;
+    seo_description_tr: string | null;
+    seo_description_en: string | null;
+    cover_image_alt_tr: string | null;
+    cover_image_alt_en: string | null;
+    updated_at: string;
+    published_at: string | null;
+};
+
+type Category = { id: string; name_tr: string; name_en: string; slug: string };
+
+export default function AdminProjectsPage() {
+    const router = useRouter();
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
-    const [submitting, setSubmitting] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [formData, setFormData] = useState({
-        title: "",
-        description: "",
-        client: "",
-        link: "",
-        image: ""
-    });
+    const [actionId, setActionId] = useState<string | null>(null);
+    const [statusFilter, setStatusFilter] = useState<"all" | "published" | "draft">("all");
+    const [featuredFilter, setFeaturedFilter] = useState<"all" | "yes" | "no">("all");
+    const [categoryFilter, setCategoryFilter] = useState("");
+    const [missingEnFilter, setMissingEnFilter] = useState(false);
+    const [missingSeoFilter, setMissingSeoFilter] = useState(false);
+    const [missingAltFilter, setMissingAltFilter] = useState(false);
+    const [sortBy, setSortBy] = useState<"newest" | "updated" | "sort_order">("newest");
+    const [search, setSearch] = useState("");
 
     const fetchProjects = async () => {
         try {
-            const res = await fetch("/api/projects");
+            const params = new URLSearchParams();
+            params.set("all", "true");
+            params.set("limit", "200");
+            if (categoryFilter) params.set("category", categoryFilter);
+            if (featuredFilter === "yes") params.set("featured", "true");
+            if (search.trim()) params.set("search", search.trim());
+            params.set("sort", sortBy === "updated" ? "updated" : sortBy === "sort_order" ? "sort_order" : "newest");
+            const res = await fetch(`/api/projects?${params}`);
             const data = await res.json();
-            setProjects(data);
-        } catch (error) {
-            console.error("Projeler yüklenirken hata oluştu", error);
+            setProjects(data.projects ?? []);
+        } catch {
+            setProjects([]);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchProjects();
+        fetch("/api/projects/categories")
+            .then((r) => r.json())
+            .then((d) => setCategories(Array.isArray(d) ? d : []))
+            .catch(() => setCategories([]));
     }, []);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSubmitting(true);
-        try {
-            await fetch("/api/projects", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
-            });
-            setIsModalOpen(false);
-            setFormData({ title: "", description: "", client: "", link: "", image: "" });
-            fetchProjects();
-        } catch (error) {
-            console.error("Proje eklenirken hata oluştu", error);
-        } finally {
-            setSubmitting(false);
-        }
-    };
+    useEffect(() => {
+        const t = setTimeout(() => fetchProjects(), search ? 300 : 0);
+        return () => clearTimeout(t);
+    }, [categoryFilter, featuredFilter, sortBy, search]);
 
     const handleDelete = async (id: string) => {
         if (!confirm("Bu projeyi kalıcı olarak silmek istediğinize emin misiniz?")) return;
         setDeletingId(id);
         try {
-            await fetch(`/api/projects?id=${id}`, { method: "DELETE" });
-            setProjects(prev => prev.filter((p: any) => p.id !== id));
-        } catch (error) {
-            console.error("Silinemedi");
+            await fetch(`/api/projects/${id}`, { method: "DELETE" });
+            fetchProjects();
+            toast.success("Proje silindi.");
+        } catch {
+            toast.error("Silinemedi.");
         } finally {
             setDeletingId(null);
         }
     };
 
+    const handleQuickAction = async (id: string, action: "publish" | "unpublish" | "feature" | "unfeature") => {
+        setActionId(id);
+        try {
+            const body =
+                action === "publish"
+                    ? { published: true }
+                    : action === "unpublish"
+                        ? { published: false }
+                        : action === "feature"
+                            ? { featured: true }
+                            : { featured: false };
+            const res = await fetch(`/api/projects/${id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                fetchProjects();
+                router.refresh();
+                toast.success(action === "publish" ? "Proje yayınlandı." : action === "unpublish" ? "Proje taslağa alındı." : "Güncellendi.");
+            } else {
+                toast.error(data.error || "İşlem başarısız.");
+            }
+        } finally {
+            setActionId(null);
+        }
+    };
+
+    const isEnComplete = (p: Project) => !!(p.title_en?.trim() && p.excerpt_en?.trim());
+    const hasSeo = (p: Project) =>
+        !!(
+            (p.seo_title_tr?.trim() || p.seo_title_en?.trim()) &&
+            (p.seo_description_tr?.trim() || p.seo_description_en?.trim())
+        );
+    const hasCoverAlt = (p: Project) => !!(p.cover_image && (p.cover_image_alt_tr?.trim() || p.cover_image_alt_en?.trim()));
+
+    const filtered = projects.filter((p) => {
+        if (statusFilter === "published" && !p.published) return false;
+        if (statusFilter === "draft" && p.published) return false;
+        if (featuredFilter === "yes" && !p.featured) return false;
+        if (featuredFilter === "no" && p.featured) return false;
+        if (categoryFilter && p.category_id !== categoryFilter) return false;
+        if (missingEnFilter && isEnComplete(p)) return false;
+        if (missingSeoFilter && hasSeo(p)) return false;
+        if (missingAltFilter && hasCoverAlt(p)) return false;
+        return true;
+    });
+
+    const sorted = [...filtered].sort((a, b) => {
+        if (sortBy === "updated") return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+        if (sortBy === "sort_order") {
+            const ao = (a as any).sort_order ?? 999;
+            const bo = (b as any).sort_order ?? 999;
+            if (ao !== bo) return ao - bo;
+        }
+        return new Date(b.published_at || b.updated_at).getTime() - new Date(a.published_at || a.updated_at).getTime();
+    });
+
+    const stats = useMemo(
+        () => ({
+            total: projects.length,
+            published: projects.filter((p) => p.published).length,
+            draft: projects.filter((p) => !p.published).length,
+            featured: projects.filter((p) => p.featured).length,
+        }),
+        [projects]
+    );
+
     return (
-        <div>
-            {/* Header */}
-            <div className="flex justify-between items-start mb-8 gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-900">Projeler</h1>
-                    <p className="text-slate-500 mt-1 text-sm">Zygsoft referans ve portfolyo projelerini yönetin.</p>
-                </div>
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-lg shadow-emerald-500/20 shrink-0"
-                >
-                    <Plus size={18} /> Yeni Proje
-                </button>
+        <div className="space-y-8 min-w-0 w-full max-w-full">
+            <AdminPageHeader
+                title="Projeler"
+                subtitle="Portfolyo ve case study projelerini yönetin."
+                actions={
+                    <>
+                        <Link
+                            href="/admin/projects/new"
+                            className="inline-flex items-center gap-2 bg-[#0e0e0e] hover:bg-[#1a1a1a] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm"
+                        >
+                            <Plus size={18} /> Yeni Proje Ekle
+                        </Link>
+                        <Link
+                            href="/admin/projects/categories"
+                            className="inline-flex items-center gap-2 border border-slate-200 hover:bg-slate-50 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
+                        >
+                            <FolderOpen size={18} /> Kategoriler
+                        </Link>
+                    </>
+                }
+            />
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <AdminStatsCard label="Toplam" value={stats.total} icon={<FolderKanban size={20} />} accent="slate" />
+                <AdminStatsCard label="Yayında" value={stats.published} icon={<CheckCircle size={20} />} accent="emerald" />
+                <AdminStatsCard label="Taslak" value={stats.draft} icon={<Clock size={20} />} accent="default" />
+                <AdminStatsCard label="Öne Çıkan" value={stats.featured} icon={<Star size={20} />} accent="violet" />
             </div>
 
-            {/* Content Table */}
-            <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                {loading ? (
-                    <div className="p-12 text-center flex items-center justify-center gap-3 text-slate-400">
-                        <Loader2 size={24} className="animate-spin text-emerald-500" />
-                        <span className="font-medium">Projeler Yükleniyor...</span>
+            <AdminCard padding="md">
+                <div className="flex flex-col gap-4">
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                            <input
+                                type="text"
+                                placeholder="Başlık veya özet ara..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#e6c800]/30 focus:border-[#e6c800]/50 transition-all"
+                            />
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            {(["all", "published", "draft"] as const).map((s) => (
+                                <button
+                                    key={s}
+                                    onClick={() => setStatusFilter(s)}
+                                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${statusFilter === s ? "bg-[#0e0e0e] text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+                                >
+                                    {s === "all" ? "Tüm Durum" : s === "published" ? "Yayında" : "Taslak"}
+                                </button>
+                            ))}
+                            {(["all", "yes", "no"] as const).map((f) => (
+                                <button
+                                    key={f}
+                                    onClick={() => setFeaturedFilter(f)}
+                                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${featuredFilter === f ? "bg-[#0e0e0e] text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+                                >
+                                    {f === "all" ? "Öne Çıkan" : f === "yes" ? "Evet" : "Hayır"}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                ) : projects.length === 0 ? (
+                    <div className="flex flex-wrap items-center gap-3">
+                        <select
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value)}
+                            className="px-3 py-2 border border-slate-200 rounded-xl text-sm font-medium bg-white min-w-[160px]"
+                        >
+                            <option value="">Tüm Kategoriler</option>
+                            {categories.map((c) => (
+                                <option key={c.id} value={c.id}>
+                                    {c.name_tr}
+                                </option>
+                            ))}
+                        </select>
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                            className="px-3 py-2 border border-slate-200 rounded-xl text-sm font-medium bg-white"
+                        >
+                            <option value="newest">En Yeni</option>
+                            <option value="updated">Son Güncelleme</option>
+                            <option value="sort_order">Sıra</option>
+                        </select>
+                        <label className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white cursor-pointer hover:bg-slate-50">
+                            <input type="checkbox" checked={missingEnFilter} onChange={(e) => setMissingEnFilter(e.target.checked)} className="rounded" />
+                            <span className="flex items-center gap-1 text-amber-600">
+                                <AlertTriangle size={14} /> EN eksik
+                            </span>
+                        </label>
+                        <label className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white cursor-pointer hover:bg-slate-50">
+                            <input type="checkbox" checked={missingSeoFilter} onChange={(e) => setMissingSeoFilter(e.target.checked)} className="rounded" />
+                            <span className="flex items-center gap-1 text-amber-600">
+                                <AlertTriangle size={14} /> SEO eksik
+                            </span>
+                        </label>
+                        <label className="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-xl text-sm bg-white cursor-pointer hover:bg-slate-50">
+                            <input type="checkbox" checked={missingAltFilter} onChange={(e) => setMissingAltFilter(e.target.checked)} className="rounded" />
+                            <span className="flex items-center gap-1 text-amber-600">
+                                <AlertTriangle size={14} /> Görsel alt metni eksik
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </AdminCard>
+
+            <AdminCard padding="none" className="min-w-0 w-full max-w-full overflow-hidden">
+                {loading ? (
+                    <div className="p-16 text-center flex items-center justify-center gap-3 text-slate-400">
+                        <Loader2 size={24} className="animate-spin text-[#e6c800]" />
+                        <span className="font-medium">Yükleniyor...</span>
+                    </div>
+                ) : sorted.length === 0 ? (
                     <div className="p-16 text-center">
-                        <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
+                        <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
                             <FolderKanban size={32} />
                         </div>
-                        <p className="text-slate-500 font-medium text-lg">Henüz hiç proje bulunmuyor.</p>
-                        <p className="text-slate-400 text-sm mt-1">Hemen sağ üstten ilk projenizi ekleyin!</p>
+                        <p className="text-slate-500 font-medium text-lg">
+                            {filtered.length === 0 && projects.length > 0 ? "Filtrelere uygun proje bulunamadı." : "Henüz proje yok."}
+                        </p>
+                        {projects.length === 0 && (
+                            <Link href="/admin/projects/new" className="inline-flex items-center gap-2 mt-4 text-[#0e0e0e] font-semibold hover:text-[#e6c800] transition-colors">
+                                <Plus size={18} /> İlk projeyi ekle
+                            </Link>
+                        )}
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead className="bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                <tr>
-                                    <th className="px-6 py-4">Proje Detayları</th>
-                                    <th className="px-6 py-4 hidden sm:table-cell">Müşteri</th>
-                                    <th className="px-6 py-4 hidden md:table-cell">Link</th>
-                                    <th className="px-6 py-4 text-right">İşlemler</th>
+                    <div className="overflow-x-auto w-full max-w-full">
+                        <table className="w-full text-sm min-w-[800px]">
+                            <thead>
+                                <tr className="border-b border-slate-200/80 bg-slate-50/50">
+                                    <th className="px-4 py-3 text-left max-w-[280px]">Başlık</th>
+                                    <th className="px-4 py-3 w-[100px]">Durum</th>
+                                    <th className="px-4 py-3 w-[140px] hidden lg:table-cell">Kategori</th>
+                                    <th className="px-4 py-3 w-[100px] hidden md:table-cell">Sektör</th>
+                                    <th className="px-4 py-3 w-[80px] text-center hidden md:table-cell">Öne Çıkan</th>
+                                    <th className="px-4 py-3 w-[70px] text-center hidden md:table-cell">TR/EN</th>
+                                    <th className="px-4 py-3 w-[70px] text-center hidden md:table-cell">SEO</th>
+                                    <th className="px-4 py-3 w-[100px] hidden sm:table-cell">Güncelleme</th>
+                                    <th className="px-4 py-3 w-[220px] text-right">İşlemler</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {projects.map((project: any) => (
-                                    <tr key={project.id} className="hover:bg-slate-50 transition-colors group">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 bg-slate-100 rounded-lg overflow-hidden shrink-0 border border-slate-200">
-                                                    {project.image ? (
-                                                        <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
+                                {sorted.map((project) => (
+                                    <tr key={project.id} className={`transition-colors ${!project.published ? "bg-amber-50/50" : ""}`}>
+                                        <td className="px-4 py-3 max-w-[280px]">
+                                            <div className="flex items-start gap-3 min-w-0">
+                                                <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-slate-100 border border-slate-200">
+                                                    {project.cover_image ? (
+                                                        <img src={project.cover_image} alt="" className="w-full h-full object-cover" />
                                                     ) : (
                                                         <div className="w-full h-full flex items-center justify-center text-slate-400">
                                                             <FolderKanban size={20} />
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div>
-                                                    <p className="font-bold text-slate-900">{project.title}</p>
-                                                    <p className="text-xs text-slate-500 mt-1 line-clamp-1 max-w-[200px] sm:max-w-xs">{project.description}</p>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="font-medium text-slate-900 line-clamp-2">{project.title_tr}</div>
+                                                    <div className="text-xs text-slate-400 font-mono mt-0.5">/portfolio/{project.slug}</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 hidden sm:table-cell">
-                                            <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
-                                                {project.client || "Belirtilmemiş"}
-                                            </span>
+                                        <td className="px-4 py-3">
+                                            <AdminBadge variant={project.published ? "published" : "draft"} label={project.published ? "Yayında" : "Taslak"} />
                                         </td>
-                                        <td className="px-6 py-4 hidden md:table-cell">
-                                            {project.link ? (
-                                                <a href={project.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors">
-                                                    Ziyaret Et <ExternalLink size={14} />
-                                                </a>
+                                        <td className="px-4 py-3 hidden lg:table-cell text-slate-600 text-sm">
+                                            {project.category?.name_tr ?? "—"}
+                                        </td>
+                                        <td className="px-4 py-3 hidden md:table-cell text-slate-600 text-sm">
+                                            {project.sector || "—"}
+                                        </td>
+                                        <td className="px-4 py-3 hidden md:table-cell text-center">
+                                            {project.featured ? <Star size={16} className="text-amber-500 mx-auto fill-amber-500" /> : "—"}
+                                        </td>
+                                        <td className="px-4 py-3 hidden md:table-cell text-center">
+                                            {isEnComplete(project) ? (
+                                                <span className="text-emerald-600">✓</span>
                                             ) : (
-                                                <span className="text-sm text-slate-400">—</span>
+                                                <span className="text-amber-600" title="EN eksik">
+                                                    <AlertTriangle size={14} />
+                                                </span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <button
-                                                onClick={() => handleDelete(project.id)}
-                                                disabled={deletingId === project.id}
-                                                className="opacity-0 group-hover:opacity-100 inline-flex items-center justify-center p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50"
-                                            >
-                                                {deletingId === project.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={18} />}
-                                            </button>
+                                        <td className="px-4 py-3 hidden md:table-cell text-center">
+                                            {hasSeo(project) ? (
+                                                <span className="text-emerald-600">✓</span>
+                                            ) : (
+                                                <span className="text-amber-600" title="SEO eksik">
+                                                    <AlertTriangle size={14} />
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-3 hidden sm:table-cell text-slate-500 text-xs">
+                                            {new Date(project.updated_at).toLocaleDateString("tr-TR")}
+                                        </td>
+                                        <td className="px-4 py-3 text-right">
+                                            <div className="flex items-center justify-end gap-2 flex-wrap">
+                                                <Link href={`/admin/projects/edit/${project.id}`} className="px-3 py-1.5 text-xs rounded-md border border-slate-200 hover:bg-slate-50 font-medium">
+                                                    Düzenle
+                                                </Link>
+                                                <a
+                                                    href={project.published ? `/projeler/${project.slug}` : `/admin/projects/preview/${project.id}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="px-3 py-1.5 text-xs rounded-md border border-slate-200 hover:bg-slate-50 font-medium"
+                                                >
+                                                    Önizle
+                                                </a>
+                                                {!project.published && (
+                                                    <button
+                                                        onClick={() => handleQuickAction(project.id, "publish")}
+                                                        disabled={actionId === project.id}
+                                                        className="px-3 py-1.5 text-xs rounded-md bg-emerald-500 text-white hover:bg-emerald-600 font-medium disabled:opacity-50 flex items-center gap-1"
+                                                    >
+                                                        {actionId === project.id ? <Loader2 size={12} className="animate-spin" /> : "Yayınla"}
+                                                    </button>
+                                                )}
+                                                {project.published && (
+                                                    <button
+                                                        onClick={() => handleQuickAction(project.id, "unpublish")}
+                                                        disabled={actionId === project.id}
+                                                        className="px-3 py-1.5 text-xs rounded-md bg-amber-500 text-white hover:bg-amber-600 font-medium disabled:opacity-50 flex items-center gap-1"
+                                                    >
+                                                        {actionId === project.id ? <Loader2 size={12} className="animate-spin" /> : "Taslağa Al"}
+                                                    </button>
+                                                )}
+                                                <button
+                                                    onClick={() => handleDelete(project.id)}
+                                                    disabled={deletingId === project.id}
+                                                    className="px-3 py-1.5 text-xs rounded-md bg-red-500 text-white hover:bg-red-600 font-medium disabled:opacity-50 flex items-center gap-1"
+                                                >
+                                                    {deletingId === project.id ? <Loader2 size={12} className="animate-spin" /> : "Sil"}
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -157,74 +420,14 @@ export default function AdminProjects() {
                         </table>
                     </div>
                 )}
-            </div>
-
-            {/* Add Modal */}
-            <AnimatePresence>
-                {isModalOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsModalOpen(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
-                        <motion.div
-                            initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                            className="bg-white rounded-3xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden"
-                        >
-                            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                                <h2 className="text-xl font-bold text-slate-900">Yeni Proje Ekle</h2>
-                                <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 flex items-center justify-center text-slate-400 hover:bg-slate-200 hover:text-slate-600 rounded-full transition-colors">
-                                    <X size={18} />
-                                </button>
-                            </div>
-
-                            <form onSubmit={handleSubmit} className="p-6 space-y-5">
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Proje Adı</label>
-                                    <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium" placeholder="Proje Adı" />
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Açıklama</label>
-                                    <textarea required rows={3} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium resize-none" placeholder="Proje hakkında kısa açıklama..." />
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Müşteri</label>
-                                        <input type="text" value={formData.client} onChange={(e) => setFormData({ ...formData, client: e.target.value })}
-                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium" placeholder="Müşteri Adı" />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Görsel (URL)</label>
-                                        <input type="url" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                                            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium" placeholder="https://..." />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Canlı Link</label>
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                                            <LinkIcon size={16} />
-                                        </div>
-                                        <input type="url" value={formData.link} onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                                            className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-sm font-medium" placeholder="Proje web sitesi linki" />
-                                    </div>
-                                </div>
-
-                                <div className="pt-4 flex items-center justify-end gap-3">
-                                    <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-all text-sm">
-                                        İptal
-                                    </button>
-                                    <button type="submit" disabled={submitting} className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 flex items-center gap-2 text-sm">
-                                        {submitting ? <><Loader2 size={16} className="animate-spin" /> Kaydediliyor...</> : "Projeyi Oluştur"}
-                                    </button>
-                                </div>
-                            </form>
-                        </motion.div>
+                {sorted.length > 0 && (
+                    <div className="px-6 py-3 border-t border-slate-100 text-xs text-slate-500 flex justify-between items-center bg-slate-50/30">
+                        <span>
+                            {sorted.length} / {projects.length} proje gösteriliyor
+                        </span>
                     </div>
                 )}
-            </AnimatePresence>
+            </AdminCard>
         </div>
     );
 }

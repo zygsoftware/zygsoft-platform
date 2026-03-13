@@ -6,17 +6,24 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ExternalLink, Code2 } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { BlockReveal, TextReveal } from "@/components/ui/reveal";
 
 type Project = {
     id: string;
-    title: string;
-    description: string;
-    image?: string | null;
-    client?: string | null;
-    link?: string | null;
     slug: string;
+    title_tr: string;
+    title_en: string;
+    excerpt_tr: string;
+    excerpt_en: string;
+    cover_image: string | null;
+    client_name: string | null;
+    live_url: string | null;
+    sector: string | null;
+    category: { name_tr: string; name_en: string } | null;
+    result_tr: string | null;
+    result_en: string | null;
+    featured: boolean;
 };
 
 export default function Portfolio() {
@@ -28,9 +35,9 @@ export default function Portfolio() {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const res = await fetch("/api/projects");
+                const res = await fetch("/api/projects?limit=50");
                 const data = await res.json();
-                setProjects(data);
+                setProjects(data.projects ?? []);
             } catch (error) {
                 console.error("Projeler yüklenemedi", error);
             } finally {
@@ -87,9 +94,11 @@ export default function Portfolio() {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {projects.map((p, i) => {
-                                    const detailHref = locale === "en"
-                                        ? `/en/portfolio/${p.slug}`
-                                        : `/portfolio/${p.slug}`;
+                                    const detailHref = `/portfolio/${p.slug}`;
+                                    const title = locale === "en" ? p.title_en : p.title_tr;
+                                    const excerpt = locale === "en" ? p.excerpt_en : p.excerpt_tr;
+                                    const categoryName = p.category ? (locale === "en" ? p.category.name_en : p.category.name_tr) : null;
+                                    const resultSnippet = locale === "en" ? (p.result_en || p.result_tr) : (p.result_tr || p.result_en);
 
                                     return (
                                         <BlockReveal key={p.id} delay={i * 0.08}>
@@ -100,8 +109,8 @@ export default function Portfolio() {
                                                     whileHover={{ scale: 1.02 }}
                                                     transition={{ duration: 0.4 }}
                                                 >
-                                                    {p.image ? (
-                                                        <img src={p.image} alt={p.title} className="absolute inset-0 w-full h-full object-cover" />
+                                                    {p.cover_image ? (
+                                                        <img src={p.cover_image} alt={title} className="absolute inset-0 w-full h-full object-cover" />
                                                     ) : (
                                                         <>
                                                             <motion.div
@@ -121,17 +130,36 @@ export default function Portfolio() {
                                                         whileHover={{ width: "100%" }}
                                                         transition={{ duration: 0.4 }} />
 
-                                                    <span className="text-xs font-bold uppercase tracking-widest text-[#888] mb-3 block">
-                                                        {p.client ? `${p.client}` : "ZYGSOFT"}
-                                                    </span>
+                                                    <div className="flex flex-wrap items-center gap-2 mb-3">
+                                                        {categoryName && (
+                                                            <span className="text-xs font-bold uppercase tracking-widest text-[#e6c800]">
+                                                                {categoryName}
+                                                            </span>
+                                                        )}
+                                                        {p.sector && (
+                                                            <span className="text-xs font-bold uppercase tracking-widest text-[#888]">
+                                                                {p.sector}
+                                                            </span>
+                                                        )}
+                                                        {!categoryName && !p.sector && (
+                                                            <span className="text-xs font-bold uppercase tracking-widest text-[#888]">
+                                                                {p.client_name || "ZYGSOFT"}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                     <h3 className="font-display font-bold text-2xl text-[#0e0e0e] mb-4 group-hover:text-[#c9ad00] transition-colors">
-                                                        {p.title}
+                                                        {title}
                                                     </h3>
-                                                    <p className="text-[#666] leading-relaxed mb-6 line-clamp-3">
-                                                        {p.description}
+                                                    <p className="text-[#666] leading-relaxed mb-2 line-clamp-3">
+                                                        {excerpt}
                                                     </p>
+                                                    {resultSnippet && (
+                                                        <p className="text-sm text-[#888] mb-4 line-clamp-2">
+                                                            {resultSnippet}
+                                                        </p>
+                                                    )}
                                                     <span className="inline-flex items-center gap-2 text-sm font-bold text-[#e6c800] uppercase tracking-wider">
-                                                        {locale === "en" ? "View Case Study" : "Detayları Gör"} <ExternalLink size={16} />
+                                                        {locale === "en" ? "View Case Study" : "Projeyi İncele"} <ExternalLink size={16} />
                                                     </span>
                                                 </div>
                                             </Link>
