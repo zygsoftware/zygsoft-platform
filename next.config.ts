@@ -4,6 +4,38 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
+  outputFileTracingExcludes: {
+    "/api/tools/letterhead": [
+      "./python-api/**/*",
+      "./tools/udf-converter/**/*",
+      "./tools/ocr-text/**/*",
+      "./tools/pdf-to-image/**/*",
+      "./tools/pdf-to-word/**/*",
+      "./tools/pdf-compress/**/*",
+      "./tools/tiff-to-pdf/**/*",
+      "./tools/requirements-legal.txt",
+      "./public/uploads/**/*",
+      "./prisma/dev.backup.db",
+      "./dev.db",
+      "./DEPLOYMENT.md",
+      "./UDF-SETUP.md",
+    ],
+    "/api/tools/udf-convert": [
+      "./python-api/**/*",
+      "./tools/udf-converter/**/*",
+      "./tools/ocr-text/**/*",
+      "./tools/pdf-to-image/**/*",
+      "./tools/pdf-to-word/**/*",
+      "./tools/pdf-compress/**/*",
+      "./tools/tiff-to-pdf/**/*",
+      "./tools/requirements-legal.txt",
+      "./public/uploads/**/*",
+      "./prisma/dev.backup.db",
+      "./dev.db",
+      "./DEPLOYMENT.md",
+      "./UDF-SETUP.md",
+    ],
+  },
   async redirects() {
     return [
       { source: "/abonelikler", destination: "/dijital-urunler", permanent: true },
