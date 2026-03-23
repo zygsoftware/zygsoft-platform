@@ -19,12 +19,16 @@
  */
 
 const bcrypt = require("bcryptjs");
+const { PrismaPg } = require("@prisma/adapter-pg");
 const { PrismaClient } = require("@prisma/client");
-const { PrismaBetterSqlite3 } = require("@prisma/adapter-better-sqlite3");
 
-const dbUrl = process.env.DATABASE_URL || "file:./dev.db";
-const adapter = new PrismaBetterSqlite3({ url: dbUrl });
-const prisma = new PrismaClient({ adapter });
+if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is required.");
+}
+
+const prisma = new PrismaClient({
+    adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
+});
 
 const DEFAULT_EMAIL = "admin@zygsoft.com";
 const FALLBACK_PASSWORD = "Zygsoft2024!";

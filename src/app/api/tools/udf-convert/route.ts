@@ -3,11 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { checkToolAccess, incrementTrialUsage } from "@/lib/trial-guard";
-import { existsSync } from "fs";
-import path from "path";
-
-const LETTERHEAD_DIR = path.join(process.cwd(), "uploads", "letterheads");
-const ALLOWED_EXT = [".udf", ".xml"];
+import { downloadFromStorage, storageBuckets } from "@/lib/supabase-storage";
 
 function parseErrorDetail(body: unknown): string {
     if (!body || typeof body !== "object") return "Dönüşüm başarısız.";
@@ -34,10 +30,6 @@ function contentDisposition(filename: string): string {
     }
     const encoded = encodeURIComponent(filename);
     return `attachment; filename="document.udf"; filename*=UTF-8''${encoded}`;
-}
-
-function getLetterheadPath(userId: string): string {
-    return path.join(LETTERHEAD_DIR, userId, "letterhead");
 }
 
 export async function POST(req: Request) {
@@ -79,24 +71,17 @@ export async function POST(req: Request) {
         proxyFormData.append("use_letterhead", useLetterhead === "true" || useLetterhead === "1" ? "true" : "false");
 
         if (useLetterhead === "true" || useLetterhead === "1") {
-            const basePath = getLetterheadPath(session.user.id);
-            let letterheadPath: string | null = null;
-            for (const e of ALLOWED_EXT) {
-                const p = basePath + e;
-                if (existsSync(p)) {
-                    letterheadPath = p;
-                    break;
-                }
-            }
-            if (!letterheadPath) {
+            const letterhead = await prisma.userLetterhead.findUnique({
+                where: { userId: session.user.id },
+            });
+            if (!letterhead?.filePath) {
                 return NextResponse.json({
                     error: "Antet kullanımı seçildi ancak kayıtlı antet bulunamadı. Lütfen önce antet yükleyin."
                 }, { status: 400 });
             }
-            const { readFile } = await import("fs/promises");
-            const letterheadBuffer = await readFile(letterheadPath);
-            const letterheadBlob = new Blob([letterheadBuffer]);
-            const letterheadName = path.basename(letterheadPath);
+            const letterheadBuffer = await downloadFromStorage(storageBuckets.letterheads, letterhead.filePath);
+            const letterheadBlob = new Blob([new Uint8Array(letterheadBuffer)]);
+            const letterheadName = letterhead.filePath.split("/").pop() || "letterhead.udf";
             proxyFormData.append("letterhead_file", letterheadBlob, letterheadName);
         }
 

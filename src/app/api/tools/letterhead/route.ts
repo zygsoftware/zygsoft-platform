@@ -2,23 +2,15 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import { writeFile, mkdir, readFile, unlink } from "fs/promises";
-import { existsSync } from "fs";
-import path from "path";
+import {
+    buildStorageObjectPath,
+    removeFromStorage,
+    storageBuckets,
+    uploadToStorage,
+} from "@/lib/supabase-storage";
 
-const LETTERHEAD_DIR = path.join(process.cwd(), "uploads", "letterheads");
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_EXT = [".udf", ".xml"];
-
-function getLetterheadPath(userId: string): string {
-    return path.join(LETTERHEAD_DIR, userId, "letterhead");
-}
-
-async function ensureLetterheadDir(userId: string): Promise<string> {
-    const dir = path.join(LETTERHEAD_DIR, userId);
-    await mkdir(dir, { recursive: true });
-    return dir;
-}
 
 export async function GET() {
     try {
@@ -41,10 +33,7 @@ export async function GET() {
             return NextResponse.json({ hasLetterhead: false });
         }
 
-        const basePath = getLetterheadPath(session.user.id);
-        const hasFile = ALLOWED_EXT.some((ext) => existsSync(basePath + ext));
-
-        return NextResponse.json({ hasLetterhead: hasFile });
+        return NextResponse.json({ hasLetterhead: Boolean(letterhead.filePath) });
     } catch (err) {
         console.error("[letterhead] GET error:", err);
         return NextResponse.json({ hasLetterhead: false });
@@ -85,27 +74,28 @@ export async function POST(req: Request) {
             }, { status: 400 });
         }
 
-        const dir = await ensureLetterheadDir(session.user.id);
-        const filePath = path.join(dir, `letterhead${ext}`);
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const objectPath = buildStorageObjectPath([session.user.id, `letterhead${ext}`]);
+        const existing = await prisma.userLetterhead.findUnique({
+            where: { userId: session.user.id },
+        });
 
-        // Remove previous letterhead (different extension) if any
-        const basePath = getLetterheadPath(session.user.id);
-        for (const e of ALLOWED_EXT) {
-            if (e !== ext) {
-                const p = basePath + e;
-                if (existsSync(p)) {
-                    await unlink(p);
-                }
-            }
+        if (existing?.filePath && existing.filePath !== objectPath) {
+            await removeFromStorage(storageBuckets.letterheads, [existing.filePath]).catch(() => {});
         }
 
-        const buffer = Buffer.from(await file.arrayBuffer());
-        await writeFile(filePath, buffer);
+        await uploadToStorage({
+            bucket: storageBuckets.letterheads,
+            objectPath,
+            body: new Uint8Array(buffer),
+            contentType: file.type || "application/octet-stream",
+            upsert: true,
+        });
 
         await prisma.userLetterhead.upsert({
             where: { userId: session.user.id },
-            create: { userId: session.user.id, filePath },
-            update: { filePath },
+            create: { userId: session.user.id, filePath: objectPath },
+            update: { filePath: objectPath },
         });
 
         return NextResponse.json({ success: true });
@@ -129,12 +119,8 @@ export async function DELETE() {
         });
 
         if (letterhead) {
-            const basePath = getLetterheadPath(session.user.id);
-            for (const ext of ALLOWED_EXT) {
-                const p = basePath + ext;
-                if (existsSync(p)) {
-                    await unlink(p);
-                }
+            if (letterhead.filePath) {
+                await removeFromStorage(storageBuckets.letterheads, [letterhead.filePath]).catch(() => {});
             }
             await prisma.userLetterhead.delete({
                 where: { userId: session.user.id },

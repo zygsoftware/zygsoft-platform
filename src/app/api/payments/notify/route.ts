@@ -2,6 +2,34 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
+import { buildStorageObjectPath, storageBuckets, uploadToStorage } from "@/lib/supabase-storage";
+
+function parseReceiptDataUrl(dataUrl: string): { buffer: Buffer; contentType: string; extension: string } {
+    const match = dataUrl.match(/^data:(.+?);base64,(.+)$/);
+    if (!match) {
+        throw new Error("Geçersiz dekont formatı.");
+    }
+
+    const [, contentType, base64Body] = match;
+    const extensionMap: Record<string, string> = {
+        "image/jpeg": ".jpg",
+        "image/png": ".png",
+        "image/webp": ".webp",
+        "image/gif": ".gif",
+        "application/pdf": ".pdf",
+    };
+    const extension = extensionMap[contentType];
+
+    if (!extension) {
+        throw new Error("Dekont için desteklenmeyen dosya türü.");
+    }
+
+    return {
+        buffer: Buffer.from(base64Body, "base64"),
+        contentType,
+        extension,
+    };
+}
 
 export async function POST(req: Request) {
     try {
@@ -35,6 +63,25 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Geçersiz tutar." }, { status: 400 });
         }
 
+        let receiptUrl: string | null = null;
+        try {
+            const parsedReceipt = parseReceiptDataUrl(receiptImage);
+            const receiptPath = buildStorageObjectPath([
+                session.user.id,
+                `${Date.now()}-${crypto.randomUUID()}${parsedReceipt.extension}`,
+            ]);
+            const uploaded = await uploadToStorage({
+                bucket: storageBuckets.payments,
+                objectPath: receiptPath,
+                body: new Uint8Array(parsedReceipt.buffer),
+                contentType: parsedReceipt.contentType,
+                upsert: false,
+            });
+            receiptUrl = uploaded.publicUrl;
+        } catch (receiptError: any) {
+            return NextResponse.json({ error: receiptError.message || "Dekont yüklenemedi." }, { status: 400 });
+        }
+
         // Only accept known product slugs — never create products from user input
         const dbProduct = await prisma.product.findUnique({ where: { slug: String(productId).trim() } });
         if (!dbProduct) {
@@ -59,7 +106,7 @@ export async function POST(req: Request) {
                 userId: session.user.id,
                 productId: dbProduct.id,
                 amount: parsedAmount,
-                receiptImage,
+                receiptImage: receiptUrl,
                 status: "pending",
             },
         });

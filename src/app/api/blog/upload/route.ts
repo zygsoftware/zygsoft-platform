@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { writeFile, mkdir } from "fs/promises";
+import { buildStorageObjectPath, storageBuckets, uploadToStorage } from "@/lib/supabase-storage";
 import path from "path";
 
 export const dynamic = "force-dynamic";
@@ -35,14 +35,17 @@ export async function POST(req: Request) {
 
         const ext = path.extname(file.name) || ".jpg";
         const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}${ext}`;
-        const uploadDir = path.join(process.cwd(), "public", "uploads", "blog");
-        await mkdir(uploadDir, { recursive: true });
-        const filepath = path.join(uploadDir, filename);
         const bytes = await file.arrayBuffer();
-        await writeFile(filepath, Buffer.from(bytes));
+        const objectPath = buildStorageObjectPath(["blog", filename]);
+        const { publicUrl } = await uploadToStorage({
+            bucket: storageBuckets.blog,
+            objectPath,
+            body: new Uint8Array(bytes),
+            contentType: file.type,
+            upsert: false,
+        });
 
-        const url = `/uploads/blog/${filename}`;
-        return NextResponse.json({ url });
+        return NextResponse.json({ url: publicUrl, path: objectPath });
     } catch (error) {
         console.error("Upload error:", error);
         return NextResponse.json({ error: "Dosya yüklenemedi." }, { status: 500 });

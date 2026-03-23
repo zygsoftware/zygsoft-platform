@@ -10,18 +10,16 @@
  * Or:  npm run migrate:legal-toolkit (if added to package.json)
  */
 
-const path = require("path");
+const { PrismaPg } = require("@prisma/adapter-pg");
 const { PrismaClient } = require("@prisma/client");
-const { PrismaBetterSqlite3 } = require("@prisma/adapter-better-sqlite3");
 
-// Use same DB as app: DATABASE_URL or ./dev.db (relative to project root when running from scripts/)
-const dbUrl = process.env.DATABASE_URL || "file:./dev.db";
-const dbPath = dbUrl.replace(/^file:/, "").trim();
-const resolvedPath = path.isAbsolute(dbPath)
-    ? dbPath
-    : path.resolve(path.join(__dirname, "..", path.basename(dbPath) || "dev.db"));
-const adapter = new PrismaBetterSqlite3({ url: "file:" + resolvedPath });
-const prisma = new PrismaClient({ adapter });
+if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is required.");
+}
+
+const prisma = new PrismaClient({
+    adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
+});
 
 const LEGAL_TOOLKIT_SLUG = "legal-toolkit";
 
