@@ -18,6 +18,7 @@ COPY api ./api
 COPY main.py ./main.py
 COPY paragraph_processor.py ./paragraph_processor.py
 COPY table_processor.py ./table_processor.py
+COPY image_processor.py ./image_processor.py
 COPY utils.py ./utils.py
 COPY blank_udf_template.xml ./blank_udf_template.xml
 
