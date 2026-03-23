@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link } from "@/i18n/navigation";
+import { useSelectedLayoutSegments } from "next/navigation";
 import {
     LayoutDashboard,
     Box,
@@ -17,9 +17,11 @@ import {
 import { motion } from "framer-motion";
 import { signOut } from "next-auth/react";
 import { useTranslations } from "next-intl";
+import { DashboardLocaleSwitcher } from "@/components/dashboard/DashboardLocaleSwitcher";
+import { isDashboardSidebarActive } from "@/lib/dashboard-nav";
 
 export function DashboardSidebar() {
-    const pathname = usePathname();
+    const segments = useSelectedLayoutSegments();
     const t = useTranslations("Dashboard.sidebar");
 
     const menuItems = [
@@ -51,12 +53,11 @@ export function DashboardSidebar() {
                 </Link>
             </div>
 
+            <DashboardLocaleSwitcher />
+
             <nav className="flex-1 px-4 space-y-1">
                 {menuItems.map((item) => {
-                    const isActive =
-                        item.href === "/dashboard"
-                            ? pathname.endsWith("/dashboard")
-                            : pathname.includes(item.href);
+                    const isActive = isDashboardSidebarActive(item.href, segments);
                     return (
                         <Link
                             key={item.href}

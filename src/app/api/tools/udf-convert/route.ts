@@ -55,6 +55,13 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Dosya eksik veya geçersiz. Lütfen bir DOCX dosyası seçin." }, { status: 400 });
         }
 
+        const isSubscribed = !guard.incrementTrial;
+        const maxFileBytes = isSubscribed ? 100 * 1024 * 1024 : 20 * 1024 * 1024;
+        
+        if (file.size > maxFileBytes) {
+            return NextResponse.json({ error: `Dosya çok büyük (maks. ${isSubscribed ? 100 : 20} MB).` }, { status: 400 });
+        }
+
         const ext = (file.name || "").split(".").pop()?.toLowerCase();
         if (ext !== "docx") {
             return NextResponse.json({ error: "Sadece .docx dosyaları desteklenmektedir." }, { status: 400 });

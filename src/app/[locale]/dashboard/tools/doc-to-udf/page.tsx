@@ -18,7 +18,7 @@ import {
     Trash2,
     RefreshCw
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { ToolPageHint } from "@/components/dashboard/ToolPageHint";
@@ -205,23 +205,23 @@ export default function DocToUdfTool() {
     return (
         <div className="relative">
             <div className="max-w-5xl relative z-10">
-                <Link href="/dashboard/tools" className="inline-flex items-center gap-2 text-[#0a0c10]/50 hover:text-[#0a0c10] transition-colors mb-10 text-xs font-bold uppercase tracking-wider">
+                <Link href="/dashboard/tools" className="inline-flex items-center gap-2 text-[#343131]/50 hover:text-[#343131] transition-colors mb-10 text-xs font-bold uppercase tracking-wider">
                     <ArrowLeft size={14} /> {t("backToHub")}
                 </Link>
 
                 <div className="mb-12">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                         <div>
-                            <h1 className="text-3xl md:text-4xl font-display font-black text-[#0a0c10] mb-3 tracking-tight">UDF Dönüştürme Merkezi</h1>
-                            <p className="text-[#0a0c10]/60 font-medium text-lg max-w-xl leading-relaxed">
+                            <h1 className="text-3xl md:text-4xl font-display font-black text-[#343131] mb-3 tracking-tight">UDF Dönüştürme Merkezi</h1>
+                            <p className="text-[#343131]/60 font-medium text-lg max-w-xl leading-relaxed">
                                 DOCX dosyalarınızı UYAP uyumlu UDF formatına saniyeler içinde dönüştürün. Belgeleriniz işlendikten sonra otomatik olarak silinir.
                             </p>
                         </div>
                         <div className="flex flex-wrap items-center gap-3">
-                            <div className="px-4 py-2.5 bg-[#0a0c10] text-[#e6c800] rounded-xl text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                            <div className="px-4 py-2.5 bg-[#343131] text-[#e6c800] rounded-xl text-xs font-bold uppercase tracking-widest flex items-center gap-2">
                                 <FileText size={14} /> {SUPPORTED_LABEL}
                             </div>
-                            <p className="text-[11px] text-[#0a0c10]/50 font-medium">Maks. 60 sn işlem süresi</p>
+                            <p className="text-[11px] text-[#343131]/50 font-medium">Maks. 60 sn işlem süresi</p>
                         </div>
                     </div>
                 </div>
@@ -247,13 +247,13 @@ export default function DocToUdfTool() {
 
                         {/* Letterhead panel */}
                         <div className="lg:col-span-3 mb-4">
-                            <div className="bg-white rounded-[2rem] border border-[#0a0c10]/[0.06] p-6 shadow-sm">
-                                <h3 className="text-base font-black text-[#0a0c10] flex items-center gap-2 mb-4">
+                            <div className="bg-white rounded-[2rem] border border-[#343131]/[0.06] p-6 shadow-sm">
+                                <h3 className="text-base font-black text-[#343131] flex items-center gap-2 mb-4">
                                     <ImageIcon size={18} className="text-[#e6c800]" />
                                     Antetli Kağıt (Letterhead)
                                 </h3>
                                 {letterheadLoading ? (
-                                    <div className="flex items-center gap-2 text-[#0a0c10]/50 text-sm">
+                                    <div className="flex items-center gap-2 text-[#343131]/50 text-sm">
                                         <Loader2 size={16} className="animate-spin" />
                                         Yükleniyor…
                                     </div>
@@ -268,7 +268,7 @@ export default function DocToUdfTool() {
                                                     <button
                                                         onClick={() => letterheadInputRef.current?.click()}
                                                         disabled={letterheadUploading}
-                                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0a0c10] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#0a0c10]/90 disabled:opacity-50 transition-all"
+                                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#343131] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#343131]/90 disabled:opacity-50 transition-all"
                                                     >
                                                         {letterheadUploading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
                                                         Değiştir
@@ -284,11 +284,11 @@ export default function DocToUdfTool() {
                                                 </>
                                             ) : (
                                                 <>
-                                                    <span className="text-sm text-[#0a0c10]/60">Antet yüklemeden dönüştürme yapılır.</span>
+                                                    <span className="text-sm text-[#343131]/60">Antet yüklemeden dönüştürme yapılır.</span>
                                                     <button
                                                         onClick={() => letterheadInputRef.current?.click()}
                                                         disabled={letterheadUploading}
-                                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#e6c800] text-[#0a0c10] text-xs font-bold uppercase tracking-wider hover:bg-[#c9ad00] disabled:opacity-50 transition-all"
+                                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#e6c800] text-[#343131] text-xs font-bold uppercase tracking-wider hover:bg-[#c9ad00] disabled:opacity-50 transition-all"
                                                     >
                                                         {letterheadUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
                                                         Antet Yükle
@@ -303,7 +303,7 @@ export default function DocToUdfTool() {
                                                 onChange={handleLetterheadUpload}
                                             />
                                         </div>
-                                        <div className="flex items-center gap-3 pt-2 border-t border-[#0a0c10]/[0.06]">
+                                        <div className="flex items-center gap-3 pt-2 border-t border-[#343131]/[0.06]">
                                             <label className="relative inline-flex items-center cursor-pointer">
                                                 <input
                                                     type="checkbox"
@@ -312,10 +312,10 @@ export default function DocToUdfTool() {
                                                     disabled={!hasLetterhead}
                                                     className="sr-only peer"
                                                 />
-                                                <div className="w-11 h-6 bg-[#0a0c10]/[0.12] peer-focus:ring-2 peer-focus:ring-[#e6c800]/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e6c800] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed" />
-                                                <span className="ml-3 text-sm font-bold text-[#0a0c10]">Antet kullan</span>
+                                                <div className="w-11 h-6 bg-[#343131]/[0.12] peer-focus:ring-2 peer-focus:ring-[#e6c800]/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e6c800] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed" />
+                                                <span className="ml-3 text-sm font-bold text-[#343131]">Antet kullan</span>
                                             </label>
-                                            <span className="text-xs text-[#0a0c10]/50">
+                                            <span className="text-xs text-[#343131]/50">
                                                 {!hasLetterhead
                                                     ? "Antet yüklemeden bu seçenek kullanılamaz."
                                                     : useLetterhead
@@ -334,9 +334,9 @@ export default function DocToUdfTool() {
                                 onDragOver={handleDragOver}
                                 onDragLeave={handleDragLeave}
                                 onDrop={handleDrop}
-                                className={`bg-white rounded-[2rem] border-2 border-dashed p-10 text-center cursor-pointer transition-all duration-300 h-full flex flex-col justify-center items-center shadow-sm hover:shadow-lg hover:shadow-[#0a0c10]/[0.06] ${isDragging
+                                className={`bg-white rounded-[2rem] border-2 border-dashed p-10 text-center cursor-pointer transition-all duration-300 h-full flex flex-col justify-center items-center shadow-sm hover:shadow-lg hover:shadow-[#343131]/[0.06] ${isDragging
                                     ? "border-amber-400 bg-amber-50/50 scale-[1.01]"
-                                    : "border-[#0a0c10]/[0.12] hover:border-[#0a0c10]/[0.2] hover:bg-[#fafafc]"
+                                    : "border-[#343131]/[0.12] hover:border-[#343131]/[0.2] hover:bg-[#fafafc]"
                                     }`}
                             >
                                 <input
@@ -353,23 +353,23 @@ export default function DocToUdfTool() {
                                     }}
                                     accept={ACCEPTED_FORMAT}
                                 />
-                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-colors ${isDragging ? "bg-[#e6c800]/20 text-[#e6c800]" : "bg-[#0a0c10] text-[#e6c800]"}`}>
+                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-colors ${isDragging ? "bg-[#e6c800]/20 text-[#e6c800]" : "bg-[#343131] text-[#e6c800]"}`}>
                                     <Upload size={28} />
                                 </div>
-                                <h3 className="text-lg font-black text-[#0a0c10] mb-2">Belgeleri Yükle</h3>
-                                <p className="text-[#0a0c10]/50 text-sm font-medium leading-relaxed mb-4">
+                                <h3 className="text-lg font-black text-[#343131] mb-2">Belgeleri Yükle</h3>
+                                <p className="text-[#343131]/50 text-sm font-medium leading-relaxed mb-4">
                                     {tUdf("uploadHint")}
                                 </p>
-                                <p className="text-[10px] font-bold uppercase tracking-wider text-[#0a0c10]/40">
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-[#343131]/40">
                                     {tUdf("uploadFormat")}
                                 </p>
                             </div>
                         </div>
 
                         <div className="lg:col-span-2">
-                            <div className="bg-white rounded-[2rem] border border-[#0a0c10]/[0.06] p-8 h-full flex flex-col shadow-sm">
+                            <div className="bg-white rounded-[2rem] border border-[#343131]/[0.06] p-8 h-full flex flex-col shadow-sm">
                                 <div className="flex items-center justify-between mb-8">
-                                    <h3 className="text-lg font-black text-[#0a0c10] flex items-center gap-2">
+                                    <h3 className="text-lg font-black text-[#343131] flex items-center gap-2">
                                         <Files size={18} className="text-[#e6c800]" />
                                         İşlem Kuyruğu ({files.length})
                                     </h3>
@@ -377,7 +377,7 @@ export default function DocToUdfTool() {
                                         <button
                                             onClick={handleConvertAll}
                                             disabled={isProcessing || !files.some(f => f.status === "idle" && !f.error)}
-                                            className="px-6 py-3 bg-[#e6c800] text-[#0a0c10] rounded-xl text-xs font-black uppercase tracking-wider hover:bg-[#c9ad00] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 shadow-sm"
+                                            className="px-6 py-3 bg-[#e6c800] text-[#343131] rounded-xl text-xs font-black uppercase tracking-wider hover:bg-[#c9ad00] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 shadow-sm"
                                         >
                                             {isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
                                             Dönüştürmeyi Başlat
@@ -387,12 +387,12 @@ export default function DocToUdfTool() {
 
                                 <div className="flex-1 space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                                     {files.length === 0 ? (
-                                        <div className="flex flex-col items-center justify-center py-20 text-[#0a0c10]/30">
-                                            <div className="w-20 h-20 bg-[#fafafc] rounded-2xl flex items-center justify-center mb-4 border border-[#0a0c10]/[0.06]">
+                                        <div className="flex flex-col items-center justify-center py-20 text-[#343131]/30">
+                                            <div className="w-20 h-20 bg-[#fafafc] rounded-2xl flex items-center justify-center mb-4 border border-[#343131]/[0.06]">
                                                 <FileIcon size={36} className="opacity-40" />
                                             </div>
                                             <p className="text-[11px] font-bold uppercase tracking-wider">Dosya ekleyin</p>
-                                            <p className="text-[10px] text-[#0a0c10]/40 mt-1">DOCX dosyalarınızı sürükleyin veya yukarıdan seçin</p>
+                                            <p className="text-[10px] text-[#343131]/40 mt-1">DOCX dosyalarınızı sürükleyin veya yukarıdan seçin</p>
                                         </div>
                                     ) : (
                                         <AnimatePresence>
@@ -403,13 +403,13 @@ export default function DocToUdfTool() {
                                                     initial={{ opacity: 0, y: 10 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     exit={{ opacity: 0, scale: 0.95 }}
-                                                    className="bg-[#fafafc] border border-[#0a0c10]/[0.06] rounded-xl p-4 flex items-center justify-between group hover:border-[#0a0c10]/[0.1] transition-colors"
+                                                    className="bg-[#fafafc] border border-[#343131]/[0.06] rounded-xl p-4 flex items-center justify-between group hover:border-[#343131]/[0.1] transition-colors"
                                                 >
                                                     <div className="flex items-center gap-4 min-w-0">
                                                         <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${f.status === "success" ? "bg-emerald-500/10 text-emerald-600" :
                                                             f.status === "error" ? "bg-red-500/10 text-red-600" :
                                                                 f.status === "converting" ? "bg-[#e6c800]/10 text-[#e6c800]" :
-                                                                    "bg-white border border-[#0a0c10]/[0.08] text-[#0a0c10]/50"
+                                                                    "bg-white border border-[#343131]/[0.08] text-[#343131]/50"
                                                             }`}>
                                                             {f.status === "converting" ? <Loader2 size={18} className="animate-spin" /> :
                                                                 f.status === "success" ? <CheckCircle2 size={18} /> :
@@ -417,8 +417,8 @@ export default function DocToUdfTool() {
                                                                         <FileIcon size={18} />}
                                                         </div>
                                                         <div className="min-w-0">
-                                                            <p className="text-[13px] font-bold text-[#0a0c10] truncate">{f.file.name}</p>
-                                                            <p className={`text-[10px] font-bold uppercase tracking-wider ${f.status === "error" ? "text-red-600" : "text-[#0a0c10]/50"}`}>
+                                                            <p className="text-[13px] font-bold text-[#343131] truncate">{f.file.name}</p>
+                                                            <p className={`text-[10px] font-bold uppercase tracking-wider ${f.status === "error" ? "text-red-600" : "text-[#343131]/50"}`}>
                                                                 {f.status === "error" ? (f.error?.includes("Dönüşüm hatası:") ? "Dönüşüm Başarısız" : f.error) : f.status === "success" ? (
                                                                     [f.resultSize != null && `${(f.resultSize / 1024).toFixed(1)} KB`, f.conversionTimeMs != null && `${(f.conversionTimeMs / 1000).toFixed(1)} sn`].filter(Boolean).join(" • ") || "Tamamlandı"
                                                                 ) : f.status === "converting" ? "Dönüştürülüyor" : "Beklemede"}
@@ -441,7 +441,7 @@ export default function DocToUdfTool() {
                                                                 if (f.resultUrl) window.URL.revokeObjectURL(f.resultUrl);
                                                                 removeFile(f.id);
                                                             }}
-                                                            className="p-2 text-[#0a0c10]/40 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all md:opacity-0 md:group-hover:opacity-100"
+                                                            className="p-2 text-[#343131]/40 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all md:opacity-0 md:group-hover:opacity-100"
                                                         >
                                                             <X size={16} />
                                                         </button>
@@ -452,8 +452,8 @@ export default function DocToUdfTool() {
                                     )}
                                 </div>
 
-                                <div className="mt-auto pt-6 border-t border-[#0a0c10]/[0.06] text-center">
-                                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#0a0c10]/40">
+                                <div className="mt-auto pt-6 border-t border-[#343131]/[0.06] text-center">
+                                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#343131]/40">
                                         Belgeleriniz işlendikten sonra sunucudan silinir. KVKK uyumlu.
                                     </p>
                                 </div>

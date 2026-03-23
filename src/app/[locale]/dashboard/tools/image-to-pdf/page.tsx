@@ -15,7 +15,7 @@ import {
     FileText,
     Zap
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { ToolPageHint } from "@/components/dashboard/ToolPageHint";
@@ -71,7 +71,11 @@ export default function ImageToPdfTool() {
             previewUrl: URL.createObjectURL(file)
         }));
 
-        setFiles(prev => [...prev, ...fileObjects]);
+        setFiles(prev => {
+            const combined = [...prev, ...fileObjects];
+            const maxFiles = hasSubscription ? 100 : 10;
+            return combined.slice(0, maxFiles);
+        });
     };
 
     const removeFile = (idToRemove: string) => {

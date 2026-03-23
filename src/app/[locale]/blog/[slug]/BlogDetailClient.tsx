@@ -237,14 +237,14 @@ export default function BlogDetailClient({
             <Header />
             <main className="min-h-screen bg-[#fafafc] pt-16">
                 <section className="relative pt-24 pb-12 md:pt-32 md:pb-16 overflow-hidden">
-                    <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#0a0c10 1px, transparent 1px), linear-gradient(90deg, #0a0c10 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#343131 1px, transparent 1px), linear-gradient(90deg, #343131 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
                     <div className="container mx-auto px-6 max-w-4xl relative z-10">
-                        <Link href="/blog" className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#0a0c10]/[0.08] rounded-full text-xs font-bold uppercase tracking-wide text-[#0a0c10]/70 hover:text-[#0e0e0e] hover:bg-white/90 hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all mb-8 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+                        <Link href="/blog" className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#343131]/[0.08] rounded-full text-xs font-bold uppercase tracking-wide text-[#343131]/70 hover:text-[#0e0e0e] hover:bg-white/90 hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all mb-8 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
                             <ArrowLeft size={14} /> {isTr ? "Blog'a Geri Dön" : "Back to Blog"}
                         </Link>
 
                         {post.category && (
-                            <span className="inline-block px-3 py-1 rounded-full bg-[#e6c800]/20 text-[#0a0c10] text-[11px] font-bold uppercase tracking-wider mb-4">
+                            <span className="inline-block px-3 py-1 rounded-full bg-[#e6c800]/20 text-[#343131] text-[11px] font-bold uppercase tracking-wider mb-4">
                                 {isTr ? post.category.name_tr : post.category.name_en}
                             </span>
                         )}
@@ -274,7 +274,7 @@ export default function BlogDetailClient({
                             )}
                             {post.author && (
                                 <span className="flex items-center gap-2">
-                                    <span className="text-[#0a0c10]/70 font-medium">{post.author}</span>
+                                    <span className="text-[#343131]/70 font-medium">{post.author}</span>
                                 </span>
                             )}
                         </div>
@@ -289,7 +289,7 @@ export default function BlogDetailClient({
                             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                             className="relative"
                         >
-                            <div className="relative aspect-video md:aspect-[21/9] bg-[#fafafc] rounded-xl overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.08)] border border-[#0a0c10]/[0.05]">
+                            <div className="relative aspect-video md:aspect-[21/9] bg-[#fafafc] rounded-xl overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.08)] border border-[#343131]/[0.05]">
                                 <Image
                                     src={post.cover_image}
                                     alt={post.cover_image_alt_tr || post.cover_image_alt_en || post.title}
@@ -317,7 +317,7 @@ export default function BlogDetailClient({
                                 transition={{ delay: 0.2, duration: 0.5 }}
                                 className="flex-1 min-w-0"
                             >
-                                <p className="text-xl md:text-2xl font-medium text-[#0e0e0e] leading-relaxed mb-10 p-6 bg-white border border-[#0a0c10]/[0.05] rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.03)] border-l-4 border-l-[#e6c800]">
+                                <p className="text-xl md:text-2xl font-medium text-[#0e0e0e] leading-relaxed mb-10 p-6 bg-white border border-[#343131]/[0.05] rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.03)] border-l-4 border-l-[#e6c800]">
                                     {post.excerpt}
                                 </p>
 
@@ -364,7 +364,7 @@ export default function BlogDetailClient({
                                                 <Link
                                                     key={t.id}
                                                     href={tagHref(t.slug)}
-                                                    className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium hover:bg-[#e6c800]/20 hover:text-[#0a0c10] transition-colors"
+                                                    className="px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium hover:bg-[#e6c800]/20 hover:text-[#343131] transition-colors"
                                                 >
                                                     {t.name}
                                                 </Link>
@@ -380,7 +380,7 @@ export default function BlogDetailClient({
 
                             {headings.length > 0 && (
                                 <aside className="lg:w-72 shrink-0">
-                                    <div className="sticky top-24 p-6 bg-white rounded-xl border border-[#0a0c10]/[0.05] shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+                                    <div className="sticky top-24 p-6 bg-white rounded-xl border border-[#343131]/[0.05] shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
                                         <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4 flex items-center gap-2">
                                             <span className="w-1 h-4 bg-[#e6c800] rounded-full" />
                                             {isTr ? "İçindekiler" : "Table of Contents"}
@@ -482,11 +482,11 @@ export default function BlogDetailClient({
                 )}
 
                 {hasPrevNext && (
-                    <section className="py-16 bg-white border-t border-[#0a0c10]/[0.06]">
+                    <section className="py-16 bg-white border-t border-[#343131]/[0.06]">
                         <div className="container mx-auto px-6 max-w-5xl">
                             <div className="flex items-center justify-between gap-4">
                                 {prev && prev.slug ? (
-                                    <Link href={blogHref(prev.slug)} className="group flex-1 max-w-md p-6 rounded-xl border border-[#0a0c10]/[0.06] hover:border-[#e6c800]/50 hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all">
+                                    <Link href={blogHref(prev.slug)} className="group flex-1 max-w-md p-6 rounded-xl border border-[#343131]/[0.06] hover:border-[#e6c800]/50 hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all">
                                         <span className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1 mb-2">
                                             <ArrowLeft size={12} /> {isTr ? "Önceki" : "Previous"}
                                         </span>
@@ -496,7 +496,7 @@ export default function BlogDetailClient({
                                     <div className="flex-1" />
                                 )}
                                 {next && next.slug ? (
-                                    <Link href={blogHref(next.slug)} className="group flex-1 max-w-md p-6 rounded-xl border border-[#0a0c10]/[0.06] hover:border-[#e6c800]/50 hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all text-right">
+                                    <Link href={blogHref(next.slug)} className="group flex-1 max-w-md p-6 rounded-xl border border-[#343131]/[0.06] hover:border-[#e6c800]/50 hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all text-right">
                                         <span className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1 justify-end mb-2">
                                             {isTr ? "Sonraki" : "Next"} <ArrowRight size={12} />
                                         </span>
@@ -511,13 +511,13 @@ export default function BlogDetailClient({
                 )}
 
                 {related.length > 0 && (
-                    <section className="py-16 bg-white border-t border-[#0a0c10]/[0.06]">
+                    <section className="py-16 bg-white border-t border-[#343131]/[0.06]">
                         <div className="container mx-auto px-6 max-w-5xl">
                             <h2 className="text-2xl font-display font-bold text-[#0e0e0e] mb-8">{isTr ? "İlgili Yazılar" : "Related Posts"}</h2>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
                                 {related.map((r) => (
                                     <Link key={r.id} href={blogHref(r.slug)} className="group block">
-                                        <article className="rounded-xl overflow-hidden border border-[#0a0c10]/[0.05] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300">
+                                        <article className="rounded-xl overflow-hidden border border-[#343131]/[0.05] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300">
                                             <div className="relative aspect-video bg-slate-100">
                                                 {r.cover_image ? (
                                                     <Image src={r.cover_image} alt={isTr ? r.title_tr : r.title_en} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 33vw" />
@@ -539,7 +539,7 @@ export default function BlogDetailClient({
                     </section>
                 )}
 
-                <section className="py-20 bg-[#0a0c10] relative overflow-hidden">
+                <section className="py-20 bg-[#343131] relative overflow-hidden">
                     <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
                     <div className="container mx-auto px-6 max-w-3xl text-center relative z-10">
                         <h2 className="font-display font-extrabold text-white text-2xl md:text-3xl mb-4">
@@ -548,7 +548,7 @@ export default function BlogDetailClient({
                         <p className="text-white/70 mb-8">
                             {isTr ? "Hukuk Araçları Paketi ile belge iş akışlarınızı hızlandırın." : "Speed up your document workflows with Legal Tools Suite."}
                         </p>
-                        <Link href="/dijital-urunler/hukuk-araclari-paketi" className="inline-flex items-center gap-2 px-8 py-4 bg-[#e6c800] text-[#0a0c10] font-bold rounded-xl hover:bg-white transition-colors">
+                        <Link href="/dijital-urunler/hukuk-araclari-paketi" className="inline-flex items-center gap-2 px-8 py-4 bg-[#e6c800] text-[#343131] font-bold rounded-xl hover:bg-white transition-colors">
                             {isTr ? "Hukuk Araçları Paketi'ni İncele" : "Try Legal Tools Suite"} <ArrowRight size={18} />
                         </Link>
                     </div>

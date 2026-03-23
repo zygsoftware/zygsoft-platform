@@ -66,15 +66,15 @@ export default function BlogCategoryPage() {
             <Header />
             <main className="min-h-screen bg-[#fafafc]">
                 <section className="pt-32 pb-16 md:pt-40 md:pb-24 relative overflow-hidden">
-                    <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#0a0c10 1px, transparent 1px), linear-gradient(90deg, #0a0c10 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#343131 1px, transparent 1px), linear-gradient(90deg, #343131 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
                     <div className="container mx-auto px-6 max-w-7xl relative z-10">
-                        <Link href={locale === "tr" ? "/blog" : `/${locale}/blog`} className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#0a0c10]/[0.08] rounded-full text-xs font-bold uppercase tracking-wide text-[#0a0c10]/70 hover:text-[#0e0e0e] hover:bg-white/90 mb-6 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+                        <Link href={locale === "tr" ? "/blog" : `/${locale}/blog`} className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#343131]/[0.08] rounded-full text-xs font-bold uppercase tracking-wide text-[#343131]/70 hover:text-[#0e0e0e] hover:bg-white/90 mb-6 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
                             <ArrowLeft size={14} /> {isTr ? "Blog'a Geri Dön" : "Back to Blog"}
                         </Link>
                         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-2xl">
-                            <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#0a0c10]/50 mb-4 block">{isTr ? "Kategori" : "Category"}</span>
+                            <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#343131]/50 mb-4 block">{isTr ? "Kategori" : "Category"}</span>
                             <h1 className="font-display font-extrabold text-[#0e0e0e] text-4xl md:text-5xl leading-[1.05] tracking-tight mb-4">{title}</h1>
-                            {description && <p className="text-[#0a0c10]/60 text-lg leading-relaxed">{description}</p>}
+                            {description && <p className="text-[#343131]/60 text-lg leading-relaxed">{description}</p>}
                         </motion.div>
                     </div>
                 </section>
@@ -85,7 +85,7 @@ export default function BlogCategoryPage() {
                             <div className="flex flex-wrap gap-2 mb-10">
                                 <Link
                                     href={locale === "tr" ? "/blog" : `/${locale}/blog`}
-                                    className="px-4 py-2 rounded-full text-sm font-medium bg-white border border-[#0a0c10]/[0.08] text-[#0a0c10]/70 hover:border-[#e6c800]/50 transition-colors"
+                                    className="px-4 py-2 rounded-full text-sm font-medium bg-white border border-[#343131]/[0.08] text-[#343131]/70 hover:border-[#e6c800]/50 transition-colors"
                                 >
                                     {isTr ? "Tümü" : "All"}
                                 </Link>
@@ -96,7 +96,7 @@ export default function BlogCategoryPage() {
                                         <Link
                                             key={c.id}
                                             href={categoryHref}
-                                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${isActive ? "bg-[#e6c800] text-[#0a0c10]" : "bg-white border border-[#0a0c10]/[0.08] text-[#0a0c10]/70 hover:border-[#e6c800]/50"}`}
+                                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${isActive ? "bg-[#e6c800] text-[#343131]" : "bg-white border border-[#343131]/[0.08] text-[#343131]/70 hover:border-[#e6c800]/50"}`}
                                         >
                                             {isTr ? c.name_tr : c.name_en}
                                         </Link>
@@ -107,16 +107,16 @@ export default function BlogCategoryPage() {
                         {loading ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                                 {[1, 2, 3, 4, 5, 6].map((n) => (
-                                    <div key={n} className="h-[380px] bg-white/60 border border-[#0a0c10]/[0.06] rounded-xl animate-pulse" />
+                                    <div key={n} className="h-[380px] bg-white/60 border border-[#343131]/[0.06] rounded-xl animate-pulse" />
                                 ))}
                             </div>
                         ) : posts.length === 0 ? (
-                            <div className="text-center py-24 px-8 bg-white rounded-2xl border border-[#0a0c10]/[0.06] shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+                            <div className="text-center py-24 px-8 bg-white rounded-2xl border border-[#343131]/[0.06] shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
                                 <div className="w-20 h-20 rounded-2xl bg-[#e6c800]/10 flex items-center justify-center mx-auto mb-6">
                                     <BookOpen size={40} className="text-[#e6c800]" />
                                 </div>
                                 <h3 className="font-display font-bold text-2xl text-[#0e0e0e] mb-2">{isTr ? "Bu kategoride henüz yazı yok" : "No posts in this category yet"}</h3>
-                                <p className="text-[#0a0c10]/60 max-w-md mx-auto mb-6">{isTr ? "Yakında bu kategoride yeni içerikler eklenecek." : "New content in this category coming soon."}</p>
+                                <p className="text-[#343131]/60 max-w-md mx-auto mb-6">{isTr ? "Yakında bu kategoride yeni içerikler eklenecek." : "New content in this category coming soon."}</p>
                                 <Link href={locale === "tr" ? "/blog" : `/${locale}/blog`} className="inline-flex items-center gap-2 text-[#e6c800] font-semibold hover:underline">
                                     <ArrowLeft size={18} /> {isTr ? "Tüm yazılara git" : "View all posts"}
                                 </Link>

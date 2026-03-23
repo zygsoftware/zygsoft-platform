@@ -57,10 +57,10 @@ export default function VerifyEmailRequiredPage() {
                     <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center mb-6">
                         <Mail size={32} className="text-amber-600" />
                     </div>
-                    <h1 className="text-2xl font-display font-black text-[#0a0c10] mb-4">
+                    <h1 className="text-2xl font-display font-black text-[#343131] mb-4">
                         {t("title")}
                     </h1>
-                    <p className="text-[#0a0c10]/60 text-[15px] leading-relaxed mb-6">
+                    <p className="text-[#343131]/60 text-[15px] leading-relaxed mb-6">
                         {t("message")}
                     </p>
                     {sent && (
@@ -75,7 +75,7 @@ export default function VerifyEmailRequiredPage() {
                         type="button"
                         onClick={handleResend}
                         disabled={sending}
-                        className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#e6c800] text-[#0a0c10] font-black uppercase tracking-[0.2em] text-[11px] rounded-xl hover:bg-[#d4b800] disabled:opacity-70 transition-all"
+                        className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-[#e6c800] text-[#343131] font-black uppercase tracking-[0.2em] text-[11px] rounded-xl hover:bg-[#d4b800] disabled:opacity-70 transition-all"
                     >
                         {sending ? (
                             <>
@@ -88,7 +88,7 @@ export default function VerifyEmailRequiredPage() {
                     </button>
                     {session?.user && (
                         <div className="mt-6 pt-6 border-t border-slate-200">
-                            <p className="text-[#0a0c10]/60 text-sm mb-3">Email doğruladıktan sonra 3 günlük demo erişimini başlatabilirsiniz.</p>
+                            <p className="text-[#343131]/60 text-sm mb-3">Email doğruladıktan sonra 3 günlük demo erişimini başlatabilirsiniz.</p>
                             <TrialRequestCTA
                                 emailVerified={false}
                                 trialStatus={(session.user as any)?.trialStatus ?? "none"}

@@ -333,7 +333,7 @@ export async function sendVerificationEmail(data: VerificationMailPayload): Prom
           <a href="${data.verifyLink}" style="display:inline-block;background:#e6c800;color:#0e0e0e;font-weight:700;text-decoration:none;padding:14px 28px;border-radius:10px;font-size:14px">E-postamı Doğrula</a>
         </td></tr>
         <tr><td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:16px 32px">
-          <p style="margin:0;font-size:11px;color:#9ca3af;text-align:center">ZYGSOFT — Bu mesaj otomatik olarak gönderilmiştir. Panel: <a href="${process.env.NEXTAUTH_URL || "https://zygsoft.com"}/dashboard" style="color:#e6c800">Panel</a></p>
+          <p style="margin:0;font-size:11px;color:#9ca3af;text-align:center">ZYGSOFT — Bu mesaj otomatik olarak gönderilmiştir. Panel: <a href="${process.env.NEXTAUTH_URL || "https://zygsoft.com"}/panel" style="color:#e6c800">Panel</a></p>
         </td></tr>
       </table>
     </td></tr>
@@ -357,7 +357,7 @@ export async function sendVerificationEmail(data: VerificationMailPayload): Prom
           <a href="${data.verifyLink}" style="display:inline-block;background:#e6c800;color:#0e0e0e;font-weight:700;text-decoration:none;padding:14px 28px;border-radius:10px;font-size:14px">Verify My Email</a>
         </td></tr>
         <tr><td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:16px 32px">
-          <p style="margin:0;font-size:11px;color:#9ca3af;text-align:center">ZYGSOFT — This message was sent automatically. Dashboard: <a href="${process.env.NEXTAUTH_URL || "https://zygsoft.com"}/dashboard" style="color:#e6c800">Dashboard</a></p>
+          <p style="margin:0;font-size:11px;color:#9ca3af;text-align:center">ZYGSOFT — This message was sent automatically. Dashboard: <a href="${process.env.NEXTAUTH_URL || "https://zygsoft.com"}/en/dashboard" style="color:#e6c800">Dashboard</a></p>
         </td></tr>
       </table>
     </td></tr>

@@ -25,6 +25,8 @@ Copy `.env.example` to `.env` (or set variables in your hosting control panel) a
 | `UDF_MICROSERVICE_URL` | **Yes** (for UDF tool) | URL of the running Python FastAPI microservice, e.g. `http://127.0.0.1:8000` |
 | `ADMIN_RESET_SECRET` | **Leave blank** | Only set temporarily for emergency admin reset; delete immediately after use |
 | `ADMIN_RESET_PASSWORD` | **Leave blank** | Only set alongside `ADMIN_RESET_SECRET`; minimum 12 characters |
+| `NEXT_PUBLIC_GTM_ID` | No | **Google Tag Manager** container ID, e.g. `GTM-XXXXXXX`. Loads on all public pages via `src/components/analytics/GoogleTag.tsx`. Prefer this if you manage GA4 / Ads from GTM. |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | No | **GA4 only** (no GTM), e.g. `G-XXXXXXXXXX`. Ignored if `NEXT_PUBLIC_GTM_ID` is set — configure GA4 inside GTM instead. |
 
 > **Critical:** `ADMIN_RESET_SECRET` / `ADMIN_RESET_PASSWORD` must be **unset** in normal production. The `/api/reset-admin` route returns 404 when the secret is absent, which is the safe default state.
 

@@ -1,18 +1,17 @@
 "use client";
 
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { motion } from "framer-motion";
-import { Shield, FileText } from "lucide-react";
+import { Shield } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { LegalPageShell } from "@/components/legal/LegalPageShell";
 
-const sections = [
+const sectionsTr = [
     {
         title: "1. Veri Sorumlusu",
-        content: `Bu aydınlatma metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca hazırlanmıştır. Veri sorumlusu sıfatıyla ZYGSOFT Yazılım & Danışmanlık ("Zygsoft"), Antalya, Türkiye adresinde mukim olup kişisel verilerinizi işlemektedir.`,
+        body: `Bu aydınlatma metni, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca hazırlanmıştır. Veri sorumlusu sıfatıyla ZYGSOFT Yazılım & Danışmanlık ("Zygsoft"), Antalya, Türkiye adresinde mukim olup kişisel verilerinizi işlemektedir.`,
     },
     {
         title: "2. İşlenen Kişisel Veriler",
-        content: `Hizmetlerimizden yararlanmanız kapsamında aşağıdaki kişisel veriler işlenebilir:
+        body: `Hizmetlerimizden yararlanmanız kapsamında aşağıdaki kişisel veriler işlenebilir:
 • Ad, soyad ve iletişim bilgileri (e-posta, telefon)
 • Şirket / büro adı ve unvan bilgileri
 • Hesap giriş bilgileri (şifrelenmiş)
@@ -22,7 +21,7 @@ const sections = [
     },
     {
         title: "3. Kişisel Verilerin İşlenme Amacı",
-        content: `Kişisel verileriniz şu amaçlarla işlenmektedir:
+        body: `Kişisel verileriniz şu amaçlarla işlenmektedir:
 • Hesap oluşturma ve kimlik doğrulama
 • Abonelik ve ödeme yönetimi
 • Satın alınan hizmetlerin aktivasyonu
@@ -32,15 +31,15 @@ const sections = [
     },
     {
         title: "4. Kişisel Verilerin Aktarılması",
-        content: `Kişisel verileriniz; yasal zorunluluklar dışında üçüncü taraflarla paylaşılmamaktadır. Ödeme işlemlerine ilişkin veriler, güvenli ödeme altyapısı sağlayıcıları ile sınırlı ölçüde paylaşılabilir. Yurt dışı veri transferi yapılmamaktadır.`,
+        body: `Kişisel verileriniz; yasal zorunluluklar dışında üçüncü taraflarla paylaşılmamaktadır. Ödeme işlemlerine ilişkin veriler, güvenli ödeme altyapısı sağlayıcıları ile sınırlı ölçüde paylaşılabilir. Yurt dışı veri transferi yapılmamaktadır.`,
     },
     {
         title: "5. Kişisel Verilerin Saklanma Süresi",
-        content: `Kişisel verileriniz, işlenme amacının ortadan kalkmasıyla birlikte veya ilgili mevzuatta öngörülen yasal saklama süresi sonunda silinmekte, yok edilmekte veya anonim hale getirilmektedir. Hesap silme talebi halinde veriler 30 gün içinde silinir.`,
+        body: `Kişisel verileriniz, işlenme amacının ortadan kalkmasıyla birlikte veya ilgili mevzuatta öngörülen yasal saklama süresi sonunda silinmekte, yok edilmekte veya anonim hale getirilmektedir. Hesap silme talebi halinde veriler 30 gün içinde silinir.`,
     },
     {
         title: "6. Kişisel Veri Sahibinin Hakları",
-        content: `KVKK'nın 11. maddesi uyarınca aşağıdaki haklara sahipsiniz:
+        body: `KVKK'nın 11. maddesi uyarınca aşağıdaki haklara sahipsiniz:
 • Kişisel verilerinizin işlenip işlenmediğini öğrenme
 • İşlenmişse buna ilişkin bilgi talep etme
 • İşlenme amacını ve amacına uygun kullanılıp kullanılmadığını öğrenme
@@ -52,60 +51,111 @@ const sections = [
     },
     {
         title: "7. Veri Güvenliği",
-        content: `Kişisel verileriniz, endüstri standardı güvenlik önlemleri (SSL/TLS şifrelemesi, güvenlik duvarları, şifreli veritabanı) ile korunmaktadır. Yüklenen hukuki belgeler sunucu tarafında işlendikten sonra otomatik olarak imha edilmektedir.`,
+        body: `Kişisel verileriniz, endüstri standardı güvenlik önlemleri (SSL/TLS şifrelemesi, güvenlik duvarları, şifreli veritabanı) ile korunmaktadır. Yüklenen hukuki belgeler sunucu tarafında işlendikten sonra otomatik olarak imha edilmektedir.`,
     },
     {
         title: "8. İletişim",
-        content: `KVKK kapsamındaki taleplerinizi info@zygsoft.com adresine e-posta ile iletebilirsiniz. Talepleriniz en geç 30 gün içinde yanıtlanacaktır.\n\nBu metin en son 05.03.2025 tarihinde güncellenmiştir.`,
+        body: `KVKK kapsamındaki taleplerinizi info@zygsoft.com adresine e-posta ile iletebilirsiniz. Talepleriniz en geç 30 gün içinde yanıtlanacaktır.\n\nBu metin en son 18.03.2026 tarihinde güncellenmiştir.`,
     },
-];
+] as const;
+
+/** English rendering of the same KVKK disclosure (Law No. 6698) for non-Turkish readers. */
+const sectionsEn = [
+    {
+        title: "1. Data controller",
+        body: `This disclosure is prepared in accordance with the Turkish Personal Data Protection Law No. 6698 (“KVKK”). The data controller is ZYGSOFT Yazılım & Danışmanlık (“Zygsoft”), based in Antalya, Turkey, which processes your personal data in this capacity.`,
+    },
+    {
+        title: "2. Categories of personal data",
+        body: `In connection with our services, we may process the following personal data:
+• Name, surname and contact details (email, phone)
+• Company / office name and title information
+• Account login credentials (stored in protected form)
+• Payment notification and receipt-related information
+• Platform usage data (logs, session information)
+• Documents you upload (for users of our legal software tools)`,
+    },
+    {
+        title: "3. Purposes of processing",
+        body: `Your personal data is processed for the following purposes:
+• Creating accounts and identity verification
+• Managing subscriptions and payments
+• Activating purchased services
+• Providing customer support
+• Fulfilling legal obligations
+• Improving service quality and ensuring system security`,
+    },
+    {
+        title: "4. Transfers",
+        body: `Your personal data is not shared with third parties except where required by law. Data related to payments may be shared to a limited extent with secure payment infrastructure providers. We do not transfer personal data abroad as described in this disclosure.`,
+    },
+    {
+        title: "5. Retention",
+        body: `Personal data is deleted, destroyed or anonymised when the purpose of processing ends or when statutory retention periods expire. If you request account deletion, data is deleted within 30 days, subject to legal retention requirements.`,
+    },
+    {
+        title: "6. Your rights (KVKK Art. 11)",
+        body: `Under Article 11 of the KVKK you have the right to:
+• Learn whether your personal data is processed
+• Request information if it has been processed
+• Learn the purpose of processing and whether data is used accordingly
+• Know third parties to whom data is transferred domestically or abroad
+• Request rectification if data is incomplete or inaccurate
+• Request erasure or destruction
+• Object to outcomes against you arising solely from automated processing
+• Request compensation for damage`,
+    },
+    {
+        title: "7. Security",
+        body: `Personal data is protected using industry-standard measures (SSL/TLS encryption, firewalls, encrypted databases). Legal documents uploaded for processing are automatically destroyed on our servers after processing is complete.`,
+    },
+    {
+        title: "8. Contact",
+        body: `You may submit requests under the KVKK by email to info@zygsoft.com. We aim to respond within 30 days at the latest.\n\nLast updated: March 18, 2026.`,
+    },
+] as const;
+
+const shell = {
+    tr: {
+        eyebrow: "Gizlilik",
+        title: "KVKK Aydınlatma Metni",
+        subtitle:
+            "Kişisel verileriniz Zygsoft tarafından 6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında işlenmektedir. Aşağıdaki metin bilgilendirme amaçlıdır.",
+        tocTitle: "İçindekiler",
+    },
+    en: {
+        eyebrow: "Privacy",
+        title: "Personal data disclosure (KVKK)",
+        subtitle:
+            "English version of our disclosure under Turkish Law No. 6698 (KVKK). Use the language switcher (Türkçe) to read the official Turkish text on the same page.",
+        tocTitle: "On this page",
+    },
+} as const;
 
 export default function KvkkPage() {
-    return (
-        <>
-            <Header />
-            <main className="flex-1 flex flex-col bg-[#070710]">
-                {/* Hero */}
-                <section className="relative pt-32 pb-16 overflow-hidden mesh-hero grid-bg">
-                    <div className="orb orb-brand w-[500px] h-[500px] -top-32 -left-32 opacity-25" />
-                    <div className="container mx-auto px-6 max-w-4xl text-center relative z-10">
-                        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mb-6 mx-auto">
-                                <Shield size={32} />
-                            </div>
-                            <span className="section-eyebrow">Gizlilik</span>
-                            <h1 className="section-title text-4xl md:text-5xl mb-4">KVKK Aydınlatma Metni</h1>
-                            <p className="text-slate-400 text-lg max-w-xl mx-auto">Kişisel verileriniz Zygsoft tarafından 6698 sayılı KVKK kapsamında güvence altına alınmaktadır.</p>
-                        </motion.div>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#070710] to-transparent" />
-                </section>
+    const locale = useLocale();
+    const tFooter = useTranslations("Footer");
+    const isEn = locale === "en";
+    const s = isEn ? shell.en : shell.tr;
+    const updatedLabel = isEn
+        ? "Last updated · March 18, 2026"
+        : "Son güncelleme · 18 Mart 2026";
 
-                {/* Content */}
-                <section className="py-16 bg-[#070710]">
-                    <div className="container mx-auto px-6 max-w-3xl">
-                        <div className="space-y-6">
-                            {sections.map((section, i) => (
-                                <motion.div
-                                    key={i}
-                                    initial={{ opacity: 0, y: 24 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: i * 0.05 }}
-                                    className="glass-card p-8 rounded-2xl"
-                                >
-                                    <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                                        <span className="text-emerald-400">{section.title.split(".")[0]}.</span>
-                                        {section.title.split(".").slice(1).join(".")}
-                                    </h2>
-                                    <div className="text-slate-400 text-sm leading-relaxed whitespace-pre-line">{section.content}</div>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            </main>
-            <Footer />
-        </>
+    const sections = isEn ? sectionsEn : sectionsTr;
+
+    return (
+        <LegalPageShell
+            eyebrow={s.eyebrow}
+            title={s.title}
+            subtitle={s.subtitle}
+            tocTitle={s.tocTitle}
+            updatedLabel={updatedLabel}
+            icon={Shield}
+            sections={sections}
+            relatedLinks={[
+                { href: "/privacy", label: tFooter("privacyPolicy") },
+                { href: "/terms", label: tFooter("termsOfService") },
+            ]}
+        />
     );
 }

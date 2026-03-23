@@ -44,7 +44,7 @@ export function NewsletterBlock({ locale, variant = "default" }: NewsletterBlock
     const isInline = variant === "inline";
 
     return (
-        <div className={isInline ? "p-5 bg-slate-50 rounded-xl border border-slate-100" : "p-8 bg-[#0a0c10] rounded-2xl border border-[#0a0c10] relative overflow-hidden"}>
+        <div className={isInline ? "p-5 bg-slate-50 rounded-xl border border-slate-100" : "p-8 bg-[#343131] rounded-2xl border border-[#343131] relative overflow-hidden"}>
             {!isInline && <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 1px)", backgroundSize: "24px 24px" }} />}
             <div className="relative z-10">
                 <div className={`flex items-center gap-3 ${isInline ? "mb-3" : "mb-4"}`}>
@@ -73,13 +73,13 @@ export function NewsletterBlock({ locale, variant = "default" }: NewsletterBlock
                             value={email}
                             onChange={(e) => onChange("email", e.target.value)}
                             placeholder={isTr ? "E-posta adresiniz" : "Your email"}
-                            className={`flex-1 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-[#e6c800] focus:border-[#e6c800] ${isInline ? "bg-white border border-slate-200 text-[#0a0c10] placeholder:text-slate-400" : "bg-white/10 border border-white/20 text-white placeholder:text-white/50"}`}
+                            className={`flex-1 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-[#e6c800] focus:border-[#e6c800] ${isInline ? "bg-white border border-slate-200 text-[#343131] placeholder:text-slate-400" : "bg-white/10 border border-white/20 text-white placeholder:text-white/50"}`}
                             disabled={status === "loading"}
                         />
                         <button
                             type="submit"
                             disabled={status === "loading"}
-                            className={`px-6 py-3 font-bold rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shrink-0 ${isInline ? "bg-[#e6c800] text-[#0a0c10] hover:bg-[#d4b800]" : "bg-[#e6c800] text-[#0a0c10] hover:bg-white"}`}
+                            className={`px-6 py-3 font-bold rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shrink-0 ${isInline ? "bg-[#e6c800] text-[#343131] hover:bg-[#d4b800]" : "bg-[#e6c800] text-[#343131] hover:bg-white"}`}
                         >
                             {status === "loading" ? <Loader2 size={18} className="animate-spin" /> : (isTr ? "Abone Ol" : "Subscribe")}
                         </button>

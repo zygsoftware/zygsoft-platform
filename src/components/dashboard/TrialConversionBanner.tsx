@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Zap, ArrowRight } from "lucide-react";
 
 interface TrialConversionBannerProps {
@@ -12,7 +12,7 @@ export function TrialConversionBanner({ trialStatus, hasSubscription }: TrialCon
     if (trialStatus !== "active" || hasSubscription) return null;
 
     return (
-        <div className="mb-6 p-5 rounded-2xl bg-gradient-to-r from-[#0a0c10] to-[#111318] border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="mb-6 p-5 rounded-2xl bg-gradient-to-r from-[#343131] to-[#111318] border border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-[#e6c800]/20 flex items-center justify-center shrink-0">
                     <Zap size={24} className="text-[#e6c800]" />
@@ -28,7 +28,7 @@ export function TrialConversionBanner({ trialStatus, hasSubscription }: TrialCon
             </div>
             <Link
                 href="/dijital-urunler/hukuk-araclari-paketi"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#e6c800] text-[#0a0c10] font-black rounded-xl text-sm hover:bg-white transition-all shrink-0"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#e6c800] text-[#343131] font-black rounded-xl text-sm hover:bg-white transition-all shrink-0"
             >
                 Paketi Etkinleştir
                 <ArrowRight size={16} />

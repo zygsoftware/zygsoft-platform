@@ -12,7 +12,7 @@ import {
     X,
     ChevronRight,
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 
 type StepStatus = "pending" | "active" | "completed";
@@ -118,7 +118,7 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
     };
 
     const packageHref = locale === "en" ? "/en/dijital-urunler/hukuk-araclari-paketi" : "/dijital-urunler/hukuk-araclari-paketi";
-    const toolsHref = locale === "en" ? "/en/dashboard/tools" : "/dashboard/tools";
+    const toolsHref = "/dashboard/tools";
 
     return (
         <motion.div
@@ -133,7 +133,7 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
                         <CheckCircle2 size={18} className="text-[#e6c800]" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-bold text-[#0a0c10]">Başlangıç Kontrol Listesi</h3>
+                        <h3 className="text-sm font-bold text-[#343131]">Başlangıç Kontrol Listesi</h3>
                         <p className="text-xs text-slate-500">
                             {completedCount} / {STEPS.length} tamamlandı
                         </p>
@@ -196,7 +196,7 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
                             <div className="flex-1 min-w-0">
                                 <p
                                     className={`text-sm font-medium ${
-                                        status === "completed" ? "text-slate-500 line-through" : "text-[#0a0c10]"
+                                        status === "completed" ? "text-slate-500 line-through" : "text-[#343131]"
                                     }`}
                                 >
                                     {step.label}
@@ -206,7 +206,7 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
                                 {step.id === "email" && status === "active" && (
                                     <Link
                                         href={locale === "en" ? "/en/verify-email-required" : "/verify-email-required"}
-                                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#0a0c10] bg-[#e6c800] rounded-lg hover:bg-[#d4b800] transition-colors"
+                                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#343131] bg-[#e6c800] rounded-lg hover:bg-[#d4b800] transition-colors"
                                     >
                                         Doğrula <ChevronRight size={14} />
                                     </Link>
@@ -215,7 +215,7 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
                                     <button
                                         onClick={handleStartTrial}
                                         disabled={startingTrial}
-                                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#0a0c10] bg-[#e6c800] rounded-lg hover:bg-[#d4b800] transition-colors disabled:opacity-70"
+                                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#343131] bg-[#e6c800] rounded-lg hover:bg-[#d4b800] transition-colors disabled:opacity-70"
                                     >
                                         {startingTrial ? (
                                             <Loader2 size={14} className="animate-spin" />
@@ -229,7 +229,7 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
                                 {step.id === "first-tool" && status === "active" && (
                                     <Link
                                         href={toolsHref}
-                                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#0a0c10] bg-[#e6c800] rounded-lg hover:bg-[#d4b800] transition-colors"
+                                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#343131] bg-[#e6c800] rounded-lg hover:bg-[#d4b800] transition-colors"
                                     >
                                         İlk Aracı Kullan <ChevronRight size={14} />
                                     </Link>
@@ -237,7 +237,7 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
                                 {step.id === "evaluate" && status === "active" && (
                                     <Link
                                         href={packageHref}
-                                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#0a0c10] bg-[#e6c800] rounded-lg hover:bg-[#d4b800] transition-colors"
+                                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#343131] bg-[#e6c800] rounded-lg hover:bg-[#d4b800] transition-colors"
                                     >
                                         Paketi İncele <ChevronRight size={14} />
                                     </Link>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "@/i18n/navigation";
 import { useState } from "react";
 import { Globe } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,15 +18,12 @@ export function LanguageSwitcher({ isScrolled }: { isScrolled?: boolean }) {
     ];
 
     const switchLocale = (newLocale: string) => {
-        // Replace locale prefix in the pathname
-        const currentPath = pathname;
-        let newPath = currentPath;
-        if (currentPath.startsWith(`/${locale}`)) {
-            newPath = currentPath.replace(`/${locale}`, `/${newLocale}`);
-        } else if (newLocale !== "tr") {
-            newPath = `/${newLocale}${currentPath}`;
+        if (newLocale === locale) {
+            setIsOpen(false);
+            return;
         }
-        router.push(newPath);
+        // Pathname type includes internal patterns (e.g. [slug]); runtime value is always valid for replace().
+        router.replace(pathname as never, { locale: newLocale });
         setIsOpen(false);
     };
 
@@ -39,7 +36,7 @@ export function LanguageSwitcher({ isScrolled }: { isScrolled?: boolean }) {
             <button
                 onMouseEnter={() => setIsOpen(true)}
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.14em] rounded-full border border-[#0a0c10]/10 px-3 py-2 bg-white/70 backdrop-blur hover:border-[#e6c800]/60 transition-colors ${textClass}`}
+                className={`flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.14em] rounded-full border border-[#343131]/10 px-3 py-2 bg-white/70 backdrop-blur hover:border-[#e6c800]/60 transition-colors ${textClass}`}
             >
                 <Globe size={16} />
                 <span className="uppercase">{locale}</span>
@@ -53,14 +50,14 @@ export function LanguageSwitcher({ isScrolled }: { isScrolled?: boolean }) {
                         transition={{ duration: 0.15 }}
                         className="absolute right-0 top-full pt-4 w-40 z-50"
                     >
-                        <div className="bg-white/95 rounded-2xl shadow-2xl border border-[#0a0c10]/10 overflow-hidden py-2 backdrop-blur">
+                        <div className="bg-white/95 rounded-2xl shadow-2xl border border-[#343131]/10 overflow-hidden py-2 backdrop-blur">
                             {languages.map((lang) => (
                                 <button
                                     key={lang.code}
                                     onClick={() => switchLocale(lang.code)}
                                     className={`flex items-center gap-3 w-full px-5 py-3 text-sm transition-colors hover:bg-[#fafafc] ${locale === lang.code
-                                        ? "text-[#0a0c10] font-bold bg-[#e6c800]/10"
-                                        : "text-[#0a0c10]/65"
+                                        ? "text-[#343131] font-bold bg-[#e6c800]/10"
+                                        : "text-[#343131]/65"
                                         }`}
                                 >
                                     <span>{lang.flag}</span>

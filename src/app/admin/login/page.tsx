@@ -118,7 +118,7 @@ export default function AdminLoginPage() {
                 <div className="lg:hidden mb-8">
                     <Link
                         href="/"
-                        className="font-display text-2xl font-black text-[#0a0c10] tracking-tighter focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e6c800] focus-visible:ring-offset-2 rounded"
+                        className="font-display text-2xl font-black text-[#343131] tracking-tighter focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e6c800] focus-visible:ring-offset-2 rounded"
                     >
                         ZYG<span className="text-[#e6c800]">SOFT</span>
                     </Link>
@@ -139,7 +139,7 @@ export default function AdminLoginPage() {
 
                 <div className="mt-8">
                     <div className="mb-8">
-                        <h1 className="text-2xl font-display font-black text-[#0a0c10]">
+                        <h1 className="text-2xl font-display font-black text-[#343131]">
                             {mode === "login" ? "Tekrar hoş geldiniz" : "Hesap oluşturun"}
                         </h1>
                         <p className="text-zinc-600 mt-1.5 text-sm font-medium">

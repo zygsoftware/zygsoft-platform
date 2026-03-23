@@ -8,8 +8,7 @@ import { Readable } from "stream";
 
 export const dynamic = "force-dynamic";
 
-const MAX_FILES = 20;
-const MAX_FILE_BYTES = 20 * 1024 * 1024; // 20 MB per file
+// Limits will be determined dynamically
 
 export type BatchToolType = "doc-to-udf" | "image-to-pdf" | "tiff-to-pdf" | "ocr-text";
 
@@ -53,6 +52,10 @@ export async function POST(req: Request) {
         const guard = await checkToolAccess();
         if (!guard.allowed) return guard.response;
 
+        const isSubscribed = !guard.incrementTrial;
+        const maxFiles = isSubscribed ? 100 : 20;
+        const maxFileBytes = isSubscribed ? 50 * 1024 * 1024 : 20 * 1024 * 1024;
+
         const session = await getServerSession(authOptions);
         const formData = await req.formData();
         const toolType = (formData.get("toolType") as BatchToolType) || "";
@@ -71,9 +74,9 @@ export async function POST(req: Request) {
         if (files.length === 0) {
             return NextResponse.json({ error: "En az bir dosya yükleyin." }, { status: 400 });
         }
-        if (files.length > MAX_FILES) {
+        if (files.length > maxFiles) {
             return NextResponse.json(
-                { error: `En fazla ${MAX_FILES} dosya yükleyebilirsiniz.` },
+                { error: `En fazla ${maxFiles} dosya yükleyebilirsiniz.` },
                 { status: 400 }
             );
         }
@@ -85,9 +88,9 @@ export async function POST(req: Request) {
                     { status: 400 }
                 );
             }
-            if (file.size > MAX_FILE_BYTES) {
+            if (file.size > maxFileBytes) {
                 return NextResponse.json(
-                    { error: `"${file.name}" çok büyük (maks. 20 MB).` },
+                    { error: `"${file.name}" çok büyük (maks. ${isSubscribed ? 50 : 20} MB).` },
                     { status: 400 }
                 );
             }

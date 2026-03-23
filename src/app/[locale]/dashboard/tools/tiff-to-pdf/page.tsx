@@ -14,7 +14,7 @@ import {
     Files,
     FileText
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { ToolPageHint } from "@/components/dashboard/ToolPageHint";
@@ -76,9 +76,10 @@ export default function TiffToPdfTool() {
             id: Math.random().toString(36).substring(7),
             file,
         }));
-        setFiles((prev) => {
+        setFiles(prev => {
             const combined = [...prev, ...fileObjects];
-            return combined.slice(0, 10);
+            const maxFiles = hasSubscription ? 100 : 10;
+            return combined.slice(0, maxFiles);
         });
         setError(null);
     };

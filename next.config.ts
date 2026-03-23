@@ -15,6 +15,14 @@ const nextConfig: NextConfig = {
       { source: "/en/portfolio/:path*", destination: "/en/projects/:path*", permanent: true },
     ];
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**",
+      },
+    ],
+  },
   experimental: {
     // Allow up to 50 MB multipart bodies (multi-file tool uploads)
     serverActions: {

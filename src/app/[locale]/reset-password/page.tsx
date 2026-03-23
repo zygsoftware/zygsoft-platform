@@ -103,7 +103,7 @@ function ResetPasswordForm() {
     return (
       <AuthFormPanel>
         <div className="mb-8">
-          <h1 className="text-2xl font-display font-black text-[#0a0c10] mb-4">
+          <h1 className="text-2xl font-display font-black text-[#343131] mb-4">
             {t("title")}
           </h1>
           <AuthStatus type="error">{message}</AuthStatus>
@@ -122,7 +122,7 @@ function ResetPasswordForm() {
             YENİ ŞİFRE
           </span>
         </div>
-        <h1 className="text-2xl md:text-3xl font-display font-black tracking-tight text-[#0a0c10] mb-2">
+        <h1 className="text-2xl md:text-3xl font-display font-black tracking-tight text-[#343131] mb-2">
           {t("title")}
         </h1>
         <p className="text-zinc-600 text-[14px] font-medium">{t("subtitle")}</p>

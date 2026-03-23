@@ -16,7 +16,7 @@ import {
     ScanText,
     Languages
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { ToolPageHint } from "@/components/dashboard/ToolPageHint";
@@ -89,7 +89,8 @@ export default function BatchConvertTool() {
         }));
         setFiles((prev) => {
             const combined = [...prev, ...fileObjects];
-            return combined.slice(0, 20);
+            const maxFiles = hasSubscription ? 100 : 20;
+            return combined.slice(0, maxFiles);
         });
         setError(null);
     };
@@ -264,7 +265,7 @@ export default function BatchConvertTool() {
                                     <div className="flex items-center justify-between mb-6">
                                         <h3 className="text-xl font-display font-bold text-[#0e0e0e] flex items-center gap-3">
                                             <FileText size={20} className="text-[#e6c800]" />
-                                            {tBatch("fileList")} ({files.length}/20)
+                                            {tBatch("fileList")} ({files.length}/{hasSubscription ? 100 : 20})
                                         </h3>
                                         {files.length > 0 && (
                                             <button

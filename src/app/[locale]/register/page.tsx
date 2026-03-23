@@ -95,7 +95,7 @@ export default function RegisterPage() {
                             KAYIT OL
                         </span>
                     </div>
-                    <h1 className="text-2xl md:text-3xl font-display font-black tracking-tight text-[#0a0c10] mb-2">
+                    <h1 className="text-2xl md:text-3xl font-display font-black tracking-tight text-[#343131] mb-2">
                         {t("title")}
                     </h1>
                     <p className="text-zinc-600 text-[14px] font-medium">{t("subtitle")}</p>
@@ -165,11 +165,11 @@ export default function RegisterPage() {
                             aria-describedby="agreed-desc"
                         />
                         <label id="agreed-desc" htmlFor="agreed" className="text-[13px] font-medium text-zinc-700 leading-relaxed cursor-pointer">
-                            <Link href="/kvkk" target="_blank" className="text-[#0a0c10] underline underline-offset-2 hover:text-[#e6c800]">
+                            <Link href="/kvkk" target="_blank" className="text-[#343131] underline underline-offset-2 hover:text-[#e6c800]">
                                 {t("kvkkLink")}
                             </Link>
                             {" ve "}
-                            <Link href="/terms" target="_blank" className="text-[#0a0c10] underline underline-offset-2 hover:text-[#e6c800]">
+                            <Link href="/terms" target="_blank" className="text-[#343131] underline underline-offset-2 hover:text-[#e6c800]">
                                 {t("termsLink")}
                             </Link>
                             {" "}ni okudum, onaylıyorum.

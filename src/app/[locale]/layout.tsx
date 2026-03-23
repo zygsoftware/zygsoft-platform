@@ -10,6 +10,7 @@ import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { Preloader } from "@/components/layout/Preloader";
 import { CustomCursor } from "@/components/layout/CustomCursor";
 import { AnimatedMeshBackground } from "@/components/layout/AnimatedMeshBackground";
+import { GoogleTag } from "@/components/analytics/GoogleTag";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,7 +19,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://zygsoft.com";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   icons: {
-    icon: "/brand/favicon.png",
+    icon: "/brand/ZYG_Logo_SQR.png",
   },
   title: {
     default:  "ZYGSOFT | Antalya Yazılım Şirketi ve Dijital Ajans",
@@ -83,7 +84,7 @@ const organizationJsonLd = {
       "url": SITE_URL,
       "logo": {
         "@type": "ImageObject",
-        "url": `${SITE_URL}/brand/logo.png`,
+        "url": `${SITE_URL}/brand/ZYGLogo.png`,
       },
       "contactPoint": {
         "@type": "ContactPoint",
@@ -129,6 +130,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} className="scroll-smooth">
       <body className={`${inter.className} min-h-screen flex flex-col`}>
+        <GoogleTag />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}

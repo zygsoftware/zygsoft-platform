@@ -47,7 +47,12 @@ export async function GET(req: Request) {
         const user = await prisma.user.upsert({
             where: { email: "admin@zygsoft.com" },
             update: { password: hashedPassword },
-            create: { email: "admin@zygsoft.com", password: hashedPassword, role: "admin" },
+            create: {
+                email: "admin@zygsoft.com",
+                password: hashedPassword,
+                role: "admin",
+                emailVerified: true,
+            },
         });
 
         await prisma.$disconnect();

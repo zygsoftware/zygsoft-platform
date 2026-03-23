@@ -63,7 +63,7 @@ export default function AdminProjectPreviewPage() {
                             <ArrowLeft size={14} /> Projelere Dön
                         </Link>
                         {project.category && (
-                            <span className="inline-block px-3 py-1 rounded-full bg-[#e6c800]/20 text-[#0a0c10] text-[11px] font-bold uppercase tracking-wider mb-4">
+                            <span className="inline-block px-3 py-1 rounded-full bg-[#e6c800]/20 text-[#343131] text-[11px] font-bold uppercase tracking-wider mb-4">
                                 {isTr ? project.category.name_tr : project.category.name_en}
                             </span>
                         )}

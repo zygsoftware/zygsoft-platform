@@ -36,6 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ...both("/dijital-urunler",  { changeFrequency: "weekly",  priority: 0.8 }),
         ...both("/dijital-urunler/hukuk-araclari-paketi", { changeFrequency: "weekly", priority: 0.9 }),
         ...both("/terms",        { changeFrequency: "yearly",  priority: 0.3 }),
+        ...both("/privacy",      { changeFrequency: "yearly",  priority: 0.3 }),
         ...both("/kvkk",         { changeFrequency: "yearly",  priority: 0.3 }),
     ];
 

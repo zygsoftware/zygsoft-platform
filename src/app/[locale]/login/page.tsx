@@ -2,7 +2,8 @@
 
 import { signIn } from "next-auth/react";
 import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail } from "lucide-react";
@@ -83,7 +84,7 @@ function LoginPageContent() {
                             GİRİŞ YAP
                         </span>
                     </div>
-                    <h1 className="text-2xl md:text-3xl font-display font-black tracking-tight text-[#0a0c10] mb-2">
+                    <h1 className="text-2xl md:text-3xl font-display font-black tracking-tight text-[#343131] mb-2">
                         {t("title")}
                     </h1>
                     <p className="text-zinc-600 text-[14px] font-medium">{t("subtitle")}</p>

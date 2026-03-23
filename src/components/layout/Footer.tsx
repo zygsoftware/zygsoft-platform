@@ -32,9 +32,9 @@ export function Footer() {
             { label: "AI Solutions", href: "/services" },
         ],
         legal: [
-            { label: "KVKK", href: "/kvkk" },
-            { label: "Kullanıcı Sözleşmesi", href: "/terms" },
-            { label: "Gizlilik Politikası", href: "/privacy" },
+            { label: t("legalKvkk"), href: "/kvkk" },
+            { label: t("termsOfService"), href: "/terms" },
+            { label: t("privacyPolicy"), href: "/privacy" },
         ],
     };
 
@@ -46,11 +46,11 @@ export function Footer() {
                     <div className="lg:col-span-4">
                         <Link href="/" className="inline-block mb-10 group" aria-label="ZYGSOFT Ana Sayfa">
                             <img
-                                src="/brand/logo.svg"
+                                src="/brand/ZYGLogo.png"
                                 alt="ZYGSOFT"
-                                className="h-10 w-auto"
-                                width={220}
-                                height={40}
+                                className="h-14 w-auto"
+                                width={280}
+                                height={56}
                             />
                         </Link>
                         <p className="text-slate-400 text-xl font-medium leading-tight max-w-sm mb-12">

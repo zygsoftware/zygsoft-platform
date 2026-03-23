@@ -9,9 +9,11 @@
     "lint": "eslint",
     "seed": "node prisma/seed.js",
     "seed:admin": "node seed-admin.js",
+    "reset:admin": "node scripts/reset-admin-password.js",
     "db:seed": "node prisma/seed.js",
     "migrate:legal-toolkit": "node scripts/migrate-legal-toolkit.js",
-    "generate:logo": "node scripts/generate-logo-png.mjs"
+    "generate:logo": "node scripts/generate-logo-png.mjs",
+    "install:legal-python": "python3 -m pip install -r tools/requirements-legal.txt"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -33,6 +35,7 @@
     "archiver": "^7.0.1",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.6.2",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "docx": "^9.6.1",
     "framer-motion": "^12.35.0",
@@ -43,14 +46,18 @@
     "next-auth": "^4.24.13",
     "next-intl": "^4.8.3",
     "nodemailer": "^7.0.13",
+    "ogl": "^1.0.11",
     "pdf-lib": "^1.17.1",
+    "radix-ui": "^1.4.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hot-toast": "^2.6.0",
     "recharts": "^3.8.0",
+    "shadcn": "^4.1.0",
     "swiper": "^12.1.2",
     "tailwind-merge": "^3.5.0",
-    "three": "^0.183.2"
+    "three": "^0.183.2",
+    "tw-animate-css": "^1.4.0"
   },
   "devDependencies": {
     "@prisma/engines": "^7.4.2",

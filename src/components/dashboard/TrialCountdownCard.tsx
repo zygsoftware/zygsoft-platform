@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, ShoppingCart, ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { TrialRequestCTA } from "@/components/trial/TrialRequestCTA";
 
 type TrialCountdownCardProps = {
@@ -77,7 +77,7 @@ export function TrialCountdownCard({
                             <Zap size={24} />
                         </div>
                         <div>
-                            <h3 className="font-black text-[#0a0c10] text-lg">3 Günlük Ücretsiz Demo</h3>
+                            <h3 className="font-black text-[#343131] text-lg">3 Günlük Ücretsiz Demo</h3>
                             <p className="text-slate-600 text-sm mt-0.5">
                                 20 işlem hakkı ile tüm belge araçlarını deneyin.
                             </p>
@@ -137,7 +137,7 @@ export function TrialCountdownCard({
                                 <Zap size={24} />
                             </div>
                             <div>
-                                <h3 className="font-black text-[#0a0c10] text-lg">{urgencyTitle}</h3>
+                                <h3 className="font-black text-[#343131] text-lg">{urgencyTitle}</h3>
                                 <p className="text-slate-600 text-sm mt-0.5">{formatTimeLeft(trialEndsAt)}</p>
                                 <p className="text-slate-500 text-sm mt-1">
                                     {trialOperationsUsed} / {trialOperationsLimit} işlem kullandınız
@@ -195,7 +195,7 @@ export function TrialCountdownCard({
                     <div className="lg:shrink-0 lg:self-center">
                         <Link
                             href="/dijital-urunler/hukuk-araclari-paketi"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-[#e6c800] text-[#0a0c10] font-black rounded-xl hover:bg-[#d4b800] transition-all shadow-sm"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-[#e6c800] text-[#343131] font-black rounded-xl hover:bg-[#d4b800] transition-all shadow-sm"
                         >
                             Paketi Etkinleştir
                             <ArrowRight size={18} />
@@ -222,7 +222,7 @@ export function TrialCountdownCard({
                             <Zap size={24} />
                         </div>
                         <div>
-                            <h3 className="font-black text-[#0a0c10] text-lg">Demo süreniz sona erdi</h3>
+                            <h3 className="font-black text-[#343131] text-lg">Demo süreniz sona erdi</h3>
                             <p className="text-slate-600 text-sm mt-0.5">
                                 Tam erişim için Hukuk Araçları Paketini satın alın.
                             </p>
@@ -230,7 +230,7 @@ export function TrialCountdownCard({
                     </div>
                     <Link
                         href="/dijital-urunler/hukuk-araclari-paketi"
-                        className="flex items-center gap-2 px-6 py-3 bg-[#e6c800] text-[#0a0c10] font-black rounded-xl hover:bg-[#d4b800] transition-all shrink-0"
+                        className="flex items-center gap-2 px-6 py-3 bg-[#e6c800] text-[#343131] font-black rounded-xl hover:bg-[#d4b800] transition-all shrink-0"
                     >
                         Paketi Satın Al <ShoppingCart size={18} />
                     </Link>

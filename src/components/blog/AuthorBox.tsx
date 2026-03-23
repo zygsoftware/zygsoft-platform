@@ -11,7 +11,7 @@ export function AuthorBox({ author, locale }: AuthorBoxProps) {
     const isTr = locale === "tr";
     return (
         <div className="flex items-center gap-4 p-6 bg-slate-50 rounded-xl border border-slate-100">
-            <div className="w-14 h-14 rounded-full bg-[#e6c800]/20 flex items-center justify-center text-[#0a0c10] shrink-0">
+            <div className="w-14 h-14 rounded-full bg-[#e6c800]/20 flex items-center justify-center text-[#343131] shrink-0">
                 <User size={28} />
             </div>
             <div>

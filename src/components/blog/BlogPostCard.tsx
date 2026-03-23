@@ -43,7 +43,7 @@ export function BlogPostCard({ post, locale, variant = "default", index = 0 }: B
 
     const cardContent = (
         <article
-            className={`group flex flex-col h-full overflow-hidden bg-white border border-[#0a0c10]/[0.05] rounded-xl transition-all duration-300 hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] hover:-translate-y-1 shadow-[0_1px_2px_rgba(0,0,0,0.03)] ${
+            className={`group flex flex-col h-full overflow-hidden bg-white border border-[#343131]/[0.05] rounded-xl transition-all duration-300 hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] hover:-translate-y-1 shadow-[0_1px_2px_rgba(0,0,0,0.03)] ${
                 isFeatured ? "lg:flex lg:flex-row" : ""
             }`}
         >
@@ -61,7 +61,7 @@ export function BlogPostCard({ post, locale, variant = "default", index = 0 }: B
                         sizes={isFeatured ? "(max-width: 1024px) 100vw, 50vw" : "(max-width: 768px) 100vw, 33vw"}
                     />
                 ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-[#0a0c10]/15">
+                    <div className="absolute inset-0 flex items-center justify-center text-[#343131]/15">
                         <BookOpen size={isFeatured ? 48 : 40} />
                     </div>
                 )}
@@ -70,12 +70,12 @@ export function BlogPostCard({ post, locale, variant = "default", index = 0 }: B
                     aria-hidden
                 />
                 {post.is_featured && (
-                    <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-[#e6c800] text-[#0a0c10] text-[10px] font-black uppercase tracking-wider">
+                    <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-[#e6c800] text-[#343131] text-[10px] font-black uppercase tracking-wider">
                         {isTr ? "Öne Çıkan" : "Featured"}
                     </span>
                 )}
                 {categoryName && !post.is_featured && (
-                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-white/95 text-[10px] font-bold uppercase text-[#0a0c10] shadow-sm">
+                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-white/95 text-[10px] font-bold uppercase text-[#343131] shadow-sm">
                         {categoryName}
                     </span>
                 )}
@@ -89,13 +89,13 @@ export function BlogPostCard({ post, locale, variant = "default", index = 0 }: B
                     {title}
                 </h3>
                 <p
-                    className={`text-[#0a0c10]/60 leading-relaxed flex-1 ${
+                    className={`text-[#343131]/60 leading-relaxed flex-1 ${
                         isFeatured ? "text-base line-clamp-3 mb-6" : "text-sm line-clamp-3 mb-4"
                     }`}
                 >
                     {excerpt}
                 </p>
-                <div className="flex flex-wrap items-center gap-4 text-xs text-[#0a0c10]/50 font-medium">
+                <div className="flex flex-wrap items-center gap-4 text-xs text-[#343131]/50 font-medium">
                     {categoryName && (
                         <span className="text-[#e6c800] font-semibold">{categoryName}</span>
                     )}
@@ -129,7 +129,7 @@ export function BlogPostCard({ post, locale, variant = "default", index = 0 }: B
                                 key={t.id}
                                 type="button"
                                 onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push(tagHref(t.slug)); }}
-                                className="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-medium hover:bg-[#e6c800]/20 hover:text-[#0a0c10] transition-colors text-left"
+                                className="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-medium hover:bg-[#e6c800]/20 hover:text-[#343131] transition-colors text-left"
                             >
                                 {t.name}
                             </button>

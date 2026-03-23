@@ -110,8 +110,9 @@ export async function GET() {
       console.log("[Instagram API] request URL (token hidden):", requestUrl);
     }
 
+    // Force Next.js to fetch a fresh response from Instagram
     const res = await fetch(url.toString(), {
-      next: { revalidate: REVALIDATE },
+      cache: "no-store",
       headers: { Accept: "application/json" },
     });
 

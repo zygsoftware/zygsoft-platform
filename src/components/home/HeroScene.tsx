@@ -99,8 +99,8 @@ function SceneContent() {
             <GlassPanel position={[2, 2, -2]} scale={[1.2, 1.8, 1]} rotation={[-0.1, 0.3, 0.2]} />
 
             {/* Orbiting Nodes */}
-            <AbstractShape position={[-4, -1, -3]} color="#0a0c10" speed={0.8} distort={0.2} radius={0.4} />
-            <AbstractShape position={[4, 3, -1]} color="#0a0c10" speed={1.2} distort={0.3} radius={0.3} />
+            <AbstractShape position={[-4, -1, -3]} color="#343131" speed={0.8} distort={0.2} radius={0.4} />
+            <AbstractShape position={[4, 3, -1]} color="#343131" speed={1.2} distort={0.3} radius={0.3} />
 
             <Connections count={20} />
             <Grid />

@@ -62,7 +62,7 @@ function VerifyEmailContent() {
     return (
       <AuthFormPanel>
         <div className="mb-8">
-          <h1 className="text-2xl font-display font-black text-[#0a0c10] mb-4">
+          <h1 className="text-2xl font-display font-black text-[#343131] mb-4">
             {t("title")}
           </h1>
           <AuthStatus type="success">{t("success")}</AuthStatus>
@@ -77,7 +77,7 @@ function VerifyEmailContent() {
   return (
     <AuthFormPanel>
       <div className="mb-8">
-        <h1 className="text-2xl font-display font-black text-[#0a0c10] mb-4">
+        <h1 className="text-2xl font-display font-black text-[#343131] mb-4">
           {t("title")}
         </h1>
         <AuthStatus type="error">{message}</AuthStatus>

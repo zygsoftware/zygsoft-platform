@@ -19,7 +19,7 @@ export function AuthFooterLinks({ links, className = "" }: AuthFooterLinksProps)
                 <Link
                     key={link.href}
                     href={link.href}
-                    className="text-[13px] font-semibold text-zinc-600 hover:text-[#0a0c10] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e6c800]/50 focus-visible:ring-offset-2 rounded [&_.accent]:text-[#e6c800] [&_.accent]:hover:text-[#c9ad00]"
+                    className="text-[13px] font-semibold text-zinc-600 hover:text-[#343131] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e6c800]/50 focus-visible:ring-offset-2 rounded [&_.accent]:text-[#e6c800] [&_.accent]:hover:text-[#c9ad00]"
                 >
                     {link.label}
                 </Link>

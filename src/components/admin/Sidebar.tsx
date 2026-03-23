@@ -47,7 +47,7 @@ export function AdminSidebar() {
             <div className="px-6 py-8 border-b border-slate-200/60">
                 <Link href="/admin/dashboard" className="flex items-center gap-3 group">
                     <img
-                        src="/brand/logo-icon.svg"
+                        src="/brand/ZYG_Logo_SQR.png"
                         alt="ZYGSOFT"
                         className="w-10 h-10 shrink-0"
                         width={40}

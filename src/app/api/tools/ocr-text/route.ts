@@ -8,7 +8,7 @@ import fs from "fs/promises";
 
 export const dynamic = "force-dynamic";
 
-const MAX_FILE_BYTES = 20 * 1024 * 1024; // 20 MB
+// Limits will be determined dynamically
 
 const ALLOWED_EXT = [".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff"];
 
@@ -23,6 +23,9 @@ export async function POST(req: Request) {
     try {
         const guard = await checkToolAccess();
         if (!guard.allowed) return guard.response;
+
+        const isSubscribed = !guard.incrementTrial;
+        const maxFileBytes = isSubscribed ? 100 * 1024 * 1024 : 20 * 1024 * 1024; // 100 MB for subs, 20 MB for demo
 
         const formData = await req.formData();
         const file = formData.get("file");
@@ -40,9 +43,9 @@ export async function POST(req: Request) {
             );
         }
 
-        if (file.size > MAX_FILE_BYTES) {
+        if (file.size > maxFileBytes) {
             return NextResponse.json(
-                { error: `Dosya çok büyük (maks. 20 MB).` },
+                { error: `Dosya çok büyük (maks. ${isSubscribed ? 100 : 20} MB).` },
                 { status: 400 }
             );
         }

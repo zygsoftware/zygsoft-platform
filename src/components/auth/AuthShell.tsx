@@ -10,7 +10,7 @@ type AuthShellProps = {
 
 export function AuthShell({ children, hero, showHero = true }: AuthShellProps) {
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#fafafc] selection:bg-[#e6c800] selection:text-[#0a0c10]">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#fafafc] selection:bg-[#e6c800] selection:text-[#343131]">
       {/* Subtle grid texture */}
       <div
         className="fixed inset-0 pointer-events-none z-0 opacity-[0.02]"
@@ -21,14 +21,14 @@ export function AuthShell({ children, hero, showHero = true }: AuthShellProps) {
 
       {/* Mobile: Hero above */}
       {showHero && hero && (
-        <aside className="lg:hidden w-full flex-shrink-0 bg-[#0a0c10] relative overflow-hidden min-h-[200px] flex items-center justify-center p-8">
+        <aside className="lg:hidden w-full flex-shrink-0 bg-[#343131] relative overflow-hidden min-h-[200px] flex items-center justify-center p-8">
           {hero}
         </aside>
       )}
 
       {/* Desktop: Hero left panel */}
       {showHero && hero && (
-        <aside className="hidden lg:flex lg:w-[42%] xl:w-[46%] flex-shrink-0 flex-col justify-between p-12 xl:p-16 2xl:p-20 bg-[#0a0c10] relative overflow-hidden">
+        <aside className="hidden lg:flex lg:w-[42%] xl:w-[46%] flex-shrink-0 flex-col justify-between p-12 xl:p-16 2xl:p-20 bg-[#343131] relative overflow-hidden">
           {hero}
         </aside>
       )}
@@ -45,11 +45,11 @@ export function AuthLogo() {
   return (
     <Link
       href="/"
-      className="block hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e6c800] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0c10] rounded"
+      className="block hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e6c800] focus-visible:ring-offset-2 focus-visible:ring-offset-[#343131] rounded"
       aria-label="ZYGSOFT Ana Sayfa"
     >
       <img
-        src="/brand/logo-dark.svg"
+        src="/brand/ZYGLogo.png"
         alt="ZYGSOFT"
         className="h-8 xl:h-9 w-auto"
         width={198}

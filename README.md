@@ -18,6 +18,16 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+### Hukuk araçları (PDF sıkıştırma, PDF → Word, PDF → görsel)
+
+Bu özellikler API route’larında `python3` subprocess kullanır. **PyMuPDF** vb. kurulu değilse “PyMuPDF kurulu değil” benzeri hata alırsınız.
+
+```bash
+npm run install:legal-python
+```
+
+Ayrıntılar: [`tools/README.md`](tools/README.md).
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More

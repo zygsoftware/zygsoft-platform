@@ -16,6 +16,8 @@ import {
     Split,
     ImageIcon,
     Layers,
+    FileType2,
+    Minimize2,
     Scale,
     Briefcase,
     GraduationCap,
@@ -40,6 +42,8 @@ const TOOLS = [
     { icon: Merge, title: "PDF Birleştir", desc: "Birden fazla PDF'i tek dosyada birleştirin." },
     { icon: Split, title: "PDF Böl", desc: "PDF sayfalarını bölün veya ayırın." },
     { icon: ImageIcon, title: "PDF → Görsel", desc: "PDF sayfalarını görsel formatına çevirin." },
+    { icon: FileType2, title: "PDF → Word", desc: "PDF'yi düzenlenebilir Word'e kaliteli dönüştürün." },
+    { icon: Minimize2, title: "PDF küçültme", desc: "Dosya boyutunu sıkıştırarak küçültün." },
     { icon: ScanText, title: "OCR Metin çıkarma", desc: "Taranan belgelerden metin çıkarın." },
     { icon: Layers, title: "Toplu belge dönüştürme", desc: "Çoklu dosya işlemleri tek seferde." },
 ];
@@ -96,7 +100,7 @@ const FAQ_ITEMS = [
 ];
 
 const PRICE_FEATURES = [
-    "8 araç, sınırsız kullanım",
+    "10 araç, sınırsız kullanım",
     "Tek yıllık ödeme",
     "UYAP uyumlu çıktı",
     "KVKK uyumlu altyapı",
@@ -105,14 +109,14 @@ const PRICE_FEATURES = [
 
 function DashboardMock() {
     return (
-        <div className="w-full max-w-[420px] rounded-2xl bg-white border border-[#0a0c10]/[0.06] shadow-[0_24px_64px_rgba(0,0,0,0.08)] overflow-hidden">
-            <div className="h-10 bg-[#0a0c10]/[0.02] border-b border-[#0a0c10]/[0.06] flex items-center px-4">
-                <span className="text-[11px] font-bold text-[#0a0c10]/60">ZYGSOFT Panel</span>
+        <div className="w-full max-w-[420px] rounded-2xl bg-white border border-[#343131]/[0.06] shadow-[0_24px_64px_rgba(0,0,0,0.08)] overflow-hidden">
+            <div className="h-10 bg-[#343131]/[0.02] border-b border-[#343131]/[0.06] flex items-center px-4">
+                <span className="text-[11px] font-bold text-[#343131]/60">ZYGSOFT Panel</span>
             </div>
             <div className="flex min-h-[280px]">
-                <aside className="w-[140px] shrink-0 border-r border-[#0a0c10]/[0.06] py-4 bg-[#0a0c10]/[0.01]">
+                <aside className="w-[140px] shrink-0 border-r border-[#343131]/[0.06] py-4 bg-[#343131]/[0.01]">
                     {["Genel Bakış", "Belge Araçları", "PDF Araçları", "OCR", "Ayarlar"].map((label, i) => (
-                        <div key={label} className="flex items-center gap-2 px-3 py-2.5 mx-2 rounded-lg text-[11px] font-medium text-[#0a0c10]/50">
+                        <div key={label} className="flex items-center gap-2 px-3 py-2.5 mx-2 rounded-lg text-[11px] font-medium text-[#343131]/50">
                             <LayoutDashboard size={14} className="shrink-0 opacity-70" />
                             <span className="truncate">{label}</span>
                         </div>
@@ -124,8 +128,8 @@ function DashboardMock() {
                             <FileText size={24} className="text-[#e6c800]" />
                         </div>
                         <div>
-                            <p className="text-[13px] font-black text-[#0a0c10]">DOCX → UDF</p>
-                            <p className="text-[11px] text-[#0a0c10]/50">dava_dilekcesi.docx</p>
+                            <p className="text-[13px] font-black text-[#343131]">DOCX → UDF</p>
+                            <p className="text-[11px] text-[#343131]/50">dava_dilekcesi.docx</p>
                         </div>
                     </div>
                     <div className="p-4 rounded-xl border border-[#e6c800]/20 bg-[#e6c800]/[0.05]">
@@ -133,7 +137,7 @@ function DashboardMock() {
                             <Check size={14} />
                             Dönüşüm tamamlandı
                         </div>
-                        <p className="text-[11px] text-[#0a0c10]/50 mt-1">dava_dilekcesi.udf</p>
+                        <p className="text-[11px] text-[#343131]/50 mt-1">dava_dilekcesi.udf</p>
                     </div>
                 </main>
             </div>
@@ -143,14 +147,14 @@ function DashboardMock() {
 
 function FaqItem({ q, a, isOpen, onToggle }: { q: string; a: string; isOpen: boolean; onToggle: () => void }) {
     return (
-        <div className="border-b border-[#0a0c10]/[0.08] last:border-0">
+        <div className="border-b border-[#343131]/[0.08] last:border-0">
             <button
                 type="button"
                 onClick={onToggle}
                 className="w-full flex items-center justify-between gap-4 py-5 text-left group"
             >
-                <span className="font-bold text-[#0a0c10] group-hover:text-[#e6c800] transition-colors">{q}</span>
-                <ChevronDown size={20} className={`shrink-0 text-[#0a0c10]/50 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+                <span className="font-bold text-[#343131] group-hover:text-[#e6c800] transition-colors">{q}</span>
+                <ChevronDown size={20} className={`shrink-0 text-[#343131]/50 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
             </button>
             <AnimatePresence>
                 {isOpen && (
@@ -161,7 +165,7 @@ function FaqItem({ q, a, isOpen, onToggle }: { q: string; a: string; isOpen: boo
                         transition={{ duration: 0.25, ease: EASE }}
                         className="overflow-hidden"
                     >
-                        <p className="pb-5 text-[#0a0c10]/50 text-[15px] leading-relaxed">{a}</p>
+                        <p className="pb-5 text-[#343131]/50 text-[15px] leading-relaxed">{a}</p>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -191,7 +195,7 @@ export default function HukukAraclariPaketiPage() {
                 <section className="relative py-20 md:py-28 lg:py-32 overflow-hidden">
                     <div className="absolute inset-0 pointer-events-none">
                         <div className="absolute right-0 top-0 w-[500px] h-[500px] rounded-full bg-[#e6c800]/[0.04]" />
-                        <div className="absolute left-0 bottom-0 w-[400px] h-[400px] rounded-full bg-[#0a0c10]/[0.02]" />
+                        <div className="absolute left-0 bottom-0 w-[400px] h-[400px] rounded-full bg-[#343131]/[0.02]" />
                     </div>
                     <div className="container mx-auto px-6 max-w-6xl relative z-10">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -200,16 +204,16 @@ export default function HukukAraclariPaketiPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.6, ease: EASE }}
                             >
-                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#0a0c10]/45 mb-4 block">
+                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#343131]/45 mb-4 block">
                                     Hukuk Araçları Paketi
                                 </span>
-                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-black tracking-tight text-[#0a0c10] mb-5 leading-[1.08]">
+                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-black tracking-tight text-[#343131] mb-5 leading-[1.08]">
                                     UYAP Belge Araçları
                                 </h1>
-                                <p className="text-xl md:text-2xl font-medium text-[#0a0c10]/40 mb-4">
+                                <p className="text-xl md:text-2xl font-medium text-[#343131]/40 mb-4">
                                     Avukatlar için profesyonel belge işleme platformu
                                 </p>
-                                <p className="text-[#0a0c10]/60 text-lg leading-relaxed mb-8">
+                                <p className="text-[#343131]/60 text-lg leading-relaxed mb-8">
                                     DOCX → UDF dönüştürme, PDF araçları, OCR metin çıkarma ve toplu belge işlemleri tek platformda.
                                 </p>
                                 <div className="flex flex-wrap gap-3">
@@ -221,7 +225,7 @@ export default function HukukAraclariPaketiPage() {
                                     </a>
                                     <a
                                         href="#demo"
-                                        className="inline-flex items-center gap-2.5 px-8 py-4 font-bold uppercase tracking-[0.2em] text-[11px] rounded-2xl border border-[#0a0c10]/[0.12] text-[#0a0c10]/80 hover:bg-[#0a0c10]/[0.04] transition-all duration-200"
+                                        className="inline-flex items-center gap-2.5 px-8 py-4 font-bold uppercase tracking-[0.2em] text-[11px] rounded-2xl border border-[#343131]/[0.12] text-[#343131]/80 hover:bg-[#343131]/[0.04] transition-all duration-200"
                                     >
                                         Demo Gör <Play size={18} />
                                     </a>
@@ -262,11 +266,11 @@ export default function HukukAraclariPaketiPage() {
                             viewport={revealViewport}
                             className="text-center mb-16"
                         >
-                            <h2 className="text-3xl md:text-4xl font-display font-black text-[#0a0c10] mb-4">
+                            <h2 className="text-3xl md:text-4xl font-display font-black text-[#343131] mb-4">
                                 Hukuk Araçları Paketi İçinde Neler Var?
                             </h2>
-                            <p className="text-[#0a0c10]/60 text-lg max-w-2xl mx-auto">
-                                8 araç, tek paket. UYAP uyumlu belge işlemleriniz için ihtiyacınız olan her şey.
+                            <p className="text-[#343131]/60 text-lg max-w-2xl mx-auto">
+                                10 araç, tek paket. UYAP uyumlu belge işlemleriniz için ihtiyacınız olan her şey.
                             </p>
                         </motion.div>
                         <motion.div
@@ -282,13 +286,13 @@ export default function HukukAraclariPaketiPage() {
                                     <motion.div
                                         key={tool.title}
                                         variants={createRevealUp(reducedMotion, 24, 4)}
-                                        className="p-6 rounded-2xl bg-white border border-[#0a0c10]/[0.06] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] hover:border-[#0a0c10]/[0.1] hover:-translate-y-1 transition-all duration-300"
+                                        className="p-6 rounded-2xl bg-white border border-[#343131]/[0.06] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] hover:border-[#343131]/[0.1] hover:-translate-y-1 transition-all duration-300"
                                     >
                                         <div className="w-12 h-12 rounded-xl bg-[#e6c800]/10 flex items-center justify-center mb-4 text-[#e6c800]">
                                             <Icon size={24} />
                                         </div>
-                                        <h3 className="text-lg font-black text-[#0a0c10] mb-2">{tool.title}</h3>
-                                        <p className="text-[#0a0c10]/60 text-sm leading-relaxed">{tool.desc}</p>
+                                        <h3 className="text-lg font-black text-[#343131] mb-2">{tool.title}</h3>
+                                        <p className="text-[#343131]/60 text-sm leading-relaxed">{tool.desc}</p>
                                     </motion.div>
                                 );
                             })}
@@ -306,10 +310,10 @@ export default function HukukAraclariPaketiPage() {
                             viewport={revealViewport}
                             className="text-center mb-16"
                         >
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#0a0c10]/45 mb-4 block">
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#343131]/45 mb-4 block">
                                 Hedef Kitle
                             </span>
-                            <h2 className="text-3xl md:text-4xl font-display font-black text-[#0a0c10]">
+                            <h2 className="text-3xl md:text-4xl font-display font-black text-[#343131]">
                                 Bu Platform Kimler İçin?
                             </h2>
                         </motion.div>
@@ -326,13 +330,13 @@ export default function HukukAraclariPaketiPage() {
                                     <motion.div
                                         key={item.title}
                                         variants={createRevealUp(reducedMotion, 24, 4)}
-                                        className="p-6 rounded-2xl bg-[#fafafc] border border-[#0a0c10]/[0.06] hover:border-[#e6c800]/30 hover:shadow-[0_8px_24px_rgba(230,200,0,0.08)] transition-all duration-300"
+                                        className="p-6 rounded-2xl bg-[#fafafc] border border-[#343131]/[0.06] hover:border-[#e6c800]/30 hover:shadow-[0_8px_24px_rgba(230,200,0,0.08)] transition-all duration-300"
                                     >
                                         <div className="w-12 h-12 rounded-xl bg-[#e6c800]/10 flex items-center justify-center mb-4 text-[#e6c800]">
                                             <Icon size={24} />
                                         </div>
-                                        <h3 className="text-lg font-black text-[#0a0c10] mb-2">{item.title}</h3>
-                                        <p className="text-[#0a0c10]/60 text-sm leading-relaxed">{item.desc}</p>
+                                        <h3 className="text-lg font-black text-[#343131] mb-2">{item.title}</h3>
+                                        <p className="text-[#343131]/60 text-sm leading-relaxed">{item.desc}</p>
                                     </motion.div>
                                 );
                             })}
@@ -350,10 +354,10 @@ export default function HukukAraclariPaketiPage() {
                             viewport={revealViewport}
                             className="text-center mb-16"
                         >
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#0a0c10]/45 mb-4 block">
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#343131]/45 mb-4 block">
                                 Çözümler
                             </span>
-                            <h2 className="text-3xl md:text-4xl font-display font-black text-[#0a0c10]">
+                            <h2 className="text-3xl md:text-4xl font-display font-black text-[#343131]">
                                 Hangi Problemleri Çözüyoruz?
                             </h2>
                         </motion.div>
@@ -368,19 +372,19 @@ export default function HukukAraclariPaketiPage() {
                                 <motion.div
                                     key={p.problem}
                                     variants={createRevealUp(reducedMotion, 24, 4)}
-                                    className="p-6 rounded-2xl bg-white border border-[#0a0c10]/[0.06] shadow-sm"
+                                    className="p-6 rounded-2xl bg-white border border-[#343131]/[0.06] shadow-sm"
                                 >
                                     <div className="flex items-start gap-3 mb-4">
                                         <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
                                             <AlertCircle size={20} className="text-red-500" />
                                         </div>
-                                        <h3 className="font-black text-[#0a0c10]">{p.problem}</h3>
+                                        <h3 className="font-black text-[#343131]">{p.problem}</h3>
                                     </div>
                                     <div className="flex items-start gap-3">
                                         <div className="w-10 h-10 rounded-lg bg-[#e6c800]/10 flex items-center justify-center shrink-0">
                                             <Check size={20} className="text-[#e6c800]" />
                                         </div>
-                                        <p className="text-[#0a0c10]/60 text-sm leading-relaxed">{p.solution}</p>
+                                        <p className="text-[#343131]/60 text-sm leading-relaxed">{p.solution}</p>
                                     </div>
                                 </motion.div>
                             ))}
@@ -398,10 +402,10 @@ export default function HukukAraclariPaketiPage() {
                             viewport={revealViewport}
                             className="text-center mb-16"
                         >
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#0a0c10]/45 mb-4 block">
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#343131]/45 mb-4 block">
                                 Süreç
                             </span>
-                            <h2 className="text-3xl md:text-4xl font-display font-black text-[#0a0c10]">
+                            <h2 className="text-3xl md:text-4xl font-display font-black text-[#343131]">
                                 Nasıl Çalışır?
                             </h2>
                         </motion.div>
@@ -422,9 +426,9 @@ export default function HukukAraclariPaketiPage() {
                                         {step.num}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="text-xl font-black text-[#0a0c10] mb-2">{step.title}</h3>
-                                        <p className="text-[#0a0c10]/60 mb-4">{step.desc}</p>
-                                        <div className="h-2 rounded-full bg-[#0a0c10]/[0.06] overflow-hidden">
+                                        <h3 className="text-xl font-black text-[#343131] mb-2">{step.title}</h3>
+                                        <p className="text-[#343131]/60 mb-4">{step.desc}</p>
+                                        <div className="h-2 rounded-full bg-[#343131]/[0.06] overflow-hidden">
                                             <motion.div
                                                 className="h-full rounded-full bg-[#e6c800]"
                                                 initial={{ width: "0%" }}
@@ -448,10 +452,10 @@ export default function HukukAraclariPaketiPage() {
                             viewport={{ once: true }}
                             className="text-center mb-12"
                         >
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#0a0c10]/45 mb-4 block">
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#343131]/45 mb-4 block">
                                 Güvenlik
                             </span>
-                            <h2 className="text-3xl md:text-4xl font-display font-black text-[#0a0c10] mb-8">
+                            <h2 className="text-3xl md:text-4xl font-display font-black text-[#343131] mb-8">
                                 Verileriniz Güvende
                             </h2>
                         </motion.div>
@@ -469,11 +473,11 @@ export default function HukukAraclariPaketiPage() {
                             ].map((item) => {
                                 const Icon = item.icon;
                                 return (
-                                    <div key={item.text} className="p-6 rounded-2xl bg-white border border-[#0a0c10]/[0.06] flex flex-col items-center text-center">
+                                    <div key={item.text} className="p-6 rounded-2xl bg-white border border-[#343131]/[0.06] flex flex-col items-center text-center">
                                         <div className="w-14 h-14 rounded-2xl bg-[#e6c800]/10 flex items-center justify-center mb-4 text-[#e6c800]">
                                             <Icon size={28} />
                                         </div>
-                                        <p className="text-[#0a0c10]/80 font-medium">{item.text}</p>
+                                        <p className="text-[#343131]/80 font-medium">{item.text}</p>
                                     </div>
                                 );
                             })}
@@ -488,7 +492,7 @@ export default function HukukAraclariPaketiPage() {
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            className="relative rounded-[2rem] p-8 md:p-12 bg-[#0a0c10] border border-white/10 overflow-hidden"
+                            className="relative rounded-[2rem] p-8 md:p-12 bg-[#343131] border border-white/10 overflow-hidden"
                         >
                             <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
                             <div className="relative z-10 text-center">
@@ -535,7 +539,7 @@ export default function HukukAraclariPaketiPage() {
                                                 trialStatus={(session?.user as any)?.trialStatus ?? "none"}
                                                 hasSubscription={false}
                                                 source="product-page"
-                                                className="!bg-[#e6c800] !text-[#0a0c10]"
+                                                className="!bg-[#e6c800] !text-[#343131]"
                                             />
                                         </div>
                                         <Link href="/dashboard/billing?product=legal-toolkit" className="text-white/70 hover:text-white text-sm font-medium">
@@ -561,10 +565,10 @@ export default function HukukAraclariPaketiPage() {
                             viewport={{ once: true }}
                             className="text-center mb-12"
                         >
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#0a0c10]/45 mb-4 block">
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#343131]/45 mb-4 block">
                                 SSS
                             </span>
-                            <h2 className="text-3xl md:text-4xl font-display font-black text-[#0a0c10]">
+                            <h2 className="text-3xl md:text-4xl font-display font-black text-[#343131]">
                                 Sıkça Sorulan Sorular
                             </h2>
                         </motion.div>
@@ -573,7 +577,7 @@ export default function HukukAraclariPaketiPage() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.1 }}
-                            className="rounded-2xl bg-white border border-[#0a0c10]/[0.06] shadow-sm overflow-hidden"
+                            className="rounded-2xl bg-white border border-[#343131]/[0.06] shadow-sm overflow-hidden"
                         >
                             {FAQ_ITEMS.map((item, i) => (
                                 <FaqItem
@@ -589,7 +593,7 @@ export default function HukukAraclariPaketiPage() {
                 </section>
 
                 {/* SECTION 10 — FINAL CTA */}
-                <section className="py-20 md:py-28 bg-[#0a0c10] border-t border-white/10">
+                <section className="py-20 md:py-28 bg-[#343131] border-t border-white/10">
                     <div className="container mx-auto px-6 max-w-4xl text-center">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}

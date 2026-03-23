@@ -25,7 +25,7 @@ export function RelatedServicesCTA({ locale }: RelatedServicesCTAProps) {
     ];
 
     return (
-        <div className="p-6 bg-white rounded-2xl border border-[#0a0c10]/[0.06] shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+        <div className="p-6 bg-white rounded-2xl border border-[#343131]/[0.06] shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
             <h3 className="font-display font-bold text-[#0e0e0e] text-lg mb-4">
                 {isTr ? "İlgili Hizmetler" : "Related Services"}
             </h3>
@@ -37,7 +37,7 @@ export function RelatedServicesCTA({ locale }: RelatedServicesCTAProps) {
                         className="flex items-center gap-4 p-4 rounded-xl border border-slate-100 hover:border-[#e6c800]/50 hover:bg-slate-50/50 transition-all group"
                     >
                         <div className="w-10 h-10 rounded-lg bg-[#e6c800]/20 flex items-center justify-center shrink-0 group-hover:bg-[#e6c800]/30 transition-colors">
-                            <s.icon size={20} className="text-[#0a0c10]" />
+                            <s.icon size={20} className="text-[#343131]" />
                         </div>
                         <div className="min-w-0">
                             <p className="font-bold text-[#0e0e0e] group-hover:text-[#e6c800] transition-colors">{s.title}</p>

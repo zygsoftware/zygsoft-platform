@@ -18,7 +18,7 @@ export function AuthTabs({ tabs, active, onChange }: AuthTabsProps) {
                     onClick={() => onChange(tab.id)}
                     className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 ${
                         active === tab.id
-                            ? "bg-white text-[#0a0c10] shadow-sm"
+                            ? "bg-white text-[#343131] shadow-sm"
                             : "text-zinc-600 hover:text-zinc-900"
                     }`}
                 >

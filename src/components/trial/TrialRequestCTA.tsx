@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
 import { useLocale } from "next-intl";
 import { Loader2, ChevronRight } from "lucide-react";
@@ -18,8 +18,8 @@ type TrialRequestCTAProps = {
 };
 
 const btnBase = "inline-flex items-center gap-2 transition-all";
-const btnFull = "px-6 py-3 bg-[#e6c800] text-[#0a0c10] font-black rounded-xl hover:bg-[#d4b800]";
-const btnCompact = "px-4 py-2 text-xs font-bold bg-[#e6c800] text-[#0a0c10] rounded-lg hover:bg-[#d4b800]";
+const btnFull = "px-6 py-3 bg-[#e6c800] text-[#343131] font-black rounded-xl hover:bg-[#d4b800]";
+const btnCompact = "px-4 py-2 text-xs font-bold bg-[#e6c800] text-[#343131] rounded-lg hover:bg-[#d4b800]";
 
 export function TrialRequestCTA({
     emailVerified,
@@ -36,7 +36,7 @@ export function TrialRequestCTA({
     if (hasSubscription) return null;
 
     const packageHref = locale === "en" ? "/en/dijital-urunler/hukuk-araclari-paketi" : "/dijital-urunler/hukuk-araclari-paketi";
-    const dashboardHref = locale === "en" ? "/en/dashboard" : "/dashboard";
+    const dashboardHref = "/dashboard";
     const verifyHref = locale === "en" ? "/en/verify-email-required" : "/verify-email-required";
 
     const handleStartTrial = async () => {

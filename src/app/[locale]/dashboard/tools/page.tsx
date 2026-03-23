@@ -1,9 +1,10 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { hasToolAccess } from "@/lib/trial-access-client";
+import { toolIdToMessagePrefix } from "@/lib/tool-message-prefix";
 import {
     FileText,
     FileImage,
@@ -21,6 +22,8 @@ import {
     ChevronRight,
     Scissors,
     Image as ImageIcon,
+    FileType2,
+    Minimize2,
 } from "lucide-react";
 
 /* ── Tool definitions ────────────────────────────────────────────── */
@@ -29,9 +32,6 @@ type AccessLevel = "active" | "subscription_required" | "login_only_active";
 
 interface ToolDef {
     id:          string;
-    name:        string;
-    description: string;
-    longDesc:    string;
     icon:        React.ReactNode;
     iconBg:      string;
     iconColor:   string;
@@ -47,9 +47,6 @@ const LEGAL_TOOLKIT_SLUG = "legal-toolkit";
 const TOOLS: ToolDef[] = [
     {
         id:          "doc-to-udf",
-        name:        "DOCX → UDF Dönüştürücü",
-        description: "Word belgelerini UYAP uyumlu UDF formatına saniyeler içinde dönüştürün.",
-        longDesc:    "Avukatlık bürolarının en çok ihtiyaç duyduğu araç. DOCX dosyalarınızı doğrudan UYAP sistemine yüklenebilir UDF formatına dönüştürür. KVKK uyumlu, toplu işlem destekli.",
         icon:        <FileText size={24} />,
         iconBg:      "bg-[#0e0e0e]",
         iconColor:   "text-[#e6c800]",
@@ -60,9 +57,6 @@ const TOOLS: ToolDef[] = [
     },
     {
         id:          "image-to-pdf",
-        name:        "Görsel → PDF Dönüştürücü",
-        description: "JPG, JPEG veya PNG görsellerinizi tek bir profesyonel PDF'e dönüştürün.",
-        longDesc:    "Birden fazla görsel dosyasını yükleyin — tek tıkla sıralı, düzenli bir PDF dökümanına birleştirin. Sürükle-bırak desteği.",
         icon:        <FileImage size={24} />,
         iconBg:      "bg-blue-50",
         iconColor:   "text-blue-600",
@@ -73,9 +67,6 @@ const TOOLS: ToolDef[] = [
     },
     {
         id:          "pdf-merge",
-        name:        "PDF Birleştirici",
-        description: "Birden fazla PDF dosyasını tek bir çıktı halinde birleştirin.",
-        longDesc:    "PDF dosyalarını sürükle-bırak ile sıralayın, istediğiniz düzende birleştirin. Dosya sayısı ve yeniden sıralama desteği mevcuttur.",
         icon:        <Layers size={24} />,
         iconBg:      "bg-violet-50",
         iconColor:   "text-violet-600",
@@ -86,9 +77,6 @@ const TOOLS: ToolDef[] = [
     },
     {
         id:          "pdf-split",
-        name:        "PDF Bölme",
-        description: "PDF dosyanızdan belirli sayfaları seçerek yeni bir PDF oluşturun.",
-        longDesc:    "Tek bir PDF yükleyin, sayfa aralığı girin — 1-5, 7, 10-12 gibi. Virgül veya tire ile sayfa seçimi yapın.",
         icon:        <Scissors size={24} />,
         iconBg:      "bg-amber-50",
         iconColor:   "text-amber-600",
@@ -99,9 +87,6 @@ const TOOLS: ToolDef[] = [
     },
     {
         id:          "pdf-to-image",
-        name:        "PDF → Görsel",
-        description: "PDF sayfalarınızı PNG veya JPG görsellere dönüştürün.",
-        longDesc:    "PDF yükleyin, çıktı formatını (PNG/JPG) seçin. İsteğe bağlı sayfa aralığı ile belirli sayfaları dönüştürün.",
         icon:        <ImageIcon size={24} />,
         iconBg:      "bg-rose-50",
         iconColor:   "text-rose-600",
@@ -111,10 +96,27 @@ const TOOLS: ToolDef[] = [
         requiredSlugs: [LEGAL_TOOLKIT_SLUG],
     },
     {
+        id:          "pdf-to-word",
+        icon:        <FileType2 size={24} />,
+        iconBg:      "bg-emerald-50",
+        iconColor:   "text-emerald-600",
+        href:        "/dashboard/tools/pdf-to-word",
+        group:       "document",
+        featured:    false,
+        requiredSlugs: [LEGAL_TOOLKIT_SLUG],
+    },
+    {
+        id:          "pdf-compress",
+        icon:        <Minimize2 size={24} />,
+        iconBg:      "bg-orange-50",
+        iconColor:   "text-orange-600",
+        href:        "/dashboard/tools/pdf-compress",
+        group:       "document",
+        featured:    false,
+        requiredSlugs: [LEGAL_TOOLKIT_SLUG],
+    },
+    {
         id:          "tiff-to-pdf",
-        name:        "TIFF → PDF",
-        description: "TIFF/TIF dosyalarınızı tek bir PDF'e dönüştürün.",
-        longDesc:    "Birden fazla TIFF dosyası yükleyin. Çok sayfalı TIFF'ler desteklenir. Sıralamayı sürükle-bırak ile değiştirebilirsiniz.",
         icon:        <FileText size={24} />,
         iconBg:      "bg-teal-50",
         iconColor:   "text-teal-600",
@@ -125,9 +127,6 @@ const TOOLS: ToolDef[] = [
     },
     {
         id:          "ocr-text",
-        name:        "OCR Metin Çıkarma",
-        description: "PDF ve görsellerden metin çıkarın. Türkçe ve İngilizce destekli.",
-        longDesc:    "PDF, PNG, JPG, TIFF dosyalarınızı yükleyin. Dil seçin (TR/EN) ve metni çıkarın. Kopyala veya TXT olarak indirin.",
         icon:        <FileText size={24} />,
         iconBg:      "bg-indigo-50",
         iconColor:   "text-indigo-600",
@@ -138,9 +137,6 @@ const TOOLS: ToolDef[] = [
     },
     {
         id:          "batch-convert",
-        name:        "Toplu Belge Dönüştürücü",
-        description: "Birden fazla belgeyi tek seferde dönüştürün. ZIP olarak indirin.",
-        longDesc:    "DOCX→UDF, Görsel→PDF, TIFF→PDF veya OCR seçin. En fazla 20 dosya yükleyin, tek ZIP ile indirin.",
         icon:        <Layers size={24} />,
         iconBg:      "bg-sky-50",
         iconColor:   "text-sky-600",
@@ -169,21 +165,32 @@ function resolveAccess(
 
 const ACCESS_CFG = {
     active: {
-        badge:   "bg-emerald-50 text-emerald-700 border border-emerald-200",
-        label:   "Aktif",
-        icon:    <CheckCircle2 size={12} />,
+        badge:    "bg-emerald-50 text-emerald-700 border border-emerald-200",
+        labelKey: "accessActiveLabel" as const,
+        icon:     <CheckCircle2 size={12} />,
     },
     login_only_active: {
-        badge:   "bg-emerald-50 text-emerald-700 border border-emerald-200",
-        label:   "Aktif",
-        icon:    <CheckCircle2 size={12} />,
+        badge:    "bg-emerald-50 text-emerald-700 border border-emerald-200",
+        labelKey: "accessActiveLabel" as const,
+        icon:     <CheckCircle2 size={12} />,
     },
     subscription_required: {
-        badge:   "bg-amber-50 text-amber-700 border border-amber-200",
-        label:   "Abonelik Gerekli",
-        icon:    <Lock size={12} />,
+        badge:    "bg-amber-50 text-amber-700 border border-amber-200",
+        labelKey: "accessSubscriptionRequiredLabel" as const,
+        icon:     <Lock size={12} />,
     },
 } as const;
+
+function getToolHubCopy(
+    toolId: string,
+    t: (key: string) => string,
+): { name: string; desc: string } {
+    const prefix = toolIdToMessagePrefix(toolId);
+    return {
+        name: t(`${prefix}.hubName`),
+        desc: t(`${prefix}.hubDescription`),
+    };
+}
 
 /* ── Tool card ───────────────────────────────────────────────────── */
 
@@ -197,8 +204,7 @@ function ToolCard({
     const t        = useTranslations("Dashboard.overview.tools");
     const cfg      = ACCESS_CFG[access];
     const isLocked = access === "subscription_required";
-    const name     = tool.id === "tiff-to-pdf" ? t("tiffToPdf.hubName") : tool.id === "ocr-text" ? t("ocrText.hubName") : tool.id === "batch-convert" ? t("batchConvert.hubName") : tool.name;
-    const desc     = tool.id === "tiff-to-pdf" ? t("tiffToPdf.hubDescription") : tool.id === "ocr-text" ? t("ocrText.hubDescription") : tool.id === "batch-convert" ? t("batchConvert.hubDescription") : tool.description;
+    const { name, desc } = getToolHubCopy(tool.id, t);
 
     return (
         <div
@@ -214,7 +220,7 @@ function ToolCard({
             {tool.featured && (
                 <div className="absolute top-0 right-0 flex items-center gap-1 bg-[#e6c800] text-[#0e0e0e] text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-bl-xl">
                     <Star size={10} fill="currentColor" />
-                    Önerilen
+                    {t("recommendedRibbon")}
                 </div>
             )}
 
@@ -240,7 +246,7 @@ function ToolCard({
                             `}
                         >
                             {cfg.icon}
-                            {cfg.label}
+                            {t(cfg.labelKey)}
                         </span>
                     </div>
                 </div>
@@ -267,7 +273,7 @@ function ToolCard({
                         "
                     >
                         <ShoppingCart size={15} />
-                        Paketi İncele
+                        {t("ctaViewPackage")}
                         <ArrowRight size={14} />
                     </Link>
                 ) : (
@@ -281,7 +287,7 @@ function ToolCard({
                         "
                     >
                         <Zap size={15} />
-                        Aracı Kullan
+                        {t("ctaUseTool")}
                         <ArrowRight size={14} />
                     </Link>
                 )}
@@ -299,7 +305,14 @@ function FeaturedToolCard({
     tool:   ToolDef;
     access: AccessLevel;
 }) {
+    const t = useTranslations("Dashboard.overview.tools");
     const isLocked = access === "subscription_required";
+    const prefix = toolIdToMessagePrefix(tool.id);
+    const { name } = getToolHubCopy(tool.id, t);
+    const longDesc =
+        tool.id === "doc-to-udf"
+            ? t("docToUdf.featuredLongDesc")
+            : t(`${prefix}.hubDescription`);
 
     return (
         <div
@@ -322,37 +335,37 @@ function FeaturedToolCard({
                         {/* Flagship badge */}
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-black uppercase tracking-wider">
                             <Star size={10} fill="currentColor" />
-                            Amiral Ürün
+                            {t("featuredFlagshipBadge")}
                         </span>
 
                         {/* Access badge */}
                         {!isLocked ? (
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 text-xs font-bold">
                                 <CheckCircle2 size={11} />
-                                Abonelik Aktif
+                                {t("badgeSubscriptionActive")}
                             </span>
                         ) : (
                             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25 text-xs font-bold">
                                 <Lock size={11} />
-                                Abonelik Gerekli
+                                {t("badgeSubscriptionRequired")}
                             </span>
                         )}
                     </div>
 
                     <h2 className="font-heading font-black text-2xl text-white mb-2">
-                        {tool.name}
+                        {name}
                     </h2>
                     <p className="text-white/60 font-medium leading-relaxed max-w-xl">
-                        {tool.longDesc}
+                        {longDesc}
                     </p>
 
                     <div className="mt-5 flex flex-wrap items-center gap-2">
-                        {["DOCX → UDF", "KVKK Uyumlu", "Toplu İşlem", "UYAP Uyumlu"].map((tag) => (
+                        {(["docxUdf", "kvkk", "batch", "uyap"] as const).map((tag) => (
                             <span
                                 key={tag}
                                 className="px-2.5 py-1 rounded-md bg-white/8 text-white/50 text-xs font-semibold border border-white/10"
                             >
-                                {tag}
+                                {t(`featuredTags.${tag}`)}
                             </span>
                         ))}
                     </div>
@@ -373,10 +386,10 @@ function FeaturedToolCard({
                                 "
                             >
                                 <ShoppingCart size={16} />
-                                Paketi İncele
+                                {t("ctaViewPackage")}
                             </Link>
                             <p className="text-white/40 text-xs text-center font-medium">
-                                3000 TL / yıl · Tüm belge araçları dahil
+                                {t("featuredPricingLine")}
                             </p>
                         </>
                     ) : (
@@ -392,13 +405,13 @@ function FeaturedToolCard({
                                 "
                             >
                                 <Zap size={16} />
-                                Aracı Kullan
+                                {t("ctaUseTool")}
                             </Link>
                             <Link
                                 href="/dashboard/billing"
                                 className="text-white/40 text-xs text-center font-medium hover:text-white/60 transition-colors"
                             >
-                                Abonelik bilgileri →
+                                {t("linkBillingInfo")}
                             </Link>
                         </>
                     )}
@@ -549,10 +562,10 @@ export default function ToolsHubPage() {
                     </div>
                     <div>
                         <p className="font-heading font-black text-slate-950 text-sm">
-                            Bir sorun mu var?
+                            {t("helpStripTitle")}
                         </p>
                         <p className="text-xs text-slate-400 font-medium">
-                            Destek ekibimiz size yardımcı olmaya hazır.
+                            {t("helpStripSubtitle")}
                         </p>
                     </div>
                 </div>
@@ -565,7 +578,7 @@ export default function ToolsHubPage() {
                             hover:bg-slate-700 transition-colors
                         "
                     >
-                        Destek Talebi Aç
+                        {t("helpCtaSupport")}
                         <ArrowRight size={13} />
                     </Link>
                     <Link
@@ -576,7 +589,7 @@ export default function ToolsHubPage() {
                             hover:bg-slate-50 transition-colors
                         "
                     >
-                        Bize Yazın
+                        {t("helpCtaContact")}
                     </Link>
                 </div>
             </div>

@@ -78,7 +78,7 @@ async function main() {
             name: name || "Admin",
             password: hash,
             role: "admin",
-            emailVerified: new Date(),
+            emailVerified: true,
         },
     });
 

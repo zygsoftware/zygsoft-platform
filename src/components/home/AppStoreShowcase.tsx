@@ -46,14 +46,14 @@ export function AppStoreShowcase() {
     ];
 
     const featureRows = [
-        { icon: Workflow, text: isTr ? "8 belge aracı, tek yıllık abonelik" : "8 document tools, one annual subscription", detail: isTr ? "Tüm araçlara sınırsız erişim" : "Unlimited access" },
+        { icon: Workflow, text: isTr ? "10 belge aracı, tek yıllık abonelik" : "10 document tools, one annual subscription", detail: isTr ? "Tüm araçlara sınırsız erişim" : "Unlimited access" },
         { icon: Shield, text: isTr ? "KVKK uyumlu, belgeler işlem sonrası silinir" : "KVKK-compliant, documents deleted after processing", detail: isTr ? "Güvenli altyapı" : "Secure infrastructure" },
         { icon: Layers, text: isTr ? "UYAP, PDF, OCR — hepsi dahil" : "UYAP, PDF, OCR — all included", detail: isTr ? "Tek paket" : "Single package" },
         { icon: CheckCircle2, text: isTr ? "Ayrı satın alma yok, tüm araçlar dahil" : "No separate purchases, all tools included", detail: isTr ? "Şeffaf fiyatlandırma" : "Transparent pricing" },
     ];
 
     return (
-        <section className="py-24 md:py-28 bg-[#0a0c10] relative overflow-hidden">
+        <section className="py-24 md:py-28 bg-[#343131] relative overflow-hidden">
             <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
 
             <div className="container mx-auto px-6 max-w-7xl relative z-10">
@@ -129,7 +129,7 @@ export function AppStoreShowcase() {
                                 <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #fff 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
 
                                 <div className="relative z-10 flex items-start justify-between mb-6">
-                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e6c800] text-[#0a0c10] text-[10px] font-black uppercase tracking-[0.24em]">
+                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e6c800] text-[#343131] text-[10px] font-black uppercase tracking-[0.24em]">
                                         <Sparkles size={12} />
                                         {previewProducts[0].tag}
                                     </div>
@@ -138,7 +138,7 @@ export function AppStoreShowcase() {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
                                     {/* Main product card */}
-                                    <div className="rounded-2xl bg-[#0a0c10]/90 border border-white/10 p-5">
+                                    <div className="rounded-2xl bg-[#343131]/90 border border-white/10 p-5">
                                         <div className="w-12 h-12 rounded-xl bg-[#e6c800]/20 text-[#e6c800] flex items-center justify-center mb-4">
                                             {previewProducts[0].icon}
                                         </div>

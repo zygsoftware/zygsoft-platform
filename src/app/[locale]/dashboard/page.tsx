@@ -18,7 +18,7 @@ import {
     Activity,
     ChevronRight,
 } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { ActivityTimeline } from "@/components/dashboard/ActivityTimeline";
 import { TrialCountdownCard, formatTimeLeftCompact } from "@/components/dashboard/TrialCountdownCard";
@@ -47,7 +47,7 @@ export default function DashboardPage() {
         setLoading(true);
         try {
             const res = await fetch("/api/dashboard/summary");
-            if (!res.ok) throw new Error("Özet alınamadı.");
+            if (!res.ok) throw new Error("summary_error");
             const data = await res.json();
             setSummary(data.summary ?? null);
         } catch {
@@ -64,10 +64,12 @@ export default function DashboardPage() {
     const hasLegalToolkitAccess = hasToolAccess(user);
     const hasPaidSubscription = activeProductSlugs.includes("legal-toolkit") || user?.role === "admin";
 
+    const effectiveActiveProducts = hasLegalToolkitAccess ? Math.max(summary?.activeProducts ?? 0, 1) : (summary?.activeProducts ?? 0);
+
     const stats = [
         {
             name:  t("stats.activeProducts"),
-            value: loading ? "—" : String(summary?.activeProducts ?? 0),
+            value: loading ? "—" : String(effectiveActiveProducts),
             icon:  Box,
             color: "text-blue-600",
             bg:    "bg-blue-50",
@@ -133,12 +135,12 @@ export default function DashboardPage() {
                     {!hasLegalToolkitAccess && user?.trialStatus === "active" && (
                         <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-xl">
                             <Sparkles size={13} className="text-amber-500" />
-                            Demo: {formatTimeLeftCompact(user?.trialEndsAt ?? null)}
+                            {t("sections.demoPrefix")} {formatTimeLeftCompact(user?.trialEndsAt ?? null)}
                         </div>
                     )}
                     <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl">
                         <Sparkles size={13} className="text-amber-500" />
-                        Kontrol Panelinize Hoş Geldiniz
+                        {t("sections.welcomePill")}
                     </div>
                 </div>
             </div>
@@ -199,7 +201,7 @@ export default function DashboardPage() {
                     if (ot > 0) {
                         return (
                             <Link
-                                href={`/${locale}/dashboard/support`}
+                                href="/dashboard/support"
                                 className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-violet-50 border border-violet-100 hover:bg-violet-100/80 transition-colors group"
                             >
                                 <div className="flex items-center gap-3">
@@ -217,7 +219,7 @@ export default function DashboardPage() {
                             </Link>
                         );
                     }
-                    if (ap === 0) {
+                    if (!hasLegalToolkitAccess) {
                         return (
                             <Link
                                 href={locale === "en" ? "/en/dijital-urunler/hukuk-araclari-paketi" : "/dijital-urunler/hukuk-araclari-paketi"}
@@ -241,7 +243,7 @@ export default function DashboardPage() {
                     if (hasLegalToolkitAccess) {
                         return (
                             <Link
-                                href={`/${locale}/dashboard/tools`}
+                                href="/dashboard/tools"
                                 className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-100 hover:bg-emerald-100/80 transition-colors group"
                             >
                                 <div className="flex items-center gap-3">
@@ -301,7 +303,7 @@ export default function DashboardPage() {
                             <span className="w-6 h-6 rounded-lg bg-amber-50 flex items-center justify-center">
                                 <Box size={13} className="text-amber-600" />
                             </span>
-                            {t("sections.apps")}
+                            {t("sections.activeProductsTitle")}
                         </h2>
                         <Link
                             href="/dashboard/products"
@@ -319,7 +321,7 @@ export default function DashboardPage() {
                         {hasLegalToolkitAccess ? (
                                 <div className="
                                 flex items-center justify-between gap-4 p-5
-                                bg-gradient-to-br from-[#0a0c10] to-[#111318]
+                                bg-gradient-to-br from-[#343131] to-[#111318]
                                 rounded-2xl border border-slate-700
                                 hover:border-slate-600 hover:shadow-lg
                                 transition-all duration-200 group
@@ -329,18 +331,18 @@ export default function DashboardPage() {
                                         <CheckCircle2 size={22} />
                                     </div>
                                     <div>
-                                        <h4 className="font-black text-white text-sm leading-tight">
-                                            Hukuk Araçları Paketi
-                                        </h4>
+                                        <div className="font-black text-white text-sm leading-tight">
+                                            {t("sections.legalToolkitCardTitle")}
+                                        </div>
                                         <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider mt-0.5">
-                                            Aktif · Sınırsız Erişim
+                                            {t("sections.legalToolkitCardBadge")}
                                         </p>
                                     </div>
                                 </div>
                                 <div className="shrink-0 flex flex-col items-end gap-2">
                                     <Link
                                         href="/dashboard/tools/doc-to-udf"
-                                        className="px-4 py-2.5 bg-[#e6c800] text-[#0a0c10] rounded-xl text-[11px] font-black uppercase tracking-wider hover:bg-white transition-all"
+                                        className="px-4 py-2.5 bg-[#e6c800] text-[#343131] rounded-xl text-[11px] font-black uppercase tracking-wider hover:bg-white transition-all"
                                     >
                                         {t("sections.start")}
                                     </Link>
@@ -359,17 +361,17 @@ export default function DashboardPage() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="font-black text-slate-950 text-sm">
-                                        {activeProductSlugs.length} aktif abonelik
+                                        {t("sections.otherSubscriptions", { count: activeProductSlugs.length })}
                                     </p>
                                     <p className="text-xs text-slate-500 font-medium mt-0.5">
-                                        Detayları görmek için Hizmetlerim sayfasına gidin.
+                                        {t("sections.otherSubscriptionsHint")}
                                     </p>
                                 </div>
                                 <Link
                                     href="/dashboard/services"
                                     className="shrink-0 px-4 py-2 bg-slate-950 text-white text-xs font-black rounded-xl hover:bg-slate-700 transition-colors"
                                 >
-                                    Görüntüle
+                                    {t("sections.viewServicesCta")}
                                 </Link>
                             </div>
                         ) : (
@@ -464,7 +466,7 @@ export default function DashboardPage() {
                                         />
                                     )}
                                     <Link
-                                        href={`/${locale}/dashboard/support`}
+                                        href="/dashboard/support"
                                         className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-950 text-white text-xs font-black rounded-xl hover:bg-slate-700 transition-colors"
                                     >
                                         {t("sections.newTicket")}

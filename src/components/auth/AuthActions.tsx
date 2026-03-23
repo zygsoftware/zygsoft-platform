@@ -31,7 +31,7 @@ export function AuthActions({
           disabled={disabled || loading}
           whileHover={{ scale: disabled || loading ? 1 : 1.02 }}
           whileTap={{ scale: disabled || loading ? 1 : 0.98 }}
-          className="w-full h-[52px] bg-[#0a0c10] text-white font-bold text-sm rounded-xl hover:bg-[#e6c800] hover:text-[#0a0c10] transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e6c800] focus-visible:ring-offset-2"
+          className="w-full h-[52px] bg-[#343131] text-white font-bold text-sm rounded-xl hover:bg-[#e6c800] hover:text-[#343131] transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e6c800] focus-visible:ring-offset-2"
           aria-busy={loading}
           aria-disabled={disabled || loading}
         >
@@ -54,7 +54,7 @@ export function AuthActions({
             <Link
               key={link.href}
               href={link.href}
-              className="text-[13px] font-semibold text-slate-600 hover:text-[#0a0c10] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e6c800]/50 focus-visible:ring-offset-2 rounded [&_.accent]:text-[#e6c800] [&_.accent]:hover:text-[#c9ad00]"
+              className="text-[13px] font-semibold text-slate-600 hover:text-[#343131] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e6c800]/50 focus-visible:ring-offset-2 rounded [&_.accent]:text-[#e6c800] [&_.accent]:hover:text-[#c9ad00]"
             >
               {link.label}
             </Link>

@@ -2,25 +2,16 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
+import type { TimelineItem } from "@/types/dashboard-timeline";
 
 export const dynamic = "force-dynamic";
 
-export type TimelineEventType =
-    | "payment_submitted"
-    | "payment_approved"
-    | "payment_rejected"
-    | "ticket_created"
-    | "ticket_updated"
-    | "tool_used";
-
-export type TimelineEvent = {
-    id: string;
-    type: TimelineEventType;
-    title: string;
-    description: string;
-    date: string;
-    href?: string;
-};
+export type {
+    TimelineItem,
+    TimelinePaymentItem,
+    TimelineTicketItem,
+    TimelineToolItem,
+} from "@/types/dashboard-timeline";
 
 /**
  * Unified activity timeline for customer dashboard.
@@ -31,15 +22,11 @@ export async function GET() {
         const session = await getServerSession(authOptions);
 
         if (!session?.user?.id) {
-            return NextResponse.json(
-                { error: "Oturum açmanız gerekiyor." },
-                { status: 401 }
-            );
+            return NextResponse.json({ error: "unauthorized" }, { status: 401 });
         }
 
         const userId = session.user.id;
 
-        // Parallel fetches - each limited for performance
         const [payments, tickets, toolUsages] = await Promise.all([
             prisma.payment.findMany({
                 where: { userId },
@@ -59,105 +46,87 @@ export async function GET() {
             }),
         ]);
 
-        const events: TimelineEvent[] = [];
+        const items: TimelineItem[] = [];
 
         for (const p of payments) {
-            const productName = p.product?.name ?? "Ürün";
-            const amountStr = `₺${p.amount.toLocaleString("tr-TR", { minimumFractionDigits: 0 })}`;
-
+            const productName = p.product?.name ?? null;
             if (p.status === "approved") {
-                events.push({
+                items.push({
+                    kind: "payment",
                     id: `payment-approved-${p.id}`,
-                    type: "payment_approved",
-                    title: productName,
-                    description: `${amountStr} · Onaylandı`,
+                    status: "approved",
+                    productName,
+                    amount: p.amount,
                     date: p.updatedAt.toISOString(),
-                    href: "/dashboard/billing",
                 });
             } else if (p.status === "rejected") {
-                events.push({
+                items.push({
+                    kind: "payment",
                     id: `payment-rejected-${p.id}`,
-                    type: "payment_rejected",
-                    title: productName,
-                    description: `${amountStr} · Reddedildi`,
+                    status: "rejected",
+                    productName,
+                    amount: p.amount,
                     date: p.updatedAt.toISOString(),
-                    href: "/dashboard/billing",
                 });
             } else {
-                events.push({
+                items.push({
+                    kind: "payment",
                     id: `payment-submitted-${p.id}`,
-                    type: "payment_submitted",
-                    title: productName,
-                    description: `${amountStr} · İncelemede`,
+                    status: "pending",
+                    productName,
+                    amount: p.amount,
                     date: p.createdAt.toISOString(),
-                    href: "/dashboard/billing",
                 });
             }
         }
 
         for (const t of tickets) {
             const isUpdated = t.updatedAt.getTime() - t.createdAt.getTime() > 60000;
-            const statusLabel =
+            const status =
                 t.status === "open"
-                    ? "Açık"
+                    ? "open"
                     : t.status === "in_progress"
-                      ? "İnceleniyor"
+                      ? "in_progress"
                       : t.status === "answered"
-                        ? "Yanıtlandı"
-                        : "Kapalı";
+                        ? "answered"
+                        : "closed";
 
             if (isUpdated) {
-                events.push({
+                items.push({
+                    kind: "ticket",
                     id: `ticket-updated-${t.id}`,
-                    type: "ticket_updated",
-                    title: t.subject,
-                    description: statusLabel,
+                    variant: "updated",
+                    subject: t.subject,
+                    status,
                     date: t.updatedAt.toISOString(),
-                    href: "/dashboard/support",
                 });
             } else {
-                events.push({
+                items.push({
+                    kind: "ticket",
                     id: `ticket-created-${t.id}`,
-                    type: "ticket_created",
-                    title: t.subject,
-                    description: statusLabel,
+                    variant: "created",
+                    subject: t.subject,
+                    status,
                     date: t.createdAt.toISOString(),
-                    href: "/dashboard/support",
                 });
             }
         }
 
-        const TOOL_META: Record<string, { label: string; desc: string; href: string }> = {
-            "doc-to-udf":     { label: "DOCX → UDF dönüştürüldü", desc: "Hukuk UDF Dönüştürücü", href: "/dashboard/tools/doc-to-udf" },
-            "pdf-split":      { label: "PDF bölündü", desc: "PDF Bölme Aracı", href: "/dashboard/tools/pdf-split" },
-            "pdf-merge":      { label: "PDF birleştirildi", desc: "PDF Birleştirici", href: "/dashboard/tools/pdf-merge" },
-            "image-to-pdf":   { label: "Görsel → PDF", desc: "Görsel → PDF Dönüştürücü", href: "/dashboard/tools/image-to-pdf" },
-            "pdf-to-image":   { label: "PDF → Görsel", desc: "PDF → Görsel Dönüştürücü", href: "/dashboard/tools/pdf-to-image" },
-            "tiff-to-pdf":    { label: "TIFF → PDF", desc: "TIFF → PDF Dönüştürücü", href: "/dashboard/tools/tiff-to-pdf" },
-            "ocr-text":       { label: "OCR Metin Çıkarma", desc: "OCR Metin Çıkarma", href: "/dashboard/tools/ocr-text" },
-            "batch-convert":  { label: "Toplu Belge Dönüştürücü", desc: "Toplu Belge Dönüştürücü", href: "/dashboard/tools/batch-convert" },
-        };
         for (const u of toolUsages) {
-            const meta = TOOL_META[u.toolSlug] ?? { label: "Araç kullanıldı", desc: u.toolSlug, href: "/dashboard/tools" };
-            events.push({
+            items.push({
+                kind: "tool",
                 id: `tool-${u.id}`,
-                type: "tool_used",
-                title: meta.label,
-                description: meta.desc,
+                toolSlug: u.toolSlug,
                 date: u.createdAt.toISOString(),
-                href: meta.href,
             });
         }
 
-        events.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        const timeline = events.slice(0, 15);
+        items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        const timeline = items.slice(0, 15);
 
         return NextResponse.json({ timeline });
     } catch (error) {
         console.error("[dashboard/timeline] GET error", error);
-        return NextResponse.json(
-            { error: "Zaman çizelgesi alınırken bir hata oluştu." },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: "server_error" }, { status: 500 });
     }
 }

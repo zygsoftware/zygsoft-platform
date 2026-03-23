@@ -6,7 +6,7 @@ import { routing } from './i18n/routing';
 
 const intlMiddleware = createMiddleware(routing);
 
-const VERIFY_EMAIL_REQUIRED_PATHS = ["/dashboard", "/verify-email-required"];
+const VERIFY_EMAIL_REQUIRED_PATHS = ["/dashboard", "/panel", "/verify-email-required"];
 const ALLOWED_UNVERIFIED_PATHS = ["/login", "/register", "/verify-email", "/forgot-password", "/reset-password", "/"];
 
 function pathMatches(pathname: string, patterns: string[]): boolean {
@@ -16,7 +16,7 @@ function pathMatches(pathname: string, patterns: string[]): boolean {
 
 function isDashboardOrProtected(pathname: string): boolean {
     const normalized = pathname.replace(/^\/en/, "") || "/";
-    return normalized.startsWith("/dashboard");
+    return normalized.startsWith("/dashboard") || normalized.startsWith("/panel");
 }
 
 export async function middleware(req: NextRequest) {

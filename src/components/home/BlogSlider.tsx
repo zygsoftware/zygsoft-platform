@@ -195,7 +195,7 @@ export function BlogSlider() {
             <style jsx global>{`
                 .swiper-button-next,
                 .swiper-button-prev {
-                    color: #0a0c10 !important;
+                    color: #343131 !important;
                     background: rgba(230,200,0,0.18);
                     width: 42px !important;
                     height: 42px !important;
@@ -214,7 +214,7 @@ export function BlogSlider() {
                     font-weight: bold;
                 }
                 .swiper-pagination-bullet {
-                    background: rgba(10,12,16,0.2) !important;
+                    background: rgba(52,49,49,0.2) !important;
                 }
                 .swiper-pagination-bullet-active {
                     background: #e6c800 !important;

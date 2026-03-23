@@ -88,8 +88,8 @@ export async function POST(req: Request) {
 
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000";
         const locale = (user.locale === "en" ? "en" : "tr") as "tr" | "en";
-        const pathPrefix = locale === "en" ? "/en" : "";
-        const panelLink = `${siteUrl}${pathPrefix}/dashboard/support`;
+        const panelLink =
+            locale === "en" ? `${siteUrl}/en/dashboard/support` : `${siteUrl}/panel/destek`;
 
         sendSupportTicketCreatedEmail({
             toEmail:   user.email,

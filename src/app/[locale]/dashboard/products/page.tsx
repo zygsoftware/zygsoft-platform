@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { motion } from "framer-motion";
+import { useTranslations, useLocale } from "next-intl";
 import {
     Box,
     FileText,
@@ -11,105 +11,147 @@ import {
     Gem,
     ArrowRight
 } from "lucide-react";
-import Link from "next/link";
-import { TiltCard } from "@/components/ui/TiltCard";
+import { Link } from "@/i18n/navigation";
+import { hasToolAccess } from "@/lib/trial-access-client";
 
-const tools = [
+const PACKAGES = [
     {
-        title: "Hukuk UDF Dönüştürücü",
-        desc: "Word (DOC/DOCX) dosyalarınızı saniyeler içinde UYAP uyumlu UDF formatına dönüştürün.",
-        icon: <FileText size={24} />,
-        href: "/dashboard/tools/doc-to-udf",
-        slug: "legal-toolkit"
+        slug: "legal-toolkit",
+        icon: <Layers size={28} />,
+        features: [
+            { key: "featureUdf" as const, icon: <FileText size={16} /> },
+            { key: "featurePdfMerge" as const, icon: <Layers size={16} /> },
+            { key: "featureTiffJpg" as const, icon: <FileImage size={16} /> },
+            { key: "featureAi" as const, icon: <BrainCircuit size={16} /> },
+        ],
     },
-    {
-        title: "PDF Birleştirici",
-        desc: "Birden fazla PDF dökümanını tek bir dosya altında birleştirin.",
-        icon: <Layers size={24} />,
-        href: "/dashboard/tools/pdf-merge",
-        slug: "legal-toolkit"
-    },
-    {
-        title: "TIFF / JPG to PDF",
-        desc: "Resim formatındaki dosyalarınızı tek tıkla PDF kitapçığına çevirin.",
-        icon: <FileImage size={24} />,
-        href: "/dashboard/tools/image-to-pdf",
-        slug: "legal-toolkit"
-    },
-    {
-        title: "AI Karar Özeti",
-        desc: "Dava dosyalarını yapay zeka ile analiz edin ve özetleyin.",
-        icon: <BrainCircuit size={24} />,
-        href: "/dashboard/tools/ai-summary",
-        slug: "legal-toolkit"
-    }
 ];
 
 export default function ProductsPage() {
     const { data: session } = useSession();
     const user = session?.user as any;
     const activeProductSlugs = user?.activeProductSlugs || [];
+    const t = useTranslations("Dashboard.productsPage");
+    const locale = useLocale();
 
     return (
         <div className="space-y-10">
             <div>
-                <h1 className="text-3xl font-heading font-black text-slate-950 mb-2">Ürünlerim</h1>
-                <p className="text-slate-500 font-medium font-sans">Hukuk Araçları Paketi ve abonelikleriniz.</p>
+                <h1 className="text-3xl font-heading font-black text-slate-950 mb-2">{t("pageTitle")}</h1>
+                <p className="text-slate-500 font-medium font-sans">{t("pageSubtitle")}</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {tools.map((tool, idx) => {
-                    const isLocked = !activeProductSlugs.includes(tool.slug);
+            <div className="max-w-4xl">
+                {PACKAGES.map((pkg, idx) => {
+                    const isAdmin = user?.role === "admin";
+                    const isLocked = !(activeProductSlugs.includes(pkg.slug) || isAdmin || hasToolAccess(user));
+                    const created = user?.createdAt ? new Date(user.createdAt) : new Date();
+                    const endDate = new Date(created);
+                    endDate.setFullYear(endDate.getFullYear() + 1);
+
                     return (
                         <div key={idx} className="relative group">
-                            <TiltCard maxTilt={5} className="h-full">
-                            <Link
-                                href={isLocked ? "/dijital-urunler/hukuk-araclari-paketi" : tool.href}
-                                className={`block h-full bg-white p-8 rounded-[2rem] border transition-all duration-300 hover-lift ${isLocked
-                                    ? "border-[#0a0c10]/[0.06] hover:border-[#e6c800]/40 hover:shadow-xl shadow-sm"
-                                    : "border-[#0a0c10]/[0.06] hover:shadow-xl hover:-translate-y-1 shadow-sm"
-                                    }`}
-                            >
-                                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-colors ${isLocked ? "bg-[#fafafc] text-[#0a0c10]/40 border border-[#0a0c10]/10" : "bg-[#0a0c10] text-[#e6c800]"
-                                    }`}>
-                                    {tool.icon}
-                                </div>
-                                <h3 className="text-xl font-display font-black text-[#0a0c10] mb-3">{tool.title}</h3>
-                                <p className="text-[#0a0c10]/60 text-sm font-medium leading-relaxed mb-6">{tool.desc}</p>
+                            <div className={`bg-white p-8 md:p-10 rounded-[2.5rem] border transition-all duration-300 shadow-sm ${
+                                isLocked ? "border-[#343131]/[0.08]" : "border-[#343131]/10 hover:shadow-xl hover:border-[#e6c800]/50"
+                            }`}>
+                                <div className="flex flex-col md:flex-row gap-8">
+                                    {/* Left Content */}
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-colors ${
+                                                isLocked ? "bg-[#fafafc] text-[#343131]/40 border border-[#343131]/10" : "bg-[#343131] text-[#e6c800]"
+                                            }`}>
+                                                {pkg.icon}
+                                            </div>
+                                            <div>
+                                                <h3 className="text-2xl font-display font-black text-[#343131] tracking-tight">{t("legalToolkit.title")}</h3>
+                                                <p className="text-[#343131]/40 text-sm font-bold uppercase tracking-widest">{t("legalToolkit.priceInfo")}</p>
+                                            </div>
+                                        </div>
+                                        <p className="text-[#343131]/60 text-[15px] font-medium leading-relaxed max-w-lg mb-6">
+                                            {t("legalToolkit.desc")}
+                                        </p>
 
-                                {!isLocked ? (
-                                    <div className="inline-flex items-center gap-2 text-slate-950 text-sm font-black group-hover:text-[#e6c800] transition-colors">
-                                        ARACI AÇ <Box size={16} />
+                                        {!isLocked && (
+                                            <div className="flex flex-wrap gap-x-8 gap-y-3 mb-8 bg-[#fafafc] border border-[#343131]/[0.04] px-6 py-4 rounded-2xl inline-flex text-sm shadow-[inset_0_2px_10px_rgba(0,0,0,0.01)]">
+                                                <div>
+                                                    <span className="flex items-center gap-1.5 text-[#343131]/40 font-bold uppercase tracking-widest text-[10px] mb-1">
+                                                        {t("startDate")}
+                                                    </span>
+                                                    <span className="text-[#343131] font-black">
+                                                        {created.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })}
+                                                    </span>
+                                                </div>
+                                                <div className="w-[1px] bg-[#343131]/[0.06] hidden sm:block"></div>
+                                                <div>
+                                                    <span className="flex items-center gap-1.5 text-[#343131]/40 font-bold uppercase tracking-widest text-[10px] mb-1">
+                                                        {t("endDate")}
+                                                    </span>
+                                                    <span className="text-[#343131] font-black">
+                                                        {isAdmin ? t("adminUnlimited") : endDate.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {!isLocked ? (
+                                            <Link href="/dashboard/tools" className="inline-flex items-center gap-2 bg-[#343131] text-[#e6c800] px-8 py-4 rounded-xl text-sm font-black hover:bg-[#1a1818] hover:shadow-lg transition-all">
+                                                {t("ctaToolsHub")} <ArrowRight size={18} />
+                                            </Link>
+                                        ) : (
+                                            <Link href="/dijital-urunler/hukuk-araclari-paketi" className="inline-flex items-center gap-2 bg-[#e6c800] text-[#343131] px-8 py-4 rounded-xl text-sm font-black hover:bg-[#c9ad00] hover:shadow-lg shadow-[#e6c800]/20 transition-all">
+                                                {t("ctaSubscribe")} <ArrowRight size={18} />
+                                            </Link>
+                                        )}
                                     </div>
-                                ) : (
-                                    <div className="inline-flex items-center gap-2 text-[#e6c800] text-xs font-bold uppercase tracking-widest group-hover:gap-3 transition-all">
-                                        ABONELİK GEREKLİ <ArrowRight size={14} />
-                                    </div>
-                                )}
-                            </Link>
-                            </TiltCard>
 
-                            {isLocked && (
-                                <div className="absolute top-5 right-5 w-10 h-10 rounded-xl bg-[#e6c800]/10 flex items-center justify-center border border-[#e6c800]/20">
-                                    <Gem size={18} className="text-[#e6c800]" />
+                                    {/* Right Features List */}
+                                    <div className="md:w-[320px] shrink-0 bg-[#fafafc] rounded-3xl p-6 border border-[#343131]/[0.04]">
+                                        <div className="text-[11px] font-black text-[#343131]/40 uppercase tracking-widest mb-4">{t("packageContents")}</div>
+                                        <ul className="space-y-3">
+                                            {pkg.features.map((feature, fIdx) => (
+                                                <li key={fIdx} className="flex items-center gap-3 text-sm font-medium text-[#343131]/70 bg-white p-3 rounded-xl border border-[#343131]/[0.03] shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                                                    <span className={`${isLocked ? "text-[#343131]/30" : "text-[#e6c800]"}`}>{feature.icon}</span>
+                                                    {t(`legalToolkit.${feature.key}`)}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
                                 </div>
-                            )}
+                                
+                                {/* Status Ribbon */}
+                                <div className="absolute top-6 right-6 lg:-right-4 lg:top-8 flex flex-col gap-2">
+                                    {!isLocked ? (
+                                        <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm text-xs font-black uppercase tracking-wider">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                            {t("statusActive")}
+                                        </div>
+                                    ) : (
+                                        <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 shadow-sm text-xs font-black uppercase tracking-wider">
+                                            <Gem size={14} className="text-amber-500" />
+                                            {t("statusSubscriptionRequired")}
+                                        </div>
+                                    )}
+                                </div>
+
+                            </div>
                         </div>
                     );
                 })}
             </div>
 
-            {!activeProductSlugs.length && (
-                <div className="bg-white rounded-[2rem] p-12 text-center border-2 border-dashed border-[#0a0c10]/[0.08]">
-                    <div className="w-20 h-20 bg-[#fafafc] rounded-2xl flex items-center justify-center mx-auto mb-6 border border-[#0a0c10]/5">
-                        <Box size={32} className="text-[#0a0c10]/30" />
+            {!(activeProductSlugs.length > 0 || user?.role === "admin" || hasToolAccess(user)) && (
+                <div className="max-w-4xl bg-gradient-to-br from-[#343131] to-[#1a1818] rounded-[2.5rem] p-10 md:p-12 text-center text-white relative overflow-hidden shadow-2xl">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#e6c800]/10 rounded-full blur-[80px] -z-0" />
+                    <div className="relative z-10 w-20 h-20 bg-white/10 rounded-2xl border border-white/10 flex items-center justify-center mx-auto mb-6 backdrop-blur-sm shadow-xl">
+                        <Box size={32} className="text-[#e6c800]" />
                     </div>
-                    <h2 className="text-2xl font-display font-black text-[#0a0c10] mb-4">Henüz Hukuk Araçları Paketi aboneliğiniz yok mu?</h2>
-                    <p className="text-[#0a0c10]/60 font-medium mb-8 max-w-md mx-auto">
-                        Tüm belge araçlarına erişmek için Hukuk Araçları Paketi'ne abone olun. Tek yıllık ödeme, tüm araçlar dahil.
+                    <h2 className="relative z-10 text-2xl md:text-3xl font-display font-black mb-4">{t("promoTitle")}</h2>
+                    <p className="relative z-10 text-white/60 font-medium mb-8 max-w-lg mx-auto leading-relaxed">
+                        {t("promoDesc")}
                     </p>
-                    <Link href="/dijital-urunler/hukuk-araclari-paketi" className="inline-flex items-center gap-2 bg-[#e6c800] text-[#0a0c10] px-10 py-4 rounded-2xl text-sm font-black hover:bg-[#c9ad00] transition-all shadow-xl shadow-[#e6c800]/20">
-                        PAKETİ İNCELE <ArrowRight size={18} />
+                    <Link href="/dijital-urunler/hukuk-araclari-paketi" className="relative z-10 inline-flex items-center gap-3 bg-white text-[#343131] px-10 py-4 rounded-xl text-sm font-black hover:bg-[#fafafc] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_12px_40px_rgba(255,255,255,0.1)]">
+                        {t("promoCta")} <ArrowRight size={18} />
                     </Link>
                 </div>
             )}

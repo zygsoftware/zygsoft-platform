@@ -1,10 +1,10 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { motion } from "framer-motion";
 import {
     Receipt, CheckCircle, UploadCloud, Building, Calendar,
@@ -31,35 +31,46 @@ type PaymentRecord = {
 
 /* ── Status config ───────────────────────────────────────────────── */
 
-const PAYMENT_STATUS: Record<string, { label: string; badge: string; icon: React.ReactNode }> = {
+const PAYMENT_STATUS_STYLE: Record<string, { badge: string; icon: React.ReactNode }> = {
     pending:  {
-        label: "İncelemede",
         badge: "bg-amber-50 text-amber-700 border border-amber-200",
         icon:  <Clock size={12} />,
     },
     approved: {
-        label: "Onaylandı",
         badge: "bg-emerald-50 text-emerald-700 border border-emerald-200",
         icon:  <CheckCircle size={12} />,
     },
     rejected: {
-        label: "Reddedildi",
         badge: "bg-red-50 text-red-600 border border-red-200",
         icon:  <XCircle size={12} />,
     },
 };
 
-const SUB_STATUS: Record<string, { label: string; color: string }> = {
-    inactive:         { label: "Pasif",          color: "text-slate-400" },
-    pending_approval: { label: "Onay Bekliyor",   color: "text-amber-500" },
-    active:           { label: "Aktif Abonelik",  color: "text-emerald-600" },
+const PAYMENT_LABEL_KEY: Record<string, "paymentStatusPending" | "paymentStatusApproved" | "paymentStatusRejected"> = {
+    pending:  "paymentStatusPending",
+    approved: "paymentStatusApproved",
+    rejected: "paymentStatusRejected",
+};
+
+const SUB_STATUS_THEME: Record<string, { color: string }> = {
+    inactive:         { color: "text-slate-400" },
+    pending_approval: { color: "text-amber-500" },
+    active:           { color: "text-emerald-600" },
+};
+
+const SUB_LABEL_KEY: Record<string, "subStatusInactive" | "subStatusPending" | "subStatusActive"> = {
+    inactive:         "subStatusInactive",
+    pending_approval: "subStatusPending",
+    active:           "subStatusActive",
 };
 
 function PaymentStatusBadge({ status }: { status: string }) {
-    const cfg = PAYMENT_STATUS[status] ?? PAYMENT_STATUS.pending;
+    const t = useTranslations("Dashboard.billing");
+    const cfg = PAYMENT_STATUS_STYLE[status] ?? PAYMENT_STATUS_STYLE.pending;
+    const lk = PAYMENT_LABEL_KEY[status] ?? "paymentStatusPending";
     return (
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${cfg.badge}`}>
-            {cfg.icon} {cfg.label}
+            {cfg.icon} {t(lk)}
         </span>
     );
 }
@@ -92,7 +103,7 @@ function BankInfoBlock() {
                 <div className="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-1">
                     {t("bankName")}
                 </div>
-                <div className="text-slate-950 font-black">YapıKredi Bankası</div>
+                <div className="text-slate-950 font-black">{t("bankDisplayName")}</div>
             </div>
             <div className="pt-4 border-t border-slate-50">
                 <div className="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-1">
@@ -114,7 +125,7 @@ function BankInfoBlock() {
                         className="shrink-0 px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-2 text-xs font-bold text-slate-600"
                     >
                         <Copy size={14} />
-                        {copied ? "Kopyalandı" : "Kopyala"}
+                        {copied ? t("copiedIban") : t("copyIban")}
                     </button>
                 </div>
             </div>
@@ -125,6 +136,7 @@ function BankInfoBlock() {
 /* ── Receipt viewer ──────────────────────────────────────────────── */
 
 function ReceiptButton({ src }: { src: string }) {
+    const t = useTranslations("Dashboard.billing");
     const isPdf = src.startsWith("data:application/pdf");
     const handleView = () => {
         const win = window.open();
@@ -142,7 +154,7 @@ function ReceiptButton({ src }: { src: string }) {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-600 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 hover:border-slate-300 transition-all"
         >
             {isPdf ? <FileText size={13} /> : <Eye size={13} />}
-            {isPdf ? "PDF Görüntüle" : "Dekont Görüntüle"}
+            {isPdf ? t("viewPdf") : t("viewReceipt")}
         </button>
     );
 }
@@ -151,6 +163,7 @@ function ReceiptButton({ src }: { src: string }) {
 
 function PaymentHistory({ refreshKey }: { refreshKey: number }) {
     const t = useTranslations("Dashboard.billing");
+    const locale = useLocale();
     const [payments, setPayments] = useState<PaymentRecord[]>([]);
     const [loading,  setLoading]  = useState(true);
     const [error,    setError]    = useState<string | null>(null);
@@ -160,13 +173,13 @@ function PaymentHistory({ refreshKey }: { refreshKey: number }) {
         setError(null);
         fetch("/api/payments/history")
             .then(async (res) => {
-                if (!res.ok) throw new Error("Veriler alınamadı.");
+                if (!res.ok) throw new Error(t("loadError"));
                 const data = await res.json();
                 setPayments(data.payments ?? []);
             })
-            .catch((e) => setError(e.message ?? "Bir hata oluştu."))
+            .catch((e) => setError(e.message ?? t("genericError")))
             .finally(() => setLoading(false));
-    }, [refreshKey]);
+    }, [refreshKey, t]);
 
     return (
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
@@ -177,15 +190,15 @@ function PaymentHistory({ refreshKey }: { refreshKey: number }) {
                 </div>
                 <div>
                     <h2 className="text-base font-heading font-black text-slate-950">
-                        Ödeme Geçmişi
+                        {t("historyTitle")}
                     </h2>
                     <p className="text-xs text-slate-400 font-medium mt-0.5">
-                        Tüm ödeme bildirimleriniz ve durumları
+                        {t("historySubtitle")}
                     </p>
                 </div>
                 {!loading && !error && (
                     <span className="ml-auto text-xs font-bold text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full">
-                        {payments.length} kayıt
+                        {t("recordCount", { count: payments.length })}
                     </span>
                 )}
             </div>
@@ -194,7 +207,7 @@ function PaymentHistory({ refreshKey }: { refreshKey: number }) {
             {loading ? (
                 <div className="flex items-center justify-center gap-3 text-slate-400 py-16">
                     <Loader2 size={20} className="animate-spin text-[#e6c800]" />
-                    <span className="text-sm font-bold">Yükleniyor...</span>
+                    <span className="text-sm font-bold">{t("loading")}</span>
                 </div>
             ) : error ? (
                 <div className="py-16 text-center px-8">
@@ -227,19 +240,22 @@ function PaymentHistory({ refreshKey }: { refreshKey: number }) {
                         <table className="w-full text-left">
                             <thead className="bg-slate-50/80 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                                 <tr>
-                                    <th className="px-7 py-3.5">Ürün / Hizmet</th>
-                                    <th className="px-5 py-3.5">Tutar</th>
-                                    <th className="px-5 py-3.5">Durum</th>
-                                    <th className="px-5 py-3.5">Abonelik</th>
-                                    <th className="px-5 py-3.5">Tarih</th>
-                                    <th className="px-5 py-3.5">Dekont</th>
+                                    <th className="px-7 py-3.5">{t("colProduct")}</th>
+                                    <th className="px-5 py-3.5">{t("colAmount")}</th>
+                                    <th className="px-5 py-3.5">{t("colStatus")}</th>
+                                    <th className="px-5 py-3.5">{t("colSubscription")}</th>
+                                    <th className="px-5 py-3.5">{t("colDate")}</th>
+                                    <th className="px-5 py-3.5">{t("colReceipt")}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
                                 {payments.map((p) => {
                                     const sub    = p.subscription;
-                                    const subCfg = sub
-                                        ? (SUB_STATUS[sub.status] ?? SUB_STATUS.inactive)
+                                    const subSt = sub
+                                        ? (SUB_STATUS_THEME[sub.status] ?? SUB_STATUS_THEME.inactive)
+                                        : null;
+                                    const subLk = sub
+                                        ? (SUB_LABEL_KEY[sub.status] ?? "subStatusInactive")
                                         : null;
                                     return (
                                         <tr
@@ -253,7 +269,7 @@ function PaymentHistory({ refreshKey }: { refreshKey: number }) {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-black text-slate-950">
-                                                            {p.product?.name ?? "Ürün Bilinmiyor"}
+                                                            {p.product?.name ?? t("productUnknown")}
                                                         </p>
                                                         {p.product?.slug && (
                                                             <p className="text-[10px] text-slate-300 font-mono mt-0.5">
@@ -265,21 +281,23 @@ function PaymentHistory({ refreshKey }: { refreshKey: number }) {
                                             </td>
                                             <td className="px-5 py-5">
                                                 <span className="text-sm font-black text-slate-950">
-                                                    ₺{p.amount.toLocaleString("tr-TR", { minimumFractionDigits: 0 })}
+                                                    ₺{p.amount.toLocaleString(locale === "tr" ? "tr-TR" : "en-US", { minimumFractionDigits: 0 })}
                                                 </span>
                                             </td>
                                             <td className="px-5 py-5">
                                                 <PaymentStatusBadge status={p.status} />
                                             </td>
                                             <td className="px-5 py-5">
-                                                {subCfg ? (
+                                                {subSt && subLk ? (
                                                     <div>
-                                                        <span className={`text-xs font-bold ${subCfg.color}`}>
-                                                            {subCfg.label}
+                                                        <span className={`text-xs font-bold ${subSt.color}`}>
+                                                            {t(subLk)}
                                                         </span>
                                                         {sub?.endsAt && (
                                                             <p className="text-[10px] text-slate-300 font-mono mt-0.5">
-                                                                {new Date(sub.endsAt).toLocaleDateString("tr-TR")} tarihine kadar
+                                                                {t("subscriptionUntil", {
+                                                                    date: new Date(sub.endsAt).toLocaleDateString(locale === "tr" ? "tr-TR" : "en-US"),
+                                                                })}
                                                             </p>
                                                         )}
                                                     </div>
@@ -290,12 +308,12 @@ function PaymentHistory({ refreshKey }: { refreshKey: number }) {
                                             <td className="px-5 py-5">
                                                 <span className="text-xs text-slate-400 font-mono whitespace-nowrap flex items-center gap-1.5">
                                                     <Calendar size={11} />
-                                                    {new Date(p.createdAt).toLocaleDateString("tr-TR", {
+                                                    {new Date(p.createdAt).toLocaleDateString(locale === "tr" ? "tr-TR" : "en-US", {
                                                         day: "numeric", month: "short", year: "numeric",
                                                     })}
                                                 </span>
                                                 <span className="text-[10px] text-slate-300 font-mono mt-0.5 block">
-                                                    {new Date(p.createdAt).toLocaleTimeString("tr-TR", {
+                                                    {new Date(p.createdAt).toLocaleTimeString(locale === "tr" ? "tr-TR" : "en-US", {
                                                         hour: "2-digit", minute: "2-digit",
                                                     })}
                                                 </span>
@@ -318,8 +336,11 @@ function PaymentHistory({ refreshKey }: { refreshKey: number }) {
                     <div className="md:hidden divide-y divide-slate-50">
                         {payments.map((p) => {
                             const sub    = p.subscription;
-                            const subCfg = sub
-                                ? (SUB_STATUS[sub.status] ?? SUB_STATUS.inactive)
+                            const subSt = sub
+                                ? (SUB_STATUS_THEME[sub.status] ?? SUB_STATUS_THEME.inactive)
+                                : null;
+                            const subLk = sub
+                                ? (SUB_LABEL_KEY[sub.status] ?? "subStatusInactive")
                                 : null;
                             return (
                                 <div key={p.id} className="p-6 space-y-3">
@@ -330,24 +351,24 @@ function PaymentHistory({ refreshKey }: { refreshKey: number }) {
                                             </div>
                                             <div>
                                                 <p className="text-sm font-black text-slate-950">
-                                                    {p.product?.name ?? "Ürün Bilinmiyor"}
+                                                    {p.product?.name ?? t("productUnknown")}
                                                 </p>
                                                 <p className="text-xs font-black text-slate-700 mt-0.5">
-                                                    ₺{p.amount.toLocaleString("tr-TR", { minimumFractionDigits: 0 })}
+                                                    ₺{p.amount.toLocaleString(locale === "tr" ? "tr-TR" : "en-US", { minimumFractionDigits: 0 })}
                                                 </p>
                                             </div>
                                         </div>
                                         <PaymentStatusBadge status={p.status} />
                                     </div>
                                     <div className="flex flex-wrap items-center gap-3 text-xs">
-                                        {subCfg && (
-                                            <span className={`font-bold ${subCfg.color}`}>
-                                                {subCfg.label}
+                                        {subSt && subLk && (
+                                            <span className={`font-bold ${subSt.color}`}>
+                                                {t(subLk)}
                                             </span>
                                         )}
                                         <span className="text-slate-400 font-mono flex items-center gap-1">
                                             <Calendar size={10} />
-                                            {new Date(p.createdAt).toLocaleDateString("tr-TR", {
+                                            {new Date(p.createdAt).toLocaleDateString(locale === "tr" ? "tr-TR" : "en-US", {
                                                 day: "numeric", month: "long", year: "numeric",
                                             })}
                                         </span>
@@ -368,6 +389,7 @@ function PaymentHistory({ refreshKey }: { refreshKey: number }) {
 export default function BillingPage() {
     const { data: session } = useSession();
     const t = useTranslations("Dashboard.billing");
+    const locale = useLocale();
     const searchParams = useSearchParams();
     const [productId,     setProductId]     = useState("legal-toolkit");
     const [amount,        setAmount]        = useState("3000");
@@ -378,8 +400,8 @@ export default function BillingPage() {
     const [error,         setError]         = useState("");
     const [historyKey,    setHistoryKey]    = useState(0);
 
-    const productDetails: Record<string, { name: string; price: string; desc: string; isFixed: boolean }> = {
-        "legal-toolkit": { name: "Hukuk Araçları Paketi", price: "3000", desc: "Tek yıllık paket. Tüm belge araçları dahil: DOCX→UDF, TIFF→PDF, Görsel→PDF, PDF birleştirme, bölme, OCR ve daha fazlası. Hukuk ve belge iş akışları için.", isFixed: true },
+    const productDetails: Record<string, { price: string; descKey: string; isFixed: boolean }> = {
+        "legal-toolkit": { price: "3000", descKey: "legal_toolkit", isFixed: true },
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -433,7 +455,7 @@ export default function BillingPage() {
                 setHistoryKey((k) => k + 1);
             }
         } catch {
-            setError("Error");
+            setError(t("genericError"));
         } finally {
             setLoading(false);
         }
@@ -458,9 +480,9 @@ export default function BillingPage() {
                         <CreditCard size={15} />
                     </div>
                     <div>
-                        <h2 className="text-sm font-black text-slate-950">Ödeme Bildirimi</h2>
+                        <h2 className="text-sm font-black text-slate-950">{t("formCardTitle")}</h2>
                         <p className="text-xs text-slate-400 font-medium">
-                            Banka transferi sonrası dekontunuzu yükleyin
+                            {t("formCardSubtitle")}
                         </p>
                     </div>
                 </div>
@@ -561,16 +583,16 @@ export default function BillingPage() {
                                                     <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
                                                         <div>
                                                             <h4 className="font-heading font-black text-[#e6c800] mb-1">
-                                                                {productDetails[productId].name}
+                                                                {t(`products.${productDetails[productId].descKey}` as "products.legal_toolkit")}
                                                             </h4>
                                                             <p className="text-slate-400 text-xs font-medium leading-relaxed max-w-sm">
-                                                                {productDetails[productId].desc}
+                                                                {t(`productDescriptions.${productDetails[productId].descKey}` as "productDescriptions.legal_toolkit")}
                                                             </p>
                                                         </div>
                                                         {productDetails[productId].isFixed && (
                                                             <div className="text-right shrink-0">
                                                                 <div className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">
-                                                                    Miktar
+                                                                    {t("fixedAmountLabel")}
                                                                 </div>
                                                                 <div className="text-2xl font-heading font-black text-white">
                                                                     ₺{productDetails[productId].price}
@@ -613,7 +635,7 @@ export default function BillingPage() {
                                                     <input
                                                         type="text"
                                                         readOnly
-                                                        value={new Date().toLocaleDateString()}
+                                                        value={new Date().toLocaleDateString(locale === "tr" ? "tr-TR" : "en-US")}
                                                         className="w-full pl-12 pr-5 py-4 bg-slate-50 border border-slate-50 rounded-2xl text-slate-400 font-black text-sm cursor-not-allowed"
                                                     />
                                                 </div>
@@ -674,7 +696,7 @@ export default function BillingPage() {
             <div className="flex items-center gap-4">
                 <div className="flex-1 h-px bg-slate-100" />
                 <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest px-2">
-                    Geçmiş İşlemler
+                    {t("pastTransactions")}
                 </span>
                 <div className="flex-1 h-px bg-slate-100" />
             </div>

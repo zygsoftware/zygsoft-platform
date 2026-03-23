@@ -1,17 +1,22 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link } from "@/i18n/navigation";
+import { useSelectedLayoutSegments } from "next/navigation";
 import { ChevronRight, Home } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 
 export function Breadcrumbs() {
-    const pathname = usePathname();
+    const segments = useSelectedLayoutSegments();
     const t = useTranslations("Dashboard.breadcrumb");
 
-    // Remove locale and split
-    const paths = pathname.split("/").filter(p => !["", "tr", "en"].includes(p));
+    const crumbs: { href: string; label: string }[] = [];
+    let acc = "/dashboard";
+    for (const seg of segments) {
+        acc = `${acc}/${seg}`;
+        // Segment names match App Router folders (internal path), not localized URL slugs
+        crumbs.push({ href: acc, label: (t as (k: string) => string)(seg) });
+    }
 
     return (
         <nav className="flex items-center space-x-2 text-sm mb-6 overflow-x-auto whitespace-nowrap pb-2 no-scrollbar">
@@ -25,16 +30,10 @@ export function Breadcrumbs() {
                 <span className="font-bold text-[13px]">{t("home")}</span>
             </Link>
 
-            {paths.map((path, index) => {
-                const href = `/${paths.slice(0, index + 1).join("/")}`;
-                const isLast = index === paths.length - 1;
-                const label = t(path) || path;
-
-                // Skip the first "dashboard" if we are already at home
-                if (path === "dashboard" && index === 0) return null;
-
+            {crumbs.map((crumb, index) => {
+                const isLast = index === crumbs.length - 1;
                 return (
-                    <div key={path} className="flex items-center space-x-2 shrink-0">
+                    <div key={crumb.href} className="flex items-center space-x-2 shrink-0">
                         <ChevronRight size={14} className="text-slate-300" />
                         {isLast ? (
                             <motion.span
@@ -42,14 +41,14 @@ export function Breadcrumbs() {
                                 animate={{ opacity: 1, x: 0 }}
                                 className="font-bold text-slate-950 px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-100 shadow-sm text-[13px]"
                             >
-                                {label}
+                                {crumb.label}
                             </motion.span>
                         ) : (
                             <Link
-                                href={href}
+                                href={crumb.href}
                                 className="font-bold text-slate-400 hover:text-slate-900 transition-colors px-2 py-1.5 rounded-lg hover:bg-slate-50 text-[13px]"
                             >
-                                {label}
+                                {crumb.label}
                             </Link>
                         )}
                     </div>

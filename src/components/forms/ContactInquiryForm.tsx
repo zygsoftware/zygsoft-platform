@@ -90,9 +90,9 @@ export function ContactInquiryForm({
         ];
 
     return (
-        <div className={`rounded-2xl border border-[#0a0c10]/[0.06] bg-white p-8 md:p-10 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] ${className}`}>
-            <h3 className="text-2xl md:text-3xl font-display font-black text-[#0a0c10] mb-2">{title}</h3>
-            <p className="text-[#0a0c10]/55 text-sm md:text-base mb-8">{subtitle}</p>
+        <div className={`rounded-2xl border border-[#343131]/[0.06] bg-white p-8 md:p-10 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] ${className}`}>
+            <h3 className="text-2xl md:text-3xl font-display font-black text-[#343131] mb-2">{title}</h3>
+            <p className="text-[#343131]/55 text-sm md:text-base mb-8">{subtitle}</p>
 
             <form onSubmit={onSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -147,7 +147,7 @@ export function ContactInquiryForm({
                 </div>
 
                 <div>
-                    <label className="block text-[11px] font-black uppercase tracking-[0.16em] text-[#0a0c10]/55 mb-2">
+                    <label className="block text-[11px] font-black uppercase tracking-[0.16em] text-[#343131]/55 mb-2">
                         {t("formMessage")} *
                     </label>
                     <textarea
@@ -179,7 +179,7 @@ export function ContactInquiryForm({
                 </button>
             </form>
 
-            <p className="mt-4 text-xs text-[#0a0c10]/55">
+            <p className="mt-4 text-xs text-[#343131]/55">
                 {t("formPrivacyNote")}
             </p>
 

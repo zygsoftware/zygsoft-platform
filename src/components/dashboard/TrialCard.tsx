@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Zap, Loader2, ShoppingCart } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 type TrialCardProps = {
     trialStatus: string;

@@ -47,11 +47,11 @@ export function Header() {
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-0 group" aria-label="ZYGSOFT Ana Sayfa">
                         <img
-                            src="/brand/logo.svg"
+                            src="/brand/ZYGLogo.png"
                             alt="ZYGSOFT"
-                            className="h-8 w-auto"
-                            width={176}
-                            height={32}
+                            className="h-11 w-auto"
+                            width={220}
+                            height={44}
                         />
                     </Link>
 
@@ -71,7 +71,7 @@ export function Header() {
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: 15 }}
                                         transition={{ duration: 0.2 }}
-                                        className="absolute top-full left-0 mt-4 w-72 bg-white/95 backdrop-blur-xl border border-[#0a0c10]/10 shadow-2xl rounded-2xl overflow-hidden p-2"
+                                        className="absolute top-full left-0 mt-4 w-72 bg-white/95 backdrop-blur-xl border border-[#343131]/10 shadow-2xl rounded-2xl overflow-hidden p-2"
                                     >
                                         {servicesLinks.map((link) => (
                                             <Link
@@ -102,7 +102,7 @@ export function Header() {
                             <div className="flex items-center gap-3">
                                 <Magnetic strength={18}>
                                     <Link href="/dashboard" className="bg-slate-950 text-white text-[11px] font-black uppercase tracking-[0.2em] py-2.5 px-6 rounded-full hover:bg-[#e6c800] hover:text-slate-950 transition-all duration-200 shadow-lg shadow-slate-900/10" data-magnetic="true">
-                                        Panel
+                                        {nav("dashboard")}
                                     </Link>
                                 </Magnetic>
                                 <button onClick={() => signOut()} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
@@ -112,11 +112,11 @@ export function Header() {
                         ) : (
                             <div className="flex items-center gap-3">
                                 <Link href="/login" className="text-slate-600 hover:text-slate-950 text-[13px] font-bold transition-colors px-3 py-2 rounded-lg hover:bg-slate-50/80">
-                                    Giriş
+                                    {nav("login")}
                                 </Link>
                                 <Magnetic strength={20}>
                                     <Link href="/register" className="bg-slate-950 text-white text-[11px] font-black uppercase tracking-[0.2em] py-2.5 px-6 rounded-full hover:bg-[#e6c800] hover:text-slate-950 transition-all duration-200 shadow-lg shadow-slate-900/10" data-magnetic="true">
-                                        Kayıt Ol
+                                        {nav("register")}
                                     </Link>
                                 </Magnetic>
                             </div>
@@ -168,10 +168,10 @@ export function Header() {
                             {session ? (
                                 <>
                                     <Link href="/dashboard" className="bg-[#e6c800] text-[#1e293b] py-4 px-6 rounded-xl font-bold text-center block" onClick={() => setIsMobileMenuOpen(false)}>
-                                        Panel
+                                        {nav("dashboard")}
                                     </Link>
                                     <button onClick={() => { signOut(); setIsMobileMenuOpen(false); }} className="bg-red-50 text-red-500 py-4 px-6 rounded-xl font-bold text-center block w-full transition-colors">
-                                        Çıkış Yap
+                                        {nav("signOut")}
                                     </button>
                                 </>
                             ) : (
