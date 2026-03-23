@@ -1,5 +1,27 @@
 import nodemailer from "nodemailer";
 
+function createSmtpTransport() {
+    const host = process.env.SMTP_HOST;
+    const user = process.env.SMTP_USER;
+    const pass = process.env.SMTP_PASS;
+    const port = Number(process.env.SMTP_PORT ?? 587);
+    const secure = process.env.SMTP_SECURE === "true";
+
+    if (!host || !user || !pass) {
+        throw new Error("SMTP ayarlari eksik. SMTP_HOST, SMTP_USER ve SMTP_PASS gerekli.");
+    }
+
+    return nodemailer.createTransport({
+        host,
+        port,
+        secure,
+        auth: { user, pass },
+        connectionTimeout: 10_000,
+        greetingTimeout: 10_000,
+        socketTimeout: 15_000,
+    });
+}
+
 export interface ContactMailPayload {
     name: string;
     email: string;
@@ -32,12 +54,7 @@ export async function sendContactNotification(data: ContactMailPayload): Promise
         return;
     }
 
-    const transporter = nodemailer.createTransport({
-        host,
-        port,
-        secure,
-        auth: { user, pass },
-    });
+    const transporter = createSmtpTransport();
 
     const dateStr = new Intl.DateTimeFormat("tr-TR", {
         timeZone: "Europe/Istanbul",
@@ -57,6 +74,54 @@ export async function sendContactNotification(data: ContactMailPayload): Promise
         subject: `[ZYGSOFT] Yeni İletişim Talebi — ${data.name}`,
         html,
         text,
+    });
+}
+
+export interface MailTestPayload {
+    toEmail: string;
+}
+
+export async function sendMailTest(data: MailTestPayload): Promise<void> {
+    const host = process.env.SMTP_HOST;
+    const user = process.env.SMTP_USER;
+    const pass = process.env.SMTP_PASS;
+    const port = Number(process.env.SMTP_PORT ?? 587);
+    const secure = process.env.SMTP_SECURE === "true";
+    const fromEmail = process.env.CONTACT_FROM_EMAIL ?? user ?? "no-reply@zygsoft.com";
+
+    if (!host || !user || !pass) {
+        throw new Error("SMTP ayarlari eksik. SMTP_HOST, SMTP_USER ve SMTP_PASS gerekli.");
+    }
+
+    const transporter = createSmtpTransport();
+
+    await transporter.verify();
+
+    await transporter.sendMail({
+        from: `"ZYGSOFT Test" <${fromEmail}>`,
+        to: data.toEmail,
+        subject: "ZYGSOFT SMTP test maili",
+        text: [
+            "Bu bir ZYGSOFT SMTP test e-postasidir.",
+            "",
+            `Host: ${host}`,
+            `Port: ${port}`,
+            `Secure: ${secure ? "true" : "false"}`,
+            `User: ${user}`,
+            `Tarih: ${new Date().toISOString()}`,
+        ].join("\n"),
+        html: `
+            <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111">
+                <h2 style="margin:0 0 12px">ZYGSOFT SMTP Test</h2>
+                <p style="margin:0 0 12px">Bu e-posta SMTP kurulumunun calistigini dogrulamak icin gonderildi.</p>
+                <ul style="padding-left:18px;margin:0">
+                    <li><strong>Host:</strong> ${host}</li>
+                    <li><strong>Port:</strong> ${port}</li>
+                    <li><strong>Secure:</strong> ${secure ? "true" : "false"}</li>
+                    <li><strong>User:</strong> ${user}</li>
+                </ul>
+            </div>
+        `,
     });
 }
 
@@ -180,12 +245,7 @@ export async function sendPasswordResetEmail(data: PasswordResetMailPayload): Pr
     }
 
     try {
-        const transporter = nodemailer.createTransport({
-            host,
-            port,
-            secure,
-            auth: { user, pass },
-        });
+        const transporter = createSmtpTransport();
 
         const subject = data.locale === "tr"
             ? "ZYGSOFT — Şifre Sıfırlama"
@@ -304,12 +364,7 @@ export async function sendVerificationEmail(data: VerificationMailPayload): Prom
     }
 
     try {
-      const transporter = nodemailer.createTransport({
-        host,
-        port,
-        secure,
-        auth: { user, pass },
-      });
+      const transporter = createSmtpTransport();
 
       const subject = data.locale === "tr"
         ? "Email adresinizi doğrulayın"
@@ -425,7 +480,7 @@ export async function sendSupportTicketCreatedEmail(data: SupportTicketCreatedMa
     }
 
     try {
-      const transporter = nodemailer.createTransport({ host, port, secure, auth: { user, pass } });
+      const transporter = createSmtpTransport();
 
       const subject = data.locale === "tr"
         ? `Destek talebiniz oluşturuldu | #${data.ticketCode}`
@@ -540,7 +595,7 @@ export async function sendSupportTicketReplyEmail(data: SupportTicketReplyMailPa
     }
 
     try {
-      const transporter = nodemailer.createTransport({ host, port, secure, auth: { user, pass } });
+      const transporter = createSmtpTransport();
 
       const subject = data.locale === "tr"
         ? `Destek talebiniz yanıtlandı | #${data.ticketCode}`
