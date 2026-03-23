@@ -185,6 +185,7 @@ export default async function PortfolioDetailPage({
                                 className="object-cover"
                                 sizes="(max-width: 1280px) 100vw, 1280px"
                                 priority
+                                unoptimized
                             />
                         ) : (
                             <div
@@ -405,7 +406,7 @@ export default async function PortfolioDetailPage({
                                     >
                                         {rel.cover_image ? (
                                             <div className="relative aspect-[16/9] w-full">
-                                                <Image src={rel.cover_image} alt={isEn ? rel.title_en : rel.title_tr} fill className="object-cover group-hover:scale-105 transition-transform" sizes="33vw" />
+                                                <Image src={rel.cover_image} alt={isEn ? rel.title_en : rel.title_tr} fill className="object-cover group-hover:scale-105 transition-transform" sizes="33vw" unoptimized />
                                             </div>
                                         ) : (
                                             <div className="aspect-[16/9] w-full" style={{ background: pickGradient(rel.slug) }} />

@@ -76,7 +76,7 @@ export default function AdminProjectPreviewPage() {
                 {project.cover_image && (
                     <section className="container mx-auto px-6 max-w-5xl -mt-4 mb-12">
                         <div className="relative aspect-video md:aspect-[21/9] bg-slate-100 rounded-xl overflow-hidden">
-                            <Image src={project.cover_image} alt={project.cover_image_alt_tr || project.cover_image_alt_en || title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 1024px" />
+                            <Image src={project.cover_image} alt={project.cover_image_alt_tr || project.cover_image_alt_en || title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 1024px" unoptimized />
                         </div>
                     </section>
                 )}

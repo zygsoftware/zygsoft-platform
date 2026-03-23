@@ -297,6 +297,7 @@ export default function BlogDetailClient({
                                     className="object-cover"
                                     sizes="(max-width: 1024px) 100vw, 1024px"
                                     priority
+                                    unoptimized
                                 />
                             </div>
                             {(post.cover_image_caption_tr || post.cover_image_caption_en) && (
@@ -520,7 +521,7 @@ export default function BlogDetailClient({
                                         <article className="rounded-xl overflow-hidden border border-[#343131]/[0.05] shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300">
                                             <div className="relative aspect-video bg-slate-100">
                                                 {r.cover_image ? (
-                                                    <Image src={r.cover_image} alt={isTr ? r.title_tr : r.title_en} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 33vw" />
+                                                    <Image src={r.cover_image} alt={isTr ? r.title_tr : r.title_en} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 33vw" unoptimized />
                                                 ) : (
                                                     <div className="absolute inset-0 flex items-center justify-center text-slate-300">—</div>
                                                 )}
