@@ -1,17 +1,34 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
-import DarkVeil from "@/components/effects/DarkVeil";
-import { HeroOrbitNetwork } from "@/components/home/HeroOrbitNetwork";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+
+const DarkVeil = dynamic(() => import("@/components/effects/DarkVeil"), { ssr: false });
+const HeroOrbitNetwork = dynamic(
+  () => import("@/components/home/HeroOrbitNetwork").then((mod) => mod.HeroOrbitNetwork),
+  { ssr: false },
+);
 
 const NOISE_SVG =
   "data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E";
 
 export function HeroSection() {
   const t = useTranslations("Homepage.hero");
+  const [showEnhancedVisuals, setShowEnhancedVisuals] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+    const prefersTouch = window.matchMedia("(pointer: coarse)").matches;
+
+    setShowEnhancedVisuals(isDesktop && !prefersReducedMotion && !prefersTouch);
+  }, []);
 
   return (
     <section
@@ -19,23 +36,25 @@ export function HeroSection() {
       aria-label="Hero"
     >
       {/* DarkVeil: tam ekran, çok düşük opaklık — gri yok, hafif sarı doku */}
-      <div
-        className="pointer-events-none absolute inset-0 z-[2]"
-        style={{
-          mixBlendMode: "multiply",
-          opacity: 0.55,
-          filter: "invert(1) sepia(1) saturate(3) brightness(2.5)",
-        }}
-      >
-        <DarkVeil
-          hueShift={198}
-          noiseIntensity={0}
-          scanlineIntensity={0}
-          speed={1.3}
-          scanlineFrequency={0.5}
-          warpAmount={3.1}
-        />
-      </div>
+      {showEnhancedVisuals ? (
+        <div
+          className="pointer-events-none absolute inset-0 z-[2]"
+          style={{
+            mixBlendMode: "multiply",
+            opacity: 0.32,
+            filter: "invert(1) sepia(1) saturate(3) brightness(2.5)",
+          }}
+        >
+          <DarkVeil
+            hueShift={198}
+            noiseIntensity={0}
+            scanlineIntensity={0}
+            speed={1.1}
+            scanlineFrequency={0.5}
+            warpAmount={2.35}
+          />
+        </div>
+      ) : null}
 
       {/* Main content */}
       <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-center px-6 pb-16 pt-20 lg:min-h-[100vh] lg:px-12 lg:pb-24 lg:pt-28 xl:px-16 2xl:px-24">
@@ -86,9 +105,11 @@ export function HeroSection() {
       </div>
 
       {/* Sağ: orbital solar sistem */}
-      <div className="absolute inset-y-0 right-0 z-20 hidden w-[58%] lg:block">
-        <HeroOrbitNetwork />
-      </div>
+      {showEnhancedVisuals ? (
+        <div className="absolute inset-y-0 right-0 z-20 hidden w-[58%] lg:block">
+          <HeroOrbitNetwork />
+        </div>
+      ) : null}
 
       {/* Scroll indicator */}
       <div

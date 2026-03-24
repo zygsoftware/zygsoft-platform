@@ -11,20 +11,29 @@ export function Preloader() {
     const pathname = usePathname();
 
     useEffect(() => {
+        if (typeof window === "undefined") return;
+
         // Authenticated panel areas don't need the intro preloader.
         // Navigating between dashboard / admin sub-pages should feel instant.
-        if (pathname.includes("/dashboard") || pathname.includes("/panel") || pathname.includes("/admin")) {
+        const isPanelRoute = pathname.includes("/dashboard") || pathname.includes("/panel") || pathname.includes("/admin");
+        const isHomepage = pathname === "/tr" || pathname === "/en" || pathname === "/";
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const prefersTouch = window.matchMedia("(pointer: coarse)").matches;
+        const seenPreloader = window.sessionStorage.getItem("zygsoft-preloader-seen") === "1";
+
+        if (isPanelRoute || !isHomepage || prefersReducedMotion || prefersTouch || seenPreloader) {
             setIsLoading(false);
             return;
         }
 
+        window.sessionStorage.setItem("zygsoft-preloader-seen", "1");
         setIsLoading(true);
         setCounter(0);
         setPhase("initial");
 
-        // Fast counter from 0 to 100
-        const duration = 1200; // 1.2s total count
-        const intervalTime = 15;
+        // Short intro on first homepage visit only.
+        const duration = 520;
+        const intervalTime = 20;
         const steps = duration / intervalTime;
         let currentStep = 0;
 
@@ -36,18 +45,12 @@ export function Preloader() {
             if (currentStep >= steps) {
                 clearInterval(interval);
 
-                // Timeline of operations 
-                // 1. Morph text to Z:Y:G SOFTWARE
-                setTimeout(() => setPhase("split"), 150);
-
-                // 2. Fade out the text
-                setTimeout(() => setPhase("fadeText"), 1100);
-
-                // 3. Split the screen curtains
+                setTimeout(() => setPhase("split"), 80);
+                setTimeout(() => setPhase("fadeText"), 420);
                 setTimeout(() => {
                     setPhase("exit");
-                    setTimeout(() => setIsLoading(false), 900);
-                }, 1400);
+                    setTimeout(() => setIsLoading(false), 520);
+                }, 520);
             }
         }, intervalTime);
 

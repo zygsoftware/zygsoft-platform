@@ -177,8 +177,51 @@ export default function HukukAraclariPaketiPage() {
     const { data: session, status } = useSession();
     const reducedMotion = !!useReducedMotion();
     const hasLegalToolkit = (session?.user as any)?.activeProductSlugs?.includes("legal-toolkit");
+    const emailVerified = (session?.user as any)?.emailVerified ?? false;
     const [activeStep, setActiveStep] = useState(0);
     const [faqOpen, setFaqOpen] = useState<number | null>(0);
+
+    const ctaHref = hasLegalToolkit
+        ? "/dashboard/tools"
+        : status === "authenticated"
+            ? "/dashboard/billing?product=legal-toolkit"
+            : "/register";
+    const ctaLabel = hasLegalToolkit
+        ? "Araçları Aç"
+        : status === "authenticated"
+            ? "Şimdi Abone Ol"
+            : "Hesap Aç ve Başla";
+    const secondaryCtaHref = hasLegalToolkit
+        ? "/dashboard/tools"
+        : "/dijital-urunler#pricing";
+
+    const productJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        name: "ZYGSOFT Hukuk Araçları Paketi",
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web",
+        offers: {
+            "@type": "Offer",
+            priceCurrency: "TRY",
+            price: "3000",
+            availability: "https://schema.org/InStock",
+            url: "https://www.zygsoft.com/dijital-urunler/hukuk-araclari-paketi",
+        },
+        description: "UYAP belge dönüşümü, PDF araçları ve OCR süreçlerini tek panelde toplayan hukuk profesyonelleri için belge işleme platformu.",
+    };
+    const faqJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: FAQ_ITEMS.map((item) => ({
+            "@type": "Question",
+            name: item.q,
+            acceptedAnswer: {
+                "@type": "Answer",
+                text: item.a,
+            },
+        })),
+    };
 
     useEffect(() => {
         if (reducedMotion) return;
@@ -189,6 +232,14 @@ export default function HukukAraclariPaketiPage() {
     return (
         <div className="min-h-screen flex flex-col font-sans bg-[#fafafc]">
             <Header />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+            />
 
             <main className="flex-1 pt-24 pb-0 relative overflow-hidden">
                 {/* SECTION 1 — HERO */}
@@ -216,20 +267,33 @@ export default function HukukAraclariPaketiPage() {
                                 <p className="text-[#343131]/60 text-lg leading-relaxed mb-8">
                                     DOCX → UDF dönüştürme, PDF araçları, OCR metin çıkarma ve toplu belge işlemleri tek platformda.
                                 </p>
-                                <div className="flex flex-wrap gap-3">
+                                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                                    <Link
+                                        href={ctaHref}
+                                        className="home-btn-primary-yellow inline-flex min-h-12 items-center justify-center gap-2.5 px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-lg shadow-[#e6c800]/25 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                                    >
+                                        {ctaLabel} <ArrowRight size={18} />
+                                    </Link>
                                     <a
                                         href="#pricing"
-                                        className="home-btn-primary-yellow inline-flex items-center gap-2.5 px-8 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
+                                        className="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-2xl border border-[#343131]/[0.12] px-8 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-[#343131]/80 transition-all duration-200 hover:bg-[#343131]/[0.04]"
                                     >
-                                        Hukuk Araçları Paketini İncele <ArrowRight size={18} />
+                                        Fiyatı Gör
                                     </a>
                                     <a
                                         href="#demo"
-                                        className="inline-flex items-center gap-2.5 px-8 py-4 font-bold uppercase tracking-[0.2em] text-[11px] rounded-2xl border border-[#343131]/[0.12] text-[#343131]/80 hover:bg-[#343131]/[0.04] transition-all duration-200"
+                                        className="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-2xl border border-[#343131]/[0.12] px-8 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-[#343131]/80 transition-all duration-200 hover:bg-[#343131]/[0.04]"
                                     >
                                         Demo Gör <Play size={18} />
                                     </a>
                                 </div>
+                                <p className="mt-4 text-sm font-medium text-[#343131]/50">
+                                    {hasLegalToolkit
+                                        ? "Aboneliğiniz aktif. Araçlara doğrudan panelden erişebilirsiniz."
+                                        : status === "authenticated"
+                                            ? "Giriş yaptınız. Ödeme bildirimi ve abonelik aktivasyonu doğrudan panelinizden ilerler."
+                                            : "Hesap açtıktan sonra ödeme bildirimi gönderip pakete aynı gün erişebilirsiniz."}
+                                </p>
                             </motion.div>
                             <motion.div
                                 initial={{ opacity: 0, y: 24 }}
@@ -535,21 +599,24 @@ export default function HukukAraclariPaketiPage() {
                                         <div className="p-3 rounded-xl bg-white/10">
                                             <p className="text-sm font-medium text-white/80 mb-2">Önce deneyin, sonra karar verin</p>
                                             <TrialRequestCTA
-                                                emailVerified={(session?.user as any)?.emailVerified ?? false}
+                                                emailVerified={emailVerified}
                                                 trialStatus={(session?.user as any)?.trialStatus ?? "none"}
                                                 hasSubscription={false}
                                                 source="product-page"
                                                 className="!bg-[#e6c800] !text-[#343131]"
                                             />
                                         </div>
-                                        <Link href="/dashboard/billing?product=legal-toolkit" className="text-white/70 hover:text-white text-sm font-medium">
-                                            Veya doğrudan abone ol →
+                                        <Link href="/dashboard/billing?product=legal-toolkit" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 px-5 py-3 text-sm font-bold text-white/85 transition-colors hover:bg-white/10">
+                                            Doğrudan abone ol <ArrowRight size={16} />
                                         </Link>
                                     </div>
                                 ) : (
-                                    <Link href="/register" className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl">
-                                        Abone Ol ve Ödeme Bildir <ArrowRight size={18} />
-                                    </Link>
+                                    <div className="flex flex-col items-center gap-3">
+                                        <Link href="/register" className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl">
+                                            Abone Ol ve Ödeme Bildir <ArrowRight size={18} />
+                                        </Link>
+                                        <p className="text-sm text-white/60">Hesap aç, ödeme bildir, aynı gün aktivasyon al.</p>
+                                    </div>
                                 )}
                             </div>
                         </motion.div>
@@ -606,12 +673,20 @@ export default function HukukAraclariPaketiPage() {
                             <p className="text-white/60 text-lg mb-8 max-w-xl mx-auto">
                                 Hukuk Araçları Paketi ile belge iş akışlarınızı tek platformda yönetin.
                             </p>
-                            <Link
-                                href="/register"
-                                className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
-                            >
-                                Hukuk Araçları Paketine Başla <ArrowRight size={20} />
-                            </Link>
+                            <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+                                <Link
+                                    href={ctaHref}
+                                    className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
+                                >
+                                    {ctaLabel} <ArrowRight size={20} />
+                                </Link>
+                                <Link
+                                    href={secondaryCtaHref}
+                                    className="inline-flex items-center gap-3 rounded-2xl border border-white/15 px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-white/85 transition-colors hover:bg-white/10"
+                                >
+                                    Araçları İncele
+                                </Link>
+                            </div>
                             <div className="mt-10 flex flex-wrap justify-center gap-6 text-sm">
                                 <Link href="/dijital-urunler" className="text-white/50 hover:text-white transition-colors">
                                     Dijital Ürünler
@@ -627,6 +702,24 @@ export default function HukukAraclariPaketiPage() {
                     </div>
                 </section>
             </main>
+
+            {!hasLegalToolkit ? (
+                <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#343131]/10 bg-white/95 px-4 py-3 shadow-[0_-10px_30px_rgba(0,0,0,0.08)] backdrop-blur md:hidden">
+                    <div className="mx-auto flex max-w-2xl items-center gap-3">
+                        <div className="min-w-0 flex-1">
+                            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#343131]/45">Hukuk Araçları Paketi</p>
+                            <p className="text-lg font-black text-[#343131]">₺3.000 <span className="text-sm font-bold text-[#343131]/45">/ yıl</span></p>
+                        </div>
+                        <Link
+                            href={ctaHref}
+                            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#343131] px-5 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-white transition-colors hover:bg-black"
+                        >
+                            {ctaLabel}
+                            <ArrowRight size={16} />
+                        </Link>
+                    </div>
+                </div>
+            ) : null}
 
             <Footer />
         </div>

@@ -17,15 +17,46 @@ import {
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { useSession } from "next-auth/react";
 
 const PRODUCT_URL = "/dijital-urunler/hukuk-araclari-paketi";
 
 export default function DijitalUrunlerPage() {
     const t = useTranslations("AppStore");
+    const { status, data: session } = useSession();
+    const hasLegalToolkit = (session?.user as any)?.activeProductSlugs?.includes("legal-toolkit");
+    const primaryHref = hasLegalToolkit
+        ? "/dashboard/tools"
+        : status === "authenticated"
+            ? "/dashboard/billing?product=legal-toolkit"
+            : "/register";
+    const primaryLabel = hasLegalToolkit
+        ? "Araçlara Git"
+        : status === "authenticated"
+            ? "Şimdi Abone Ol"
+            : "Hesap Aç ve Başla";
+
+    const storeJsonLd = {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: "ZYGSOFT Dijital Ürünler",
+        itemListElement: [
+            {
+                "@type": "ListItem",
+                position: 1,
+                url: `https://www.zygsoft.com${PRODUCT_URL}`,
+                name: "Hukuk Araçları Paketi",
+            },
+        ],
+    };
 
     return (
         <div className="min-h-screen flex flex-col font-sans bg-[#fafafc] selection:bg-[#e6c800] selection:text-[#343131]">
             <Header />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }}
+            />
 
             <main className="flex-1 pt-32 pb-32 relative overflow-hidden">
                 {/* Background ambient glows */}
@@ -51,6 +82,21 @@ export default function DijitalUrunlerPage() {
                             <p className="text-[#343131]/60 text-lg md:text-xl font-medium leading-relaxed">
                                 {t("storeDesc")}
                             </p>
+                            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                                <Link
+                                    href={primaryHref}
+                                    className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#343131] px-7 py-4 text-[11px] font-black uppercase tracking-[0.22em] text-white transition-all hover:scale-[1.02] hover:bg-black active:scale-[0.98]"
+                                >
+                                    {primaryLabel}
+                                    <ArrowRight size={16} />
+                                </Link>
+                                <Link
+                                    href={`${PRODUCT_URL}#pricing`}
+                                    className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl border border-[#343131]/10 bg-white px-7 py-4 text-[11px] font-black uppercase tracking-[0.22em] text-[#343131] transition-colors hover:border-[#e6c800]/30 hover:bg-[#e6c800]/10"
+                                >
+                                    Fiyatı Gör
+                                </Link>
+                            </div>
                         </motion.div>
                     </div>
 
@@ -99,13 +145,21 @@ export default function DijitalUrunlerPage() {
                                         ))}
                                     </div>
 
-                                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                                        <Link
-                                            href={PRODUCT_URL}
-                                            className="inline-flex items-center gap-3 bg-[#e6c800] text-[#141313] px-8 py-4 md:py-5 rounded-2xl text-[13px] md:text-sm font-black uppercase tracking-widest hover:bg-[#c9ad00] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-[#e6c800]/20 whitespace-nowrap"
-                                        >
-                                            {t("viewDetails")} <ArrowRight size={18} />
-                                        </Link>
+                                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                                            <Link
+                                                href={primaryHref}
+                                                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#e6c800] px-8 py-4 text-[13px] font-black uppercase tracking-widest text-[#141313] shadow-xl shadow-[#e6c800]/20 transition-all hover:scale-[1.02] hover:bg-[#c9ad00] active:scale-[0.98] whitespace-nowrap"
+                                            >
+                                                {primaryLabel} <ArrowRight size={18} />
+                                            </Link>
+                                            <Link
+                                                href={PRODUCT_URL}
+                                                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-8 py-4 text-[12px] font-black uppercase tracking-[0.18em] text-white/90 transition-colors hover:bg-white/10"
+                                            >
+                                                {t("viewDetails")}
+                                            </Link>
+                                        </div>
                                         <div className="flex flex-col">
                                             <span className="text-2xl font-black text-white">₺3.000 <span className="text-sm text-white/40 font-bold">{t("services.legalToolkitPeriod")}</span></span>
                                             <span className="text-xs font-bold text-[#e6c800] uppercase tracking-wider mt-1">{t("services.legalToolkitToolCount")}</span>
@@ -165,7 +219,7 @@ export default function DijitalUrunlerPage() {
                             <p className="text-[#343131]/60 font-medium">Satın alma ve aktivasyon adımları</p>
                         </div>
 
-                        <div className="grid md:grid-cols-4 gap-6">
+                        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
                             {[
                                 { step: 1, title: "Hesap Oluşturun", desc: "Ücretsiz hesabınıza giriş yapın.", icon: <ShieldCheck size={24} /> },
                                 { step: 2, title: "Ödeme Yapın", desc: "İlgili tutarı banka hesabımıza gönderin.", icon: <FileText size={24} /> },
