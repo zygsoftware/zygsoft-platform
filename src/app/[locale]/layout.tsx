@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import dynamic from "next/dynamic";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { NextIntlClientProvider } from 'next-intl';
@@ -10,23 +9,7 @@ import { Providers } from "@/components/Providers";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { AnimatedMeshBackground } from "@/components/layout/AnimatedMeshBackground";
 import { GoogleTag } from "@/components/analytics/GoogleTag";
-
-const FloatingWhatsApp = dynamic(
-  () => import("@/components/layout/FloatingWhatsApp").then((mod) => mod.FloatingWhatsApp),
-  { ssr: false },
-);
-const Preloader = dynamic(
-  () => import("@/components/layout/Preloader").then((mod) => mod.Preloader),
-  { ssr: false },
-);
-const CustomCursor = dynamic(
-  () => import("@/components/layout/CustomCursor").then((mod) => mod.CustomCursor),
-  { ssr: false },
-);
-const CookieConsentBanner = dynamic(
-  () => import("@/components/analytics/CookieConsentBanner").then((mod) => mod.CookieConsentBanner),
-  { ssr: false },
-);
+import { ClientEnhancements } from "@/components/layout/ClientEnhancements";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -157,15 +140,12 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <AnimatedMeshBackground />
-            <CustomCursor />
-            <Preloader />
+            <ClientEnhancements locale={locale} />
             <SmoothScroll>
               <div className="flex-1 flex flex-col min-h-0">
                 {children}
               </div>
             </SmoothScroll>
-            <FloatingWhatsApp />
-            <CookieConsentBanner locale={locale} />
             <SpeedInsights />
           </Providers>
         </NextIntlClientProvider>
