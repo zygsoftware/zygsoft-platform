@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import { getSession, signIn, signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -63,6 +63,15 @@ export default function AdminLoginPage() {
 
             if (!res.ok) {
                 setError("Giris yapilamadi. Lutfen tekrar deneyin.");
+                return;
+            }
+
+            const nextSession = await getSession();
+            const nextUserRole = ((nextSession?.user as SessionUser | undefined)?.role ?? "").toLowerCase();
+
+            if (nextUserRole !== "admin") {
+                await signOut({ redirect: false });
+                setError("Bu hesap yönetim paneline erişemiyor.");
                 return;
             }
 
