@@ -20,7 +20,12 @@ import { useTranslations } from "next-intl";
 import { DashboardLocaleSwitcher } from "@/components/dashboard/DashboardLocaleSwitcher";
 import { isDashboardSidebarActive } from "@/lib/dashboard-nav";
 
-export function DashboardSidebar() {
+type DashboardSidebarProps = {
+    className?: string;
+    onNavigate?: () => void;
+};
+
+export function DashboardSidebar({ className = "", onNavigate }: DashboardSidebarProps) {
     const segments = useSelectedLayoutSegments();
     const t = useTranslations("Dashboard.sidebar");
 
@@ -34,9 +39,9 @@ export function DashboardSidebar() {
     ];
 
     return (
-        <aside className="w-72 bg-[var(--surface)] border-r border-[var(--border)] flex flex-col h-screen sticky top-0">
+        <aside className={`bg-[var(--surface)] border-r border-[var(--border)] flex flex-col ${className}`}>
             <div className="p-8">
-                <Link href="/" className="flex items-center gap-0 group">
+                <Link href="/" className="flex items-center gap-0 group" onClick={onNavigate}>
                     <span className="font-display text-2xl font-black tracking-[-0.03em] text-slate-950">
                         ZYG<span className="text-[#e6c800]">SOFT</span>
                     </span>
@@ -46,6 +51,7 @@ export function DashboardSidebar() {
             <div className="px-4 mb-4">
                 <Link
                     href="/"
+                    onClick={onNavigate}
                     className="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-950 rounded-xl transition-all group font-bold text-[13px] border border-dashed border-slate-200"
                 >
                     <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
@@ -62,6 +68,7 @@ export function DashboardSidebar() {
                         <Link
                             key={item.href}
                             href={item.href}
+                            onClick={onNavigate}
                             className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
                                 ? "bg-[var(--surface-dark)] text-white shadow-sm"
                                 : "text-slate-500 hover:bg-slate-50 hover:text-slate-950"
@@ -84,6 +91,7 @@ export function DashboardSidebar() {
             <div className="p-4 border-t border-[var(--border)] space-y-1">
                 <Link
                     href="/dashboard/account"
+                    onClick={onNavigate}
                     className="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-50 hover:text-slate-950 rounded-xl transition-all group"
                 >
                     <Settings size={20} />

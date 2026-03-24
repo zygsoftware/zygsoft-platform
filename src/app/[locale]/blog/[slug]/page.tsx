@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import BlogDetailClient from "./BlogDetailClient";
 import { Metadata } from "next";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://zygsoft.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.zygsoft.com";
 
 type Props = { params: Promise<{ slug: string; locale: string }> };
 

@@ -102,7 +102,7 @@ export default async function ServiceSlugLayout({
     params: Promise<{ locale: string; slug: string }>;
 }) {
     const { locale, slug } = await params;
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://zygsoft.com";
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.zygsoft.com";
     const isEn = locale === "en";
     const lang = isEn ? "en" : "tr";
     const prefix = isEn ? `${siteUrl}/en` : siteUrl;

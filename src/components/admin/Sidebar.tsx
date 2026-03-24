@@ -38,14 +38,19 @@ const navGroups = [
     },
 ];
 
-export function AdminSidebar() {
+type AdminSidebarProps = {
+    className?: string;
+    onNavigate?: () => void;
+};
+
+export function AdminSidebar({ className = "", onNavigate }: AdminSidebarProps) {
     const pathname = usePathname();
 
     return (
-        <aside className="w-64 bg-white/60 backdrop-blur-2xl flex flex-col h-screen fixed border-r border-slate-200/60 z-20">
+        <aside className={`bg-white/60 backdrop-blur-2xl flex flex-col border-r border-slate-200/60 ${className}`}>
             {/* Logo */}
             <div className="px-6 py-8 border-b border-slate-200/60">
-                <Link href="/admin/dashboard" className="flex items-center gap-3 group">
+                <Link href="/admin/dashboard" className="flex items-center gap-3 group" onClick={onNavigate}>
                     <img
                         src="/brand/ZYG_Logo_SQR.png"
                         alt="ZYGSOFT"
@@ -75,6 +80,7 @@ export function AdminSidebar() {
                                     <Link
                                         key={item.href}
                                         href={item.href}
+                                        onClick={onNavigate}
                                         className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 group ${isActive
                                             ? "bg-[#0e0e0e] text-white shadow-lg"
                                             : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
@@ -95,6 +101,7 @@ export function AdminSidebar() {
             <div className="px-4 py-6 border-t border-slate-200/60 space-y-2 bg-slate-50/50">
                 <Link
                     href="/"
+                    onClick={onNavigate}
                     className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-600 font-medium hover:bg-slate-200/50 transition-all"
                 >
                     <span className="text-lg">🌐</span>

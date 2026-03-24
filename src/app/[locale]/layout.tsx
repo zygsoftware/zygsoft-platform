@@ -14,7 +14,7 @@ import { GoogleTag } from "@/components/analytics/GoogleTag";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://zygsoft.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.zygsoft.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -67,6 +67,7 @@ export const metadata: Metadata = {
     images:      ["/og-default.png"],
   },
   alternates: {
+    canonical: SITE_URL,
     languages: {
       "tr": `${SITE_URL}/`,
       "en": `${SITE_URL}/en/`,
@@ -81,6 +82,7 @@ const organizationJsonLd = {
       "@type": "Organization",
       "@id": `${SITE_URL}/#organization`,
       "name": "ZYGSOFT",
+      "alternateName": "Zygsoft",
       "url": SITE_URL,
       "logo": {
         "@type": "ImageObject",
@@ -106,6 +108,7 @@ const organizationJsonLd = {
       "@id": `${SITE_URL}/#website`,
       "url": SITE_URL,
       "name": "ZYGSOFT",
+      "alternateName": "Zygsoft",
       "publisher": { "@id": `${SITE_URL}/#organization` },
       "inLanguage": ["tr-TR", "en-US"],
     },

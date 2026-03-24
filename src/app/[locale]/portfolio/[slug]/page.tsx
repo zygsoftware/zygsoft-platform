@@ -7,7 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { StructuredContent } from "@/lib/render-content";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://zygsoft.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.zygsoft.com";
 
 /* ── Gradient palette for image placeholders ────────────────────── */
 const GRADIENTS = [
