@@ -1,8 +1,9 @@
 "use client";
 
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import { Mail, ShieldCheck } from "lucide-react";
 import {
@@ -15,18 +16,35 @@ import {
     AuthActions,
 } from "@/components/auth";
 
+type SessionUser = {
+    role?: string;
+};
+
 export default function AdminLoginPage() {
     const reduceMotion = useReducedMotion();
+    const router = useRouter();
+    const { data: session, status } = useSession();
+    const userRole = (session?.user as SessionUser | undefined)?.role;
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (status === "authenticated" && userRole === "admin") {
+            window.location.assign("/admin/dashboard");
+        }
+    }, [status, userRole]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError("");
         try {
+            if (status === "authenticated" && userRole !== "admin") {
+                await signOut({ redirect: false });
+            }
+
             const res = await signIn("credentials", {
                 redirect: false,
                 email,
@@ -49,9 +67,8 @@ export default function AdminLoginPage() {
                 return;
             }
 
-            // Force a full navigation so auth cookies are definitely available
-            // before middleware checks the protected admin route.
-            window.location.href = res.url || "/admin/dashboard";
+            router.refresh();
+            window.location.assign("/admin/dashboard");
         } catch {
             setError("Bağlantı hatası oluştu. Lütfen tekrar deneyin.");
         } finally {

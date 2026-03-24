@@ -6,8 +6,10 @@ import { routing } from './i18n/routing';
 
 const intlMiddleware = createMiddleware(routing);
 
-const VERIFY_EMAIL_REQUIRED_PATHS = ["/dashboard", "/panel", "/verify-email-required"];
-const ALLOWED_UNVERIFIED_PATHS = ["/login", "/register", "/verify-email", "/forgot-password", "/reset-password", "/"];
+type AuthToken = {
+    role?: string;
+    emailVerified?: boolean;
+} | null;
 
 function pathMatches(pathname: string, patterns: string[]): boolean {
     const normalized = pathname.replace(/^\/en/, "") || "/";
@@ -20,7 +22,8 @@ function isDashboardOrProtected(pathname: string): boolean {
 }
 
 export async function middleware(req: NextRequest) {
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET }) as AuthToken;
+    const userRole = token?.role;
 
     // Check for admin routes first
     const isAdminRoute = req.nextUrl.pathname.startsWith("/admin");
@@ -32,18 +35,21 @@ export async function middleware(req: NextRequest) {
             if (!token) {
                 return NextResponse.redirect(new URL("/admin/login", req.url));
             }
+            if (userRole !== "admin") {
+                return NextResponse.redirect(new URL("/admin/login", req.url));
+            }
             if (req.nextUrl.pathname === "/admin") {
                 return NextResponse.redirect(new URL("/admin/dashboard", req.url));
             }
         }
-        if (isLoginRoute && token) {
+        if (isLoginRoute && token && userRole === "admin") {
             return NextResponse.redirect(new URL("/admin/dashboard", req.url));
         }
         return NextResponse.next();
     }
 
     // Email verification guard: customer users must verify email before using dashboard
-    if (token && (token as any).role === "customer" && !(token as any).emailVerified) {
+    if (token && token.role === "customer" && !token.emailVerified) {
         if (isDashboardOrProtected(req.nextUrl.pathname) && !pathMatches(req.nextUrl.pathname, ["/verify-email-required"])) {
             const locale = req.nextUrl.pathname.startsWith("/en") ? "/en" : "";
             return NextResponse.redirect(new URL(`${locale}/verify-email-required`, req.url));
