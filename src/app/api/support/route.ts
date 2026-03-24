@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { supportRateLimit } from "@/lib/rate-limit";
 import { generateTicketCode } from "@/lib/support-ticket";
 import { sendSupportTicketCreatedEmail } from "@/lib/mail";
+import { getSiteUrl } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 
@@ -86,7 +87,7 @@ export async function POST(req: Request) {
             },
         });
 
-        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+        const siteUrl = getSiteUrl();
         const locale = (user.locale === "en" ? "en" : "tr") as "tr" | "en";
         const panelLink =
             locale === "en" ? `${siteUrl}/en/dashboard/support` : `${siteUrl}/panel/destek`;

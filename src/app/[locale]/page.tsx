@@ -1,40 +1,52 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Code, Globe, Shield, Zap, Sparkles, MonitorSmartphone, CheckCircle2, Cpu, BarChart3, Users, MessageSquare, Layers, Search, Rocket } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { HomepageBlogSection } from "@/components/blog/HomepageBlogSection";
-import { AppStoreShowcase } from "@/components/home/AppStoreShowcase";
-import { InstagramFeedSection } from "@/components/home/InstagramFeedSection";
 import { HeroSection } from "@/components/home/HeroSection";
-import { PanelShowcase } from "@/components/home/PanelShowcase";
 import { ContactInquiryForm } from "@/components/forms/ContactInquiryForm";
-import { Magnetic } from "@/components/ui/Magnetic";
 import { ParticleField } from "@/components/ui/ParticleField";
 import { createRevealUp, revealViewport, staggerContainer } from "@/components/ui/motion";
 import { BlockReveal, TextReveal } from "@/components/ui/reveal";
+
+const PanelShowcase = dynamic(
+  () => import("@/components/home/PanelShowcase").then((mod) => mod.PanelShowcase),
+  {
+    ssr: false,
+    loading: () => <div className="min-h-[720px] w-full bg-[#f5f5f7]" aria-hidden />,
+  },
+);
+const AppStoreShowcase = dynamic(
+  () => import("@/components/home/AppStoreShowcase").then((mod) => mod.AppStoreShowcase),
+  {
+    ssr: false,
+    loading: () => <div className="min-h-[760px] w-full bg-[#343131]" aria-hidden />,
+  },
+);
+const HomepageBlogSection = dynamic(
+  () => import("@/components/blog/HomepageBlogSection").then((mod) => mod.HomepageBlogSection),
+  {
+    ssr: false,
+    loading: () => <div className="min-h-[520px] w-full bg-[#f3f0ea]" aria-hidden />,
+  },
+);
+const InstagramFeedSection = dynamic(
+  () => import("@/components/home/InstagramFeedSection").then((mod) => mod.InstagramFeedSection),
+  {
+    ssr: false,
+    loading: () => <div className="min-h-[420px] w-full bg-white" aria-hidden />,
+  },
+);
 
 export default function Home() {
   const t = useTranslations("Homepage");
   const containerRef = useRef(null);
   const reducedMotion = !!useReducedMotion();
-
-  // Mouse Parallax Logic
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({
-        x: (e.clientX / window.innerWidth - 0.5) * 2,
-        y: (e.clientY / window.innerHeight - 0.5) * 2,
-      });
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
 
   // Section-based scroll snapping (homepage only, CSS-only, removed on unmount)
   useEffect(() => {
@@ -273,7 +285,6 @@ export default function Home() {
               <div className="lg:col-span-5 relative">
                 <BlockReveal delay={0.12} className="relative z-10">
                   <motion.div
-                    style={{ y: mousePos.y * 24, x: mousePos.x * 16 }}
                     className="aspect-[4/5] bg-[#343131] rounded-[3rem] overflow-hidden relative shadow-[0_48px_96px_rgba(0,0,0,0.18)] p-10 flex flex-col justify-center gap-10"
                   >
                     {/* Visual Metric Scene */}
@@ -406,12 +417,10 @@ export default function Home() {
 
               <TextReveal delay={0.2}>
               <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-                <Magnetic strength={20}>
-                  <Link href="/contact" className="home-btn-primary-yellow group relative px-9 py-3.5 font-black uppercase tracking-[0.22em] text-[11px] rounded-xl overflow-hidden transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-[0_16px_48px_rgba(230,200,0,0.2)]">
-                    <span className="relative z-10">{t("ctaSection.cta") || t("ctaSection.button")}</span>
-                    <div className="absolute inset-0 border border-white/30 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </Link>
-                </Magnetic>
+                <Link href="/contact" className="home-btn-primary-yellow group relative px-9 py-3.5 font-black uppercase tracking-[0.22em] text-[11px] rounded-xl overflow-hidden transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-[0_16px_48px_rgba(230,200,0,0.2)]">
+                  <span className="relative z-10">{t("ctaSection.cta") || t("ctaSection.button")}</span>
+                  <div className="absolute inset-0 border border-white/30 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </Link>
 
                 <Link href="/portfolio" className="group flex items-center gap-4 text-white/90 font-bold uppercase tracking-[0.24em] text-[11px] hover:text-[#e6c800] transition-colors duration-200">
                   <span>{t("ctaSection.ctaSecondary") || "Explore Portfolio"}</span>

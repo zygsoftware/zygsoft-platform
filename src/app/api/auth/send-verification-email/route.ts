@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { verificationEmailRateLimit } from "@/lib/rate-limit";
 import { sendVerificationEmail } from "@/lib/mail";
+import { getSiteUrl } from "@/lib/site-url";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
@@ -17,7 +18,7 @@ function genericMessage(locale: "tr" | "en") {
 }
 
 function buildVerifyUrl(token: string, locale: "tr" | "en") {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+  const siteUrl = getSiteUrl();
   const pathPrefix = locale === "en" ? "/en" : "";
   return `${siteUrl}${pathPrefix}/verify-email?token=${encodeURIComponent(token)}`;
 }

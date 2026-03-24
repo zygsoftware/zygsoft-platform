@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { getDisplayTicketCode } from "@/lib/support-ticket";
 import { sendSupportTicketReplyEmail } from "@/lib/mail";
+import { getSiteUrl } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 
@@ -67,7 +68,7 @@ export async function PUT(req: Request) {
         });
 
         if (replyText && updated.user?.email) {
-            const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+            const siteUrl = getSiteUrl();
             const locale = (updated.user.locale === "en" ? "en" : "tr") as "tr" | "en";
             const panelLink =
                 locale === "en" ? `${siteUrl}/en/dashboard/support` : `${siteUrl}/panel/destek`;

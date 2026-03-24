@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { forgotPasswordRateLimit } from "@/lib/rate-limit";
 import { sendPasswordResetEmail } from "@/lib/mail";
+import { getSiteUrl } from "@/lib/site-url";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
@@ -16,7 +17,7 @@ function successMessage(locale: "tr" | "en") {
 
 /** Build reset URL. localePrefix as-needed: tr = no prefix, en = /en */
 function buildResetUrl(token: string, locale: "tr" | "en") {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = getSiteUrl();
   const pathPrefix = locale === "en" ? "/en" : "";
   return `${siteUrl}${pathPrefix}/reset-password?token=${encodeURIComponent(token)}`;
 }

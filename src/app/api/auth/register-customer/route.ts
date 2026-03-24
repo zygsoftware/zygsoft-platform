@@ -4,11 +4,12 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { registerRateLimit } from "@/lib/rate-limit";
 import { sendVerificationEmail } from "@/lib/mail";
+import { getSiteUrl } from "@/lib/site-url";
 
 const TOKEN_EXPIRY_HOURS = 24;
 
 function buildVerifyUrl(token: string, locale: "tr" | "en") {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+  const siteUrl = getSiteUrl();
   const pathPrefix = locale === "en" ? "/en" : "";
   return `${siteUrl}${pathPrefix}/verify-email?token=${encodeURIComponent(token)}`;
 }

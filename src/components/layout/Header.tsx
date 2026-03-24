@@ -1,6 +1,7 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Menu, X, ChevronDown, LogOut, ArrowUpRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -46,12 +47,13 @@ export function Header() {
                 <div className="container mx-auto px-6 lg:px-8 flex items-center justify-between h-[52px]">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-0 group" aria-label="ZYGSOFT Ana Sayfa">
-                        <img
+                        <Image
                             src="/brand/ZYGLogo.png"
                             alt="ZYGSOFT"
                             className="h-11 w-auto"
                             width={220}
                             height={44}
+                            priority
                         />
                     </Link>
 

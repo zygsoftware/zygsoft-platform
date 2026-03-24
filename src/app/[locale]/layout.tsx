@@ -1,17 +1,32 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import dynamic from "next/dynamic";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Providers } from "@/components/Providers";
-import { FloatingWhatsApp } from "@/components/layout/FloatingWhatsApp";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
-import { Preloader } from "@/components/layout/Preloader";
-import { CustomCursor } from "@/components/layout/CustomCursor";
 import { AnimatedMeshBackground } from "@/components/layout/AnimatedMeshBackground";
 import { GoogleTag } from "@/components/analytics/GoogleTag";
-import { CookieConsentBanner } from "@/components/analytics/CookieConsentBanner";
+
+const FloatingWhatsApp = dynamic(
+  () => import("@/components/layout/FloatingWhatsApp").then((mod) => mod.FloatingWhatsApp),
+  { ssr: false },
+);
+const Preloader = dynamic(
+  () => import("@/components/layout/Preloader").then((mod) => mod.Preloader),
+  { ssr: false },
+);
+const CustomCursor = dynamic(
+  () => import("@/components/layout/CustomCursor").then((mod) => mod.CustomCursor),
+  { ssr: false },
+);
+const CookieConsentBanner = dynamic(
+  () => import("@/components/analytics/CookieConsentBanner").then((mod) => mod.CookieConsentBanner),
+  { ssr: false },
+);
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -151,6 +166,7 @@ export default async function RootLayout({
             </SmoothScroll>
             <FloatingWhatsApp />
             <CookieConsentBanner locale={locale} />
+            <SpeedInsights />
           </Providers>
         </NextIntlClientProvider>
       </body>

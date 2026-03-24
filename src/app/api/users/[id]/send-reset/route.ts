@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { sendPasswordResetEmail } from "@/lib/mail";
+import { getSiteUrl } from "@/lib/site-url";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 
@@ -16,7 +17,7 @@ async function isAdmin() {
 }
 
 function buildResetUrl(token: string, locale: "tr" | "en") {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+    const siteUrl = getSiteUrl();
     const pathPrefix = locale === "en" ? "/en" : "";
     return `${siteUrl}${pathPrefix}/reset-password?token=${encodeURIComponent(token)}`;
 }
