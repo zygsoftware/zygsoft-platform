@@ -155,7 +155,7 @@ export default function DijitalUrunlerPage() {
                                             </Link>
                                             <Link
                                                 href={PRODUCT_URL}
-                                                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-8 py-4 text-[12px] font-black uppercase tracking-[0.18em] text-white/90 transition-colors hover:bg-white/10"
+                                                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-8 py-4 text-[12px] font-black uppercase tracking-[0.18em] text-white transition-colors hover:bg-white/10 hover:text-white"
                                             >
                                                 {t("viewDetails")}
                                             </Link>

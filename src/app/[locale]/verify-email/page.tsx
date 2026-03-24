@@ -16,7 +16,6 @@ type VerifyStatus = "pending" | "success" | "expired" | "invalid";
 function VerifyEmailContent() {
   const t = useTranslations("Auth.verifyEmail");
   const locale = useLocale();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
@@ -36,16 +35,15 @@ function VerifyEmailContent() {
         const data = await res.json();
         if (data.success) {
           setStatus("success");
-          const loginPath = locale === "en" ? "/en/login?verified=success" : "/login?verified=success";
-          setTimeout(() => router.push(loginPath), 2500);
         } else {
           setStatus((data.error === "expired" ? "expired" : "invalid") as VerifyStatus);
         }
       })
       .catch(() => setStatus("invalid"));
-  }, [token, locale, router]);
+  }, [token]);
 
-  const loginPath = locale === "en" ? "/en/login" : "/login";
+  const loginPath = locale === "en" ? "/en/login?verified=success" : "/login?verified=success";
+  const dashboardPath = locale === "en" ? "/en/dashboard" : "/dashboard";
 
   if (status === "pending") {
     return (
@@ -63,11 +61,20 @@ function VerifyEmailContent() {
       <AuthFormPanel>
         <div className="mb-8">
           <h1 className="text-2xl font-display font-black text-[#343131] mb-4">
-            {t("title")}
+            {locale === "en" ? "Congratulations, your email is verified." : "Tebrikler, e-posta adresiniz doğrulandı."}
           </h1>
-          <AuthStatus type="success">{t("success")}</AuthStatus>
+          <AuthStatus type="success">
+            {locale === "en"
+              ? "Your account is now active. You can sign in or continue to your dashboard."
+              : "Hesabiniz artik aktif. Giris yapabilir veya dogrudan panelinize devam edebilirsiniz."}
+          </AuthStatus>
         </div>
-        <AuthActions footerLinks={[{ href: loginPath, label: t("goToLogin") }]} />
+        <AuthActions
+          footerLinks={[
+            { href: loginPath, label: locale === "en" ? "Go to login" : "Girişe git" },
+            { href: dashboardPath, label: locale === "en" ? "Open dashboard" : "Panele git" },
+          ]}
+        />
       </AuthFormPanel>
     );
   }

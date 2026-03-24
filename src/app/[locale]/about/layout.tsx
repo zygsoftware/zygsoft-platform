@@ -8,10 +8,10 @@ export async function generateMetadata({
     const { locale } = await params;
     const isEn = locale === "en";
 
-    const title = isEn ? "About Us" : "Hakkımızda";
+    const title = isEn ? "About ZYGSOFT" : "ZYGSOFT Hakkında";
     const description = isEn
-        ? "Founded in 2019, ZYGSOFT is an Antalya-based software company delivering web development, digital transformation, and automation solutions globally."
-        : "2019'da kurulan ZYGSOFT, Antalya merkezli olarak global ölçekte web geliştirme, dijital dönüşüm ve otomasyon çözümleri sunan bir yazılım şirketidir.";
+        ? "Learn how ZYGSOFT approaches software, digital products, SEO, performance, and conversion-focused growth for modern businesses."
+        : "ZYGSOFT'un yazılım, dijital ürün, SEO, performans ve dönüşüm odaklı büyüme yaklaşımını yakından inceleyin.";
     const canonical = isEn ? "/en/about" : "/about";
 
     return {
