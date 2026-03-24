@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { Mail, MapPin, ChevronDown } from "lucide-react";
+import { Mail, MapPin, ChevronDown, Phone } from "lucide-react";
 import { useState } from "react";
 import { ContactInquiryForm } from "@/components/forms/ContactInquiryForm";
 import { useLocale, useTranslations } from "next-intl";
@@ -67,6 +67,7 @@ export default function Contact() {
                                 <div className="space-y-5 mb-10">
                                     {[
                                         { icon: <Mail size={18} />, label: t("emailTitle"), value: "info@zygsoft.com", href: "mailto:info@zygsoft.com" },
+                                        { icon: <Phone size={18} />, label: locale === "tr" ? "Telefon" : "Phone", value: "+90 542 291 69 12", href: "tel:+905422916912" },
                                         { icon: <MapPin size={18} />, label: t("officeTitle"), value: t("officeDesc"), href: null },
                                     ].map((item, i) => (
                                         <motion.div key={i} className="flex items-center gap-4 p-5 glass rounded-xl hover-glow"

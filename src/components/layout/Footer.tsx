@@ -62,6 +62,11 @@ export function Footer() {
                                     info@zygsoft.com
                                 </a>
                             </Magnetic>
+                            <Magnetic strength={15}>
+                                <a href="tel:+905422916912" className="flex items-center gap-3 hover:text-[#e6c800] transition-colors w-fit" data-magnetic="true">
+                                    +90 542 291 69 12
+                                </a>
+                            </Magnetic>
                             <p className="text-slate-400 font-medium">Antalya, Türkiye</p>
                         </div>
                     </div>

@@ -4,8 +4,7 @@ import { motion } from "framer-motion";
 import { MessageCircle } from "lucide-react";
 
 export function FloatingWhatsApp() {
-    const phoneNumber = "905551234567"; // Customize this number
-    const whatsappUrl = `https://wa.me/${phoneNumber}`;
+    const whatsappUrl = "https://wa.me/qr/NBGOQJPJFQBXO1";
 
     return (
         <motion.div
