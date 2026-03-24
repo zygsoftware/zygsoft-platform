@@ -1,4 +1,5 @@
 import Script from "next/script";
+import { CONSENT_STORAGE_KEY } from "@/lib/consent";
 
 /**
  * Google etiketleme — ortam değişkenlerinden biri dolu olmalı.
@@ -18,6 +19,26 @@ export function GoogleTag() {
     if (gtmId) {
         return (
             <>
+                <Script id="google-consent-default" strategy="beforeInteractive">
+                    {`
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+(function() {
+  var consent = null;
+  try {
+    consent = JSON.parse(window.localStorage.getItem('${CONSENT_STORAGE_KEY}') || 'null');
+  } catch (e) {}
+  var analyticsGranted = !!(consent && consent.analytics);
+  var marketingGranted = !!(consent && consent.marketing);
+  gtag('consent', 'default', {
+    analytics_storage: analyticsGranted ? 'granted' : 'denied',
+    ad_storage: marketingGranted ? 'granted' : 'denied',
+    ad_user_data: marketingGranted ? 'granted' : 'denied',
+    ad_personalization: marketingGranted ? 'granted' : 'denied'
+  });
+})();
+`}
+                </Script>
                 <Script id="google-tag-manager" strategy="afterInteractive">
                     {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -41,6 +62,26 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     if (gaId) {
         return (
             <>
+                <Script id="google-consent-default-ga4" strategy="beforeInteractive">
+                    {`
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+(function() {
+  var consent = null;
+  try {
+    consent = JSON.parse(window.localStorage.getItem('${CONSENT_STORAGE_KEY}') || 'null');
+  } catch (e) {}
+  var analyticsGranted = !!(consent && consent.analytics);
+  var marketingGranted = !!(consent && consent.marketing);
+  gtag('consent', 'default', {
+    analytics_storage: analyticsGranted ? 'granted' : 'denied',
+    ad_storage: marketingGranted ? 'granted' : 'denied',
+    ad_user_data: marketingGranted ? 'granted' : 'denied',
+    ad_personalization: marketingGranted ? 'granted' : 'denied'
+  });
+})();
+`}
+                </Script>
                 <Script
                     src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
                     strategy="afterInteractive"

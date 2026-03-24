@@ -11,6 +11,7 @@ import { Preloader } from "@/components/layout/Preloader";
 import { CustomCursor } from "@/components/layout/CustomCursor";
 import { AnimatedMeshBackground } from "@/components/layout/AnimatedMeshBackground";
 import { GoogleTag } from "@/components/analytics/GoogleTag";
+import { CookieConsentBanner } from "@/components/analytics/CookieConsentBanner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -149,6 +150,7 @@ export default async function RootLayout({
               </div>
             </SmoothScroll>
             <FloatingWhatsApp />
+            <CookieConsentBanner locale={locale} />
           </Providers>
         </NextIntlClientProvider>
       </body>
