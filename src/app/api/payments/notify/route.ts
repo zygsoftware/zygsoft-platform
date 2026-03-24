@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { buildStorageObjectPath, storageBuckets, uploadToStorage } from "@/lib/supabase-storage";
+import { sendPaymentNotification } from "@/lib/mail";
 
 const KNOWN_PRODUCTS: Record<
     string,
@@ -152,6 +153,23 @@ export async function POST(req: Request) {
                 status: "pending_approval"
             }
         });
+
+        try {
+            await sendPaymentNotification({
+                paymentId: newPayment.id,
+                createdAt: newPayment.createdAt,
+                amount: parsedAmount,
+                receiptUrl,
+                productName: dbProduct.name,
+                productSlug: dbProduct.slug,
+                userName: user.name ?? null,
+                userEmail: String(user.email ?? ""),
+                userPhone: user.phone ?? null,
+                userCompany: user.company ?? null,
+            });
+        } catch (mailError) {
+            console.error("[payments/notify] Payment notification email failed:", mailError);
+        }
 
         return NextResponse.json(
             { message: "Ödeme bildirimi başarıyla alındı.", paymentId: newPayment.id },

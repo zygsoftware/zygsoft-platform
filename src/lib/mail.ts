@@ -125,6 +125,112 @@ export async function sendMailTest(data: MailTestPayload): Promise<void> {
     });
 }
 
+export interface PaymentNotificationMailPayload {
+    paymentId: string;
+    createdAt: Date;
+    amount: number;
+    receiptUrl: string | null;
+    productName: string;
+    productSlug: string;
+    userName: string | null;
+    userEmail: string;
+    userPhone: string | null;
+    userCompany: string | null;
+}
+
+export async function sendPaymentNotification(data: PaymentNotificationMailPayload): Promise<void> {
+    const host = process.env.SMTP_HOST;
+    const user = process.env.SMTP_USER;
+    const pass = process.env.SMTP_PASS;
+    const toEmail = process.env.CONTACT_TO_EMAIL ?? "info@zygsoft.com";
+    const fromEmail = process.env.CONTACT_FROM_EMAIL ?? "no-reply@zygsoft.com";
+
+    if (!host || !user || !pass) {
+        console.warn("[mail] SMTP is not configured — skipping payment notification email.");
+        return;
+    }
+
+    const transporter = createSmtpTransport();
+
+    const dateStr = new Intl.DateTimeFormat("tr-TR", {
+        timeZone: "Europe/Istanbul",
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(data.createdAt);
+
+    const amountStr = new Intl.NumberFormat("tr-TR", {
+        style: "currency",
+        currency: "TRY",
+        maximumFractionDigits: 2,
+    }).format(data.amount);
+
+    const html = `<!DOCTYPE html>
+<html lang="tr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:40px 16px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb">
+        <tr>
+          <td style="background:#0e0e0e;padding:28px 32px">
+            <span style="font-size:22px;font-weight:900;color:#ffffff;letter-spacing:-0.02em">ZYG<span style="color:#e6c800">SOFT</span></span>
+            <p style="margin:6px 0 0;font-size:12px;color:#9ca3af;text-transform:uppercase;letter-spacing:0.1em">Yeni Ödeme Bildirimi</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:32px">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              ${row("Ödeme ID", data.paymentId)}
+              ${row("Tarih", dateStr)}
+              ${row("Tutar", amountStr)}
+              ${row("Ürün", data.productName)}
+              ${row("Ürün Kodu", data.productSlug)}
+              ${row("Kullanıcı", data.userName)}
+              ${row("E-posta", data.userEmail)}
+              ${row("Telefon", data.userPhone)}
+              ${row("Şirket", data.userCompany)}
+              ${row("Dekont", data.receiptUrl ? `<a href="${data.receiptUrl}" style="color:#2563eb;text-decoration:none">Dekontu görüntüle</a>` : "Yok")}
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:16px 32px">
+            <p style="margin:0;font-size:11px;color:#9ca3af;text-align:center">Bu e-posta ödeme bildirimi alındığında otomatik gönderilir.</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+    const text = [
+        "ZYGSOFT — Yeni Ödeme Bildirimi",
+        "=".repeat(40),
+        `Ödeme ID   : ${data.paymentId}`,
+        `Tarih      : ${dateStr}`,
+        `Tutar      : ${amountStr}`,
+        `Ürün       : ${data.productName}`,
+        `Ürün Kodu  : ${data.productSlug}`,
+        `Kullanıcı  : ${data.userName ?? "-"}`,
+        `E-posta    : ${data.userEmail}`,
+        `Telefon    : ${data.userPhone ?? "-"}`,
+        `Şirket     : ${data.userCompany ?? "-"}`,
+        `Dekont     : ${data.receiptUrl ?? "-"}`,
+    ].join("\n");
+
+    await transporter.sendMail({
+        from: `"ZYGSOFT Payments" <${fromEmail}>`,
+        to: toEmail,
+        subject: `[ZYGSOFT] Yeni ödeme bildirimi — ${data.productName}`,
+        html,
+        text,
+    });
+}
+
 /* ── Email templates ────────────────────────────────────────────── */
 
 function row(label: string, value: string | null | undefined): string {

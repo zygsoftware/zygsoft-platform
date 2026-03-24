@@ -1,6 +1,6 @@
 "use client";
 
-import { getSession, signIn, signOut, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -49,6 +49,7 @@ export default function AdminLoginPage() {
                 redirect: false,
                 email,
                 password,
+                callbackUrl: "/admin/dashboard",
             });
 
             if (!res) {
@@ -66,16 +67,7 @@ export default function AdminLoginPage() {
                 return;
             }
 
-            const nextSession = await getSession();
-            const nextUserRole = ((nextSession?.user as SessionUser | undefined)?.role ?? "").toLowerCase();
-
-            if (nextUserRole !== "admin") {
-                await signOut({ redirect: false });
-                setError("Bu hesap yönetim paneline erişemiyor.");
-                return;
-            }
-
-            router.replace("/admin/dashboard");
+            window.location.href = res.url || "/admin/dashboard";
         } catch {
             setError("Bağlantı hatası oluştu. Lütfen tekrar deneyin.");
         } finally {
