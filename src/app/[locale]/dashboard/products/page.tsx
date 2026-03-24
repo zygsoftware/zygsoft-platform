@@ -13,6 +13,25 @@ import {
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { hasToolAccess } from "@/lib/trial-access-client";
+import { isSubscriptionCurrentlyActive } from "@/lib/subscription-utils";
+
+type SessionSubscription = {
+    status?: string;
+    createdAt?: string;
+    endsAt?: string | null;
+    product?: {
+        slug?: string;
+    };
+};
+
+type DashboardUser = {
+    role?: string;
+    activeProductSlugs?: string[];
+    subscriptions?: SessionSubscription[];
+    trialStatus?: string;
+    trialStartedAt?: string | null;
+    trialEndsAt?: string | null;
+};
 
 const PACKAGES = [
     {
@@ -29,10 +48,18 @@ const PACKAGES = [
 
 export default function ProductsPage() {
     const { data: session } = useSession();
-    const user = session?.user as any;
+    const user = session?.user as DashboardUser | undefined;
     const activeProductSlugs = user?.activeProductSlugs || [];
     const t = useTranslations("Dashboard.productsPage");
     const locale = useLocale();
+    const isAdmin = user?.role === "admin";
+    const subscriptions = Array.isArray(user?.subscriptions) ? (user.subscriptions as SessionSubscription[]) : [];
+    const legalToolkitSubscription = subscriptions.find((subscription) => subscription.product?.slug === "legal-toolkit");
+    const hasLegalSubscription =
+        activeProductSlugs.includes("legal-toolkit") ||
+        isSubscriptionCurrentlyActive(legalToolkitSubscription?.status, legalToolkitSubscription?.endsAt) ||
+        isAdmin;
+    const hasLegalTrial = !hasLegalSubscription && user?.trialStatus === "active";
 
     return (
         <div className="space-y-10">
@@ -43,11 +70,30 @@ export default function ProductsPage() {
 
             <div className="max-w-4xl">
                 {PACKAGES.map((pkg, idx) => {
-                    const isAdmin = user?.role === "admin";
-                    const isLocked = !(activeProductSlugs.includes(pkg.slug) || isAdmin || hasToolAccess(user));
-                    const created = user?.createdAt ? new Date(user.createdAt) : new Date();
-                    const endDate = new Date(created);
-                    endDate.setFullYear(endDate.getFullYear() + 1);
+                    const isUnlocked = pkg.slug === "legal-toolkit" && (hasLegalSubscription || hasLegalTrial || isAdmin || hasToolAccess(user));
+                    const isLocked = !isUnlocked;
+                    const subscriptionStartDate = legalToolkitSubscription?.createdAt ? new Date(legalToolkitSubscription.createdAt) : null;
+                    const subscriptionEndDate = legalToolkitSubscription?.endsAt ? new Date(legalToolkitSubscription.endsAt) : null;
+                    const trialStartDate = user?.trialStartedAt ? new Date(user.trialStartedAt) : null;
+                    const trialEndDate = user?.trialEndsAt ? new Date(user.trialEndsAt) : null;
+                    const activeStartDate = hasLegalSubscription ? subscriptionStartDate : hasLegalTrial ? trialStartDate : null;
+                    const activeEndDate = isAdmin
+                        ? null
+                        : hasLegalSubscription
+                            ? subscriptionEndDate
+                            : hasLegalTrial
+                                ? trialEndDate
+                                : null;
+                    const statusLabel = hasLegalSubscription
+                        ? t("statusActive")
+                        : hasLegalTrial
+                            ? t("statusTrial")
+                            : t("statusSubscriptionRequired");
+                    const statusClass = hasLegalSubscription
+                        ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                        : hasLegalTrial
+                            ? "bg-blue-50 text-blue-600 border-blue-100"
+                            : "bg-amber-50 text-amber-600 border-amber-100";
 
                     return (
                         <div key={idx} className="relative group">
@@ -79,7 +125,9 @@ export default function ProductsPage() {
                                                         {t("startDate")}
                                                     </span>
                                                     <span className="text-[#343131] font-black">
-                                                        {created.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })}
+                                                        {activeStartDate
+                                                            ? activeStartDate.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })
+                                                            : "—"}
                                                     </span>
                                                 </div>
                                                 <div className="w-[1px] bg-[#343131]/[0.06] hidden sm:block"></div>
@@ -88,7 +136,11 @@ export default function ProductsPage() {
                                                         {t("endDate")}
                                                     </span>
                                                     <span className="text-[#343131] font-black">
-                                                        {isAdmin ? t("adminUnlimited") : endDate.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })}
+                                                        {isAdmin
+                                                            ? t("adminUnlimited")
+                                                            : activeEndDate
+                                                                ? activeEndDate.toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" })
+                                                                : "—"}
                                                     </span>
                                                 </div>
                                             </div>
@@ -122,9 +174,9 @@ export default function ProductsPage() {
                                 {/* Status Ribbon */}
                                 <div className="absolute top-6 right-6 lg:-right-4 lg:top-8 flex flex-col gap-2">
                                     {!isLocked ? (
-                                        <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm text-xs font-black uppercase tracking-wider">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                            {t("statusActive")}
+                                        <div className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border shadow-sm text-xs font-black uppercase tracking-wider ${statusClass}`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${hasLegalSubscription ? "bg-emerald-500" : "bg-blue-500"}`} />
+                                            {statusLabel}
                                         </div>
                                     ) : (
                                         <div className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 shadow-sm text-xs font-black uppercase tracking-wider">

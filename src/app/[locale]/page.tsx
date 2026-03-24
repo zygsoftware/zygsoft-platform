@@ -4,11 +4,12 @@ import { useRef, useEffect } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, ArrowUpRight, Code, Globe, Shield, Zap, Sparkles, MonitorSmartphone, CheckCircle2, Cpu, BarChart3, Users, MessageSquare, Layers, Search, Rocket } from "lucide-react";
+import { Zap, Sparkles, CheckCircle2, Cpu, BarChart3, Rocket } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/home/HeroSection";
+import { SolutionsSection } from "@/components/home/SolutionsSection";
 import { ContactInquiryForm } from "@/components/forms/ContactInquiryForm";
 import { ParticleField } from "@/components/ui/ParticleField";
 import { createRevealUp, revealViewport, staggerContainer } from "@/components/ui/motion";
@@ -42,6 +43,24 @@ const InstagramFeedSection = dynamic(
     loading: () => <div className="min-h-[420px] w-full bg-white" aria-hidden />,
   },
 );
+
+type PartnerPillar = {
+  t: string;
+  d: string;
+};
+
+type ProcessStep = {
+  n: string;
+  t: string;
+  d: string;
+};
+
+type WhyChooseUsItem = {
+  t: string;
+  d: string;
+};
+
+const partnerIcons = [BarChart3, Sparkles, Cpu, Rocket];
 
 export default function Home() {
   const t = useTranslations("Homepage");
@@ -89,7 +108,10 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-              {t.raw("partnerSection.pillars").map((pillar: any, i: number) => (
+              {(t.raw("partnerSection.pillars") as PartnerPillar[]).map((pillar, i) => {
+                const PillarIcon = partnerIcons[i];
+
+                return (
                 <BlockReveal key={i} delay={i * 0.08}>
                   <motion.div
                     whileHover={{ y: -3 }}
@@ -98,13 +120,14 @@ export default function Home() {
                   >
                     <div className="absolute top-0 right-0 w-24 h-24 bg-[#343131]/0 group-hover:bg-[#343131]/[0.03] rounded-full transition-all duration-400 -translate-y-1/2 translate-x-1/2" />
                     <div className="w-12 h-12 rounded-lg bg-[#fafafc] border border-[#343131]/5 flex items-center justify-center mb-5 group-hover:bg-[#e6c800]/90 group-hover:border-[#e6c800] transition-colors duration-300">
-                      {[<BarChart3 size={22} />, <Sparkles size={22} />, <Cpu size={22} />, <Rocket size={22} />][i]}
+                      {PillarIcon ? <PillarIcon size={22} /> : null}
                     </div>
                     <h3 className="text-lg font-black uppercase tracking-tight mb-2">{pillar.t}</h3>
                     <p className="text-[#343131]/52 text-[14px] font-medium leading-relaxed">{pillar.d}</p>
                   </motion.div>
                 </BlockReveal>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
@@ -112,62 +135,9 @@ export default function Home() {
         {/* Transition: off-white → white */}
         <div className="h-12 bg-gradient-to-b from-[#fafafc] to-white" aria-hidden />
 
-        {/* ── SECTION 03: SERVICES ────────────────────────── */}
-        <section className="home-snap-section py-24 md:py-28 bg-white overflow-hidden relative">
-          <div className="container mx-auto px-6">
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-20">
-              <BlockReveal className="max-w-3xl">
-                <TextReveal delay={0.05}>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#343131]/45 mb-5 block">{t("servicesSection.tag")}</span>
-                </TextReveal>
-                <TextReveal delay={0.12}>
-                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-black leading-[0.94] tracking-tighter text-[#343131]" dangerouslySetInnerHTML={{ __html: t.raw("servicesSection.title") }} />
-                </TextReveal>
-              </BlockReveal>
-              <BlockReveal delay={0.12} className="max-w-md lg:text-right">
-                <TextReveal delay={0.18}>
-                  <p className="text-[#343131]/52 text-[17px] font-medium mb-8 max-w-sm">
-                    {t("servicesSection.description")}
-                  </p>
-                </TextReveal>
-                <Link href="/services" className="inline-flex items-center gap-4 font-black text-sm uppercase tracking-widest group">
-                  {t("servicesSection.viewAll")} <div className="w-12 h-px bg-[#343131] group-hover:w-20 transition-all duration-500" />
-                </Link>
-              </BlockReveal>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-              {Object.entries(t.raw("servicesSection.items")).map(([key, item]: [string, any], i: number) => (
-                <BlockReveal key={key} delay={i * 0.08}>
-                  <Link href={`/services#${key}`} className="block group">
-                    <motion.div
-                      whileHover={{ y: -3 }}
-                      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                      className="relative bg-[#fafafc] border border-[#343131]/[0.05] rounded-xl p-10 h-full overflow-hidden transition-all duration-300 hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] hover:bg-white"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#343131]/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                      <div className="flex flex-col h-full justify-between relative z-10">
-                        <div className="mb-16 flex justify-between items-start">
-                          <div className="w-16 h-16 rounded-xl bg-white border border-[#343131]/5 flex items-center justify-center text-[#343131] shadow-[0_1px_2px_rgba(0,0,0,0.04)] group-hover:bg-[#e6c800]/90 group-hover:border-[#e6c800] transition-all duration-300">
-                            {[<Globe size={28} />, <Zap size={28} />, <Cpu size={28} />, <Code size={28} />][i]}
-                          </div>
-                          <div className="w-10 h-10 rounded-full border border-[#343131]/8 flex items-center justify-center group-hover:border-[#e6c800] group-hover:bg-[#e6c800] group-hover:text-[#343131] transition-all duration-300">
-                            <ArrowUpRight size={18} className="opacity-50 group-hover:opacity-100 transition-opacity duration-200" />
-                          </div>
-                        </div>
-                        <div>
-                          <h3 className="text-xl md:text-2xl font-black uppercase tracking-tighter mb-3 leading-[0.94]">{item.t}</h3>
-                          <p className="text-[#343131]/52 text-[15px] font-medium max-w-sm leading-relaxed">{item.d}</p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </Link>
-                </BlockReveal>
-              ))}
-            </div>
-          </div>
-        </section>
+        <div className="home-snap-section">
+          <SolutionsSection />
+        </div>
 
         {/* Transition: white → dark (neutral gradient, no yellow) */}
         <div
@@ -211,7 +181,7 @@ export default function Home() {
             >
               <div className="absolute top-1/2 left-0 w-full h-px bg-white/[0.08] hidden lg:block -translate-y-1/2 -z-10" />
 
-              {t.raw("processSection.steps").map((step: any, i: number) => (
+              {(t.raw("processSection.steps") as ProcessStep[]).map((step, i) => (
                 <motion.div key={i} variants={createRevealUp(reducedMotion, 36, 6)}>
                   <motion.div
                     whileHover={{ y: -3, borderColor: "rgba(230,200,0,0.2)", backgroundColor: "rgba(255,255,255,0.05)" }}
@@ -261,7 +231,7 @@ export default function Home() {
                     whileInView="visible"
                     viewport={revealViewport}
                   >
-                    {t.raw("whyChooseUs.items").map((item: any, i: number) => (
+                    {(t.raw("whyChooseUs.items") as WhyChooseUsItem[]).map((item, i) => (
                       <motion.div
                         key={i}
                         variants={createRevealUp(reducedMotion, 28, 6)}

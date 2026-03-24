@@ -6,8 +6,10 @@ import { Footer } from "@/components/layout/Footer";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import { servicesData } from "@/lib/servicesData";
+import { servicePageMeta, type ServicePlatformKey } from "@/lib/servicePageMeta";
 import { ArrowRight, Globe, Megaphone, Palette, BarChart3, Target, Code2 } from "lucide-react";
 import { BlockReveal, TextReveal } from "@/components/ui/reveal";
+import { FacebookLogo, GoogleAdsLogo, InstagramLogo, MetaLogo, WhatsAppLogo } from "@/components/home/PlatformLogos";
 
 const icons: Record<string, React.ReactNode> = {
     "web-ve-uygulama-gelistirme": <Globe size={32} />,
@@ -15,6 +17,14 @@ const icons: Record<string, React.ReactNode> = {
     "marka-kimligi-ve-grafik-tasarim": <Palette size={32} />,
     "dijital-strateji-ve-pazarlama": <BarChart3 size={32} />,
     "google-ads-ve-meta-pixel-reklam-yonetimi": <Target size={32} />,
+};
+
+const platformIcons: Record<ServicePlatformKey, React.ReactNode> = {
+    instagram: <InstagramLogo className="w-4 h-4" />,
+    facebook: <FacebookLogo className="w-4 h-4" />,
+    meta: <MetaLogo className="w-4 h-4" />,
+    "google-ads": <GoogleAdsLogo className="w-4 h-4" />,
+    whatsapp: <WhatsAppLogo className="w-4 h-4" />,
 };
 
 export default function Services() {
@@ -64,9 +74,11 @@ export default function Services() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {Object.keys(servicesData).map((slug, index) => {
                                 const entry = servicesData[slug][lang];
+                                const meta = servicePageMeta[slug]?.[lang];
                                 const title = entry.title;
                                 const subtitle = entry.subtitle;
                                 const icon = icons[slug] || <Code2 size={32} />;
+                                const previewPlatforms = meta?.platforms.slice(0, 3) ?? [];
 
                                 return (
                                     <BlockReveal key={slug} delay={index * 0.08} className="h-full">
@@ -91,6 +103,20 @@ export default function Services() {
                                                 <p className="text-[#666] leading-relaxed mb-8 flex-1">
                                                     {subtitle}
                                                 </p>
+
+                                                {previewPlatforms.length > 0 && (
+                                                    <div className="flex flex-wrap gap-2 mb-7">
+                                                        {previewPlatforms.map((platform) => (
+                                                            <span
+                                                                key={`${slug}-${platform.label}`}
+                                                                className="inline-flex items-center gap-1.5 rounded-full border border-[#343131]/10 bg-white px-3 py-1.5 text-[11px] font-bold text-[#343131]/70"
+                                                            >
+                                                                {platform.key ? platformIcons[platform.key] : <span className="w-1.5 h-1.5 rounded-full bg-[#e6c800]" />}
+                                                                {platform.label}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                )}
 
                                                 <div className="flex items-center text-sm font-bold text-[#e6c800] uppercase tracking-wider mt-auto group-hover:text-[#c9ad00] transition-colors">
                                                     {detailCta} <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />

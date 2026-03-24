@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
+import { isDigitalProductSlug } from "@/lib/subscription-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -33,8 +34,12 @@ export async function GET() {
             },
         });
 
+        const serviceSubscriptions = subscriptions.filter(
+            (sub) => !isDigitalProductSlug(sub.product.slug)
+        );
+
         // Fetch the most recent payment per product for each subscription
-        const productIds = subscriptions
+        const productIds = serviceSubscriptions
             .map((s) => s.productId)
             .filter(Boolean) as string[];
 
@@ -62,7 +67,7 @@ export async function GET() {
 
         const now = new Date();
 
-        const result = subscriptions.map((sub) => {
+        const result = serviceSubscriptions.map((sub) => {
             const latestPayment = paymentMap.get(sub.productId) ?? null;
 
             // Derived presentation status

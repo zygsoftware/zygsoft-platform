@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MessageCircle } from "lucide-react";
+import { WhatsAppGlyph } from "@/components/home/PlatformLogos";
 
 export function FloatingWhatsApp() {
     const whatsappUrl = "https://wa.me/qr/NBGOQJPJFQBXO1";
@@ -11,7 +11,7 @@ export function FloatingWhatsApp() {
             initial={{ opacity: 0, scale: 0.5, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            className="fixed bottom-6 right-6 z-50 pointer-events-auto"
+            className="fixed bottom-5 right-5 z-50 pointer-events-auto"
         >
             <a
                 href={whatsappUrl}
@@ -20,11 +20,11 @@ export function FloatingWhatsApp() {
                 className="relative group flex items-center justify-center"
             >
                 {/* Ping Animation Layer */}
-                <div className="absolute inset-0 bg-[#25D366] rounded-full animate-ping opacity-60 pointer-events-none" />
+                <div className="absolute inset-0 bg-[#25D366] rounded-full animate-ping opacity-55 pointer-events-none" />
 
                 {/* Primary Button */}
-                <div className="relative w-16 h-16 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-2xl shadow-green-500/40 hover:scale-110 hover:-translate-y-1 transition-all duration-300">
-                    <MessageCircle size={32} />
+                <div className="relative w-[52px] h-[52px] bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-2xl shadow-green-500/35 hover:scale-110 hover:-translate-y-1 transition-all duration-300">
+                    <WhatsAppGlyph className="w-[32px] h-[32px]" />
                 </div>
 
                 {/* Tooltip on Hover */}

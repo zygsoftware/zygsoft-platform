@@ -2,12 +2,17 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
+import { getSubscriptionEndDate } from "@/lib/subscription-utils";
+
+type SessionUser = {
+    role?: string;
+};
 
 export async function GET() {
     try {
         const session = await getServerSession(authOptions);
 
-        if (!session || (session.user as any).role !== "admin") {
+        if (!session || (session.user as SessionUser | undefined)?.role !== "admin") {
             return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 403 });
         }
 
@@ -24,7 +29,7 @@ export async function GET() {
         });
 
         return NextResponse.json({ payments });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: "Ödemeler getirilirken hata oluştu." }, { status: 500 });
     }
 }
@@ -33,7 +38,7 @@ export async function PUT(req: Request) {
     try {
         const session = await getServerSession(authOptions);
 
-        if (!session || (session.user as any).role !== "admin") {
+        if (!session || (session.user as SessionUser | undefined)?.role !== "admin") {
             return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 403 });
         }
 
@@ -48,7 +53,16 @@ export async function PUT(req: Request) {
             return NextResponse.json({ error: "Geçersiz ödeme durumu." }, { status: 400 });
         }
 
-        const payment = await prisma.payment.findUnique({ where: { id: paymentId } });
+        const payment = await prisma.payment.findUnique({
+            where: { id: paymentId },
+            include: {
+                product: {
+                    select: {
+                        billingPeriod: true,
+                    },
+                },
+            },
+        });
         if (!payment) {
             return NextResponse.json({ error: "Ödeme bulunamadı." }, { status: 404 });
         }
@@ -59,14 +73,18 @@ export async function PUT(req: Request) {
             data: { status }
         });
 
-        // If approved, update Subscription +30 days
+        // If approved, update the subscription using the product billing period.
         if (status === "approved" && payment.productId) {
-            const endDate = new Date();
-            endDate.setDate(endDate.getDate() + 30);
-
             const existingSub = await prisma.subscription.findFirst({
                 where: { userId: payment.userId, productId: payment.productId }
             });
+
+            const baseDate =
+                existingSub?.endsAt && new Date(existingSub.endsAt) > new Date()
+                    ? new Date(existingSub.endsAt)
+                    : new Date();
+
+            const endDate = getSubscriptionEndDate(payment.product?.billingPeriod, baseDate);
 
             if (existingSub) {
                 await prisma.subscription.update({
@@ -100,7 +118,7 @@ export async function PUT(req: Request) {
         }
 
         return NextResponse.json({ message: `Ödeme ${status} olarak işaretlendi.` });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: "İşlem sırasında hata oluştu." }, { status: 500 });
     }
 }
