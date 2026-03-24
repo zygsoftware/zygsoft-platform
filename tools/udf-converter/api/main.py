@@ -123,6 +123,56 @@ app = FastAPI(
 )
 
 
+def _parse_pdf_page_range(input_str: str, page_count: int) -> list[int]:
+    """Parse page range string into 0-based indices."""
+    trimmed = input_str.strip()
+    if not trimmed:
+        return list(range(page_count))
+
+    indices: list[int] = []
+    tokens = [t.strip() for t in trimmed.split(",") if t.strip()]
+
+    for token in tokens:
+        if "-" in token:
+            parts = token.split("-", 1)
+            if len(parts) != 2:
+                raise ValueError(f'Gecersiz aralik: "{token}". Ornek: 1-5')
+            try:
+                start = int(parts[0].strip())
+                end = int(parts[1].strip())
+            except ValueError as exc:
+                raise ValueError(f'Gecersiz sayfa numarasi: "{token}"') from exc
+            if start < 1 or end < 1:
+                raise ValueError("Sayfa numaralari 1'den kucuk olamaz.")
+            if start > end:
+                raise ValueError(f'Aralik baslangici bitisten buyuk olamaz: "{token}"')
+            if start > page_count or end > page_count:
+                raise ValueError(f"PDF'de {page_count} sayfa var. Aralik siniri asiliyor.")
+            for page_num in range(start, end + 1):
+                indices.append(page_num - 1)
+        else:
+            try:
+                num = int(token)
+            except ValueError as exc:
+                raise ValueError(f'Gecersiz sayfa numarasi: "{token}"') from exc
+            if num < 1:
+                raise ValueError("Sayfa numaralari 1'den kucuk olamaz.")
+            if num > page_count:
+                raise ValueError(f"PDF'de {page_count} sayfa var. Sayfa {num} mevcut degil.")
+            indices.append(num - 1)
+
+    if not indices:
+        raise ValueError("En az bir sayfa secilmelidir.")
+
+    seen = set()
+    unique: list[int] = []
+    for idx in indices:
+        if idx not in seen:
+            seen.add(idx)
+            unique.append(idx)
+    return unique
+
+
 def _normalize_filename(name: str) -> str:
     """Normalize Unicode to NFC for consistent handling."""
     if not name:
@@ -158,6 +208,90 @@ def health():
 
 
 logger = logging.getLogger(__name__)
+
+
+@app.post("/api/convert/pdf-to-image")
+async def convert_pdf_to_image(
+    file: UploadFile = File(...),
+    format: str = Form("png"),
+    page_range: str = Form(""),
+):
+    """Convert uploaded PDF pages to images and return a ZIP archive."""
+    fmt = (format or "png").lower()
+    if fmt not in ("png", "jpg", "jpeg"):
+        raise HTTPException(status_code=400, detail="Cikti formati png veya jpg olmalidir.")
+
+    if not file.filename or not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Sadece PDF dosyalari desteklenmektedir.")
+
+    try:
+        import fitz  # type: ignore
+    except ImportError as exc:
+        raise HTTPException(status_code=500, detail="PyMuPDF kurulu degil.") from exc
+
+    temp_dir = None
+    try:
+        temp_dir = Path(tempfile.mkdtemp())
+        suffix = uuid.uuid4().hex[:12]
+        pdf_path = temp_dir / f"input_{suffix}.pdf"
+        out_dir = temp_dir / "out"
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        content = await file.read()
+        if len(content) == 0:
+            raise HTTPException(status_code=400, detail="Dosya bos.")
+        pdf_path.write_bytes(content)
+
+        try:
+            doc = fitz.open(pdf_path)
+        except Exception as exc:
+            raise HTTPException(status_code=422, detail=f"PDF okunamadi: {exc}") from exc
+
+        page_count = len(doc)
+        if page_count == 0:
+            doc.close()
+            raise HTTPException(status_code=422, detail="PDF icinde sayfa bulunamadi.")
+
+        try:
+            indices = _parse_pdf_page_range(page_range or "", page_count)
+        except ValueError as exc:
+            doc.close()
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+        ext = "png" if fmt == "png" else "jpg"
+        matrix = fitz.Matrix(2.0, 2.0)
+
+        for output_index, page_idx in enumerate(indices, start=1):
+            page = doc[page_idx]
+            pix = page.get_pixmap(matrix=matrix, alpha=False)
+            img_path = out_dir / f"page_{output_index:03d}.{ext}"
+            if ext == "png":
+                pix.save(str(img_path))
+            else:
+                pix.pil_save(str(img_path), format="JPEG", quality=90)
+
+        doc.close()
+
+        zip_path = out_dir / "images.zip"
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+            for image_path in sorted(out_dir.glob(f"page_*.{ext}")):
+                zf.write(image_path, image_path.name)
+
+        zip_bytes = zip_path.read_bytes()
+        return Response(
+            content=zip_bytes,
+            media_type="application/zip",
+            headers={
+                "Content-Disposition": 'attachment; filename="zygsoft_pdf_images.zip"',
+            },
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"PDF donusumu basarisiz: {exc}") from exc
+    finally:
+        if temp_dir and temp_dir.exists():
+            shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 @app.post("/api/convert/doc-to-udf")

@@ -1,28 +1,29 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { checkToolAccess, incrementTrialUsage } from "@/lib/trial-guard";
-import { spawn } from "child_process";
-import path from "path";
-import os from "os";
-import fs from "fs/promises";
+
+function parseErrorDetail(body: unknown): string {
+    if (!body || typeof body !== "object") return "Dönüştürme başarısız.";
+    const obj = body as { detail?: string | { msg?: string }[] };
+    if (!obj.detail) return "Dönüştürme başarısız.";
+    if (typeof obj.detail === "string") return obj.detail;
+    if (Array.isArray(obj.detail)) {
+        const first = obj.detail[0];
+        return (typeof first === "object" && first?.msg) ? first.msg : String(first || "Dönüştürme başarısız.");
+    }
+    return "Dönüştürme başarısız.";
+}
 
 export const dynamic = "force-dynamic";
 
-// Limits will be determined dynamically
-
 export async function POST(req: Request) {
-    let tempDir: string | null = null;
-
     try {
         const guard = await checkToolAccess();
         if (!guard.allowed) return guard.response;
 
         const isSubscribed = !guard.incrementTrial;
-        const maxFileBytes = isSubscribed ? 100 * 1024 * 1024 : 20 * 1024 * 1024; // 100 MB for subs, 20 MB for demo
+        const maxFileBytes = isSubscribed ? 100 * 1024 * 1024 : 20 * 1024 * 1024;
 
-        const session = await getServerSession(authOptions);
         const formData = await req.formData();
         const file = formData.get("file");
         const format = (formData.get("format") as string)?.toLowerCase() || "png";
@@ -36,14 +37,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Çıktı formatı png veya jpg olmalıdır." }, { status: 400 });
         }
 
-        const isPdf =
-            file.type === "application/pdf" ||
-            file.name.toLowerCase().endsWith(".pdf");
+        const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
         if (!isPdf) {
-            return NextResponse.json(
-                { error: `"${file.name}" PDF formatında değil.` },
-                { status: 400 }
-            );
+            return NextResponse.json({ error: `"${file.name}" PDF formatında değil.` }, { status: 400 });
         }
 
         if (file.size > maxFileBytes) {
@@ -53,75 +49,64 @@ export async function POST(req: Request) {
             );
         }
 
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
+        const microserviceUrl = process.env.UDF_MICROSERVICE_URL || "http://127.0.0.1:8000";
+        const apiEndpoint = `${microserviceUrl}/api/convert/pdf-to-image`;
 
-        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "zygsoft-pdf2img-"));
-        const pdfPath = path.join(tempDir, "input.pdf");
-        const outDir = path.join(tempDir, "out");
-        await fs.writeFile(pdfPath, buffer);
-
-        const convertScript = path.join(process.cwd(), "tools", "pdf-to-image", "convert.py");
-        const formatArg = format === "jpeg" ? "jpg" : format;
-        const pageRangeArg = pageRange.trim();
-
-        const zipPath = await new Promise<string>((resolve, reject) => {
-            const args = [convertScript, pdfPath, outDir, formatArg];
-            if (pageRangeArg) args.push(pageRangeArg);
-
-            const proc = spawn("python3", args, {
-                cwd: process.cwd(),
-                stdio: ["ignore", "pipe", "pipe"],
-            });
-
-            let stdout = "";
-            let stderr = "";
-            proc.stdout?.on("data", (d) => { stdout += d.toString(); });
-            proc.stderr?.on("data", (d) => { stderr += d.toString(); });
-
-            proc.on("close", (code) => {
-                if (code === 0) {
-                    const zip = stdout.trim();
-                    resolve(zip || path.join(outDir, "images.zip"));
-                } else {
-                    const errMsg = stderr.match(/ERROR:(.+)/)?.[1]?.trim() || stderr || "Dönüştürme başarısız.";
-                    reject(new Error(errMsg));
-                }
-            });
-            proc.on("error", (err) => {
-                reject(new Error("Python PDF dönüştürücü başlatılamadı. pymupdf ve Pillow kurulu olmalı: pip install pymupdf Pillow"));
-            });
-        });
-
-        let zipBuffer: Buffer;
-        try {
-            zipBuffer = await fs.readFile(zipPath);
-        } catch {
-            return NextResponse.json({ error: "ZIP dosyası oluşturulamadı." }, { status: 500 });
+        const proxyFormData = new FormData();
+        proxyFormData.append("file", file);
+        proxyFormData.append("format", format === "jpeg" ? "jpg" : format);
+        if (pageRange.trim()) {
+            proxyFormData.append("page_range", pageRange.trim());
         }
+
+        let response: Response;
+        try {
+            response = await fetch(apiEndpoint, {
+                method: "POST",
+                body: proxyFormData,
+                signal: AbortSignal.timeout(90000),
+            });
+        } catch (fetchErr: unknown) {
+            const err = fetchErr as { name?: string };
+            if (err?.name === "AbortError") {
+                return NextResponse.json({ error: "İşlem zaman aşımına uğradı." }, { status: 504 });
+            }
+            return NextResponse.json(
+                { error: "Dönüştürme servisine bağlanılamadı. Lütfen daha sonra tekrar deneyin." },
+                { status: 503 }
+            );
+        }
+
+        if (!response.ok) {
+            let errBody: unknown;
+            try {
+                errBody = await response.json();
+            } catch {
+                errBody = { detail: "Dönüştürme başarısız." };
+            }
+            return NextResponse.json({ error: parseErrorDetail(errBody) }, { status: response.status });
+        }
+
+        const zipBuffer = await response.arrayBuffer();
 
         prisma.toolUsage.create({ data: { userId: guard.userId, toolSlug: "pdf-to-image" } }).catch(() => {});
         if (guard.incrementTrial) {
             incrementTrialUsage(guard.userId).catch(() => {});
         }
 
-        return new NextResponse(new Uint8Array(zipBuffer), {
+        return new NextResponse(zipBuffer, {
             status: 200,
             headers: {
-                "Content-Type":        "application/zip",
+                "Content-Type": "application/zip",
                 "Content-Disposition": 'attachment; filename="zygsoft_pdf_images.zip"',
-                "Cache-Control":       "no-store",
+                "Cache-Control": "no-store",
             },
         });
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error("[pdf-to-image] Error", err);
         return NextResponse.json(
-            { error: err.message || "Dönüştürme sırasında beklenmeyen bir hata oluştu." },
+            { error: "Dönüştürme sırasında beklenmeyen bir hata oluştu." },
             { status: 500 }
         );
-    } finally {
-        if (tempDir) {
-            fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
-        }
     }
 }
