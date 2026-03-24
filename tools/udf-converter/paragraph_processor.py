@@ -1,5 +1,6 @@
 from image_processor import process_image
 from docx.oxml.ns import qn
+import re
 
 W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 
@@ -286,6 +287,50 @@ def _get_list_type_from_word_numbering(paragraph, document):
     except Exception:
         return None
 
+def _get_number_format_from_word_numbering(paragraph, document):
+    try:
+        numPr = paragraph._element.find('.//{%s}numPr' % W_NS)
+        if numPr is None:
+            return None
+
+        numId_elem = numPr.find('.//{%s}numId' % W_NS)
+        ilvl_elem = numPr.find('.//{%s}ilvl' % W_NS)
+        if numId_elem is None or ilvl_elem is None:
+            return None
+
+        num_id = numId_elem.get('{%s}val' % W_NS)
+        ilvl = int(ilvl_elem.get('{%s}val' % W_NS, '0'))
+
+        numbering_part = getattr(document.part, 'numbering_part', None)
+        if numbering_part is None:
+            return None
+
+        root = numbering_part.element
+        num_elem = root.find(f'.//{{{W_NS}}}num[@{{{W_NS}}}numId="{num_id}"]')
+        if num_elem is None:
+            return None
+
+        abstract_num_id_elem = num_elem.find(f'.//{{{W_NS}}}abstractNumId')
+        if abstract_num_id_elem is None:
+            return None
+
+        abstract_num_id = abstract_num_id_elem.get(f'{{{W_NS}}}val')
+        abstract_num = root.find(f'.//{{{W_NS}}}abstractNum[@{{{W_NS}}}abstractNumId="{abstract_num_id}"]')
+        if abstract_num is None:
+            return None
+
+        lvl = abstract_num.find(f'.//{{{W_NS}}}lvl[@{{{W_NS}}}ilvl="{ilvl}"]')
+        if lvl is None:
+            return None
+
+        num_fmt = lvl.find(f'.//{{{W_NS}}}numFmt')
+        if num_fmt is None:
+            return None
+
+        return num_fmt.get(f'{{{W_NS}}}val')
+    except Exception:
+        return None
+
 def _is_empty_paragraph(paragraph):
     if not paragraph.runs:
         return True
@@ -296,12 +341,13 @@ def _is_numbered_heading(paragraph):
     if not paragraph.text:
         return False
     text = paragraph.text.strip()
-    import re
     return bool(re.match(r'^\d+\.\s+.+', text) or re.match(r'^[IVX]+\.\s+.+', text))
 
 # ---------- PSEUDO LIST ----------
 
 _BULLET_MARKERS = ("•", "◦", "▪", "▫", "‣", "-", "*", "–", "—")
+_NUMBERED_MARKER_RE = re.compile(r'^(?P<marker>(?:\d+|[ivxlcdm]+|[IVXLCDM]+|[A-Za-z]))[.)]\s+(?P<text>.+)$')
+_INLINE_NUMBERED_RE = re.compile(r'(?<!\S)(?P<marker>(?:\d+|[ivxlcdm]+|[IVXLCDM]+|[A-Za-z]))[.)]\s+')
 
 def _normalize_newlines(s: str) -> str:
     return (s or "").replace("\r\n", "\n").replace("\r", "\n")
@@ -329,6 +375,21 @@ def _split_pseudo_list_items(raw_text: str):
                 for p in parts:
                     items.append(("•", p.strip()))
                 return True
+
+        numbered_match = _NUMBERED_MARKER_RE.match(line)
+        if numbered_match:
+            items.append((numbered_match.group("marker") + ".", numbered_match.group("text").strip()))
+            return True
+
+        matches = list(_INLINE_NUMBERED_RE.finditer(line))
+        if len(matches) >= 2:
+            for idx, match in enumerate(matches):
+                start = match.end()
+                end = matches[idx + 1].start() if idx + 1 < len(matches) else len(line)
+                text = line[start:end].strip(" \t,;")
+                if text:
+                    items.append((match.group("marker") + ".", text))
+            return True
         return False
 
     for ln in lines:
@@ -358,6 +419,10 @@ def _is_pseudo_list_paragraph(paragraph):
         for mk in _BULLET_MARKERS:
             if s.startswith(mk):
                 return True
+        if _NUMBERED_MARKER_RE.match(s):
+            return True
+        if len(list(_INLINE_NUMBERED_RE.finditer(s))) >= 2:
+            return True
     return False
 
 # ---------- UDF attrs ----------
@@ -366,7 +431,7 @@ def _list_spacing_attrs():
     return ' SpaceBefore="0.0" SpaceAfter="0.0"'
 
 def _pseudo_list_indent_attrs():
-    return ' LeftIndent="36.0" FirstLineIndent="-18.0"'
+    return ' LeftIndent="18.0"'
 
 def _real_list_indent_attrs(paragraph, document):
     try:
@@ -375,13 +440,40 @@ def _real_list_indent_attrs(paragraph, document):
             left_pt, hanging_pt = _get_numbering_left_hanging_pt(document, num_id, ilvl)
             attrs = []
             if left_pt is not None:
-                attrs.append(f' LeftIndent="{left_pt:.1f}"')
-            if hanging_pt is not None:
-                attrs.append(f' FirstLineIndent="{-hanging_pt:.1f}"')
+                text_left_pt = left_pt
+                if hanging_pt is not None:
+                    text_left_pt = max(left_pt - hanging_pt, 0.0)
+                attrs.append(f' LeftIndent="{text_left_pt:.1f}"')
             return "".join(attrs)
     except Exception:
         pass
     return _pseudo_list_indent_attrs()
+
+def _format_number_marker(counter, fmt_val):
+    fmt = (fmt_val or "decimal").lower()
+    if fmt == "decimal":
+        return f"{counter}."
+    if fmt == "lowerletter":
+        return f"{chr(ord('a') + ((counter - 1) % 26))}."
+    if fmt == "upperletter":
+        return f"{chr(ord('A') + ((counter - 1) % 26))}."
+    if fmt in {"lowerroman", "upperroman"}:
+        numerals = [
+            (1000, "M"), (900, "CM"), (500, "D"), (400, "CD"),
+            (100, "C"), (90, "XC"), (50, "L"), (40, "XL"),
+            (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I"),
+        ]
+        value = counter
+        result = []
+        for arabic, roman in numerals:
+            while value >= arabic:
+                result.append(roman)
+                value -= arabic
+        roman_text = "".join(result) or str(counter)
+        if fmt == "lowerroman":
+            roman_text = roman_text.lower()
+        return f"{roman_text}."
+    return f"{counter}."
 
 # ---------- ANA İŞLEV: process_paragraph ----------
 
@@ -422,8 +514,8 @@ def process_paragraph(paragraph, document, current_offset, styles_map=None):
             combined_text = ""
             offset = current_offset
 
-            for mk, txt in items:
-                bullet = "• "
+            for marker, txt in items:
+                bullet = f"{marker} "
                 line = bullet + txt
 
                 combined_text += line + "\n"
@@ -450,6 +542,7 @@ def process_paragraph(paragraph, document, current_offset, styles_map=None):
     # Inline bullet/num
     if is_real_list and not _is_empty_paragraph(paragraph):
         list_type = _get_list_type_from_word_numbering(paragraph, document) or 'bullet'
+        num_fmt = _get_number_format_from_word_numbering(paragraph, document)
         num_id, ilvl = _get_numid_ilvl(paragraph)
 
         if list_type == 'number' and num_id is not None:
@@ -457,7 +550,7 @@ def process_paragraph(paragraph, document, current_offset, styles_map=None):
             if key not in process_paragraph.list_counters:
                 process_paragraph.list_counters[key] = 0
             process_paragraph.list_counters[key] += 1
-            bullet_char = f"{process_paragraph.list_counters[key]}. "
+            bullet_char = f"{_format_number_marker(process_paragraph.list_counters[key], num_fmt)} "
         else:
             bullet_char = "• "
 

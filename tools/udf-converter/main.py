@@ -156,10 +156,6 @@ def _process_document_elements(docx_path: str):
         is_list_prev_meaningful = _find_prev_meaningful_listflag(body_elems, list_flags, p_map, idx)
         is_list_next_meaningful = _find_next_meaningful_listflag(body_elems, list_flags, p_map, idx)
 
-        # Liste bloğu başlangıcı: önce anlamlı eleman liste değil, şimdi liste
-        if is_list_now and not is_list_prev_meaningful and (elements or content):
-            _append_blank()
-
         if el.tag.endswith('p'):
             paragraph = p_map.get(el)
             if paragraph:

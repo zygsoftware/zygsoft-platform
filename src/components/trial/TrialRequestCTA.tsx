@@ -7,6 +7,7 @@ import { useLocale } from "next-intl";
 import { Loader2, ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { TrialStartConfirmModal } from "./TrialStartConfirmModal";
+import { pushDataLayerEvent } from "@/lib/analytics";
 
 type TrialRequestCTAProps = {
     emailVerified: boolean;
@@ -48,6 +49,12 @@ export function TrialRequestCTA({
             });
             const data = await res.json();
             if (res.ok) {
+                pushDataLayerEvent("trial_start", {
+                    source,
+                    trial_days: 3,
+                    trial_product: "legal-toolkit",
+                    locale,
+                });
                 await updateSession();
                 toast.success("Demo erişiminiz aktif edildi.");
             } else {

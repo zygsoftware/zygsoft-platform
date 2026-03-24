@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Loader2, Send } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { usePrefillUserFields } from "@/hooks/usePrefillUserFields";
+import { pushDataLayerEvent } from "@/lib/analytics";
 
 type ContactInquiryFormProps = {
     title?: string;
@@ -61,6 +62,12 @@ export function ContactInquiryForm({
                 return;
             }
 
+            pushDataLayerEvent("contact_form_submit", {
+                form_name: "contact_inquiry",
+                contact_subject: form.subject,
+                contact_company: form.company || undefined,
+                contact_locale: locale,
+            });
             setStatus("success");
             reset();
         } catch {
@@ -226,4 +233,3 @@ function Field({
         </div>
     );
 }
-

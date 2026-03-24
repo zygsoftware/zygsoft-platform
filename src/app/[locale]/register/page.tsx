@@ -15,6 +15,7 @@ import {
     AuthStatus,
     AuthActions,
 } from "@/components/auth";
+import { pushDataLayerEvent } from "@/lib/analytics";
 
 export default function RegisterPage() {
     const t = useTranslations("Auth.register");
@@ -57,6 +58,10 @@ export default function RegisterPage() {
             if (!res.ok) {
                 setError(data.error || "Kayıt sırasında hata oluştu.");
             } else {
+                pushDataLayerEvent("sign_up", {
+                    method: "credentials",
+                    signup_locale: locale,
+                });
                 const loginPath = locale === "en" ? "/en/login?registered=true" : "/login?registered=true";
                 router.push(loginPath);
             }
