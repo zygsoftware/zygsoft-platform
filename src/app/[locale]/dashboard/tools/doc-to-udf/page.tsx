@@ -20,10 +20,11 @@ import {
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ToolPageHint } from "@/components/dashboard/ToolPageHint";
 import { ToolLockedGate } from "@/components/dashboard/ToolLockedGate";
 import { hasToolAccess } from "@/lib/trial-access-client";
+import { pushDataLayerEvent } from "@/lib/analytics";
 
 interface QueuedFile {
     id: string;
@@ -58,6 +59,7 @@ function parseFilenameFromDisposition(disposition: string | null, fallback: stri
 export default function DocToUdfTool() {
     const t = useTranslations("Dashboard.overview.tools");
     const tUdf = useTranslations("Dashboard.overview.tools.docToUdf");
+    const locale = useLocale();
     const { data: session } = useSession();
     const [files, setFiles] = useState<QueuedFile[]>([]);
     const [isDragging, setIsDragging] = useState(false);
@@ -163,6 +165,13 @@ export default function DocToUdfTool() {
         for (const fileItem of filesToConvert) {
             setFiles(prev => prev.map(f => f.id === fileItem.id ? { ...f, status: "converting" } : f));
             const start = Date.now();
+            pushDataLayerEvent("doc_to_udf_start", {
+                locale,
+                use_letterhead: useLetterhead,
+                source: "dashboard-doc-to-udf",
+                file_name: fileItem.file.name,
+                file_size: fileItem.file.size,
+            });
 
             try {
                 const formData = new FormData();
@@ -195,6 +204,15 @@ export default function DocToUdfTool() {
                     resultSize: blob.size,
                     conversionTimeMs: Date.now() - start
                 } : f));
+                pushDataLayerEvent("doc_to_udf_success", {
+                    locale,
+                    use_letterhead: useLetterhead,
+                    source: "dashboard-doc-to-udf",
+                    file_name: fileItem.file.name,
+                    output_filename: filename,
+                    output_size: blob.size,
+                    conversion_time_ms: Date.now() - start,
+                });
             } catch (err: any) {
                 setFiles(prev => prev.map(f => f.id === fileItem.id ? { ...f, status: "error", error: err.message } : f));
             }

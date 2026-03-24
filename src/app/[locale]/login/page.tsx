@@ -16,6 +16,7 @@ import {
     AuthStatus,
     AuthActions,
 } from "@/components/auth";
+import { pushDataLayerEvent } from "@/lib/analytics";
 
 function getForgotPath(locale: string) {
     return locale === "en" ? "/en/forgot-password" : "/forgot-password";
@@ -50,6 +51,10 @@ function LoginPageContent() {
             setError(t("errorInvalid"));
             setLoading(false);
         } else {
+            pushDataLayerEvent("login", {
+                method: "credentials",
+                login_locale: locale,
+            });
             router.push("/dashboard");
         }
     };

@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { motion } from "framer-motion";
+import { pushDataLayerEvent } from "@/lib/analytics";
 import {
     Receipt, CheckCircle, UploadCloud, Building, Calendar,
     ArrowRight, Loader2, Info, AlertCircle, Clock, XCircle,
@@ -451,6 +452,12 @@ export default function BillingPage() {
                 const data = await res.json();
                 setError(data.error || "Error");
             } else {
+                pushDataLayerEvent("payment_notify", {
+                    payment_amount: parseFloat(amount),
+                    payment_locale: locale,
+                    payment_product_id: productId,
+                    payment_product_name: productDetails[productId]?.descKey ?? productId,
+                });
                 setSuccess(true);
                 setHistoryKey((k) => k + 1);
             }
