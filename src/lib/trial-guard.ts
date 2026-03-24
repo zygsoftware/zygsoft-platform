@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { hasPaidLegalToolkitAccess } from "@/lib/tool-policy";
 
 export type TrialGuardResult =
     | { allowed: true; incrementTrial: boolean; userId: string }
@@ -9,7 +10,7 @@ export type TrialGuardResult =
 
 /**
  * Check if user can use a tool. Allows:
- * - Users with active subscription (legal-toolkit)
+ * - Users with active, email-verified legal-toolkit subscription
  * - Admins
  * - Users with active trial (not expired, under limit)
  */
@@ -25,11 +26,23 @@ export async function checkToolAccess(): Promise<TrialGuardResult> {
         };
     }
 
-    const activeSlugs = (session.user as any).activeProductSlugs || [];
     const isAdmin = (session.user as any).role === "admin";
+    const emailVerified = Boolean((session.user as any).emailVerified);
 
-    if (activeSlugs.includes("legal-toolkit") || isAdmin) {
+    if (hasPaidLegalToolkitAccess(session.user as any) || isAdmin) {
         return { allowed: true, incrementTrial: false, userId: session.user.id };
+    }
+
+    if (!emailVerified) {
+        return {
+            allowed: false,
+            response: NextResponse.json(
+                {
+                    error: "Hukuk Araçları Paketini kullanabilmek için önce e-posta adresinizi doğrulamanız gerekiyor.",
+                },
+                { status: 403 }
+            ),
+        };
     }
 
     const user = await prisma.user.findUnique({

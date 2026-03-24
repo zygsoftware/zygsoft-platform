@@ -1,14 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { checkToolAccess, incrementTrialUsage } from "@/lib/trial-guard";
-import { spawn } from "child_process";
-import path from "path";
-import os from "os";
-import fs from "fs/promises";
+import { formatMbLimit, getToolMaxFileBytes } from "@/lib/tool-policy";
 
-export const dynamic = "force-dynamic";
-
-// Limits will be determined dynamically
+function parseErrorDetail(body: unknown): string {
+    if (!body || typeof body !== "object") return "OCR işlemi başarısız.";
+    const obj = body as { detail?: string | { msg?: string }[] };
+    if (!obj.detail) return "OCR işlemi başarısız.";
+    if (typeof obj.detail === "string") return obj.detail;
+    if (Array.isArray(obj.detail)) {
+        const first = obj.detail[0];
+        return (typeof first === "object" && first?.msg) ? first.msg : String(first || "OCR işlemi başarısız.");
+    }
+    return "OCR işlemi başarısız.";
+}
 
 const ALLOWED_EXT = [".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff"];
 
@@ -17,80 +22,62 @@ function isValidFile(file: File): boolean {
     return ALLOWED_EXT.includes(ext);
 }
 
-export async function POST(req: Request) {
-    let tempDir: string | null = null;
+export const dynamic = "force-dynamic";
 
+export async function POST(req: Request) {
     try {
         const guard = await checkToolAccess();
         if (!guard.allowed) return guard.response;
 
-        const isSubscribed = !guard.incrementTrial;
-        const maxFileBytes = isSubscribed ? 100 * 1024 * 1024 : 20 * 1024 * 1024; // 100 MB for subs, 20 MB for demo
-
+        const hasPaidAccess = !guard.incrementTrial;
         const formData = await req.formData();
         const file = formData.get("file");
         const langRaw = (formData.get("language") as string) || "tr";
-        const lang = (langRaw === "en" ? "en" : "tr").toLowerCase();
+        const language = (langRaw === "en" ? "en" : "tr").toLowerCase();
 
         if (!file || !(file instanceof File) || file.size === 0) {
             return NextResponse.json({ error: "Lütfen bir dosya yükleyin." }, { status: 400 });
         }
-
         if (!isValidFile(file)) {
-            return NextResponse.json(
-                { error: "Geçersiz dosya türü. PDF, PNG, JPG, JPEG, TIF veya TIFF kabul edilir." },
-                { status: 400 }
-            );
+            return NextResponse.json({ error: "Geçersiz dosya türü. PDF, PNG, JPG, JPEG, TIF veya TIFF kabul edilir." }, { status: 400 });
         }
 
-        if (file.size > maxFileBytes) {
-            return NextResponse.json(
-                { error: `Dosya çok büyük (maks. ${isSubscribed ? 100 : 20} MB).` },
-                { status: 400 }
-            );
+        const maxFileBytes = getToolMaxFileBytes("ocr-text", hasPaidAccess, file);
+        if (maxFileBytes !== null && file.size > maxFileBytes) {
+            return NextResponse.json({ error: `Dosya çok büyük (maks. ${formatMbLimit(maxFileBytes)}).` }, { status: 400 });
         }
 
-        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "zygsoft-ocr-"));
-        const ext = file.name.split(".").pop()?.toLowerCase() || "pdf";
-        const inputPath = path.join(tempDir, `input.${ext}`);
-        const buf = Buffer.from(await file.arrayBuffer());
-        await fs.writeFile(inputPath, buf);
+        const microserviceUrl = process.env.UDF_MICROSERVICE_URL || "http://127.0.0.1:8000";
+        const proxyFormData = new FormData();
+        proxyFormData.append("file", file);
+        proxyFormData.append("language", language);
 
-        const ocrScript = path.join(process.cwd(), "tools", "ocr-text", "ocr.py");
-
-        const result = await new Promise<{ text?: string; error?: string }>((resolve, reject) => {
-            const proc = spawn("python3", [ocrScript, inputPath, lang], {
-                cwd: process.cwd(),
-                stdio: ["ignore", "pipe", "pipe"],
+        let response: Response;
+        try {
+            response = await fetch(`${microserviceUrl}/api/convert/ocr-text`, {
+                method: "POST",
+                body: proxyFormData,
+                signal: AbortSignal.timeout(90000),
             });
-
-            let stdout = "";
-            let stderr = "";
-            proc.stdout?.on("data", (d) => { stdout += d.toString(); });
-            proc.stderr?.on("data", (d) => { stderr += d.toString(); });
-
-            proc.on("close", (code) => {
-                try {
-                    const parsed = JSON.parse(stdout || "{}");
-                    if (parsed.error) {
-                        resolve({ error: parsed.error });
-                    } else {
-                        resolve({ text: parsed.text ?? "" });
-                    }
-                } catch {
-                    const errMsg = stderr.match(/ERROR:(.+)/)?.[1]?.trim() || stderr || "OCR işlemi başarısız.";
-                    resolve({ error: errMsg });
-                }
-            });
-            proc.on("error", (err) => {
-                reject(new Error("OCR servisi başlatılamadı. Tesseract ve Python bağımlılıkları kurulu olmalı."));
-            });
-        });
-
-        if (result.error) {
-            return NextResponse.json({ error: result.error }, { status: 500 });
+        } catch (fetchErr: unknown) {
+            const err = fetchErr as { name?: string };
+            if (err?.name === "AbortError") {
+                return NextResponse.json({ error: "İşlem zaman aşımına uğradı." }, { status: 504 });
+            }
+            return NextResponse.json({ error: "OCR servisine bağlanılamadı. Lütfen daha sonra tekrar deneyin." }, { status: 503 });
         }
 
+        if (!response.ok) {
+            let errBody: unknown;
+            try {
+                errBody = await response.json();
+            } catch {
+                errBody = { detail: "OCR işlemi başarısız." };
+            }
+            return NextResponse.json({ error: parseErrorDetail(errBody) }, { status: response.status });
+        }
+
+        const result = await response.json();
         const isBatch = req.headers.get("X-Batch-Mode") === "1";
         if (!isBatch) {
             prisma.toolUsage.create({ data: { userId: guard.userId, toolSlug: "ocr-text" } }).catch(() => {});
@@ -99,18 +86,9 @@ export async function POST(req: Request) {
             }
         }
 
-        return NextResponse.json({
-            text: result.text ?? "",
-        });
-    } catch (err: any) {
+        return NextResponse.json({ text: result.text ?? "" });
+    } catch (err) {
         console.error("[ocr-text] Error", err);
-        return NextResponse.json(
-            { error: err.message || "OCR sırasında beklenmeyen bir hata oluştu." },
-            { status: 500 }
-        );
-    } finally {
-        if (tempDir) {
-            fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
-        }
+        return NextResponse.json({ error: "OCR sırasında beklenmeyen bir hata oluştu." }, { status: 500 });
     }
 }

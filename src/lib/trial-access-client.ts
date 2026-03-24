@@ -5,6 +5,7 @@
 export function hasToolAccess(user: {
     activeProductSlugs?: string[];
     role?: string;
+    emailVerified?: boolean | Date | null;
     trialStatus?: string;
     trialEndsAt?: string | Date | null;
     trialOperationsUsed?: number;
@@ -13,7 +14,10 @@ export function hasToolAccess(user: {
     if (!user) return false;
 
     const slugs = user.activeProductSlugs || [];
-    if (slugs.includes("legal-toolkit") || user.role === "admin") return true;
+    if (user.role === "admin") return true;
+    if (Boolean(user.emailVerified) && slugs.includes("legal-toolkit")) return true;
+
+    if (!user.emailVerified) return false;
 
     if (user.trialStatus !== "active") return false;
 

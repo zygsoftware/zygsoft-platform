@@ -1,22 +1,27 @@
 import { NextResponse } from "next/server";
-import { spawn } from "child_process";
-import path from "path";
-import os from "os";
-import fs from "fs/promises";
 import { checkToolAccess, incrementTrialUsage } from "@/lib/trial-guard";
+import { formatMbLimit, getToolMaxFileBytes } from "@/lib/tool-policy";
+
+function parseErrorDetail(body: unknown): string {
+    if (!body || typeof body !== "object") return "Sıkıştırma başarısız.";
+    const obj = body as { detail?: string | { msg?: string }[] };
+    if (!obj.detail) return "Sıkıştırma başarısız.";
+    if (typeof obj.detail === "string") return obj.detail;
+    if (Array.isArray(obj.detail)) {
+        const first = obj.detail[0];
+        return (typeof first === "object" && first?.msg) ? first.msg : String(first || "Sıkıştırma başarısız.");
+    }
+    return "Sıkıştırma başarısız.";
+}
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
-    let tempDir: string | null = null;
-
     try {
         const guard = await checkToolAccess();
         if (!guard.allowed) return guard.response;
 
-        const isSubscribed = !guard.incrementTrial;
-        const maxFileBytes = isSubscribed ? 100 * 1024 * 1024 : 20 * 1024 * 1024;
-
+        const hasPaidAccess = !guard.incrementTrial;
         const formData = await req.formData();
         const file = formData.get("file");
 
@@ -24,101 +29,51 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Lütfen bir PDF dosyası yükleyin." }, { status: 400 });
         }
 
-        const isPdf =
-            file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+        const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
         if (!isPdf) {
             return NextResponse.json({ error: `"${file.name}" PDF formatında değil.` }, { status: 400 });
         }
 
-        if (file.size > maxFileBytes) {
-            return NextResponse.json(
-                { error: `Dosya çok büyük (maks. ${isSubscribed ? 100 : 20} MB).` },
-                { status: 400 }
-            );
+        const maxFileBytes = getToolMaxFileBytes("pdf-compress", hasPaidAccess, file);
+        if (maxFileBytes !== null && file.size > maxFileBytes) {
+            return NextResponse.json({ error: `Dosya çok büyük (maks. ${formatMbLimit(maxFileBytes)}).` }, { status: 400 });
         }
 
-        const bytes = await file.arrayBuffer();
-        const buffer = Buffer.from(bytes);
+        const microserviceUrl = process.env.UDF_MICROSERVICE_URL || "http://127.0.0.1:8000";
+        const proxyFormData = new FormData();
+        proxyFormData.append("file", file);
 
-        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "zygsoft-pdfcmp-"));
-        const inPath = path.join(tempDir, "input.pdf");
-        const outPath = path.join(tempDir, "compressed.pdf");
-        await fs.writeFile(inPath, buffer);
-
-        const script = path.join(process.cwd(), "tools", "pdf-compress", "compress.py");
-
-        const pyResult = await new Promise<{
-            code: number | null;
-            stderr: string;
-            spawnErr?: string;
-        }>((resolve) => {
-            const proc = spawn("python3", [script, inPath, outPath], {
-                cwd: process.cwd(),
-                stdio: ["ignore", "pipe", "pipe"],
-            });
-            let stderr = "";
-            proc.stderr?.on("data", (d) => {
-                stderr += d.toString();
-            });
-            proc.on("error", (err) => {
-                resolve({ code: null, stderr, spawnErr: err.message });
-            });
-            proc.on("close", (code) => resolve({ code: code ?? 1, stderr }));
-        });
-
-        if (pyResult.code !== 0) {
-            const errLower = pyResult.stderr.toLowerCase();
-            if (pyResult.spawnErr) {
-                console.error("[pdf-compress] spawn failed:", pyResult.spawnErr);
-                return NextResponse.json(
-                    {
-                        error:
-                            "Sunucuda Python (python3) bulunamadı veya çalıştırılamadı. Yerelde: pip install pymupdf ve python3 yolunu kontrol edin.",
-                    },
-                    { status: 503 }
-                );
-            }
-            if (pyResult.code === 2 || errLower.includes("pymupdf not installed")) {
-                return NextResponse.json(
-                    {
-                        error:
-                            "Sunucuda PyMuPDF kurulu değil. Kurulum: pip install pymupdf (veya tools/requirements-legal.txt)",
-                    },
-                    { status: 503 }
-                );
-            }
-            if (errLower.includes("password protected")) {
-                return NextResponse.json(
-                    { error: "Bu PDF şifre korumalı. Şifreyi kaldırıp tekrar deneyin." },
-                    { status: 422 }
-                );
-            }
-            console.error("[pdf-compress] exit", pyResult.code, pyResult.stderr.trim());
-            return NextResponse.json(
-                {
-                    error:
-                        "Sıkıştırma başarısız. PDF bozuk, uyumsuz veya şifreli olabilir. Farklı bir PDF ile deneyin veya dosyayı yeniden kaydedin.",
-                },
-                { status: 422 }
-            );
-        }
-
-        let outBuffer: Buffer;
+        let response: Response;
         try {
-            outBuffer = await fs.readFile(outPath);
-        } catch {
-            return NextResponse.json({ error: "Çıktı dosyası oluşturulamadı." }, { status: 500 });
+            response = await fetch(`${microserviceUrl}/api/convert/pdf-compress`, {
+                method: "POST",
+                body: proxyFormData,
+                signal: AbortSignal.timeout(90000),
+            });
+        } catch (fetchErr: unknown) {
+            const err = fetchErr as { name?: string };
+            if (err?.name === "AbortError") {
+                return NextResponse.json({ error: "İşlem zaman aşımına uğradı." }, { status: 504 });
+            }
+            return NextResponse.json({ error: "Sıkıştırma servisine bağlanılamadı. Lütfen daha sonra tekrar deneyin." }, { status: 503 });
         }
 
-        if (outBuffer.length === 0) {
-            return NextResponse.json({ error: "Sıkıştırılmış dosya boş." }, { status: 500 });
+        if (!response.ok) {
+            let errBody: unknown;
+            try {
+                errBody = await response.json();
+            } catch {
+                errBody = { detail: "Sıkıştırma başarısız." };
+            }
+            return NextResponse.json({ error: parseErrorDetail(errBody) }, { status: response.status });
         }
 
+        const outBuffer = await response.arrayBuffer();
         if (guard.incrementTrial) {
             incrementTrialUsage(guard.userId).catch(() => {});
         }
 
-        return new NextResponse(new Uint8Array(outBuffer), {
+        return new NextResponse(outBuffer, {
             status: 200,
             headers: {
                 "Content-Type": "application/pdf",
@@ -129,9 +84,5 @@ export async function POST(req: Request) {
     } catch (err) {
         console.error("[pdf-compress]", err);
         return NextResponse.json({ error: "Sıkıştırma sırasında beklenmeyen bir hata oluştu." }, { status: 500 });
-    } finally {
-        if (tempDir) {
-            fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
-        }
     }
 }

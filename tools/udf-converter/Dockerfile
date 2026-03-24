@@ -8,6 +8,9 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg62-turbo \
     libopenjp2-7 \
+    tesseract-ocr \
+    tesseract-ocr-eng \
+    tesseract-ocr-tur \
     zlib1g \
     && rm -rf /var/lib/apt/lists/*
 

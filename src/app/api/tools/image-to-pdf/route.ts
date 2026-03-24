@@ -4,13 +4,11 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { PDFDocument } from "pdf-lib";
 import { prisma } from "@/lib/prisma";
 import { checkToolAccess, incrementTrialUsage } from "@/lib/trial-guard";
+import { formatMbLimit, getToolMaxFileBytes, getToolMaxFiles } from "@/lib/tool-policy";
 
 export const dynamic = "force-dynamic";
 
 /* ── Limits ─────────────────────────────────────────────────────── */
-const MAX_FILES      = 10;
-// Limits will be determined dynamically
-
 /* Supported MIME types — pdf-lib embedJpg / embedPng only */
 const ALLOWED: Record<string, "jpg" | "png"> = {
     "image/jpeg": "jpg",
@@ -35,8 +33,8 @@ export async function POST(req: Request) {
         const guard = await checkToolAccess();
         if (!guard.allowed) return guard.response;
 
-        const isSubscribed = !guard.incrementTrial;
-        const maxFileBytes = isSubscribed ? 100 * 1024 * 1024 : 8 * 1024 * 1024; // 100 MB for subs, 8 MB for demo
+        const hasPaidAccess = !guard.incrementTrial;
+        const maxFiles = getToolMaxFiles("image-to-pdf", hasPaidAccess);
 
         const session = await getServerSession(authOptions);
         /* Parse multipart */
@@ -54,9 +52,9 @@ export async function POST(req: Request) {
         if (files.length === 0) {
             return NextResponse.json({ error: "En az bir resim dosyası gereklidir." }, { status: 400 });
         }
-        if (files.length > MAX_FILES) {
+        if (maxFiles !== null && files.length > maxFiles) {
             return NextResponse.json(
-                { error: `En fazla ${MAX_FILES} dosya yükleyebilirsiniz.` },
+                { error: `En fazla ${maxFiles} dosya yükleyebilirsiniz.` },
                 { status: 400 }
             );
         }
@@ -74,9 +72,10 @@ export async function POST(req: Request) {
                     );
                 }
             }
-            if (file.size > maxFileBytes) {
+            const maxFileBytes = getToolMaxFileBytes("image-to-pdf", hasPaidAccess, file);
+            if (maxFileBytes !== null && file.size > maxFileBytes) {
                 return NextResponse.json(
-                    { error: `"${file.name}" dosyası çok büyük (maks. ${isSubscribed ? 100 : 8} MB).` },
+                    { error: `"${file.name}" dosyası çok büyük (maks. ${formatMbLimit(maxFileBytes)}).` },
                     { status: 400 }
                 );
             }

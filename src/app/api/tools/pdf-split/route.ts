@@ -4,6 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { PDFDocument } from "pdf-lib";
 import { prisma } from "@/lib/prisma";
 import { checkToolAccess, incrementTrialUsage } from "@/lib/trial-guard";
+import { formatMbLimit, getToolMaxFileBytes } from "@/lib/tool-policy";
 
 export const dynamic = "force-dynamic";
 
@@ -88,8 +89,7 @@ export async function POST(req: Request) {
         const guard = await checkToolAccess();
         if (!guard.allowed) return guard.response;
 
-        const isSubscribed = !guard.incrementTrial;
-        const maxFileBytes = isSubscribed ? 100 * 1024 * 1024 : 20 * 1024 * 1024; // 100 MB for subs, 20 MB for demo
+        const hasPaidAccess = !guard.incrementTrial;
 
         const session = await getServerSession(authOptions);
 
@@ -122,9 +122,10 @@ export async function POST(req: Request) {
             );
         }
 
-        if (file.size > maxFileBytes) {
+        const maxFileBytes = getToolMaxFileBytes("pdf-split", hasPaidAccess, file);
+        if (maxFileBytes !== null && file.size > maxFileBytes) {
             return NextResponse.json(
-                { error: `"${file.name}" dosyası çok büyük (maks. ${isSubscribed ? 100 : 20} MB).` },
+                { error: `"${file.name}" dosyası çok büyük (maks. ${formatMbLimit(maxFileBytes)}).` },
                 { status: 400 }
             );
         }
@@ -163,7 +164,7 @@ export async function POST(req: Request) {
         const pdfBytes = await outDoc.save();
 
         /* Log usage */
-        const userId = session!.user!.id as string;
+        const userId = guard.userId;
         prisma.toolUsage.create({ data: { userId, toolSlug: "pdf-split" } }).catch(() => {});
         if (guard.incrementTrial && guard.userId) {
             incrementTrialUsage(guard.userId).catch(() => {});

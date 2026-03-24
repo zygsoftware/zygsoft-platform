@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { checkToolAccess, incrementTrialUsage } from "@/lib/trial-guard";
 import archiver from "archiver";
 import { Readable } from "stream";
+import { formatMbLimit, getToolMaxFileBytes, getToolMaxFiles } from "@/lib/tool-policy";
 
 export const dynamic = "force-dynamic";
 
@@ -52,9 +53,8 @@ export async function POST(req: Request) {
         const guard = await checkToolAccess();
         if (!guard.allowed) return guard.response;
 
-        const isSubscribed = !guard.incrementTrial;
-        const maxFiles = isSubscribed ? 100 : 20;
-        const maxFileBytes = isSubscribed ? 50 * 1024 * 1024 : 20 * 1024 * 1024;
+        const hasPaidAccess = !guard.incrementTrial;
+        const maxFiles = getToolMaxFiles("batch-convert", hasPaidAccess);
 
         const session = await getServerSession(authOptions);
         const formData = await req.formData();
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
         if (files.length === 0) {
             return NextResponse.json({ error: "En az bir dosya yükleyin." }, { status: 400 });
         }
-        if (files.length > maxFiles) {
+        if (maxFiles !== null && files.length > maxFiles) {
             return NextResponse.json(
                 { error: `En fazla ${maxFiles} dosya yükleyebilirsiniz.` },
                 { status: 400 }
@@ -88,9 +88,10 @@ export async function POST(req: Request) {
                     { status: 400 }
                 );
             }
-            if (file.size > maxFileBytes) {
+            const maxFileBytes = getToolMaxFileBytes("batch-convert", hasPaidAccess, file);
+            if (maxFileBytes !== null && file.size > maxFileBytes) {
                 return NextResponse.json(
-                    { error: `"${file.name}" çok büyük (maks. ${isSubscribed ? 50 : 20} MB).` },
+                    { error: `"${file.name}" çok büyük (maks. ${formatMbLimit(maxFileBytes)}).` },
                     { status: 400 }
                 );
             }

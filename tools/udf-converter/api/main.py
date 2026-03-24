@@ -10,6 +10,8 @@ When letterhead is .udf: extracts content.xml (with properties/bgImage) and copi
 bgImageSource-referenced resources into the output zip.
 """
 import logging
+import io
+import json
 import os
 import re
 import sys
@@ -292,6 +294,265 @@ async def convert_pdf_to_image(
     finally:
         if temp_dir and temp_dir.exists():
             shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+@app.post("/api/convert/pdf-to-word")
+async def convert_pdf_to_word(
+    file: UploadFile = File(...),
+):
+    """Convert uploaded PDF to DOCX."""
+    if not file.filename or not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Sadece PDF dosyalari desteklenmektedir.")
+
+    temp_dir = None
+    try:
+        from pdf2docx import Converter  # type: ignore
+    except ImportError as exc:
+        raise HTTPException(status_code=500, detail="pdf2docx kurulu degil.") from exc
+
+    try:
+        temp_dir = Path(tempfile.mkdtemp())
+        suffix = uuid.uuid4().hex[:12]
+        pdf_path = temp_dir / f"input_{suffix}.pdf"
+        docx_path = temp_dir / f"output_{suffix}.docx"
+
+        content = await file.read()
+        if len(content) == 0:
+            raise HTTPException(status_code=400, detail="Dosya bos.")
+        pdf_path.write_bytes(content)
+
+        cv = None
+        try:
+            cv = Converter(str(pdf_path))
+            cv.convert(str(docx_path), start=0, end=None)
+        except Exception as exc:
+            raise HTTPException(status_code=422, detail=f"PDF -> Word donusumu basarisiz: {exc}") from exc
+        finally:
+            if cv is not None:
+                cv.close()
+
+        if not docx_path.exists():
+            raise HTTPException(status_code=500, detail="DOCX dosyasi olusturulamadi.")
+
+        docx_bytes = docx_path.read_bytes()
+        return Response(
+            content=docx_bytes,
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            headers={
+                "Content-Disposition": 'attachment; filename="zygsoft_document.docx"',
+            },
+        )
+    finally:
+        if temp_dir and temp_dir.exists():
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+@app.post("/api/convert/pdf-compress")
+async def compress_pdf(
+    file: UploadFile = File(...),
+):
+    """Compress uploaded PDF with PyMuPDF."""
+    if not file.filename or not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Sadece PDF dosyalari desteklenmektedir.")
+
+    try:
+        import fitz  # type: ignore
+    except ImportError as exc:
+        raise HTTPException(status_code=500, detail="PyMuPDF kurulu degil.") from exc
+
+    temp_dir = None
+    try:
+        temp_dir = Path(tempfile.mkdtemp())
+        suffix = uuid.uuid4().hex[:12]
+        pdf_path = temp_dir / f"input_{suffix}.pdf"
+        out_path = temp_dir / f"compressed_{suffix}.pdf"
+
+        content = await file.read()
+        if len(content) == 0:
+            raise HTTPException(status_code=400, detail="Dosya bos.")
+        pdf_path.write_bytes(content)
+
+        try:
+            doc = fitz.open(pdf_path)
+        except Exception as exc:
+            raise HTTPException(status_code=422, detail=f"PDF okunamadi: {exc}") from exc
+
+        if doc.is_encrypted and not doc.authenticate(""):
+            doc.close()
+            raise HTTPException(status_code=422, detail="Bu PDF sifre korumali. Sifreyi kaldirip tekrar deneyin.")
+
+        attempts = [
+            {"garbage": 4, "deflate": True, "clean": True, "linear": True},
+            {"garbage": 4, "deflate": True, "clean": True, "linear": False},
+            {"garbage": 4, "deflate": True, "clean": False, "linear": False},
+            {"garbage": 3, "deflate": True, "clean": False, "linear": False},
+            {"garbage": 2, "deflate": False, "clean": False, "linear": False},
+        ]
+
+        last_error = None
+        for options in attempts:
+            try:
+                if out_path.exists():
+                    out_path.unlink()
+                doc.save(str(out_path), **options)
+                break
+            except Exception as exc:
+                last_error = exc
+        doc.close()
+
+        if not out_path.exists():
+            raise HTTPException(status_code=422, detail=f"Sikistirma basarisiz: {last_error}")
+
+        return Response(
+            content=out_path.read_bytes(),
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": 'attachment; filename="zygsoft_compressed.pdf"',
+            },
+        )
+    finally:
+        if temp_dir and temp_dir.exists():
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+@app.post("/api/convert/ocr-text")
+async def convert_ocr_text(
+    file: UploadFile = File(...),
+    language: str = Form("tr"),
+):
+    """Extract OCR text from PDF/images/tiff."""
+    try:
+        import pytesseract  # type: ignore
+        from PIL import Image  # type: ignore
+    except ImportError as exc:
+        raise HTTPException(status_code=500, detail="pytesseract veya Pillow kurulu degil.") from exc
+
+    try:
+        import fitz  # type: ignore
+    except ImportError:
+        fitz = None
+
+    lang_arg = (language or "tr").lower().strip()
+    lang_map = {"tr": "tur", "en": "eng"}
+    if lang_arg not in lang_map:
+        raise HTTPException(status_code=400, detail="Gecersiz dil. tr veya en kullanin.")
+
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="Dosya adi bulunamadi.")
+
+    ext = Path(file.filename).suffix.lower()
+    if ext not in {".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff"}:
+        raise HTTPException(status_code=400, detail="Gecersiz dosya turu.")
+
+    content = await file.read()
+    if len(content) == 0:
+        raise HTTPException(status_code=400, detail="Dosya bos.")
+
+    def image_to_text(img: "Image.Image", lang_code: str) -> str:
+        return pytesseract.image_to_string(img, lang=lang_code)
+
+    try:
+        result = ""
+        if ext == ".pdf":
+            if fitz is None:
+                raise HTTPException(status_code=500, detail="PDF OCR icin PyMuPDF gerekli.")
+            doc = fitz.open(stream=content, filetype="pdf")
+            texts: list[str] = []
+            try:
+                for idx in range(len(doc)):
+                    page = doc[idx]
+                    pix = page.get_pixmap(dpi=200)
+                    img = Image.open(io.BytesIO(pix.tobytes("png")))
+                    texts.append(image_to_text(img, lang_map[lang_arg]))
+            finally:
+                doc.close()
+            result = "\n\n".join(texts)
+        else:
+            with Image.open(io.BytesIO(content)) as img:
+                if hasattr(img, "n_frames") and img.n_frames > 1:
+                    texts: list[str] = []
+                    for frame_index in range(img.n_frames):
+                        img.seek(frame_index)
+                        frame = img.copy()
+                        if frame.mode not in ("RGB", "L"):
+                            frame = frame.convert("RGB")
+                        texts.append(image_to_text(frame, lang_map[lang_arg]))
+                    result = "\n\n".join(texts)
+                else:
+                    if img.mode not in ("RGB", "L"):
+                        img = img.convert("RGB")
+                    result = image_to_text(img, lang_map[lang_arg])
+    except pytesseract.TesseractNotFoundError as exc:
+        raise HTTPException(status_code=500, detail="Tesseract sistemde kurulu degil.") from exc
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"OCR basarisiz: {exc}") from exc
+
+    return Response(
+        content=json.dumps({"text": result}),
+        media_type="application/json",
+    )
+
+
+@app.post("/api/convert/tiff-to-pdf")
+async def convert_tiff_to_pdf(
+    files: list[UploadFile] = File(...),
+):
+    """Convert one or more TIFF files to a merged PDF."""
+    try:
+        from PIL import Image  # type: ignore
+    except ImportError as exc:
+        raise HTTPException(status_code=500, detail="Pillow kurulu degil.") from exc
+
+    if not files:
+        raise HTTPException(status_code=400, detail="En az bir TIFF dosyasi yukleyin.")
+
+    all_pages: list["Image.Image"] = []
+    try:
+        for upload in files:
+            if not upload.filename or not upload.filename.lower().endswith((".tif", ".tiff")):
+                raise HTTPException(status_code=400, detail="Sadece .tif ve .tiff desteklenir.")
+            content = await upload.read()
+            if len(content) == 0:
+                raise HTTPException(status_code=400, detail=f'"{upload.filename}" bos.')
+
+            with Image.open(io.BytesIO(content)) as img:
+                if hasattr(img, "n_frames"):
+                    for frame_index in range(img.n_frames):
+                        img.seek(frame_index)
+                        frame = img.copy()
+                        if frame.mode != "RGB":
+                            frame = frame.convert("RGB")
+                        all_pages.append(frame)
+                else:
+                    frame = img.copy()
+                    if frame.mode != "RGB":
+                        frame = frame.convert("RGB")
+                    all_pages.append(frame)
+
+        if not all_pages:
+            raise HTTPException(status_code=422, detail="Hicbir TIFF sayfasi islenemedi.")
+
+        output = io.BytesIO()
+        all_pages[0].save(
+            output,
+            "PDF",
+            save_all=True,
+            append_images=all_pages[1:],
+            resolution=100.0,
+        )
+        return Response(
+            content=output.getvalue(),
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": 'attachment; filename="zygsoft_tiff_merged.pdf"',
+            },
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"TIFF -> PDF donusumu basarisiz: {exc}") from exc
 
 
 @app.post("/api/convert/doc-to-udf")

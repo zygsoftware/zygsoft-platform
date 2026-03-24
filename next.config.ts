@@ -56,9 +56,10 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    // Allow up to 50 MB multipart bodies (multi-file tool uploads)
+    // Raise request cloning / proxy limits for large legal-toolkit uploads.
+    proxyClientMaxBodySize: "500mb",
     serverActions: {
-      bodySizeLimit: "50mb",
+      bodySizeLimit: "500mb",
     },
   },
 };

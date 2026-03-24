@@ -8,8 +8,8 @@ import {
     storageBuckets,
     uploadToStorage,
 } from "@/lib/supabase-storage";
+import { formatMbLimit, getToolMaxFileBytes, hasPaidLegalToolkitAccess } from "@/lib/tool-policy";
 
-const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_EXT = [".udf", ".xml"];
 
 export async function GET() {
@@ -19,9 +19,7 @@ export async function GET() {
             return NextResponse.json({ error: "Oturum açmanız gerekiyor." }, { status: 401 });
         }
 
-        const activeSlugs = (session.user as any).activeProductSlugs || [];
-        const isAdmin = (session.user as any).role === "admin";
-        if (!activeSlugs.includes("legal-toolkit") && !isAdmin) {
+        if (!hasPaidLegalToolkitAccess(session.user as any)) {
             return NextResponse.json({ hasLetterhead: false });
         }
 
@@ -47,11 +45,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Oturum açmanız gerekiyor." }, { status: 401 });
         }
 
-        const activeSlugs = (session.user as any).activeProductSlugs || [];
-        const isAdmin = (session.user as any).role === "admin";
-        if (!activeSlugs.includes("legal-toolkit") && !isAdmin) {
+        if (!hasPaidLegalToolkitAccess(session.user as any)) {
             return NextResponse.json({
-                error: "Bu özellik için Hukuk Araçları Paketi aboneliği gereklidir.",
+                error: "Bu özellik için aktif Hukuk Araçları Paketi aboneliği ve doğrulanmış e-posta gereklidir.",
             }, { status: 403 });
         }
 
@@ -62,8 +58,12 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Dosya eksik veya geçersiz." }, { status: 400 });
         }
 
-        if (file.size > MAX_SIZE) {
-            return NextResponse.json({ error: "Antet dosyası en fazla 5 MB olabilir." }, { status: 400 });
+        const maxFileBytes = getToolMaxFileBytes("letterhead", true, {
+            name: file.name || "letterhead.xml",
+            type: file.type || "application/octet-stream",
+        });
+        if (maxFileBytes !== null && file.size > maxFileBytes) {
+            return NextResponse.json({ error: `Antet dosyası en fazla ${formatMbLimit(maxFileBytes)} olabilir.` }, { status: 400 });
         }
 
         const name = (file.name || "").toLowerCase();

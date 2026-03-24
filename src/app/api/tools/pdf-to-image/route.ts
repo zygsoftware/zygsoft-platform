@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { checkToolAccess, incrementTrialUsage } from "@/lib/trial-guard";
+import { formatMbLimit, getToolMaxFileBytes } from "@/lib/tool-policy";
 
 function parseErrorDetail(body: unknown): string {
     if (!body || typeof body !== "object") return "Dönüştürme başarısız.";
@@ -21,8 +22,7 @@ export async function POST(req: Request) {
         const guard = await checkToolAccess();
         if (!guard.allowed) return guard.response;
 
-        const isSubscribed = !guard.incrementTrial;
-        const maxFileBytes = isSubscribed ? 100 * 1024 * 1024 : 20 * 1024 * 1024;
+        const hasPaidAccess = !guard.incrementTrial;
 
         const formData = await req.formData();
         const file = formData.get("file");
@@ -42,9 +42,10 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: `"${file.name}" PDF formatında değil.` }, { status: 400 });
         }
 
-        if (file.size > maxFileBytes) {
+        const maxFileBytes = getToolMaxFileBytes("pdf-to-image", hasPaidAccess, file);
+        if (maxFileBytes !== null && file.size > maxFileBytes) {
             return NextResponse.json(
-                { error: `"${file.name}" dosyası çok büyük (maks. ${isSubscribed ? 100 : 20} MB).` },
+                { error: `"${file.name}" dosyası çok büyük (maks. ${formatMbLimit(maxFileBytes)}).` },
                 { status: 400 }
             );
         }
