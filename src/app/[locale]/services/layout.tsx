@@ -10,8 +10,8 @@ export async function generateMetadata({
 
     const title = isEn ? "Our Services" : "Hizmetlerimiz";
     const description = isEn
-        ? "ZYGSOFT offers end-to-end digital services: web and application development, social media management, brand identity design, digital strategy, and audience analysis."
-        : "ZYGSOFT; web ve uygulama geliştirme, sosyal medya yönetimi, marka kimliği tasarımı, dijital strateji ve hedef kitle analizi alanlarında uçtan uca hizmet sunar.";
+        ? "ZYGSOFT offers end-to-end services across web development, social media, brand identity, digital growth strategy, and Google Ads plus Meta Pixel performance setup."
+        : "ZYGSOFT; web geliştirme, sosyal medya yönetimi, marka kimliği, dijital büyüme stratejisi ve Google Ads ile Meta Pixel performans kurulumları dahil uçtan uca hizmet sunar.";
     const canonical = isEn ? "/en/services" : "/services";
 
     return {

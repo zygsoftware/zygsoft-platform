@@ -6,14 +6,15 @@ import { Footer } from "@/components/layout/Footer";
 import { useTranslations, useLocale } from "next-intl";
 import Link from "next/link";
 import { servicesData } from "@/lib/servicesData";
-import { ArrowRight, Globe, Megaphone, Palette, BarChart3, Layers, Code2 } from "lucide-react";
+import { ArrowRight, Globe, Megaphone, Palette, BarChart3, Target, Code2 } from "lucide-react";
 import { BlockReveal, TextReveal } from "@/components/ui/reveal";
 
 const icons: Record<string, React.ReactNode> = {
     "web-ve-uygulama-gelistirme": <Globe size={32} />,
     "sosyal-medya-yonetimi": <Megaphone size={32} />,
     "marka-kimligi-ve-grafik-tasarim": <Palette size={32} />,
-    "dijital-strateji-ve-pazarlama": <BarChart3 size={32} />
+    "dijital-strateji-ve-pazarlama": <BarChart3 size={32} />,
+    "google-ads-ve-meta-pixel-reklam-yonetimi": <Target size={32} />,
 };
 
 export default function Services() {

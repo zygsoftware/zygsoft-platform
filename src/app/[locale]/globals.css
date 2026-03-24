@@ -758,7 +758,10 @@ html.home-scroll-snap .home-snap-section {
 /* Dark surfaces default to light text unless text-* is explicitly set */
 :is(
   .surface-dark,
+  [class*="bg-[#0e0e0e]"],
+  [class*="bg-[#141313]"],
   [class~="bg-[#343131]"],
+  [class*="bg-[#343131]"],
   [class*="bg-black"],
   [class*="bg-slate-9"],
   [class*="bg-zinc-9"],
@@ -769,7 +772,10 @@ html.home-scroll-snap .home-snap-section {
 
 :is(
   .surface-dark,
+  [class*="bg-[#0e0e0e]"],
+  [class*="bg-[#141313]"],
   [class~="bg-[#343131]"],
+  [class*="bg-[#343131]"],
   [class*="bg-black"],
   [class*="bg-slate-9"],
   [class*="bg-zinc-9"],
@@ -782,14 +788,19 @@ html.home-scroll-snap .home-snap-section {
 /* Dark surface hard-fix: prevent dark text utility classes on dark backgrounds */
 :is(
   .surface-dark,
+  [class*="bg-[#0e0e0e]"],
+  [class*="bg-[#141313]"],
   [class~="bg-[#343131]"],
+  [class*="bg-[#343131]"],
   [class*="bg-black"],
   [class*="bg-slate-9"],
   [class*="bg-zinc-9"],
   [class*="bg-neutral-9"]
 )
   :is(
+    [class*="text-[#0e0e0e]"],
     [class~="text-[#343131]"],
+    [class*="text-[#343131]"],
     [class*="text-black"],
     [class*="text-slate-9"],
     [class*="text-zinc-9"],
