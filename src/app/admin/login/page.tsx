@@ -32,9 +32,9 @@ export default function AdminLoginPage() {
 
     useEffect(() => {
         if (status === "authenticated" && userRole === "admin") {
-            window.location.assign("/admin/dashboard");
+            router.replace("/admin/dashboard");
         }
-    }, [status, userRole]);
+    }, [router, status, userRole]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -49,7 +49,6 @@ export default function AdminLoginPage() {
                 redirect: false,
                 email,
                 password,
-                callbackUrl: "/admin/dashboard",
             });
 
             if (!res) {
@@ -67,8 +66,7 @@ export default function AdminLoginPage() {
                 return;
             }
 
-            router.refresh();
-            window.location.assign("/admin/dashboard");
+            router.replace("/admin/dashboard");
         } catch {
             setError("Bağlantı hatası oluştu. Lütfen tekrar deneyin.");
         } finally {
