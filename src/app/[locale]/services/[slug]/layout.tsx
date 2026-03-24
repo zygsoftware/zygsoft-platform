@@ -46,14 +46,14 @@ const SERVICE_META: Record<string, { tr: { title: string; desc: string }; en: { 
             desc:  "Data-driven digital growth and performance marketing. Scale your brand with SEO, content strategy, and digital advertising managed by ZYGSOFT.",
         },
     },
-    "hedef-kitle-analizi": {
+    "google-ads-ve-meta-pixel-reklam-yonetimi": {
         tr: {
-            title: "Hedef Kitle Analizi",
-            desc:  "Müşterilerinizi yakından tanıyın ve satışlarınızı artırın. Demografik analiz, kullanıcı araştırması ve segment stratejileri — ZYGSOFT.",
+            title: "Google Ads ve Meta Pixel Reklam Yonetimi",
+            desc:  "Google Ads, Meta Pixel, Google Tag Manager ve Google Analytics kurulumu ile olculur reklam yonetimi. Donusum takibi ve performans optimizasyonu ZYGSOFT ile birlikte ilerler.",
         },
         en: {
-            title: "Target Audience Analysis",
-            desc:  "Understand your customers deeply and grow your sales. Demographic analysis, user research, and segmentation strategies from ZYGSOFT.",
+            title: "Google Ads and Meta Pixel Advertising Management",
+            desc:  "Measured advertising operations with Google Ads, Meta Pixel, Google Tag Manager, and Google Analytics setup, conversion tracking, and ongoing optimisation by ZYGSOFT.",
         },
     },
 };

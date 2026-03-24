@@ -21,6 +21,13 @@ export default function Services() {
     const t = useTranslations("Services");
     const locale = useLocale();
     const lang = locale === "en" ? "en" : "tr";
+    const sectionLabel = lang === "en" ? "Our Services" : "Hizmetlerimiz";
+    const detailCta = lang === "en" ? "Explore Details" : "Detayli Incele";
+    const finalTitle = lang === "en" ? "Let's Build the Right Growth Plan Together" : "Projenizi Birlikte Hayata Gecirelim";
+    const finalBody = lang === "en"
+        ? "If you are not sure which service fits your business best, that's completely fine. We can review your current situation together and recommend the right path."
+        : "Hangi hizmete ihtiyaciniz oldugundan emin degilseniz sorun degil. Isletmenizi birlikte degerlendirip size en uygun dijital yolu birlikte belirleyelim.";
+    const finalButton = lang === "en" ? "Request a Free Intro Call" : "Ucretsiz On Gorusme Talep Edin";
 
     return (
         <>
@@ -39,7 +46,7 @@ export default function Services() {
                         style={{ background: "radial-gradient(circle, rgba(230,200,0,0.1) 0%, transparent 70%)" }} />
                     <div className="container mx-auto px-6 max-w-7xl">
                         <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-                            <span className="section-label">Hizmetlerimiz</span>
+                            <span className="section-label">{sectionLabel}</span>
                             <h1 className="font-display font-extrabold text-[#0e0e0e] mt-4 mb-6"
                                 style={{ fontSize: "clamp(44px,6vw,88px)", lineHeight: 1.03 }}>
                                 {t("title")}
@@ -86,7 +93,7 @@ export default function Services() {
                                                 </p>
 
                                                 <div className="flex items-center text-sm font-bold text-[#e6c800] uppercase tracking-wider mt-auto group-hover:text-[#c9ad00] transition-colors">
-                                                    Detaylı İncele <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                                                    {detailCta} <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                                                 </div>
                                             </motion.div>
                                         </Link>
@@ -103,17 +110,17 @@ export default function Services() {
                         <BlockReveal>
                             <TextReveal delay={0.08}>
                                 <h2 className="font-display font-extrabold text-[#0e0e0e] mb-6" style={{ fontSize: "clamp(32px,3.5vw,48px)" }}>
-                                    Projenizi Birlikte Hayata Geçirelim
+                                    {finalTitle}
                                 </h2>
                             </TextReveal>
                             <TextReveal delay={0.16}>
                                 <p className="text-[#888] text-lg mb-8 max-w-2xl mx-auto">
-                                    Hangi hizmete ihtiyacınız olduğundan emin değilseniz sorun değil. İşletmenizi anlayarak size en uygun dijital stratejiyi birlikte belirleyelim.
+                                    {finalBody}
                                 </p>
                             </TextReveal>
                             <BlockReveal delay={0.12}>
                                 <Link href="/contact" className="btn-primary inline-flex">
-                                    Ücretsiz Ön Görüşme Talep Edin <ArrowRight size={16} />
+                                    {finalButton} <ArrowRight size={16} />
                                 </Link>
                             </BlockReveal>
                         </BlockReveal>
