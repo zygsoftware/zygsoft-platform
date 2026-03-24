@@ -29,7 +29,7 @@ export function Footer() {
             { label: s("socialMedia"), href: "/services/sosyal-medya-yonetimi" },
             { label: s("branding"), href: "/services/marka-kimligi-ve-grafik-tasarim" },
             { label: s("digitalStrategy"), href: "/services/dijital-strateji-ve-pazarlama" },
-            { label: "AI Solutions", href: "/services" },
+            { label: s("adsManagement"), href: "/services/google-ads-ve-meta-pixel-reklam-yonetimi" },
         ],
         legal: [
             { label: t("legalKvkk"), href: "/kvkk" },

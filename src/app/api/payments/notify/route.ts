@@ -4,6 +4,20 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { buildStorageObjectPath, storageBuckets, uploadToStorage } from "@/lib/supabase-storage";
 
+const KNOWN_PRODUCTS: Record<
+    string,
+    { name: string; description: string; category: string; price: number; billingPeriod: string; iconType: string }
+> = {
+    "legal-toolkit": {
+        name: "Hukuk Araçları Paketi",
+        description: "UYAP uyumlu belge dönüşümü, PDF araçları, OCR ve toplu işlem araçlarını içeren yıllık dijital ürün paketi.",
+        category: "legal",
+        price: 3000,
+        billingPeriod: "yearly",
+        iconType: "blocks",
+    },
+};
+
 function parseReceiptDataUrl(dataUrl: string): { buffer: Buffer; contentType: string; extension: string } {
     const match = dataUrl.match(/^data:(.+?);base64,(.+)$/);
     if (!match) {
@@ -82,10 +96,27 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: receiptError.message || "Dekont yüklenemedi." }, { status: 400 });
         }
 
-        // Only accept known product slugs — never create products from user input
-        const dbProduct = await prisma.product.findUnique({ where: { slug: String(productId).trim() } });
+        const normalizedProductSlug = String(productId).trim();
+        let dbProduct = await prisma.product.findUnique({ where: { slug: normalizedProductSlug } });
+
         if (!dbProduct) {
-            return NextResponse.json({ error: "Seçilen ürün bulunamadı." }, { status: 404 });
+            const fallbackProduct = KNOWN_PRODUCTS[normalizedProductSlug];
+            if (!fallbackProduct) {
+                return NextResponse.json({ error: "Seçilen ürün bulunamadı." }, { status: 404 });
+            }
+
+            dbProduct = await prisma.product.create({
+                data: {
+                    slug: normalizedProductSlug,
+                    name: fallbackProduct.name,
+                    description: fallbackProduct.description,
+                    category: fallbackProduct.category,
+                    price: fallbackProduct.price,
+                    billingPeriod: fallbackProduct.billingPeriod,
+                    iconType: fallbackProduct.iconType,
+                    isActive: true,
+                },
+            });
         }
 
         // Check if there is already a pending payment for this specific product

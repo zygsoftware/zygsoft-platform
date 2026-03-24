@@ -32,7 +32,7 @@ export function Header() {
         { name: s("webDev"), href: "/services/web-ve-uygulama-gelistirme" },
         { name: s("branding"), href: "/services/marka-kimligi-ve-grafik-tasarim" },
         { name: s("digitalStrategy"), href: "/services/dijital-strateji-ve-pazarlama" },
-        { name: s("audienceAnalysis"), href: "/services/hedef-kitle-analizi" },
+        { name: s("adsManagement"), href: "/services/google-ads-ve-meta-pixel-reklam-yonetimi" },
     ];
 
     return (
