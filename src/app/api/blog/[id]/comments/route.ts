@@ -7,6 +7,7 @@ export const dynamic = "force-dynamic";
 
 type SessionUser = {
     id?: string;
+    name?: string | null;
     role?: string;
     emailVerified?: boolean;
     email?: string | null;
@@ -19,7 +20,7 @@ async function resolveSessionUser(user?: SessionUser | null) {
 
     const dbUser = await prisma.user.findUnique({
         where: { email: user.email },
-        select: { id: true, role: true, emailVerified: true, email: true },
+        select: { id: true, name: true, role: true, emailVerified: true, email: true },
     });
 
     return dbUser ? { ...user, ...dbUser } : user;
@@ -98,8 +99,8 @@ export async function POST(
             data: {
                 post_id: params.id,
                 user_id: user.id,
-                name: session.user.name ?? undefined,
-                email: session.user.email ?? undefined,
+                name: user.name ?? undefined,
+                email: user.email ?? undefined,
                 content: content.trim(),
                 status: "pending",
                 parent_id: parent_id || undefined,

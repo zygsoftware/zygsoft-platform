@@ -163,6 +163,13 @@ export function contactRateLimit(request: Request): RateLimitResult {
 }
 
 /**
+ * 5 requests per 60 minutes — for newsletter signups.
+ */
+export function newsletterRateLimit(request: Request): RateLimitResult {
+    return rateLimit(request, "newsletter", { windowMs: 60 * 60_000, max: 5 });
+}
+
+/**
  * 3 requests per 60 minutes — for customer registration.
  * Tight to prevent account-farming bots.
  */

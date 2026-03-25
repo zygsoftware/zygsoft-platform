@@ -39,6 +39,7 @@ export async function POST(req: Request) {
         if (!guard.allowed) return guard.response;
 
         const session = await getServerSession(authOptions);
+        const sessionUserId = session?.user?.id;
         const formData = await req.formData();
         const file = formData.get("file") as File | null;
         const targetFormat = (formData.get("format") as string) || "udf";
@@ -72,8 +73,11 @@ export async function POST(req: Request) {
         proxyFormData.append("use_letterhead", useLetterhead === "true" || useLetterhead === "1" ? "true" : "false");
 
         if (useLetterhead === "true" || useLetterhead === "1") {
+            if (!sessionUserId) {
+                return NextResponse.json({ error: "Oturum bilgisi bulunamadı." }, { status: 401 });
+            }
             const letterhead = await prisma.userLetterhead.findUnique({
-                where: { userId: session.user.id },
+                where: { userId: sessionUserId },
             });
             if (!letterhead?.filePath) {
                 return NextResponse.json({

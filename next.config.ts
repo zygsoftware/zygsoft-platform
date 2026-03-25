@@ -3,7 +3,28 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin();
 
+const securityHeaders = [
+  {
+    key: "X-Frame-Options",
+    value: "DENY",
+  },
+  {
+    key: "X-Content-Type-Options",
+    value: "nosniff",
+  },
+  {
+    key: "Referrer-Policy",
+    value: "strict-origin-when-cross-origin",
+  },
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=()",
+  },
+];
+
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  reactStrictMode: true,
   outputFileTracingExcludes: {
     "/api/tools/letterhead": [
       "./python-api/**/*",
@@ -45,6 +66,14 @@ const nextConfig: NextConfig = {
       { source: "/portfolio/:path*", destination: "/projeler/:path*", permanent: true },
       { source: "/en/portfolio", destination: "/en/projects", permanent: true },
       { source: "/en/portfolio/:path*", destination: "/en/projects/:path*", permanent: true },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: securityHeaders,
+      },
     ];
   },
   images: {

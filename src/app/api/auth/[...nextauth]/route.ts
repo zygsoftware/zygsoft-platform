@@ -1,10 +1,59 @@
+import type { DefaultSession, NextAuthOptions } from "next-auth";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
-export const authOptions = {
+type AuthUserPayload = {
+    id: string;
+    email: string | null;
+    role: string;
+    emailVerified: boolean;
+    trialStatus: string;
+    trialEndsAt: Date | null;
+    trialOperationsUsed: number;
+    trialOperationsLimit: number;
+    onboardingCompleted: boolean;
+};
+
+type SessionUser = DefaultSession["user"] & {
+    id: string;
+    role?: string;
+    phone?: string | null;
+    company?: string | null;
+    emailVerified?: boolean;
+    trialStatus?: string;
+    trialStartedAt?: Date | null;
+    trialEndsAt?: Date | null;
+    trialOperationsUsed?: number;
+    trialOperationsLimit?: number;
+    onboardingCompleted?: boolean;
+    subscriptions?: Array<{
+        status: string;
+        endsAt: Date | null;
+        product: { slug: string };
+    }>;
+    activeProductSlugs?: string[];
+};
+
+type AppSession = DefaultSession & {
+    user: SessionUser;
+};
+
+type AppToken = {
+    id?: string;
+    role?: string;
+    emailVerified?: boolean;
+    trialStatus?: string;
+    trialStartedAt?: Date | null;
+    trialEndsAt?: Date | null;
+    trialOperationsUsed?: number;
+    trialOperationsLimit?: number;
+    onboardingCompleted?: boolean;
+};
+
+export const authOptions: NextAuthOptions = {
     adapter: PrismaAdapter(prisma),
     secret: process.env.NEXTAUTH_SECRET,
     providers: [
@@ -19,11 +68,16 @@ export const authOptions = {
                     return null;
                 }
 
+                const normalizedEmail = credentials.email.trim().toLowerCase();
+
                 const user = await prisma.user.findUnique({
-                    where: { email: credentials.email },
+                    where: { email: normalizedEmail },
                 });
 
-                // Simplified for testing; in production, use bcrypt here
+                if (!user || user.status !== "active") {
+                    return null;
+                }
+
                 const isValid = await bcrypt.compare(credentials.password, user?.password || "");
                 if (user && isValid) {
                     return {
@@ -44,28 +98,34 @@ export const authOptions = {
         }),
     ],
     callbacks: {
-        async jwt({ token, user }: { token: any; user?: any }) {
+        async jwt({ token, user }) {
+            const appToken = token as typeof token & AppToken;
+            const authUser = user as AuthUserPayload | undefined;
+
             if (user) {
-                token.id = user.id;
-                token.role = (user as any).role;
-                token.emailVerified = (user as any).emailVerified;
-                token.trialStatus = (user as any).trialStatus;
-                token.trialEndsAt = (user as any).trialEndsAt;
-                token.trialOperationsUsed = (user as any).trialOperationsUsed;
-                token.trialOperationsLimit = (user as any).trialOperationsLimit;
-                token.onboardingCompleted = (user as any).onboardingCompleted ?? false;
+                appToken.id = authUser?.id;
+                appToken.role = authUser?.role;
+                appToken.emailVerified = authUser?.emailVerified;
+                appToken.trialStatus = authUser?.trialStatus;
+                appToken.trialEndsAt = authUser?.trialEndsAt;
+                appToken.trialOperationsUsed = authUser?.trialOperationsUsed;
+                appToken.trialOperationsLimit = authUser?.trialOperationsLimit;
+                appToken.onboardingCompleted = authUser?.onboardingCompleted ?? false;
             }
-            return token;
+            return appToken;
         },
-        async session({ session, token }: { session: any; token: any }) {
-            if (session.user && token.id) {
-                session.user.id = token.id as string;
-                (session.user as any).role = token.role;
+        async session({ session, token }) {
+            const appSession = session as AppSession;
+            const appToken = token as typeof token & AppToken;
+
+            if (appSession.user && appToken.id) {
+                appSession.user.id = appToken.id;
+                appSession.user.role = appToken.role;
 
                 // Fetch fresh user data (emailVerified, trial, subscriptions)
                 try {
                     const dbUser = await prisma.user.findUnique({
-                        where: { id: token.id },
+                        where: { id: appToken.id },
                         select: {
                             name: true,
                             email: true,
@@ -80,54 +140,54 @@ export const authOptions = {
                             onboardingCompleted: true,
                         },
                     });
-                    (session.user as any).name = dbUser?.name ?? session.user?.name ?? null;
-                    (session.user as any).email = dbUser?.email ?? session.user?.email ?? null;
-                    (session.user as any).phone = dbUser?.phone ?? null;
-                    (session.user as any).company = dbUser?.company ?? null;
-                    (session.user as any).emailVerified = dbUser?.emailVerified ?? false;
-                    (session.user as any).trialStatus = dbUser?.trialStatus ?? "none";
-                    (session.user as any).trialStartedAt = dbUser?.trialStartedAt ?? null;
-                    (session.user as any).trialEndsAt = dbUser?.trialEndsAt ?? null;
-                    (session.user as any).trialOperationsUsed = dbUser?.trialOperationsUsed ?? 0;
-                    (session.user as any).trialOperationsLimit = dbUser?.trialOperationsLimit ?? 20;
-                    (session.user as any).onboardingCompleted = dbUser?.onboardingCompleted ?? false;
+                    appSession.user.name = dbUser?.name ?? appSession.user?.name ?? null;
+                    appSession.user.email = dbUser?.email ?? appSession.user?.email ?? null;
+                    appSession.user.phone = dbUser?.phone ?? null;
+                    appSession.user.company = dbUser?.company ?? null;
+                    appSession.user.emailVerified = dbUser?.emailVerified ?? false;
+                    appSession.user.trialStatus = dbUser?.trialStatus ?? "none";
+                    appSession.user.trialStartedAt = dbUser?.trialStartedAt ?? null;
+                    appSession.user.trialEndsAt = dbUser?.trialEndsAt ?? null;
+                    appSession.user.trialOperationsUsed = dbUser?.trialOperationsUsed ?? 0;
+                    appSession.user.trialOperationsLimit = dbUser?.trialOperationsLimit ?? 20;
+                    appSession.user.onboardingCompleted = dbUser?.onboardingCompleted ?? false;
                 } catch {
-                    (session.user as any).emailVerified = token.emailVerified ?? false;
-                    (session.user as any).trialStatus = token.trialStatus ?? "none";
-                    (session.user as any).trialStartedAt = token.trialStartedAt ?? null;
-                    (session.user as any).trialEndsAt = token.trialEndsAt ?? null;
-                    (session.user as any).trialOperationsUsed = token.trialOperationsUsed ?? 0;
-                    (session.user as any).trialOperationsLimit = token.trialOperationsLimit ?? 20;
-                    (session.user as any).onboardingCompleted = token.onboardingCompleted ?? false;
+                    appSession.user.emailVerified = appToken.emailVerified ?? false;
+                    appSession.user.trialStatus = appToken.trialStatus ?? "none";
+                    appSession.user.trialStartedAt = appToken.trialStartedAt ?? null;
+                    appSession.user.trialEndsAt = appToken.trialEndsAt ?? null;
+                    appSession.user.trialOperationsUsed = appToken.trialOperationsUsed ?? 0;
+                    appSession.user.trialOperationsLimit = appToken.trialOperationsLimit ?? 20;
+                    appSession.user.onboardingCompleted = appToken.onboardingCompleted ?? false;
                 }
 
                 // Fetch fresh subscriptions from DB
                 try {
                     const subscriptions = await prisma.subscription.findMany({
-                        where: { userId: token.id },
+                        where: { userId: appToken.id },
                         include: { product: true }
                     });
 
-                    (session.user as any).subscriptions = subscriptions;
+                    appSession.user.subscriptions = subscriptions;
                     // Active slugs: status must be "active" AND subscription must not be expired
                     const now = new Date();
-                    (session.user as any).activeProductSlugs = subscriptions
-                        .filter((sub: any) => {
+                    appSession.user.activeProductSlugs = subscriptions
+                        .filter((sub) => {
                             if (sub.status !== "active") return false;
                             if (sub.endsAt && new Date(sub.endsAt) < now) return false;
                             return true;
                         })
-                        .map((sub: any) => sub.product.slug);
+                        .map((sub) => sub.product.slug);
 
-                } catch (e) {
-                    (session.user as any).subscriptions = [];
-                    (session.user as any).activeProductSlugs = [];
+                } catch {
+                    appSession.user.subscriptions = [];
+                    appSession.user.activeProductSlugs = [];
                 }
             }
-            return session;
+            return appSession;
         },
     },
-    session: { strategy: "jwt" as any },
+    session: { strategy: "jwt" },
     pages: {
         signIn: "/login",
         error: "/login",

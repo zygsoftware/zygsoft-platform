@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { contactRateLimit } from "@/lib/rate-limit";
+import { newsletterRateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
-    const rl = contactRateLimit(req);
+    const rl = newsletterRateLimit(req);
     if (rl.limited) {
         return NextResponse.json(
             { error: "Çok fazla istek. Lütfen birkaç dakika sonra tekrar deneyin." },
@@ -16,6 +16,19 @@ export async function POST(req: Request) {
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             return NextResponse.json({ error: "Geçerli bir e-posta adresi girin." }, { status: 400 });
         }
+
+        const existing = await prisma.contactMessage.findFirst({
+            where: {
+                email,
+                subject: "Blog Bülteni Aboneliği",
+            },
+            select: { id: true },
+        });
+
+        if (existing) {
+            return NextResponse.json({ message: "Bu e-posta adresi zaten kayıtlı." }, { status: 200 });
+        }
+
         await prisma.contactMessage.create({
             data: {
                 name: "Blog Bülteni",

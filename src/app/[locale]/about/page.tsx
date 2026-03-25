@@ -1,340 +1,190 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { ArrowRight, BadgeCheck, Building2, Target, Telescope } from "lucide-react";
+import { useLocale } from "next-intl";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import {
-    ArrowRight,
-    BadgeCheck,
-    Building2,
-    ChartNoAxesCombined,
-    Code2,
-    Compass,
-    FileText,
-    Layers3,
-    ShieldCheck,
-    Sparkles,
-    Users,
-} from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { BlockReveal, TextReveal } from "@/components/ui/reveal";
-import { useLocale } from "next-intl";
+import { BlockReveal } from "@/components/ui/reveal";
 
-export default function About() {
+type PrincipleCard = {
+    title: string;
+    body: string;
+    icon: React.ReactNode;
+};
+
+export default function AboutPage() {
     const locale = useLocale();
     const isEn = locale === "en";
 
     const copy = isEn
         ? {
               eyebrow: "About ZYGSOFT",
-              heroTitle: "A software partner that combines product thinking with execution.",
+              breadcrumbHome: "Home",
+              heroTitle: "About ZYGSOFT",
               heroBody:
-                  "We build fast, reliable, conversion-focused digital products for companies that need more than a pretty website. From corporate sites to subscription tools, we focus on clarity, speed, and measurable business value.",
-              heroPrimary: "Start a Project",
-              heroSecondary: "Explore Digital Products",
-              introTitle: "We do not just ship pages. We design business infrastructure.",
-              introBody1:
-                  "ZYGSOFT is an Antalya-based software and digital product studio. We work with service companies, law offices, growing brands, and teams that need a site, dashboard, tool, or conversion system that actually moves the business forward.",
-              introBody2:
-                  "Our approach is simple: understand the real workflow, remove friction, then build an experience that is technically solid and commercially useful. We care about clean code, search visibility, performance, and the user's path to action.",
-              stats: [
-                  { num: "2019", label: "Founded in Antalya" },
-                  { num: "B2B", label: "Product-minded delivery" },
-                  { num: "Web + SaaS", label: "Core build focus" },
-                  { num: "TR / EN", label: "Bilingual growth-ready UX" },
-              ],
-              pillarsTitle: "What clients work with us for",
-              pillars: [
+                  "ZYGSOFT is an Antalya-based software company focused on websites, digital tools, automation-driven workflows, and conversion-oriented product experiences.",
+              heroPrimary: "Contact Us",
+              heroSecondary: "View Services",
+              companyEyebrow: "About ZYGSOFT",
+              companyTitle: "We build the digital layer behind trust, speed, and measurable growth.",
+              companyBody1:
+                  "Our work spans corporate websites, client-facing panels, subscription-ready digital tools, and operational systems that reduce friction. We prefer clear structure, practical delivery, and product thinking over visual noise.",
+              companyBody2:
+                  "For us, a strong website or digital platform should explain the business better, create more qualified action, and make the company feel more professional, reliable, and easier to work with.",
+              missionEyebrow: "Direction",
+              missionTitle: "Mission and vision built on practical execution.",
+              principles: [
                   {
-                      icon: <Code2 size={20} />,
-                      title: "Websites that perform",
-                      desc: "We build company websites that load fast, rank better, and guide visitors toward contact, demo, or purchase actions.",
+                      title: "Mission",
+                      body: "To design and build digital systems that create real business value through clearer structure, stronger performance, and more reliable user experience.",
+                      icon: <Target size={20} />,
                   },
                   {
-                      icon: <Layers3 size={20} />,
-                      title: "Productized digital tools",
-                      desc: "We turn repetitive workflows into practical subscription products, client panels, and internal systems.",
+                      title: "Vision",
+                      body: "To become a trusted software and digital product partner for businesses that want to modernize operations, strengthen brand presence, and scale with better systems.",
+                      icon: <Telescope size={20} />,
                   },
-                  {
-                      icon: <ChartNoAxesCombined size={20} />,
-                      title: "Conversion-oriented growth",
-                      desc: "We connect UX, SEO, analytics, and funnels so the site supports actual growth instead of acting as a brochure.",
-                  },
-              ],
-              processTitle: "How we usually work",
-              process: [
-                  {
-                      step: "01",
-                      title: "Understand the business",
-                      desc: "We start with goals, bottlenecks, user actions, and the commercial model, not just visual preferences.",
-                  },
-                  {
-                      step: "02",
-                      title: "Design a focused structure",
-                      desc: "We simplify the page hierarchy, CTA logic, messaging, and product flow before writing code.",
-                  },
-                  {
-                      step: "03",
-                      title: "Build for speed and longevity",
-                      desc: "We care about maintainable code, responsive layouts, structured content, and operational clarity.",
-                  },
-                  {
-                      step: "04",
-                      title: "Measure and improve",
-                      desc: "With analytics, search visibility, and user behavior signals in place, we keep improving what matters.",
-                  },
-              ],
-              trustTitle: "Our working principles",
-              trustPoints: [
-                  {
-                      icon: <ShieldCheck size={18} />,
-                      title: "Clear communication",
-                      desc: "We prefer realistic scope, visible priorities, and honest feedback over overpromising.",
-                  },
-                  {
-                      icon: <Compass size={18} />,
-                      title: "Business-first decisions",
-                      desc: "We choose what helps the client sell, deliver, or operate better, not what only looks impressive.",
-                  },
-                  {
-                      icon: <BadgeCheck size={18} />,
-                      title: "Responsible delivery",
-                      desc: "Performance, SEO, accessibility, and maintainability are part of the build, not afterthoughts.",
-                  },
-                  {
-                      icon: <Users size={18} />,
-                      title: "Long-term partnership",
-                      desc: "We like building systems that can evolve with the business, not one-off pages with no future.",
-                  },
-              ],
-              audienceTitle: "Who this usually fits",
-              audience: [
-                  "Law offices and legal operations that need document automation and cleaner internal flows.",
-                  "Service businesses that want a stronger corporate presence and more qualified leads.",
-                  "Founders launching digital products, subscription tools, or client-facing dashboards.",
-                  "Teams replacing scattered manual work with structured, measurable digital systems.",
-              ],
-              ctaTitle: "If the current site looks fine but does not move the business, it is time to rebuild the system behind it.",
-              ctaBody:
-                  "We can review your structure, user flow, and conversion path together, then turn it into a cleaner and more effective product experience.",
-              ctaPrimary: "Contact Us",
-              ctaSecondary: "View Services",
+              ] as PrincipleCard[],
+              founderEyebrow: "Founder",
+              founderName: "Gurkan Yavuz",
+              founderRole: "Senior Developer",
+              founderBody:
+                  "Gurkan Yavuz is the founder of ZYGSOFT. His background combines software development, web systems, operational IT thinking, and practical digital execution. This creates a product perspective that focuses not only on how a system looks, but also on how it performs and supports real workflows.",
+              founderQuote:
+                  "Technology should not only exist as infrastructure. It should shape how a business is perceived, managed, and moved forward.",
+              ctaTitle: "If your company needs a clearer digital face and a stronger system behind it, we can build it together.",
+              ctaPrimary: "Start a Project",
           }
         : {
               eyebrow: "Hakkımızda",
-              heroTitle: "Ürün bakışını, teknik uygulamayla birleştiren bir yazılım partneri.",
+              breadcrumbHome: "Anasayfa",
+              heroTitle: "Hakkımızda",
               heroBody:
-                  "Güzel görünen ama iş üretmeyen siteler yerine; hızlı çalışan, güven veren ve dönüşüm odaklı dijital ürünler geliştiriyoruz. Kurumsal web sitelerinden abonelikli araçlara kadar odağımız net: hız, açıklık ve ölçülebilir iş değeri.",
-              heroPrimary: "Proje Başlat",
-              heroSecondary: "Dijital Ürünleri İncele",
-              introTitle: "Biz sadece sayfa tasarlamıyoruz. İşin dijital altyapısını kuruyoruz.",
-              introBody1:
-                  "ZYGSOFT, Antalya merkezli bir yazılım ve dijital ürün stüdyosudur. Hizmet şirketleri, hukuk büroları, büyüyen markalar ve daha sağlam bir site, panel, araç ya da dönüşüm sistemi kurmak isteyen ekiplerle çalışıyoruz.",
-              introBody2:
-                  "Yaklaşımımız basit: önce gerçek iş akışını anlarız, sonra sürtünmeyi azaltır, en sonunda teknik olarak güçlü ve ticari olarak işe yarayan bir deneyim kurarız. Temiz kod, arama görünürlüğü, performans ve kullanıcının aksiyona giden yolu bizim için temel başlıklardır.",
-              stats: [
-                  { num: "2019", label: "Antalya'da kuruluş" },
-                  { num: "B2B", label: "Ürün odaklı teslim yaklaşımı" },
-                  { num: "Web + SaaS", label: "Ana uzmanlık alanı" },
-                  { num: "TR / EN", label: "Büyümeye hazır çift dilli UX" },
-              ],
-              pillarsTitle: "Müşteriler neden bizimle çalışıyor",
-              pillars: [
+                  "ZYGSOFT, Antalya merkezli bir yazılım şirketidir. Kurumsal web siteleri, dijital araçlar, otomasyon odaklı iş akışları ve dönüşüm odaklı ürün deneyimleri geliştiriyoruz.",
+              heroPrimary: "İletişime Geç",
+              heroSecondary: "Hizmetleri Gör",
+              companyEyebrow: "ZYGSOFT Hakkında",
+              companyTitle: "Güven, hız ve ölçülebilir büyümenin arkasındaki dijital katmanı kuruyoruz.",
+              companyBody1:
+                  "Çalışma alanımız; kurumsal web siteleri, müşteri panelleri, abonelik altyapısına uygun dijital araçlar ve operasyonel sürtünmeyi azaltan iç sistemleri kapsar. Görsel gürültü yerine net yapı, pratik teslim ve ürün mantığına önem veriyoruz.",
+              companyBody2:
+                  "Bize göre iyi bir site ya da dijital platform, işi daha iyi anlatmalı, daha nitelikli aksiyon üretmeli ve markayı daha profesyonel, daha güvenilir ve daha güçlü göstermelidir.",
+              missionEyebrow: "Yönümüz",
+              missionTitle: "Pratik uygulama üzerine kurulu vizyon ve misyon.",
+              principles: [
                   {
-                      icon: <Code2 size={20} />,
-                      title: "Performans üreten web siteleri",
-                      desc: "Daha hızlı açılan, daha iyi sıralanan ve ziyaretçiyi iletişime, demoya ya da satın almaya taşıyan siteler kuruyoruz.",
+                      title: "Misyon",
+                      body: "Daha net yapı, daha güçlü performans ve daha güvenilir kullanıcı deneyimi üzerinden işletmelere gerçek değer üreten dijital sistemler tasarlamak ve geliştirmek.",
+                      icon: <Target size={20} />,
                   },
                   {
-                      icon: <Layers3 size={20} />,
-                      title: "Ürünleşmiş dijital araçlar",
-                      desc: "Tekrarlayan iş akışlarını abonelikli ürünlere, müşteri panellerine ve pratik iç sistemlere dönüştürüyoruz.",
+                      title: "Vizyon",
+                      body: "Operasyonunu modernize etmek, marka görünümünü güçlendirmek ve daha iyi sistemlerle ölçeklenmek isteyen işletmeler için güvenilir bir yazılım ve dijital ürün partneri olmak.",
+                      icon: <Telescope size={20} />,
                   },
-                  {
-                      icon: <ChartNoAxesCombined size={20} />,
-                      title: "Dönüşüm odaklı büyüme",
-                      desc: "UX, SEO, analitik ve huni mantığını birlikte ele alıyor; sitenin broşür değil büyüme kanalı olmasını hedefliyoruz.",
-                  },
-              ],
-              processTitle: "Genelde nasıl çalışıyoruz",
-              process: [
-                  {
-                      step: "01",
-                      title: "İşi ve darboğazı anlarız",
-                      desc: "Görsel beğeniden önce hedefe, kullanıcı aksiyonuna, iş modeline ve tıkanan noktaya bakarız.",
-                  },
-                  {
-                      step: "02",
-                      title: "Odaklı bir yapı kurarız",
-                      desc: "Koddan önce sayfa kurgusunu, mesaj hiyerarşisini, CTA akışını ve ürün yolunu netleştiririz.",
-                  },
-                  {
-                      step: "03",
-                      title: "Hızlı ve sürdürülebilir inşa ederiz",
-                      desc: "Responsive yapı, temiz kod, içerik düzeni ve operasyonel açıklık teslimatın parçasıdır.",
-                  },
-                  {
-                      step: "04",
-                      title: "Ölçer ve geliştiririz",
-                      desc: "Analitik, görünürlük ve kullanıcı davranışını izleyip gerçekten etkili olan noktaları büyütürüz.",
-                  },
-              ],
-              trustTitle: "Çalışma prensiplerimiz",
-              trustPoints: [
-                  {
-                      icon: <ShieldCheck size={18} />,
-                      title: "Açık iletişim",
-                      desc: "Abartılı vaatler yerine gerçekçi kapsam, görünür öncelikler ve dürüst geri bildirim sunarız.",
-                  },
-                  {
-                      icon: <Compass size={18} />,
-                      title: "İş odaklı kararlar",
-                      desc: "Sadece etkileyici görüneni değil; satışı, teslimatı ya da operasyonu iyileştireni tercih ederiz.",
-                  },
-                  {
-                      icon: <BadgeCheck size={18} />,
-                      title: "Sorumlu teslimat",
-                      desc: "Performans, SEO, erişilebilirlik ve sürdürülebilirlik sonradan eklenen değil, baştan planlanan konulardır.",
-                  },
-                  {
-                      icon: <Users size={18} />,
-                      title: "Uzun vadeli bakış",
-                      desc: "Geleceği olmayan tek seferlik sayfalar yerine, iş büyüdükçe gelişebilen sistemler kurmayı severiz.",
-                  },
-              ],
-              audienceTitle: "En çok kimlerle iyi çalışıyoruz",
-              audience: [
-                  "Belge süreçlerini hızlandırmak ve iç operasyonunu sadeleştirmek isteyen hukuk bürolarıyla.",
-                  "Kurumsal görünümünü güçlendirip daha nitelikli talep toplamak isteyen hizmet şirketleriyle.",
-                  "Dijital ürün, abonelikli araç ya da müşteri paneli çıkaran kurucularla.",
-                  "Dağınık manuel işleri daha ölçülebilir dijital sistemlere dönüştürmek isteyen ekiplerle.",
-              ],
-              ctaTitle: "Site güzel görünüyor ama iş üretmiyorsa, sadece tasarımı değil sistemi yenilemek gerekir.",
-              ctaBody:
-                  "İstersen birlikte mevcut yapını, kullanıcı yolunu ve dönüşüm akışını gözden geçirelim; bunu daha net, hızlı ve etkili bir ürün deneyimine çevirelim.",
-              ctaPrimary: "İletişime Geç",
-              ctaSecondary: "Hizmetleri Gör",
+              ] as PrincipleCard[],
+              founderEyebrow: "Kurucu",
+              founderName: "Gürkan Yavuz",
+              founderRole: "Senior Developer",
+              founderBody:
+                  "Gürkan Yavuz, ZYGSOFT'un kurucusudur. Yazılım geliştirme, web sistemleri, operasyonel IT yaklaşımı ve pratik dijital uygulama deneyimini bir araya getirir. Bu yaklaşım, geliştirilen ürünlerin sadece iyi görünmesini değil; hızlı, anlaşılır ve gerçek iş akışına uyumlu çalışmasını hedefler.",
+              founderQuote:
+                  "Teknoloji sadece arka planda çalışan bir altyapı olmamalı; işletmenin nasıl algılandığını, yönetildiğini ve ileri taşındığını da belirlemelidir.",
+              ctaTitle: "Şirketin dijital yüzünü ve arkasındaki sistemi daha güçlü hale getirmek istiyorsan bunu birlikte kurabiliriz.",
+              ctaPrimary: "Proje Başlat",
           };
 
     return (
         <>
             <Header />
-            <main style={{ background: "#f9f7f3" }}>
-                <section
-                    className="relative overflow-hidden pt-36 pb-20 md:pt-40 md:pb-24"
-                    style={{ background: "linear-gradient(160deg, #f9f7f3 58%, #efe8d8 100%)" }}
-                >
+            <main className="bg-[#f7f4ec]">
+                <section className="relative overflow-hidden border-b border-black/6 bg-[linear-gradient(180deg,#fcfbf6_0%,#f7f4ec_100%)] pt-24 pb-10 md:pt-28 md:pb-12">
                     <div
-                        className="pointer-events-none absolute inset-0"
+                        className="pointer-events-none absolute inset-0 opacity-[0.04]"
                         style={{
-                            backgroundImage: "radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px)",
-                            backgroundSize: "40px 40px",
+                            backgroundImage: "radial-gradient(circle at 1px 1px, rgba(0,0,0,0.65) 1px, transparent 0)",
+                            backgroundSize: "28px 28px",
                         }}
                     />
-                    <motion.div
-                        className="pointer-events-none absolute right-[-10%] top-12 h-72 w-72 rounded-full md:right-10 md:h-96 md:w-96"
-                        animate={{ y: [0, -16, 0], scale: [1, 1.04, 1] }}
-                        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                        style={{
-                            background:
-                                "radial-gradient(circle, rgba(230,200,0,0.12) 0%, rgba(230,200,0,0.03) 45%, transparent 72%)",
-                        }}
-                    />
+                    <div className="pointer-events-none absolute left-[-8%] top-4 h-56 w-56 rounded-full bg-[#e6c800]/12 blur-3xl" />
 
-                    <div className="container mx-auto max-w-7xl px-6 relative z-10">
-                        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-                            <motion.div
-                                initial={{ opacity: 0, y: 36 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8 }}
-                                className="max-w-3xl"
-                            >
-                                <span className="section-label">{copy.eyebrow}</span>
+                    <div className="container relative z-10 mx-auto max-w-7xl px-6">
+                        <BlockReveal>
+                            <div className="max-w-3xl">
+                                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-[#343131]/45">
+                                    <Link href="/" className="transition-colors hover:text-[#111111]">
+                                        {copy.breadcrumbHome}
+                                    </Link>
+                                    <span>/</span>
+                                    <span>{copy.eyebrow}</span>
+                                </div>
+                                <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-black/8 bg-white/90 px-4 py-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#343131]/60 shadow-[0_8px_24px_rgba(0,0,0,0.04)]">
+                                    <Building2 size={13} className="text-[#e6c800]" />
+                                    {copy.eyebrow}
+                                </span>
                                 <h1
-                                    className="mt-4 font-display font-extrabold text-[#0e0e0e]"
-                                    style={{ fontSize: "clamp(38px,5.2vw,76px)", lineHeight: 0.98 }}
+                                    className="mt-4 max-w-3xl font-display font-extrabold text-[#111111]"
+                                    style={{ fontSize: "clamp(28px,3.1vw,42px)", lineHeight: 1.02 }}
                                 >
                                     {copy.heroTitle}
                                 </h1>
-                                <p className="mt-6 max-w-2xl text-base leading-8 text-[#5f5b52] md:text-xl">
+                                <p className="mt-4 max-w-3xl text-[15px] leading-7 text-[#5a564d] md:text-base">
                                     {copy.heroBody}
                                 </p>
-                                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                                <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                                     <Link href="/contact" className="btn-primary inline-flex justify-center">
                                         {copy.heroPrimary} <ArrowRight size={16} />
                                     </Link>
                                     <Link
-                                        href="/dijital-urunler"
-                                        className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white/80 px-6 py-3 text-sm font-bold uppercase tracking-[0.18em] text-[#0e0e0e] transition-all hover:border-[#e6c800]/40 hover:bg-white"
+                                        href="/services"
+                                        className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white/85 px-6 py-3 text-sm font-bold uppercase tracking-[0.18em] text-[#0e0e0e] transition-all hover:border-[#e6c800]/40 hover:bg-white"
                                     >
                                         {copy.heroSecondary}
                                     </Link>
                                 </div>
-                            </motion.div>
-
-                            <BlockReveal delay={0.12} className="grid grid-cols-2 gap-4">
-                                {copy.stats.map((stat, index) => (
-                                    <div
-                                        key={stat.label}
-                                        className={`rounded-2xl border p-5 shadow-sm transition-all hover-glow md:p-6 ${
-                                            index === 0 || index === 3
-                                                ? "border-[#0e0e0e] bg-[#0e0e0e] text-white"
-                                                : "border-black/8 bg-white/80 backdrop-blur"
-                                        }`}
-                                    >
-                                        <p
-                                            className={`font-display text-3xl font-extrabold md:text-4xl ${
-                                                index === 0 || index === 3 ? "text-[#e6c800]" : "text-[#0e0e0e]"
-                                            }`}
-                                        >
-                                            {stat.num}
-                                        </p>
-                                        <p className={`mt-1 text-sm leading-6 ${index === 0 || index === 3 ? "text-white/65" : "text-[#7a7468]"}`}>
-                                            {stat.label}
-                                        </p>
-                                    </div>
-                                ))}
-                            </BlockReveal>
-                        </div>
+                            </div>
+                        </BlockReveal>
                     </div>
                 </section>
 
-                <section className="border-y border-black/8 bg-white py-16 md:py-24">
+                <section className="py-16 md:py-20">
                     <div className="container mx-auto max-w-7xl px-6">
-                        <div className="grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:gap-20">
+                        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
                             <BlockReveal>
-                                <h2
-                                    className="font-display font-extrabold text-[#0e0e0e]"
-                                    style={{ fontSize: "clamp(30px,3.6vw,52px)", lineHeight: 1.02 }}
-                                >
-                                    {copy.introTitle}
-                                </h2>
-                                <p className="mt-6 text-base leading-8 text-[#5d594f] md:text-lg">{copy.introBody1}</p>
-                                <p className="mt-5 text-base leading-8 text-[#7a7468] md:text-lg">{copy.introBody2}</p>
+                                <div className="rounded-[30px] border border-black/7 bg-white p-7 shadow-[0_16px_40px_rgba(0,0,0,0.04)] md:p-8">
+                                    <span className="section-label">{copy.companyEyebrow}</span>
+                                    <h2
+                                        className="mt-4 font-display font-extrabold text-[#111111]"
+                                        style={{ fontSize: "clamp(28px,3.6vw,48px)", lineHeight: 1.02 }}
+                                    >
+                                        {copy.companyTitle}
+                                    </h2>
+                                    <p className="mt-5 text-base leading-8 text-[#5d594f] md:text-lg">{copy.companyBody1}</p>
+                                    <p className="mt-4 text-base leading-8 text-[#716c62] md:text-lg">{copy.companyBody2}</p>
+                                </div>
                             </BlockReveal>
 
-                            <BlockReveal delay={0.1}>
-                                <div className="rounded-[28px] border border-black/8 bg-[#faf7ef] p-6 md:p-8">
-                                    <div className="mb-6 flex items-center gap-3">
-                                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0e0e0e] text-[#e6c800]">
-                                            <Building2 size={22} />
-                                        </div>
-                                        <div>
-                                            <p className="font-display text-xl font-bold text-[#0e0e0e]">ZYGSOFT</p>
-                                            <p className="text-sm text-[#7c766a]">
-                                                {isEn ? "Software, product and conversion systems" : "Yazılım, ürün ve dönüşüm sistemleri"}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-4">
-                                        {copy.audience.map((item) => (
-                                            <div key={item} className="flex items-start gap-3 rounded-2xl bg-white/80 p-4">
-                                                <div className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#e6c800]/20 text-[#0e0e0e]">
-                                                    <FileText size={14} />
+                            <BlockReveal delay={0.08}>
+                                <div className="grid gap-4">
+                                    <div className="rounded-[30px] border border-black/7 bg-[#faf7ef] p-7 shadow-[0_20px_50px_rgba(0,0,0,0.06)] md:p-8">
+                                        <span className="text-[10px] font-black uppercase tracking-[0.28em] text-[#343131]/45">
+                                            {copy.missionEyebrow}
+                                        </span>
+                                        <h3 className="mt-4 text-3xl font-display font-extrabold leading-tight text-[#111111]">
+                                            {copy.missionTitle}
+                                        </h3>
+                                        <div className="mt-6 grid gap-4">
+                                            {copy.principles.map((item) => (
+                                                <div key={item.title} className="rounded-[24px] border border-black/8 bg-white p-5 shadow-[0_10px_24px_rgba(0,0,0,0.03)]">
+                                                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-[#111111] text-[#e6c800]">
+                                                        {item.icon}
+                                                    </div>
+                                                    <h3 className="font-display text-xl font-bold text-[#111111]">{item.title}</h3>
+                                                    <p className="mt-2 text-sm leading-7 text-[#5a564d]">{item.body}</p>
                                                 </div>
-                                                <p className="text-sm leading-7 text-[#4f4b43] md:text-[15px]">{item}</p>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </BlockReveal>
@@ -342,121 +192,58 @@ export default function About() {
                     </div>
                 </section>
 
-                <section className="py-16 md:py-24" style={{ background: "#f9f7f3" }}>
+                <section className="border-y border-black/7 bg-white py-16 md:py-20">
                     <div className="container mx-auto max-w-7xl px-6">
-                        <BlockReveal className="mb-10 md:mb-14">
-                            <TextReveal delay={0.05}>
-                                <span className="section-label">{copy.pillarsTitle}</span>
-                            </TextReveal>
-                        </BlockReveal>
-                        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                            {copy.pillars.map((pillar, i) => (
-                                <BlockReveal key={pillar.title} delay={i * 0.08}>
-                                    <motion.article
-                                        className="glass rounded-2xl p-7 hover-glow md:p-8"
-                                        whileHover={{ y: -6, transition: { duration: 0.2 } }}
-                                    >
-                                        <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#e6c800]/30 bg-[#e6c800]/15 text-[#0e0e0e]">
-                                            {pillar.icon}
-                                        </div>
-                                        <h3 className="font-display text-2xl font-bold text-[#0e0e0e]">{pillar.title}</h3>
-                                        <p className="mt-3 text-sm leading-7 text-[#757063] md:text-[15px]">{pillar.desc}</p>
-                                    </motion.article>
-                                </BlockReveal>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                <section className="bg-[#0e0e0e] py-16 md:py-24">
-                    <div className="container mx-auto max-w-7xl px-6">
-                        <BlockReveal className="mb-10 md:mb-14">
-                            <TextReveal delay={0.05}>
-                                <span className="section-label" style={{ color: "#e6c800" }}>
-                                    {copy.processTitle}
-                                </span>
-                            </TextReveal>
-                        </BlockReveal>
-                        <div className="grid gap-4 md:grid-cols-2">
-                            {copy.process.map((item, i) => (
-                                <BlockReveal key={item.step} delay={i * 0.08}>
-                                    <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-6 md:p-7">
-                                        <p className="font-display text-sm font-extrabold tracking-[0.22em] text-[#e6c800]">{item.step}</p>
-                                        <h3 className="mt-3 font-display text-2xl font-bold text-white">{item.title}</h3>
-                                        <p className="mt-3 text-sm leading-7 text-white/65 md:text-[15px]">{item.desc}</p>
-                                    </div>
-                                </BlockReveal>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                <section className="border-y border-black/8 bg-white py-16 md:py-24">
-                    <div className="container mx-auto max-w-7xl px-6">
-                        <div className="grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16">
+                        <div className="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
                             <BlockReveal>
-                                <span className="section-label">{copy.trustTitle}</span>
-                                <h2
-                                    className="mt-4 font-display font-extrabold text-[#0e0e0e]"
-                                    style={{ fontSize: "clamp(28px,3.2vw,44px)", lineHeight: 1.04 }}
-                                >
-                                    {isEn
-                                        ? "We prefer clean structure, measurable outcomes and responsible execution."
-                                        : "Temiz yapı, ölçülebilir sonuç ve sorumlu teslimat çizgisini koruyoruz."}
-                                </h2>
-                                <p className="mt-5 max-w-xl text-base leading-8 text-[#696459] md:text-lg">
-                                    {isEn
-                                        ? "Clients usually come to us when the existing site is slow, scattered, hard to manage, or simply not producing enough qualified action."
-                                        : "Müşteriler genelde bize mevcut site yavaşladığında, dağınık hale geldiğinde, yönetimi zorlaştığında ya da yeterince nitelikli aksiyon üretmediğinde geliyor."}
-                                </p>
+                                <div className="rounded-[30px] border border-black/7 bg-[#faf7ef] p-7 shadow-[0_12px_32px_rgba(0,0,0,0.03)] md:p-8">
+                                    <span className="block text-[10px] font-black uppercase tracking-[0.28em] text-[#343131]/45">
+                                        {copy.founderEyebrow}
+                                    </span>
+                                    <h2 className="mt-4 font-display text-3xl font-extrabold leading-[1] text-[#111111]">
+                                        {copy.founderName}
+                                    </h2>
+                                    <div className="mt-4 inline-flex rounded-full border border-black/8 bg-white px-4 py-2 text-sm font-semibold text-[#433f38]">
+                                        {copy.founderRole}
+                                    </div>
+                                </div>
                             </BlockReveal>
 
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                {copy.trustPoints.map((point, i) => (
-                                    <BlockReveal key={point.title} delay={i * 0.06}>
-                                        <div className="rounded-2xl border border-black/8 bg-[#faf7ef] p-5 md:p-6">
-                                            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#0e0e0e] text-[#e6c800]">
-                                                {point.icon}
-                                            </div>
-                                            <h3 className="font-display text-lg font-bold text-[#0e0e0e]">{point.title}</h3>
-                                            <p className="mt-2 text-sm leading-7 text-[#716b5f]">{point.desc}</p>
+                            <div className="grid gap-6">
+                                <BlockReveal delay={0.08}>
+                                    <div className="rounded-[30px] border border-black/7 bg-white p-7 shadow-[0_12px_32px_rgba(0,0,0,0.03)] md:p-8">
+                                        <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#faf4d4] text-[#111111]">
+                                            <BadgeCheck size={20} />
                                         </div>
-                                    </BlockReveal>
-                                ))}
+                                        <p className="text-base leading-8 text-[#59554c] md:text-lg">{copy.founderBody}</p>
+                                        <blockquote className="mt-6 rounded-[24px] border border-[#e6c800]/30 bg-[#fffdf5] px-5 py-5 text-base font-medium italic leading-8 text-[#27231e] shadow-[0_10px_24px_rgba(0,0,0,0.02)]">
+                                            “{copy.founderQuote}”
+                                        </blockquote>
+                                    </div>
+                                </BlockReveal>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <section className="py-16 md:py-24" style={{ background: "#f3f0ea" }}>
+                <section className="py-16 md:py-20">
                     <div className="container mx-auto max-w-7xl px-6">
                         <BlockReveal>
-                            <div className="relative overflow-hidden rounded-[30px] bg-[#0e0e0e] px-6 py-10 text-center md:px-12 md:py-14">
-                                <div className="pointer-events-none absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at top, rgba(230,200,0,0.3), transparent 40%)" }} />
+                            <div className="relative overflow-hidden rounded-[32px] border border-black/7 bg-white px-6 py-10 text-center shadow-[0_16px_36px_rgba(0,0,0,0.04)] md:px-12 md:py-14">
+                                <div
+                                    className="pointer-events-none absolute inset-0 opacity-[0.08]"
+                                    style={{ backgroundImage: "radial-gradient(circle at top, rgba(230,200,0,0.45), transparent 42%)" }}
+                                />
                                 <div className="relative z-10 mx-auto max-w-4xl">
-                                    <div className="mb-5 flex justify-center">
-                                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/8 text-[#e6c800]">
-                                            <Sparkles size={26} />
-                                        </div>
-                                    </div>
                                     <h2
-                                        className="font-display font-extrabold text-white"
-                                        style={{ fontSize: "clamp(30px,4vw,54px)", lineHeight: 1.02 }}
+                                        className="font-display font-extrabold text-[#111111]"
+                                        style={{ fontSize: "clamp(28px,3.8vw,50px)", lineHeight: 1.02 }}
                                     >
                                         {copy.ctaTitle}
                                     </h2>
-                                    <p className="mx-auto mt-5 max-w-3xl text-base leading-8 text-white/70 md:text-lg">
-                                        {copy.ctaBody}
-                                    </p>
-                                    <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+                                    <div className="mt-8 flex justify-center">
                                         <Link href="/contact" className="btn-yellow justify-center">
                                             {copy.ctaPrimary} <ArrowRight size={16} />
-                                        </Link>
-                                        <Link
-                                            href="/services"
-                                            className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-bold uppercase tracking-[0.18em] text-white transition-all hover:bg-white/10"
-                                        >
-                                            {copy.ctaSecondary}
                                         </Link>
                                     </div>
                                 </div>
