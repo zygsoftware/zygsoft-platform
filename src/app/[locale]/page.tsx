@@ -4,7 +4,7 @@ import { useRef, useEffect } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
-import { Zap, Sparkles, CheckCircle2, Cpu, BarChart3, Rocket, ShieldCheck } from "lucide-react";
+import { Sparkles, CheckCircle2, Cpu, BarChart3, Rocket, ShieldCheck } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -51,11 +51,6 @@ type PartnerPillar = {
 
 type ProcessStep = {
   n: string;
-  t: string;
-  d: string;
-};
-
-type WhyChooseUsItem = {
   t: string;
   d: string;
 };
@@ -197,15 +192,15 @@ export default function Home() {
             <div className="flex flex-col lg:flex-row items-end justify-between gap-12 mb-24">
               <BlockReveal className="max-w-3xl">
                 <TextReveal delay={0.05}>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-white/45 mb-5 block">{t("processSection.tag")}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.32em] !text-white/55 mb-5 block">{t("processSection.tag")}</span>
                 </TextReveal>
                 <TextReveal delay={0.12}>
-                  <h2 className="text-4xl md:text-5xl font-display font-black leading-[0.94] tracking-tighter uppercase text-white" dangerouslySetInnerHTML={{ __html: t.raw("processSection.title") }} />
+                  <h2 className="text-4xl md:text-5xl font-display font-black leading-[0.94] tracking-tighter uppercase !text-white" dangerouslySetInnerHTML={{ __html: t.raw("processSection.title") }} />
                 </TextReveal>
               </BlockReveal>
               <BlockReveal delay={0.12} className="max-w-md lg:text-right">
                 <TextReveal delay={0.18}>
-                  <p className="text-white/45 text-[16px] font-medium italic max-w-sm">
+                  <p className="!text-white/58 text-[16px] font-medium italic max-w-sm">
                     {t("processSection.description")}
                   </p>
                 </TextReveal>
@@ -228,10 +223,10 @@ export default function Home() {
                     transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
                     className="home-card-dark group relative rounded-xl p-10 h-full flex flex-col justify-between transition-all duration-300"
                   >
-                    <span className="text-5xl font-black text-white/15 group-hover:text-[#e6c800]/40 transition-colors leading-none mb-8">{step.n}</span>
+                    <span className="text-5xl font-black !text-white/15 group-hover:!text-[#e6c800]/40 transition-colors leading-none mb-8">{step.n}</span>
                     <div>
-                      <h4 className="text-xl font-black uppercase mb-4 tracking-tight text-white transition-colors">{step.t}</h4>
-                      <p className="text-white/65 font-medium transition-colors leading-relaxed text-[15px]">{step.d}</p>
+                      <h4 className="text-xl font-black uppercase mb-4 tracking-tight !text-white transition-colors">{step.t}</h4>
+                      <p className="!text-white/72 font-medium transition-colors leading-relaxed text-[15px]">{step.d}</p>
                     </div>
                   </motion.div>
                 </motion.div>
@@ -249,99 +244,12 @@ export default function Home() {
 
         {/* Transition: dark → light (neutral gradient, cinematic) */}
         <div
-          className="h-24 md:h-28"
+          className="h-20 md:h-24"
           style={{
-            background: "linear-gradient(to bottom, #343131 0%, #1a1c22 15%, #2a2c32 30%, #50545a 50%, #a8acb0 75%, #e8e8ec 90%, #ffffff 100%)",
+            background: "linear-gradient(to bottom, #343131 0%, #474a50 22%, #6e7278 45%, #b8bcc1 72%, #eceef1 90%, #ffffff 100%)",
           }}
           aria-hidden
         />
-
-        {/* ── SECTION 05: WHY CHOOSE US ────────────────────────── */}
-        <section className="home-snap-section py-24 md:py-28 bg-white overflow-hidden">
-          <div className="container mx-auto px-6">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-14 lg:gap-16 items-center">
-              <div className="lg:col-span-7">
-                <BlockReveal>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#343131]/45 mb-8 block">{t("whyChooseUs.tag")}</span>
-                  <h2 className="text-4xl md:text-5xl font-display font-black leading-[0.92] tracking-tighter mb-10 text-[#343131] max-w-xl" dangerouslySetInnerHTML={{ __html: t.raw("whyChooseUs.title") }} />
-                  <motion.div
-                    className="grid grid-cols-1 md:grid-cols-2 gap-12"
-                    variants={staggerContainer}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={revealViewport}
-                  >
-                    {(t.raw("whyChooseUs.items") as WhyChooseUsItem[]).map((item, i) => (
-                      <motion.div
-                        key={i}
-                        variants={createRevealUp(reducedMotion, 28, 6)}
-                        whileHover={{ x: 6 }}
-                        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                        className="flex flex-col gap-5 group p-7 rounded-2xl hover:bg-[#fafafc] transition-all duration-300"
-                      >
-                        <div className="w-12 h-12 shrink-0 rounded-xl bg-[#343131] flex items-center justify-center text-[#e6c800] shadow-lg">
-                          <CheckCircle2 size={22} />
-                        </div>
-                        <div>
-                          <h4 className="text-xl font-black uppercase tracking-tight mb-2 leading-none">{item.t}</h4>
-                          <p className="text-[#343131]/48 font-medium leading-relaxed text-[15px] max-w-xs">{item.d}</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                </BlockReveal>
-              </div>
-
-              <div className="lg:col-span-5 relative">
-                <BlockReveal delay={0.12} className="relative z-10">
-                  <motion.div
-                    className="aspect-[4/5] bg-[#343131] rounded-[3rem] overflow-hidden relative shadow-[0_48px_96px_rgba(0,0,0,0.18)] p-10 flex flex-col justify-center gap-10"
-                  >
-                    {/* Visual Metric Scene */}
-                    <div className="absolute inset-0 opacity-10 pointer-events-none">
-                      <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-                    </div>
-
-                    {[
-                      { label: t("whyChooseUsPanel.metric1"), val: 98 },
-                      { label: t("whyChooseUsPanel.metric2"), val: 100 },
-                      { label: t("whyChooseUsPanel.metric3"), val: 99 }
-                    ].map((item, idx) => (
-                      <div key={idx} className="relative z-10">
-                        <div className="flex justify-between font-black text-[10px] uppercase tracking-[0.5em] text-white/40 mb-4">
-                          <span>{item.label}</span>
-                          <span className="text-[#e6c800]">{item.val}%</span>
-                        </div>
-                        <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            whileInView={{ width: `${item.val}%` }}
-                            transition={{ duration: 2, ease: "easeOut", delay: 0.5 + (idx * 0.2) }}
-                            className="h-full bg-gradient-to-r from-[#e6c800] to-white/50"
-                          />
-                        </div>
-                      </div>
-                    ))}
-
-                    <div className="mt-10 pt-10 border-t border-white/10 flex items-center gap-6">
-                      <div className="w-16 h-16 rounded-full bg-[#e6c800] flex items-center justify-center text-[#343131] shadow-[0_0_32px_rgba(230,200,0,0.2)]">
-                        <Zap size={32} />
-                      </div>
-                      <div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/55 block mb-2">{t("whyChooseUsPanel.architectureEyebrow")}</span>
-                        <span className="text-xl md:text-2xl font-black uppercase text-white tracking-tight">{t("whyChooseUsPanel.architectureTitle")}</span>
-                      </div>
-                    </div>
-                  </motion.div>
-                </BlockReveal>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] bg-[#343131]/[0.02] blur-[60px] rounded-full -z-10" />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Transition: white → off-white (Why Choose Us → Capabilities) */}
-        <div className="h-8 bg-gradient-to-b from-white to-[#fafafc]" aria-hidden />
 
         {/* ── SECTION 06: CAPABILITIES (TECH STACK) ────────────────────────── */}
         <section className="home-snap-section py-20 md:py-24 bg-[#fafafc] border-y border-[#343131]/[0.04] overflow-hidden">
@@ -418,26 +326,22 @@ export default function Home() {
 
           <div className="container mx-auto px-6 relative z-10 text-center">
             <BlockReveal className="flex flex-col items-center">
-              <TextReveal delay={0.05}>
-                <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/50 mb-6 block">{t("ctaSection.tag")}</span>
-              </TextReveal>
-              <TextReveal delay={0.12}>
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-black leading-[0.94] tracking-tight text-white uppercase mb-10 max-w-3xl mx-auto" dangerouslySetInnerHTML={{ __html: t.raw("ctaSection.title") }} />
-              </TextReveal>
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-[0.4em] !text-white/55 mb-6 block">{t("ctaSection.tag")}</span>
+                <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-black leading-[0.94] tracking-tight !text-white uppercase mb-10 max-w-3xl mx-auto" dangerouslySetInnerHTML={{ __html: t.raw("ctaSection.title") }} />
+              </div>
 
-              <TextReveal delay={0.2}>
               <div className="flex flex-col md:flex-row items-center justify-center gap-6">
                 <Link href="/contact" className="home-btn-primary-yellow group relative px-9 py-3.5 font-black uppercase tracking-[0.22em] text-[11px] rounded-xl overflow-hidden transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-[0_16px_48px_rgba(230,200,0,0.2)]">
                   <span className="relative z-10">{t("ctaSection.cta") || t("ctaSection.button")}</span>
                   <div className="absolute inset-0 border border-white/30 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </Link>
 
-                <Link href="/portfolio" className="group flex items-center gap-4 text-white/90 font-bold uppercase tracking-[0.24em] text-[11px] hover:text-[#e6c800] transition-colors duration-200">
+                <Link href="/portfolio" className="group flex items-center gap-4 !text-white/90 font-bold uppercase tracking-[0.24em] text-[11px] hover:!text-[#e6c800] transition-colors duration-200">
                   <span>{t("ctaSection.ctaSecondary") || "Explore Portfolio"}</span>
                   <div className="w-8 h-px bg-white/50 group-hover:bg-[#e6c800] group-hover:w-12 transition-all duration-300" />
                 </Link>
               </div>
-              </TextReveal>
             </BlockReveal>
           </div>
         </section>

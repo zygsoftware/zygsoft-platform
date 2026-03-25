@@ -15,7 +15,7 @@ export function AppStoreShowcase() {
     const reducedMotion = !!useReducedMotion();
     const isTr = locale === "tr";
     const { status, data: session } = useSession();
-    const hasLegalToolkit = (session?.user as any)?.activeProductSlugs?.includes("legal-toolkit");
+    const hasLegalToolkit = session?.user?.activeProductSlugs?.includes("legal-toolkit") ?? false;
     const primaryHref = hasLegalToolkit
         ? "/dashboard/tools"
         : status === "authenticated"
@@ -59,14 +59,14 @@ export function AppStoreShowcase() {
     ];
 
     const featureRows = [
-        { icon: Workflow, text: isTr ? "10 belge aracı, tek yıllık abonelik" : "10 document tools, one annual subscription", detail: isTr ? "Tüm araçlara sınırsız erişim" : "Unlimited access" },
+        { icon: Workflow, text: isTr ? "11 belge aracı, tek yıllık abonelik" : "11 document tools, one annual subscription", detail: isTr ? "Tüm araçlara sınırsız erişim" : "Unlimited access" },
         { icon: Shield, text: isTr ? "KVKK uyumlu, belgeler işlem sonrası silinir" : "KVKK-compliant, documents deleted after processing", detail: isTr ? "Güvenli altyapı" : "Secure infrastructure" },
         { icon: Layers, text: isTr ? "UYAP, PDF, OCR — hepsi dahil" : "UYAP, PDF, OCR — all included", detail: isTr ? "Tek paket" : "Single package" },
         { icon: CheckCircle2, text: isTr ? "Ayrı satın alma yok, tüm araçlar dahil" : "No separate purchases, all tools included", detail: isTr ? "Şeffaf fiyatlandırma" : "Transparent pricing" },
     ];
 
     return (
-        <section className="py-24 md:py-28 bg-[#343131] relative overflow-hidden">
+        <section className="py-24 md:py-28 bg-[#343131] text-white relative overflow-hidden">
             <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
 
             <div className="container mx-auto px-6 max-w-7xl relative z-10">
@@ -80,7 +80,7 @@ export function AppStoreShowcase() {
                     >
                         <div className="inline-flex items-center gap-3 mb-8 px-5 py-2.5 bg-white/8 border border-white/15 rounded-full backdrop-blur">
                             <Blocks size={12} className="text-[#e6c800]" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/80">{t("storeBadge") || "Dijital Ürünler & Yazılım Araçları"}</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] !text-white/80">{t("storeBadge") || "Dijital Ürünler & Yazılım Araçları"}</span>
                         </div>
 
                         <motion.h2
@@ -88,12 +88,12 @@ export function AppStoreShowcase() {
                             initial="hidden"
                             whileInView="visible"
                             viewport={revealViewport}
-                            className="text-4xl md:text-5xl xl:text-6xl font-display font-black leading-[0.96] tracking-tight text-white mb-7"
+                            className="text-4xl md:text-5xl xl:text-6xl font-display font-black leading-[0.96] tracking-tight !text-white mb-7"
                         >
                             {t("storeTitle") || "Dijital Ürünler ile İşinizi Büyütün"}
                         </motion.h2>
 
-                        <p className="text-white/65 text-lg leading-relaxed mb-10 max-w-xl">
+                        <p className="!text-white/68 text-lg leading-relaxed mb-10 max-w-xl">
                             {t("storeDesc") || "Avukatlık büroları ve işletmeler için özel yazılım araçları. Hukuk UDF Dönüştürücü ile belgelerinizi UYAP uyumlu formata anında çevirin. Abonelik başlat, saniyeler içinde kullanmaya başla."}
                         </p>
 
@@ -114,8 +114,8 @@ export function AppStoreShowcase() {
                                         {feat.icon}
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-white mb-1.5">{feat.title}</h4>
-                                        <p className="text-white/75 text-sm leading-relaxed">{feat.desc}</p>
+                                        <h4 className="font-bold !text-white mb-1.5">{feat.title}</h4>
+                                        <p className="!text-white/78 text-sm leading-relaxed">{feat.desc}</p>
                                     </div>
                                 </motion.div>
                             ))}
@@ -129,7 +129,7 @@ export function AppStoreShowcase() {
                         </Link>
                         <Link
                             href="/dijital-urunler/hukuk-araclari-paketi#pricing"
-                            className="ml-0 mt-4 inline-flex items-center gap-2.5 text-[11px] font-black uppercase tracking-[0.2em] text-white/70 transition-colors hover:text-white md:ml-6 md:mt-0"
+                            className="ml-0 mt-4 inline-flex items-center gap-2.5 text-[11px] font-black uppercase tracking-[0.2em] !text-white/72 transition-colors hover:!text-white md:ml-6 md:mt-0"
                         >
                             {isTr ? "Paket detayını gör" : "View package details"}
                             <ArrowRight size={14} />
@@ -144,16 +144,16 @@ export function AppStoreShowcase() {
                         className="lg:col-span-6"
                     >
                         <TiltCard maxTilt={7} className="h-full">
-                            <div className="relative rounded-[2.3rem] border border-white/10 bg-gradient-to-b from-white/[0.09] to-white/[0.03] p-7 md:p-8 shadow-[0_50px_120px_rgba(0,0,0,0.38)] overflow-hidden">
+                            <div className="relative rounded-[2.3rem] border border-white/10 bg-gradient-to-b from-white/[0.09] to-white/[0.03] p-7 md:p-8 shadow-[0_32px_72px_rgba(0,0,0,0.26)] overflow-hidden">
                                 <div className="absolute -top-20 -right-16 h-60 w-60 rounded-full bg-[#e6c800]/15 blur-3xl pointer-events-none" />
                                 <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #fff 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
 
                                 <div className="relative z-10 flex items-start justify-between mb-6">
-                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e6c800] text-[#343131] text-[10px] font-black uppercase tracking-[0.24em]">
+                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e6c800] !text-[#343131] text-[10px] font-black uppercase tracking-[0.24em]">
                                         <Sparkles size={12} />
                                         {previewProducts[0].tag}
                                     </div>
-                                    <span className="text-white/70 text-[10px] uppercase tracking-[0.2em] font-bold">{isTr ? "Belge Araçları Paketi" : "Document Tools Package"}</span>
+                                    <span className="!text-white/72 text-[10px] uppercase tracking-[0.2em] font-bold">{isTr ? "Belge Araçları Paketi" : "Document Tools Package"}</span>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
@@ -162,11 +162,11 @@ export function AppStoreShowcase() {
                                         <div className="w-12 h-12 rounded-xl bg-[#e6c800]/20 text-[#e6c800] flex items-center justify-center mb-4">
                                             {previewProducts[0].icon}
                                         </div>
-                                        <h3 className="text-2xl font-black text-white leading-tight mb-2">{previewProducts[0].name}</h3>
-                                        <p className="text-white/75 text-sm leading-relaxed mb-5">{previewProducts[0].desc}</p>
+                                        <h3 className="text-2xl font-black !text-white leading-tight mb-2">{previewProducts[0].name}</h3>
+                                        <p className="!text-white/78 text-sm leading-relaxed mb-5">{previewProducts[0].desc}</p>
                                         {/* Price with subtle shine sweep */}
                                         <div className="relative rounded-xl bg-white/[0.08] border border-white/10 px-4 py-3 overflow-hidden">
-                                            <span className="relative z-10 text-white text-2xl font-black">{previewProducts[0].price}<span className="text-base text-white/70 font-bold ml-0.5">{previewProducts[0].period}</span></span>
+                                            <span className="relative z-10 !text-white text-2xl font-black">{previewProducts[0].price}<span className="text-base !text-white/72 font-bold ml-0.5">{previewProducts[0].period}</span></span>
                                             {!reducedMotion && (
                                                 <motion.div
                                                     className="absolute inset-0 z-0 pointer-events-none"
@@ -208,8 +208,8 @@ export function AppStoreShowcase() {
                                                         <Icon size={16} className="group-hover/card:scale-110 transition-transform duration-300" />
                                                     </span>
                                                     <div className="min-w-0 flex-1">
-                                                        <p className="text-[13px] font-medium text-white/95 leading-snug">{row.text}</p>
-                                                        <p className="text-[11px] text-white/60 mt-1 opacity-100 md:opacity-0 md:group-hover/card:opacity-100 transition-opacity duration-300 ease-out">
+                                                        <p className="text-[13px] font-medium !text-white/95 leading-snug">{row.text}</p>
+                                                        <p className="text-[11px] !text-white/62 mt-1 opacity-100 md:opacity-0 md:group-hover/card:opacity-100 transition-opacity duration-300 ease-out">
                                                             {row.detail}
                                                         </p>
                                                     </div>
@@ -227,7 +227,7 @@ export function AppStoreShowcase() {
                                             isTr ? "2. Otomatik dönüşüm kuyruğunu çalıştırın" : "2. Run automated conversion queue",
                                             isTr ? "3. UYAP uyumlu çıktıyı indirin" : "3. Download UYAP-compatible output",
                                         ].map((item, i) => (
-                                            <p key={i} className="text-white/85 text-sm">{item}</p>
+                                            <p key={i} className="!text-white/88 text-sm">{item}</p>
                                         ))}
                                     </div>
                                 </div>
@@ -255,11 +255,11 @@ export function AppStoreShowcase() {
                                 {previewProducts.slice(1).map((prod) => (
                                     <Link key={prod.id} href="/dashboard/tools" className="block">
                                         <motion.div variants={createRevealUp(reducedMotion, 28, 8)} whileHover={{ y: -3 }} transition={{ duration: 0.2 }} className="home-card-dark rounded-2xl p-4 hover:border-[#e6c800]/40 transition-colors duration-200">
-                                            <div className="flex items-center gap-3 mb-3 text-white">
+                                            <div className="flex items-center gap-3 mb-3 !text-white">
                                                 <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">{prod.icon}</div>
                                                 <p className="font-bold">{prod.name}</p>
                                             </div>
-                                            <p className="text-white/55 text-sm line-clamp-2">{prod.desc}</p>
+                                            <p className="!text-white/58 text-sm line-clamp-2">{prod.desc}</p>
                                             <div className="mt-3 text-xs font-bold text-[#e6c800]/90">{prod.price}</div>
                                         </motion.div>
                                     </Link>

@@ -100,7 +100,7 @@ const FAQ_ITEMS = [
 ];
 
 const PRICE_FEATURES = [
-    "10 araç, sınırsız kullanım",
+    "11 araç, sınırsız kullanım",
     "Tek yıllık ödeme",
     "UYAP uyumlu çıktı",
     "KVKK uyumlu altyapı",
@@ -334,7 +334,7 @@ export default function HukukAraclariPaketiPage() {
                                 Hukuk Araçları Paketi İçinde Neler Var?
                             </h2>
                             <p className="text-[#343131]/60 text-lg max-w-2xl mx-auto">
-                                10 araç, tek paket. UYAP uyumlu belge işlemleriniz için ihtiyacınız olan her şey.
+                                11 araç, tek paket. UYAP uyumlu belge işlemleriniz için ihtiyacınız olan her şey.
                             </p>
                         </motion.div>
                         <motion.div

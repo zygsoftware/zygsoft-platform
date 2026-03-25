@@ -57,17 +57,14 @@ export function InstagramFeedSection() {
   const t = useTranslations("Homepage.instagram");
   const [posts, setPosts] = useState<InstagramPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     fetch(API_ROUTE)
       .then((res) => res.json())
       .then((data: ApiResponse) => {
-        setSuccess(data.success);
         setPosts(data.posts ?? []);
       })
       .catch(() => {
-        setSuccess(false);
         setPosts([]);
       })
       .finally(() => setLoading(false));
@@ -83,29 +80,29 @@ export function InstagramFeedSection() {
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-16">
           <BlockReveal className="max-w-2xl">
             <TextReveal delay={0.05}>
-              <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-white/50 mb-5 block">{t("tag")}</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.32em] !text-white/55 mb-5 block">{t("tag")}</span>
             </TextReveal>
             <TextReveal delay={0.12}>
-              <h2 className="text-4xl md:text-5xl font-display font-black leading-[0.92] tracking-tight text-white uppercase mb-4">
+              <h2 className="text-4xl md:text-5xl font-display font-black leading-[0.92] tracking-tight !text-white uppercase mb-4">
                 {t("title")}
               </h2>
             </TextReveal>
             <TextReveal delay={0.18}>
-              <p className="text-white/55 text-[16px] font-medium max-w-md">
+              <p className="!text-white/62 text-[16px] font-medium max-w-md">
                 {t("description")}
               </p>
             </TextReveal>
           </BlockReveal>
 
           <BlockReveal delay={0.12} className="flex flex-wrap items-center gap-4 shrink-0">
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-sm font-bold text-white/90">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-sm font-bold !text-white/92">
               <Instagram size={18} /> @zygsoft
             </span>
             <a
               href={INSTAGRAM_PROFILE}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#e6c800] text-[#343131] font-bold text-sm hover:bg-[#c9ad00] transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#e6c800] !text-[#343131] font-bold text-sm hover:bg-[#c9ad00] transition-colors"
             >
               {t("viewProfile")}
               <ExternalLink size={16} />
@@ -120,18 +117,18 @@ export function InstagramFeedSection() {
             ))}
           </div>
         ) : !hasPosts ? (
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-16 text-center">
+          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-16 text-center shadow-[0_12px_32px_rgba(0,0,0,0.16)]">
             <div className="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-6">
-              <ImageIcon size={40} className="text-white/30" />
+              <ImageIcon size={40} className="!text-white/35" />
             </div>
-            <p className="text-white/60 text-lg font-medium mb-6 max-w-md mx-auto">
+            <p className="!text-white/70 text-lg font-medium mb-6 max-w-md mx-auto">
               {t("emptyState")}
             </p>
             <a
               href={INSTAGRAM_PROFILE}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#e6c800] text-[#343131] font-bold hover:bg-[#c9ad00] transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#e6c800] !text-[#343131] font-bold hover:bg-[#c9ad00] transition-colors"
             >
               {t("viewProfile")}
               <ExternalLink size={18} />
@@ -159,7 +156,7 @@ export function InstagramFeedSection() {
                       referrerPolicy="no-referrer"
                     />
                     <div className="absolute top-3 left-3">
-                      <span className="px-2.5 py-1 rounded-lg bg-black/60 text-[10px] font-bold uppercase tracking-wider text-white/90">
+                      <span className="px-2.5 py-1 rounded-lg bg-black/60 text-[10px] font-bold uppercase tracking-wider !text-white/90">
                         {getMediaTypeLabel(post.mediaType, t)}
                       </span>
                     </div>
@@ -173,11 +170,11 @@ export function InstagramFeedSection() {
                   </div>
                   <div className="p-5">
                     {post.caption && (
-                      <p className="text-white/70 text-[15px] leading-relaxed line-clamp-2 mb-3" title={post.caption}>
+                      <p className="!text-white/72 text-[15px] leading-relaxed line-clamp-2 mb-3" title={post.caption}>
                         {post.caption}
                       </p>
                     )}
-                    <div className="flex items-center justify-between text-xs text-white/40">
+                    <div className="flex items-center justify-between text-xs !text-white/45">
                       <span className="flex items-center gap-1.5">
                         <Calendar size={12} />
                         {formatDate(post.timestamp, locale)}
@@ -196,7 +193,7 @@ export function InstagramFeedSection() {
               href={INSTAGRAM_PROFILE}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/20 text-white/80 font-bold text-sm hover:border-[#e6c800]/50 hover:text-[#e6c800] transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/20 !text-white/82 font-bold text-sm hover:border-[#e6c800]/50 hover:text-[#e6c800] transition-colors"
             >
               {t("visitAccount")}
               <ExternalLink size={16} />

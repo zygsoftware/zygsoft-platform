@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "next-intl";
 
@@ -27,8 +27,8 @@ const RINGS = [
 
 interface PlanetDef {
   phase: number;
-  labelKey: any;
-  descKey: any;
+  labelKey: string;
+  descKey: string;
   yellow: boolean;
   icon: string;
 }
@@ -64,19 +64,12 @@ interface HoverCard { ri: number; x: number; y: number; }
 
 export function HeroOrbitNetwork() {
   const tLoc = useTranslations("HeroOrbit");
-  const translatedPlanets = useRef(PLANETS.map(p => ({
+  const [boxWidth, setBoxWidth] = useState(0);
+  const translatedPlanets = useMemo(() => PLANETS.map(p => ({
     ...p,
-    label: tLoc(p.labelKey as any),
-    desc: tLoc(p.descKey as any)
-  })));
-
-  useEffect(() => {
-    translatedPlanets.current = PLANETS.map(p => ({
-      ...p,
-      label: tLoc(p.labelKey as any),
-      desc: tLoc(p.descKey as any)
-    }));
-  }, [tLoc]);
+    label: tLoc(p.labelKey),
+    desc: tLoc(p.descKey)
+  })), [tLoc]);
 
   const cRef = useRef<HTMLCanvasElement>(null);
   const bRef = useRef<HTMLDivElement>(null);
@@ -104,6 +97,7 @@ export function HeroOrbitNetwork() {
       const r = box.getBoundingClientRect();
       W = Math.round(r.width) || box.clientWidth;
       H = Math.round(r.height) || box.clientHeight;
+      setBoxWidth(W);
       const dpr = Math.min(window.devicePixelRatio, 2);
       canvas.width  = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
@@ -179,7 +173,7 @@ export function HeroOrbitNetwork() {
       // ── Rings + photon + planets ──
       for (let ri = 0; ri < RINGS.length; ri++) {
         const ring   = RINGS[ri];
-        const planet = translatedPlanets.current[ri];
+        const planet = translatedPlanets[ri];
         const alpha  = ringAlphas.current[ri];
         const rx = W * ring.rxF, ry = H * ring.ryF;
         const rot = t * ring.spd * Math.PI * 2 * ring.dir + ring.tilt;
@@ -242,28 +236,58 @@ export function HeroOrbitNetwork() {
         const { x: px, y: py } = ellipsePoint(cx, cy, rx, ry, rot, planet.phase);
         planetPos.current[ri] = { x: px, y: py };
 
-        // Dark aura gradient
-        const hg = ctx.createRadialGradient(px, py, 0, px, py, pSz * 5.5);
-        hg.addColorStop(0,    `rgba(52,49,49,${(isHov ? 0.65 : 0.45) * alpha})`);
-        hg.addColorStop(0.5,  `rgba(52,49,49,${(isHov ? 0.25 : 0.15) * alpha})`);
+        // Outer aura
+        const hg = ctx.createRadialGradient(px, py, 0, px, py, pSz * 6.2);
+        hg.addColorStop(0,    `rgba(52,49,49,${(isHov ? 0.48 : 0.34) * alpha})`);
+        hg.addColorStop(0.45, `rgba(52,49,49,${(isHov ? 0.18 : 0.10) * alpha})`);
         hg.addColorStop(1,    "rgba(52,49,49,0)");
         
         ctx.globalAlpha = alpha;
         ctx.beginPath();
-        ctx.arc(px, py, pSz * 5.5, 0, Math.PI * 2);
+        ctx.arc(px, py, pSz * 6.2, 0, Math.PI * 2);
         ctx.fillStyle = hg;
         ctx.fill();
+
+        // Soft yellow carrier glow
+        const yg = ctx.createRadialGradient(px, py, 0, px, py, pSz * 3.6);
+        yg.addColorStop(0, `rgba(230,200,0,${(isHov ? 0.28 : 0.18) * alpha})`);
+        yg.addColorStop(0.55, `rgba(230,200,0,${(isHov ? 0.10 : 0.06) * alpha})`);
+        yg.addColorStop(1, "rgba(230,200,0,0)");
+        ctx.beginPath();
+        ctx.arc(px, py, pSz * 3.6, 0, Math.PI * 2);
+        ctx.fillStyle = yg;
+        ctx.fill();
+
+        // Outer ring
+        ctx.beginPath();
+        ctx.arc(px, py, (pSz + 2.3) * pulse, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(52,49,49,${(isHov ? 0.34 : 0.22) * alpha})`;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        // Middle ring
+        ctx.beginPath();
+        ctx.arc(px, py, (pSz + 0.9) * pulse, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(230,200,0,${(isHov ? 0.70 : 0.52) * alpha})`;
+        ctx.lineWidth = 1.1;
+        ctx.stroke();
 
         // Solid core with dark glow
         ctx.save();
         ctx.shadowColor = "rgba(52,49,49,0.9)";
-        ctx.shadowBlur  = isHov ? 24 : 14;
+        ctx.shadowBlur  = isHov ? 20 : 12;
         ctx.beginPath();
-        ctx.arc(px, py, (pSz + 1) * pulse, 0, Math.PI * 2);
+        ctx.arc(px, py, (pSz + 0.1) * pulse, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(52,49,49,1)`;
         ctx.fill();
         ctx.shadowBlur = 0;
         ctx.restore();
+
+        // Tiny center highlight
+        ctx.beginPath();
+        ctx.arc(px, py, Math.max(1.3, pSz * 0.34) * pulse, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,245,195,${(isHov ? 0.95 : 0.78) * alpha})`;
+        ctx.fill();
         ctx.globalAlpha = 1;
 
         // Label (always visible)
@@ -280,6 +304,7 @@ export function HeroOrbitNetwork() {
       // ── Center Sun ──
       const sunDim = hoveredIdx.current !== -1 ? 0.70 : 1.0;
       const p = 0.82 + Math.sin(t * 1.05) * 0.18;
+      const ringSpin = t * 0.72;
 
       const fc = ctx.createRadialGradient(cx, cy, 0, cx, cy, 80 * p);
       fc.addColorStop(0, Y(0.10 * sunDim)); fc.addColorStop(0.6, Y(0.035 * sunDim));
@@ -292,18 +317,65 @@ export function HeroOrbitNetwork() {
       ctx.beginPath(); ctx.fillStyle = ic; ctx.arc(cx, cy, 34*p, 0, Math.PI*2); ctx.fill();
 
       ctx.globalAlpha = sunDim;
-      ctx.beginPath(); ctx.arc(cx,cy,9*p,0,Math.PI*2); ctx.fillStyle=Wh(0.97); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx,cy,5.5*p,0,Math.PI*2); ctx.fillStyle=Y(0.92); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx,cy,13*p,0,Math.PI*2);
-      ctx.strokeStyle=D(0.09); ctx.lineWidth=0.8; ctx.stroke();
-      const fl = 26*p;
-      ctx.strokeStyle=Wh(0.35); ctx.lineWidth=1.2;
-      for (const a of [0, Math.PI/2]) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(ringSpin);
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 22 * p, 0, Math.PI * 2);
+      ctx.strokeStyle = Y(0.20);
+      ctx.lineWidth = 6;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 18 * p, 0, Math.PI * 2);
+      ctx.strokeStyle = Y(0.82);
+      ctx.lineWidth = 2.2;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 13.5 * p, 0, Math.PI * 2);
+      ctx.strokeStyle = D(0.22);
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+
+      ctx.setLineDash([3, 5]);
+      ctx.beginPath();
+      ctx.arc(0, 0, 9.5 * p, Math.PI * 0.22, Math.PI * 1.92);
+      ctx.strokeStyle = Y(0.95);
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      for (const a of [0, Math.PI / 2]) {
         ctx.beginPath();
-        ctx.moveTo(cx-Math.cos(a)*fl, cy-Math.sin(a)*fl);
-        ctx.lineTo(cx+Math.cos(a)*fl, cy+Math.sin(a)*fl);
+        ctx.moveTo(-15 * p * Math.cos(a), -15 * p * Math.sin(a));
+        ctx.lineTo(15 * p * Math.cos(a), 15 * p * Math.sin(a));
+        ctx.strokeStyle = Wh(0.18);
+        ctx.lineWidth = 1;
         ctx.stroke();
       }
+
+      ctx.restore();
+
+      ctx.save();
+      ctx.shadowColor = "rgba(230,200,0,0.55)";
+      ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 8.4 * p, 0, Math.PI * 2);
+      ctx.fillStyle = D(0.98);
+      ctx.fill();
+      ctx.restore();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, 5.8 * p, 0, Math.PI * 2);
+      ctx.fillStyle = Y(0.96);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, 2.5 * p, 0, Math.PI * 2);
+      ctx.fillStyle = Wh(0.94);
+      ctx.fill();
       ctx.globalAlpha = 1;
 
       raf = requestAnimationFrame(draw);
@@ -316,7 +388,7 @@ export function HeroOrbitNetwork() {
       box.removeEventListener("mousemove", onMove);
       box.removeEventListener("mouseleave", onLeave);
     };
-  }, []);
+  }, [translatedPlanets]);
 
   return (
     <div ref={bRef} className="absolute inset-0" aria-hidden style={{ cursor:"default" }}>
@@ -325,13 +397,13 @@ export function HeroOrbitNetwork() {
       {/* HTML hover card */}
       <AnimatePresence>
         {hoverCard !== null && (() => {
-          const planet = translatedPlanets.current[hoverCard.ri];
-          const isRight = hoverCard.x > (bRef.current?.clientWidth ?? 0) * 0.6;
+          const planet = translatedPlanets[hoverCard.ri];
+          const isRight = hoverCard.x > boxWidth * 0.6;
           const cardW = 220;
           const rawLeft = isRight
             ? hoverCard.x - cardW - 16
             : hoverCard.x + 24;
-          const safeLeft = Math.max(8, Math.min(rawLeft, (bRef.current?.clientWidth ?? 500) - cardW - 8));
+          const safeLeft = Math.max(8, Math.min(rawLeft, Math.max(boxWidth, 500) - cardW - 8));
           const rawTop  = hoverCard.y - 70;
           const safeTop = Math.max(8, rawTop);
 

@@ -103,7 +103,7 @@ export function Header() {
                         {session ? (
                             <div className="flex items-center gap-3">
                                 <Magnetic strength={18}>
-                                    <Link href="/dashboard" className="bg-slate-950 text-white text-[11px] font-black uppercase tracking-[0.2em] py-2.5 px-6 rounded-full hover:bg-[#e6c800] hover:text-slate-950 transition-all duration-200 shadow-lg shadow-slate-900/10" data-magnetic="true">
+                                    <Link href="/dashboard" className="bg-slate-950 !text-white text-[11px] font-black uppercase tracking-[0.2em] py-2.5 px-6 rounded-full hover:bg-[#e6c800] hover:!text-slate-950 transition-all duration-200 shadow-lg shadow-slate-900/10" data-magnetic="true">
                                         {nav("dashboard")}
                                     </Link>
                                 </Magnetic>
@@ -117,7 +117,7 @@ export function Header() {
                                     {nav("login")}
                                 </Link>
                                 <Magnetic strength={20}>
-                                    <Link href="/register" className="bg-slate-950 text-white text-[11px] font-black uppercase tracking-[0.2em] py-2.5 px-6 rounded-full hover:bg-[#e6c800] hover:text-slate-950 transition-all duration-200 shadow-lg shadow-slate-900/10" data-magnetic="true">
+                                    <Link href="/register" className="bg-slate-950 !text-white text-[11px] font-black uppercase tracking-[0.2em] py-2.5 px-6 rounded-full hover:bg-[#e6c800] hover:!text-slate-950 transition-all duration-200 shadow-lg shadow-slate-900/10" data-magnetic="true">
                                         {nav("register")}
                                     </Link>
                                 </Magnetic>

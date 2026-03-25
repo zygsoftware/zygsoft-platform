@@ -625,11 +625,11 @@ export function PanelShowcase() {
                                                 onClick={() => setActiveTab(tab.id)}
                                                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-bold transition-all duration-200 ${
                                                     isActive
-                                                        ? "bg-[#343131] text-white shadow-[0_14px_30px_rgba(52,49,49,0.18)]"
+                                                        ? "bg-[#343131] !text-white shadow-[0_14px_30px_rgba(52,49,49,0.18)]"
                                                         : "bg-white text-[#343131]/70 border border-[#343131]/10 hover:text-[#343131] hover:border-[#343131]/20"
                                                 }`}
                                             >
-                                                <Icon size={14} />
+                                                <Icon size={14} className={isActive ? "!text-white" : ""} />
                                                 {tab.label}
                                             </button>
                                         );
@@ -666,8 +666,8 @@ export function PanelShowcase() {
                                             </p>
                                         </div>
                                         <div className="rounded-2xl bg-[#343131] px-4 py-3 shadow-[0_18px_40px_rgba(52,49,49,0.18)]">
-                                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/45">Status</p>
-                                            <p className="mt-2 text-[13px] font-bold text-white">{t("liveSystem")}</p>
+                                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] !text-white/55">Status</p>
+                                            <p className="mt-2 text-[13px] font-bold !text-white">{t("liveSystem")}</p>
                                         </div>
                                     </div>
                                 </div>

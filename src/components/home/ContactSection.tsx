@@ -67,10 +67,10 @@ export function ContactSection({ title, subtitle }: ContactSectionProps) {
                     <div className="w-14 h-14 rounded-2xl bg-[#e6c800]/10 border border-[#e6c800]/20 flex items-center justify-center mb-8">
                       <MessageSquare size={28} className="text-[#e6c800]" />
                     </div>
-                    <h3 className="text-2xl md:text-3xl font-display font-black text-white mb-4 tracking-tight">
+                    <h3 className="text-2xl md:text-3xl font-display font-black !text-white mb-4 tracking-tight">
                       {t("title")}
                     </h3>
-                    <p className="text-white/65 text-[15px] font-medium leading-relaxed mb-8">
+                    <p className="!text-white/65 text-[15px] font-medium leading-relaxed mb-8">
                       {t("description")}
                     </p>
                     {/* Mini dashboard preview */}
@@ -85,15 +85,15 @@ export function ContactSection({ title, subtitle }: ContactSectionProps) {
                         >
                           <Icon size={20} className="text-[#e6c800] shrink-0" />
                           <div>
-                            <p className="text-white font-bold text-sm">{label}</p>
-                            <p className="text-white/50 text-[11px]">{sub}</p>
+                            <p className="!text-white font-bold text-sm">{label}</p>
+                            <p className="!text-white/50 text-[11px]">{sub}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                     {/* Animated flow indicator */}
                     <motion.div
-                      className="flex items-center gap-2 text-white/40 text-[12px] font-medium"
+                      className="flex items-center gap-2 !text-white/40 text-[12px] font-medium"
                       initial={{ opacity: 0 }}
                       whileInView={{ opacity: 1 }}
                       viewport={revealViewport}
@@ -106,7 +106,7 @@ export function ContactSection({ title, subtitle }: ContactSectionProps) {
                   <div className="mt-8 pt-8 border-t border-white/10">
                     <Link
                       href="/contact"
-                      className="group inline-flex items-center gap-2 text-[13px] font-bold text-[#e6c800] hover:text-white transition-colors"
+                      className="group inline-flex items-center gap-2 text-[13px] font-bold !text-[#e6c800] hover:!text-white transition-colors"
                     >
                       {t("cta")}
                       <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />

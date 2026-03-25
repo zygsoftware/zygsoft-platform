@@ -9,7 +9,6 @@ import {
     Layers, 
     Scissors, 
     ImageIcon, 
-    FileStack, 
     Zap, 
     CheckCircle2, 
     Star,
@@ -24,7 +23,7 @@ const PRODUCT_URL = "/dijital-urunler/hukuk-araclari-paketi";
 export default function DijitalUrunlerPage() {
     const t = useTranslations("AppStore");
     const { status, data: session } = useSession();
-    const hasLegalToolkit = (session?.user as any)?.activeProductSlugs?.includes("legal-toolkit");
+    const hasLegalToolkit = session?.user?.activeProductSlugs?.includes("legal-toolkit") ?? false;
     const primaryHref = hasLegalToolkit
         ? "/dashboard/tools"
         : status === "authenticated"
@@ -85,7 +84,7 @@ export default function DijitalUrunlerPage() {
                             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                                 <Link
                                     href={primaryHref}
-                                    className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#343131] px-7 py-4 text-[11px] font-black uppercase tracking-[0.22em] text-white transition-all hover:scale-[1.02] hover:bg-black active:scale-[0.98]"
+                                    className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#343131] px-7 py-4 text-[11px] font-black uppercase tracking-[0.22em] !text-white transition-all hover:scale-[1.02] hover:bg-black active:scale-[0.98]"
                                 >
                                     {primaryLabel}
                                     <ArrowRight size={16} />
@@ -149,13 +148,13 @@ export default function DijitalUrunlerPage() {
                                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                                             <Link
                                                 href={primaryHref}
-                                                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#e6c800] px-8 py-4 text-[13px] font-black uppercase tracking-widest text-[#141313] shadow-xl shadow-[#e6c800]/20 transition-all hover:scale-[1.02] hover:bg-[#c9ad00] active:scale-[0.98] whitespace-nowrap"
+                                                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#e6c800] px-8 py-4 text-[13px] font-black uppercase tracking-widest !text-[#141313] shadow-xl shadow-[#e6c800]/20 transition-all hover:scale-[1.02] hover:bg-[#c9ad00] active:scale-[0.98] whitespace-nowrap"
                                             >
                                                 {primaryLabel} <ArrowRight size={18} />
                                             </Link>
                                             <Link
                                                 href={PRODUCT_URL}
-                                                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-8 py-4 text-[12px] font-black uppercase tracking-[0.18em] text-white transition-colors hover:bg-white/10 hover:text-white"
+                                                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-8 py-4 text-[12px] font-black uppercase tracking-[0.18em] !text-white transition-colors hover:bg-white/10 hover:!text-white"
                                             >
                                                 {t("viewDetails")}
                                             </Link>

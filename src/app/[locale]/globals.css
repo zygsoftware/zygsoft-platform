@@ -755,9 +755,10 @@ html.home-scroll-snap .home-snap-section {
 }
 
 /* ─── Global Surface Contrast System ─────────────────────────────── */
-/* Dark surfaces default to light text unless text-* is explicitly set */
+/* Only opt-in dark surfaces should inherit light foreground. */
 :is(
   .surface-dark,
+  .home-card-dark,
   [class*="bg-[#0e0e0e]"],
   [class*="bg-[#141313]"],
   [class~="bg-[#343131]"],
@@ -772,6 +773,7 @@ html.home-scroll-snap .home-snap-section {
 
 :is(
   .surface-dark,
+  .home-card-dark,
   [class*="bg-[#0e0e0e]"],
   [class*="bg-[#141313]"],
   [class~="bg-[#343131]"],
@@ -788,6 +790,7 @@ html.home-scroll-snap .home-snap-section {
 /* Dark surface hard-fix: prevent dark text utility classes on dark backgrounds */
 :is(
   .surface-dark,
+  .home-card-dark,
   [class*="bg-[#0e0e0e]"],
   [class*="bg-[#141313]"],
   [class~="bg-[#343131]"],
@@ -809,10 +812,12 @@ html.home-scroll-snap .home-snap-section {
   color: #f8fafc !important;
 }
 
-/* Light surfaces default to dark text unless text-* is explicitly set */
+/* Solid light surfaces can safely inherit dark text. Avoid broad bg-white matching,
+   because translucent cards like bg-white/5 often live inside dark sections. */
 :is(
   .surface-light,
-  [class*="bg-white"],
+  .home-card-light,
+  [class~="bg-white"],
   [class*="bg-[#fafafc]"],
   [class*="bg-[#f9f7f3]"],
   [class*="bg-cream"]
@@ -822,7 +827,8 @@ html.home-scroll-snap .home-snap-section {
 
 :is(
   .surface-light,
-  [class*="bg-white"],
+  .home-card-light,
+  [class~="bg-white"],
   [class*="bg-[#fafafc]"],
   [class*="bg-[#f9f7f3]"],
   [class*="bg-cream"]
@@ -834,11 +840,25 @@ html.home-scroll-snap .home-snap-section {
 /* Brand yellow actions must always keep dark foreground */
 :is(
   [class~="bg-[#e6c800]"],
+  [class*="bg-[#e6c800]"],
   [class*="bg-brand-500"],
-  .btn-yellow
+  .btn-yellow,
+  .home-btn-primary-yellow
+) {
+  color: #343131 !important;
+}
+
+:is(
+  [class~="bg-[#e6c800]"],
+  [class*="bg-[#e6c800]"],
+  [class*="bg-brand-500"],
+  .btn-yellow,
+  .home-btn-primary-yellow
 )
   :is(
+    h1, h2, h3, h4, h5, h6, p, span, small, strong,
     [class*="text-white"],
+    [class*="text-[#343131]"],
     [class*="text-zinc-100"],
     [class*="text-slate-100"]
   ) {
