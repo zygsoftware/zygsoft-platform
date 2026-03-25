@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowRight, BookOpen, Clock, Calendar, Eye } from "lucide-react";
+import { ArrowRight, BookOpen, Clock, Calendar, Eye, Heart, MessageSquare } from "lucide-react";
 
 export type BlogPostCardData = {
     id: string;
@@ -18,8 +18,14 @@ export type BlogPostCardData = {
     reading_time_min: number | null;
     view_count?: number;
     is_featured?: boolean;
+    allow_comments?: boolean;
+    liked_by_current_user?: boolean;
     category?: { name_tr: string; name_en: string; slug: string } | null;
     tags?: { tag: { id: string; name: string; slug: string } }[];
+    _count?: {
+        comments?: number;
+        likes?: number;
+    };
 };
 
 type BlogPostCardProps = {
@@ -27,38 +33,51 @@ type BlogPostCardProps = {
     locale: string;
     variant?: "default" | "compact" | "featured";
     index?: number;
+    sectionBasePath?: "/blog" | "/news";
+    tagBasePath?: "/blog/tag";
 };
 
-export function BlogPostCard({ post, locale, variant = "default", index = 0 }: BlogPostCardProps) {
+export function BlogPostCard({
+    post,
+    locale,
+    variant = "default",
+    index = 0,
+    sectionBasePath = "/blog",
+    tagBasePath = "/blog/tag",
+}: BlogPostCardProps) {
     const router = useRouter();
     const isTr = locale === "tr";
     const title = isTr ? post.title_tr : post.title_en;
     const excerpt = isTr ? post.excerpt_tr : post.excerpt_en;
     const categoryName = post.category ? (isTr ? post.category.name_tr : post.category.name_en) : null;
-    const blogHref = locale === "tr" ? `/blog/${post.slug}` : `/${locale}/blog/${post.slug}`;
-    const tagHref = (slug: string) => (locale === "tr" ? `/blog/tag/${slug}` : `/${locale}/blog/tag/${slug}`);
+    const blogHref = locale === "tr"
+        ? `${sectionBasePath === "/news" ? "/haberler" : "/blog-haberler"}/${post.slug}`
+        : `/${locale}${sectionBasePath}/${post.slug}`;
+    const tagHref = (slug: string) => (locale === "tr" ? `/blog-haberler/etiket/${slug}` : `/${locale}${tagBasePath}/${slug}`);
     const postTags = post.tags?.map((t: { tag: { id: string; name: string; slug: string } }) => t.tag).filter(Boolean) ?? [];
 
     const isFeatured = variant === "featured";
+    const imageWrapClass = isFeatured
+        ? "aspect-[16/9] md:aspect-[19/9] bg-[linear-gradient(180deg,#f8f1cd_0%,#f5f6fa_100%)]"
+        : "aspect-[16/9] bg-[linear-gradient(180deg,#f8f1cd_0%,#f5f6fa_100%)]";
+    const imageClass = isFeatured
+        ? "object-cover object-center transition-transform duration-700 group-hover:scale-[1.05]"
+        : "object-cover object-top transition-transform duration-700 group-hover:scale-[1.06]";
+    const likeCount = post._count?.likes ?? 0;
+    const commentCount = post.allow_comments === false ? 0 : (post._count?.comments ?? 0);
 
     const cardContent = (
         <article
-            className={`group flex flex-col h-full overflow-hidden bg-white border border-[#343131]/[0.05] rounded-xl transition-all duration-300 hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] hover:-translate-y-1 shadow-[0_1px_2px_rgba(0,0,0,0.03)] ${
-                isFeatured ? "lg:flex lg:flex-row" : ""
-            }`}
+            className="group flex h-full flex-col overflow-hidden rounded-[30px] border border-[#343131]/[0.05] bg-white transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_22px_50px_rgba(0,0,0,0.08)] shadow-[0_1px_2px_rgba(0,0,0,0.03)]"
         >
-            <div
-                className={`relative bg-[#fafafc] overflow-hidden shrink-0 ${
-                    isFeatured ? "aspect-video lg:aspect-auto lg:w-1/2 lg:min-h-[320px]" : "aspect-video"
-                }`}
-            >
+            <div className={`relative overflow-hidden shrink-0 ${imageWrapClass}`}>
                 {post.cover_image ? (
                     <Image
                         src={post.cover_image}
                         alt={title}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                        sizes={isFeatured ? "(max-width: 1024px) 100vw, 50vw" : "(max-width: 768px) 100vw, 33vw"}
+                        className={imageClass}
+                        sizes={isFeatured ? "(max-width: 1024px) 100vw, 66vw" : "(max-width: 768px) 100vw, 33vw"}
                         unoptimized
                     />
                 ) : (
@@ -71,35 +90,18 @@ export function BlogPostCard({ post, locale, variant = "default", index = 0 }: B
                     aria-hidden
                 />
                 {post.is_featured && (
-                    <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-[#e6c800] text-[#343131] text-[10px] font-black uppercase tracking-wider">
+                    <span className="absolute bottom-4 left-4 px-3 py-1 rounded-full bg-[#e6c800] text-[#343131] text-[10px] font-black uppercase tracking-wider">
                         {isTr ? "Öne Çıkan" : "Featured"}
                     </span>
                 )}
                 {categoryName && !post.is_featured && (
-                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-white/95 text-[10px] font-bold uppercase text-[#343131] shadow-sm">
+                    <span className="absolute bottom-4 left-4 px-2.5 py-1 rounded-lg bg-white/95 text-[10px] font-bold uppercase text-[#343131] shadow-sm">
                         {categoryName}
                     </span>
                 )}
             </div>
-            <div className={`flex flex-col flex-1 ${isFeatured ? "p-8 md:p-10 lg:w-1/2 lg:justify-center" : "p-6"}`}>
-                <h3
-                    className={`font-display font-bold text-[#0e0e0e] line-clamp-2 group-hover:text-[#e6c800] transition-colors ${
-                        isFeatured ? "text-2xl md:text-3xl mb-4" : "text-lg mb-2"
-                    }`}
-                >
-                    {title}
-                </h3>
-                <p
-                    className={`text-[#343131]/60 leading-relaxed flex-1 ${
-                        isFeatured ? "text-base line-clamp-3 mb-6" : "text-sm line-clamp-3 mb-4"
-                    }`}
-                >
-                    {excerpt}
-                </p>
+            <div className={`flex flex-col flex-1 ${isFeatured ? "p-7 md:p-8" : "p-6"}`}>
                 <div className="flex flex-wrap items-center gap-4 text-xs text-[#343131]/50 font-medium">
-                    {categoryName && (
-                        <span className="text-[#e6c800] font-semibold">{categoryName}</span>
-                    )}
                     {post.published_at && (
                         <span className="flex items-center gap-1">
                             <Calendar size={12} />
@@ -123,8 +125,37 @@ export function BlogPostCard({ post, locale, variant = "default", index = 0 }: B
                         </span>
                     )}
                 </div>
+                <h3
+                    className={`font-display font-bold text-[#0e0e0e] line-clamp-3 group-hover:text-[#e6c800] transition-colors ${
+                        isFeatured ? "mt-4 text-2xl md:text-4xl mb-4 leading-[1.02]" : "mt-4 text-xl mb-2 leading-[1.15]"
+                    }`}
+                >
+                    {title}
+                </h3>
+                <p
+                    className={`text-[#343131]/60 leading-relaxed flex-1 ${
+                        isFeatured ? "text-base line-clamp-3 mb-6" : "text-sm line-clamp-3 mb-4"
+                    }`}
+                >
+                    {excerpt}
+                </p>
+                <div className="mt-1 flex flex-wrap items-center gap-3 text-xs font-semibold text-[#343131]/58">
+                    {categoryName && (
+                        <span className="rounded-full bg-[#faf4d4] px-2.5 py-1 text-[#0e0e0e]">{categoryName}</span>
+                    )}
+                    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 ${
+                        post.liked_by_current_user ? "bg-rose-50 text-rose-600" : "bg-slate-100 text-slate-600"
+                    }`}>
+                        <Heart size={12} className={post.liked_by_current_user ? "fill-current" : ""} />
+                        {likeCount}
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-slate-600">
+                        <MessageSquare size={12} />
+                        {commentCount}
+                    </span>
+                </div>
                 {postTags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="mt-3 flex flex-wrap gap-1.5" onClick={(e) => e.stopPropagation()}>
                         {postTags.slice(0, 3).map((t: { id: string; name: string; slug: string }) => (
                             <button
                                 key={t.id}
@@ -137,7 +168,7 @@ export function BlogPostCard({ post, locale, variant = "default", index = 0 }: B
                         ))}
                     </div>
                 )}
-                <span className="mt-4 inline-flex items-center gap-2 font-bold text-[#0e0e0e] text-sm group-hover:text-[#e6c800] transition-colors">
+                <span className="mt-5 inline-flex items-center gap-2 font-bold text-[#0e0e0e] text-sm group-hover:text-[#e6c800] transition-colors">
                     {isTr ? "Devamını Oku" : "Read more"}
                     <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                 </span>

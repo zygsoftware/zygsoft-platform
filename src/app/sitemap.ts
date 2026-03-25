@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
+import { NEWS_CATEGORY_SLUG } from "@/lib/news";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://www.zygsoft.com";
 
@@ -31,7 +32,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ...both("/services",     { changeFrequency: "weekly",  priority: 0.9 }),
         { url: `${BASE}/projeler`,      lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
         { url: `${BASE}/en/projects`,  lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
-        ...both("/blog",         { changeFrequency: "weekly",  priority: 0.8 }),
+        { url: `${BASE}/blog-haberler`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
+        { url: `${BASE}/en/blog`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
         ...both("/contact",      { changeFrequency: "monthly", priority: 0.7 }),
         ...both("/dijital-urunler",  { changeFrequency: "weekly",  priority: 0.8 }),
         ...both("/dijital-urunler/hukuk-araclari-paketi", { changeFrequency: "weekly", priority: 0.9 }),
@@ -67,24 +69,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     try {
         const posts = await prisma.blogPost.findMany({
             where:  { published: true },
-            select: { slug: true, updated_at: true },
+            select: { slug: true, updated_at: true, category: { select: { slug: true } } },
         });
-        blogRoutes = posts.flatMap((post) =>
-            both(`/blog/${post.slug}`, { changeFrequency: "monthly", priority: 0.7 })
-        ).map((entry, i) => ({
-            ...entry,
-            lastModified: posts[Math.floor(i / 2)]?.updated_at ?? new Date(),
-        }));
+        blogRoutes = posts.flatMap((post) => {
+            const isNews = post.category?.slug === NEWS_CATEGORY_SLUG;
+            const trUrl = isNews ? `${BASE}/haberler/${post.slug}` : `${BASE}/blog-haberler/${post.slug}`;
+            const enUrl = isNews ? `${BASE}/en/news/${post.slug}` : `${BASE}/en/blog/${post.slug}`;
+            return [
+                { url: trUrl, lastModified: post.updated_at ?? new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
+                { url: enUrl, lastModified: post.updated_at ?? new Date(), changeFrequency: "monthly" as const, priority: 0.7 },
+            ];
+        });
 
         const categories = await prisma.blogCategory.findMany({ select: { slug: true } });
-        categoryRoutes = categories.flatMap((c) =>
-            both(`/blog/category/${c.slug}`, { changeFrequency: "weekly", priority: 0.6 })
-        );
+        categoryRoutes = categories.flatMap((c) => [
+            { url: `${BASE}/blog-haberler/kategori/${c.slug}`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.6 },
+            { url: `${BASE}/en/blog/category/${c.slug}`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.6 },
+        ]);
 
         const tags = await prisma.blogTag.findMany({ select: { slug: true } });
-        tagRoutes = tags.flatMap((t) =>
-            both(`/blog/tag/${t.slug}`, { changeFrequency: "weekly", priority: 0.5 })
-        );
+        tagRoutes = tags.flatMap((t) => [
+            { url: `${BASE}/blog-haberler/etiket/${t.slug}`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.5 },
+            { url: `${BASE}/en/blog/tag/${t.slug}`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.5 },
+        ]);
     } catch {
         // Sitemap should not crash the build if DB is unavailable
     }

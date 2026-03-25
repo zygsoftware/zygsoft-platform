@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import { signIn, useSession } from "next-auth/react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Link } from "@/i18n/navigation";
@@ -25,6 +26,24 @@ type RelatedPost = {
 };
 
 type PrevNext = { slug: string; title: string } | null;
+type BlogDetailPost = {
+    id: string;
+    title: string;
+    excerpt: string;
+    content: string;
+    cover_image: string | null;
+    cover_image_alt_tr?: string | null;
+    cover_image_alt_en?: string | null;
+    cover_image_caption_tr?: string | null;
+    cover_image_caption_en?: string | null;
+    published_at: string | Date | null;
+    reading_time_min: number | null;
+    view_count?: number;
+    author?: string | null;
+    allow_comments: boolean;
+    category?: { name_tr: string; name_en: string } | null;
+    tags?: { tag?: { id: string; name: string; slug: string } }[];
+};
 
 export default function BlogDetailClient({
     post,
@@ -33,80 +52,105 @@ export default function BlogDetailClient({
     next,
     locale,
     inPreview,
+    sectionBasePath = "/blog",
+    sectionLabel,
+    relatedLabel,
+    backLabel,
 }: {
-    post: any;
+    post: BlogDetailPost;
     related: RelatedPost[];
     prev?: PrevNext;
     next?: PrevNext;
     locale: string;
     inPreview?: boolean;
+    sectionBasePath?: "/blog" | "/news";
+    sectionLabel?: string;
+    relatedLabel?: string;
+    backLabel?: string;
 }) {
+    const { data: session, status } = useSession();
     const isTr = locale === "tr";
+    const postId = post.id;
+    const allowComments = post.allow_comments;
+    const resolvedSectionLabel = sectionLabel || (isTr ? "Blog" : "Blog");
+    const resolvedRelatedLabel = relatedLabel || (isTr ? "İlgili Yazılar" : "Related Posts");
+    const resolvedBackLabel = backLabel || (isTr ? `${resolvedSectionLabel}'e Geri Dön` : `Back to ${resolvedSectionLabel}`);
     const [progress, setProgress] = useState(0);
     const [copied, setCopied] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
     const [liked, setLiked] = useState(false);
     const [comments, setComments] = useState<{ id: string; content: string; name: string | null; created_at: string; user?: { name: string | null } }[]>([]);
     const [commentContent, setCommentContent] = useState("");
-    const [commentName, setCommentName] = useState("");
-    const [commentEmail, setCommentEmail] = useState("");
     const [commentSubmitting, setCommentSubmitting] = useState(false);
     const [commentSuccess, setCommentSuccess] = useState(false);
     const [commentError, setCommentError] = useState("");
+    const isAuthenticated = status === "authenticated";
 
     useEffect(() => {
-        if (post?.id) {
-            fetch(`/api/blog/${post.id}/view`, { method: "POST" }).catch(() => {});
+        if (postId) {
+            fetch(`/api/blog/${postId}/view`, { method: "POST" }).catch(() => {});
         }
-    }, [post?.id]);
+    }, [postId]);
 
     const fetchLikes = useCallback(() => {
-        if (!post?.id) return;
-        fetch(`/api/blog/${post.id}/like`)
+        if (!postId) return;
+        fetch(`/api/blog/${postId}/like`)
             .then((r) => r.json())
             .then((d) => {
                 setLikeCount(d.count ?? 0);
                 setLiked(d.liked ?? false);
             })
             .catch(() => {});
-    }, [post?.id]);
+    }, [postId]);
 
     const fetchComments = useCallback(() => {
-        if (!post?.id) return;
-        fetch(`/api/blog/${post.id}/comments`)
+        if (!postId) return;
+        fetch(`/api/blog/${postId}/comments`)
             .then((r) => r.json())
             .then((d) => setComments(Array.isArray(d) ? d : []))
             .catch(() => setComments([]));
-    }, [post?.id]);
+    }, [postId]);
 
     useEffect(() => {
         fetchLikes();
     }, [fetchLikes]);
 
     useEffect(() => {
-        if (post?.allow_comments) fetchComments();
-    }, [post?.allow_comments, fetchComments]);
+        if (allowComments) fetchComments();
+    }, [allowComments, fetchComments]);
 
     const handleLike = () => {
-        if (!post?.id) return;
-        fetch(`/api/blog/${post.id}/like`, { method: "POST" })
+        if (!isAuthenticated) {
+            signIn(undefined, { callbackUrl: window.location.href });
+            return;
+        }
+        if (!postId) return;
+        fetch(`/api/blog/${postId}/like`, { method: "POST" })
             .then((r) => r.json())
             .then((d) => {
+                if (d.error) {
+                    setCommentError(d.error);
+                    return;
+                }
                 setLiked(d.liked ?? false);
                 setLikeCount((c) => (d.liked ? c + 1 : Math.max(0, c - 1)));
             })
-            .catch(() => {});
+            .catch(() => setCommentError(isTr ? "İşlem sırasında bir hata oluştu." : "Something went wrong."));
     };
 
     const handleCommentSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!post?.id || !commentContent.trim()) return;
+        if (!isAuthenticated) {
+            signIn(undefined, { callbackUrl: window.location.href });
+            return;
+        }
+        if (!postId || !commentContent.trim()) return;
         setCommentSubmitting(true);
         setCommentError("");
-        fetch(`/api/blog/${post.id}/comments`, {
+        fetch(`/api/blog/${postId}/comments`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content: commentContent.trim(), name: commentName.trim(), email: commentEmail.trim() }),
+            body: JSON.stringify({ content: commentContent.trim() }),
         })
             .then((r) => r.json())
             .then((d) => {
@@ -114,8 +158,6 @@ export default function BlogDetailClient({
                     setCommentError(d.error);
                 } else {
                     setCommentContent("");
-                    setCommentName("");
-                    setCommentEmail("");
                     setCommentSuccess(true);
                     setTimeout(() => setCommentSuccess(false), 3000);
                 }
@@ -203,10 +245,10 @@ export default function BlogDetailClient({
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const blogHref = (slug: string) => ({ pathname: "/blog/[slug]" as const, params: { slug } });
+    const blogHref = (slug: string) => ({ pathname: `${sectionBasePath}/[slug]` as "/blog/[slug]" | "/news/[slug]", params: { slug } });
     const tagHref = (slug: string) => ({ pathname: "/blog/tag/[slug]" as const, params: { slug } });
     const hasPrevNext = (prev && prev.slug) || (next && next.slug);
-    const postTags = post.tags?.map((t: { tag?: { id: string; name: string; slug: string } }) => t.tag).filter(Boolean) ?? [];
+    const postTags = post.tags?.map((t: { tag?: { id: string; name: string; slug: string } }) => t.tag).filter((tag): tag is { id: string; name: string; slug: string } => Boolean(tag)) ?? [];
 
     return (
         <>
@@ -239,8 +281,8 @@ export default function BlogDetailClient({
                 <section className="relative pt-24 pb-12 md:pt-32 md:pb-16 overflow-hidden">
                     <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#343131 1px, transparent 1px), linear-gradient(90deg, #343131 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
                     <div className="container mx-auto px-6 max-w-4xl relative z-10">
-                        <Link href="/blog" className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#343131]/[0.08] rounded-full text-xs font-bold uppercase tracking-wide text-[#343131]/70 hover:text-[#0e0e0e] hover:bg-white/90 hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all mb-8 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-                            <ArrowLeft size={14} /> {isTr ? "Blog'a Geri Dön" : "Back to Blog"}
+                        <Link href={sectionBasePath} className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#343131]/[0.08] rounded-full text-xs font-bold uppercase tracking-wide text-[#343131]/70 hover:text-[#0e0e0e] hover:bg-white/90 hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all mb-8 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+                            <ArrowLeft size={14} /> {resolvedBackLabel}
                         </Link>
 
                         {post.category && (
@@ -342,9 +384,9 @@ export default function BlogDetailClient({
                                         </button>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={handleLike}
-                                        className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors ${
+                                <button
+                                    onClick={handleLike}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors ${
                                             liked ? "bg-red-50 border-red-200 text-red-600" : "bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200"
                                         }`}
                                     >
@@ -421,7 +463,7 @@ export default function BlogDetailClient({
                 )}
 
                 {post.allow_comments && (
-                    <section className="py-16 bg-slate-50/50 border-t border-slate-100">
+                    <section id="comments" className="py-16 bg-slate-50/50 border-t border-slate-100 scroll-mt-28">
                         <div className="container mx-auto px-6 max-w-3xl">
                             <h2 className="text-2xl font-display font-bold text-[#0e0e0e] mb-2 flex items-center gap-2">
                                 <MessageSquare size={24} /> {isTr ? "Yorumlar" : "Comments"}
@@ -431,41 +473,50 @@ export default function BlogDetailClient({
                                     ? (isTr ? "Henüz yorum yok. İlk yorumu siz yapın." : "No comments yet. Be the first to comment.")
                                     : `${comments.length} ${isTr ? "yorum" : "comment"}`}
                             </p>
-                            <form onSubmit={handleCommentSubmit} className="mb-10 p-6 bg-white rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                                <textarea
-                                    required
-                                    rows={4}
-                                    value={commentContent}
-                                    onChange={(e) => setCommentContent(e.target.value)}
-                                    placeholder={isTr ? "Yorumunuzu yazın..." : "Write your comment..."}
-                                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#e6c800]/30 focus:border-[#e6c800]/50 outline-none resize-none transition-colors"
-                                />
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <input
-                                        type="text"
-                                        value={commentName}
-                                        onChange={(e) => setCommentName(e.target.value)}
-                                        placeholder={isTr ? "Adınız" : "Your name"}
-                                        className="px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#e6c800]/30 focus:border-[#e6c800]/50 outline-none"
+                            {isAuthenticated ? (
+                                <form onSubmit={handleCommentSubmit} className="mb-10 p-6 bg-white rounded-2xl border border-slate-100 shadow-sm space-y-4">
+                                    <div className="rounded-2xl border border-[#343131]/[0.06] bg-[#fafafc] px-4 py-3 text-sm text-[#343131]/65">
+                                        {isTr ? "Yorumunuz hesabınızdaki ad ile gönderilir." : "Your comment will be submitted with your account name."}
+                                        {session?.user?.name ? <span className="ml-1 font-semibold text-[#0e0e0e]">{session.user.name}</span> : null}
+                                    </div>
+                                    <textarea
+                                        required
+                                        rows={4}
+                                        value={commentContent}
+                                        onChange={(e) => setCommentContent(e.target.value)}
+                                        placeholder={isTr ? "Yorumunuzu yazın..." : "Write your comment..."}
+                                        className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#e6c800]/30 focus:border-[#e6c800]/50 outline-none resize-none transition-colors"
                                     />
-                                    <input
-                                        type="email"
-                                        value={commentEmail}
-                                        onChange={(e) => setCommentEmail(e.target.value)}
-                                        placeholder={isTr ? "E-posta" : "Email"}
-                                        className="px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#e6c800]/30 focus:border-[#e6c800]/50 outline-none"
-                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={commentSubmitting}
+                                        className="px-6 py-3 bg-[#0e0e0e] text-white font-semibold rounded-xl hover:bg-[#1a1a1a] disabled:opacity-50 transition-colors"
+                                    >
+                                        {commentSubmitting ? (isTr ? "Gönderiliyor..." : "Sending...") : (isTr ? "Yorum Gönder" : "Submit Comment")}
+                                    </button>
+                                    {commentSuccess && <p className="text-emerald-600 text-sm font-medium flex items-center gap-2">{isTr ? "Yorumunuz onay bekliyor. Teşekkürler!" : "Your comment is pending approval. Thank you!"}</p>}
+                                    {commentError && <p className="text-red-600 text-sm font-medium">{commentError}</p>}
+                                </form>
+                            ) : (
+                                <div className="mb-10 rounded-[28px] border border-[#343131]/[0.06] bg-white p-6 shadow-sm">
+                                    <h3 className="text-lg font-bold text-[#0e0e0e]">
+                                        {isTr ? "Yorum yapmak için giriş yapın" : "Sign in to join the discussion"}
+                                    </h3>
+                                    <p className="mt-3 text-sm leading-7 text-[#343131]/62">
+                                        {isTr
+                                            ? "Yorum bırakmak ve beğeni kullanmak için hesabınızla giriş yapmanız gerekiyor."
+                                            : "You need to be signed in to comment and like stories."}
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={() => signIn(undefined, { callbackUrl: window.location.href })}
+                                        className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#0e0e0e] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#1a1a1a]"
+                                    >
+                                        {isTr ? "Giriş Yap" : "Sign In"}
+                                        <ArrowRight size={16} />
+                                    </button>
                                 </div>
-                                <button
-                                    type="submit"
-                                    disabled={commentSubmitting}
-                                    className="px-6 py-3 bg-[#0e0e0e] text-white font-semibold rounded-xl hover:bg-[#1a1a1a] disabled:opacity-50 transition-colors"
-                                >
-                                    {commentSubmitting ? (isTr ? "Gönderiliyor..." : "Sending...") : (isTr ? "Yorum Gönder" : "Submit Comment")}
-                                </button>
-                                {commentSuccess && <p className="text-emerald-600 text-sm font-medium flex items-center gap-2">{isTr ? "Yorumunuz onay bekliyor. Teşekkürler!" : "Your comment is pending approval. Thank you!"}</p>}
-                                {commentError && <p className="text-red-600 text-sm font-medium">{commentError}</p>}
-                            </form>
+                            )}
                             <div className="space-y-4">
                                 {comments.map((c) => (
                                     <article key={c.id} className="p-5 bg-white rounded-xl border border-slate-100 shadow-sm">
@@ -514,7 +565,7 @@ export default function BlogDetailClient({
                 {related.length > 0 && (
                     <section className="py-16 bg-white border-t border-[#343131]/[0.06]">
                         <div className="container mx-auto px-6 max-w-5xl">
-                            <h2 className="text-2xl font-display font-bold text-[#0e0e0e] mb-8">{isTr ? "İlgili Yazılar" : "Related Posts"}</h2>
+                            <h2 className="text-2xl font-display font-bold text-[#0e0e0e] mb-8">{resolvedRelatedLabel}</h2>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
                                 {related.map((r) => (
                                     <Link key={r.id} href={blogHref(r.slug)} className="group block">

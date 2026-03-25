@@ -5,6 +5,26 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export const dynamic = "force-dynamic";
 
+type SessionUser = {
+    id?: string;
+    role?: string;
+    emailVerified?: boolean;
+    email?: string | null;
+};
+
+async function resolveSessionUser(user?: SessionUser | null) {
+    if (!user) return null;
+    if (user.id) return user;
+    if (!user.email) return user;
+
+    const dbUser = await prisma.user.findUnique({
+        where: { email: user.email },
+        select: { id: true, role: true, emailVerified: true, email: true },
+    });
+
+    return dbUser ? { ...user, ...dbUser } : user;
+}
+
 export async function GET(
     req: Request,
     props: { params: Promise<{ id: string }> }
@@ -34,7 +54,7 @@ export async function GET(
         });
 
         return NextResponse.json(comments);
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: "Yorumlar alınamadı" }, { status: 500 });
     }
 }
@@ -47,7 +67,12 @@ export async function POST(
         const params = await props.params;
         const session = await getServerSession(authOptions);
         const body = await req.json();
-        const { content, parent_id, name, email } = body;
+        const { content, parent_id } = body;
+        const user = await resolveSessionUser(session?.user as SessionUser | undefined);
+
+        if (!user?.id) {
+            return NextResponse.json({ error: "Yorum yapmak için giriş yapmanız gerekiyor." }, { status: 401 });
+        }
 
         if (!content?.trim()) {
             return NextResponse.json({ error: "Yorum içeriği gerekli" }, { status: 400 });
@@ -62,30 +87,19 @@ export async function POST(
             return NextResponse.json({ error: "Yorumlar kapalı" }, { status: 403 });
         }
 
-        const userId = session?.user ? (session.user as any).id : null;
-        const userName = session?.user?.name ?? name?.trim();
-        const userEmail = session?.user?.email ?? email?.trim();
-
-        if (!userId && (!userName || !userEmail)) {
-            return NextResponse.json({ error: "Ad ve e-posta gerekli (misafir yorumları için)" }, { status: 400 });
-        }
-
-        if (userId) {
-            const user = session!.user as any;
-            if (user.role !== "admin" && !user.emailVerified) {
-                return NextResponse.json(
-                    { error: "Yorum yazmak için e-posta adresinizi doğrulamanız gerekiyor." },
-                    { status: 403 }
-                );
-            }
+        if (user.role !== "admin" && !user.emailVerified) {
+            return NextResponse.json(
+                { error: "Yorum yazmak için e-posta adresinizi doğrulamanız gerekiyor." },
+                { status: 403 }
+            );
         }
 
         const comment = await prisma.blogComment.create({
             data: {
                 post_id: params.id,
-                user_id: userId || undefined,
-                name: userName || undefined,
-                email: userEmail || undefined,
+                user_id: user.id,
+                name: session.user.name ?? undefined,
+                email: session.user.email ?? undefined,
                 content: content.trim(),
                 status: "pending",
                 parent_id: parent_id || undefined,

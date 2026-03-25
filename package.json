@@ -11,6 +11,7 @@
     "seed": "node prisma/seed.js",
     "seed:admin": "node seed-admin.js",
     "reset:admin": "node scripts/reset-admin-password.js",
+    "gift:subscription": "node scripts/gift-subscription.js",
     "db:seed": "node prisma/seed.js",
     "migrate:sqlite-to-postgres": "node scripts/migrate-sqlite-to-postgres.js",
     "migrate:storage": "node scripts/migrate-local-uploads-to-storage.js",

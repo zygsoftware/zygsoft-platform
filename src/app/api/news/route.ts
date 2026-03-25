@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { NEWS_CATEGORY_SLUG } from "@/lib/news";
+import { NEWS_CATEGORY_DEFAULTS } from "@/lib/news";
 
 export const dynamic = "force-dynamic";
 
@@ -17,96 +16,60 @@ function estimateReadingTime(html: string): number {
     return Math.max(1, Math.ceil(words / 200));
 }
 
-type SessionUser = {
-    id?: string;
-    role?: string;
-    emailVerified?: boolean;
-    email?: string | null;
-};
-
-async function resolveSessionUser(user?: SessionUser | null) {
-    if (!user) return null;
-    if (user.id) return user;
-    if (!user.email) return user;
-
-    const dbUser = await prisma.user.findUnique({
-        where: { email: user.email },
-        select: { id: true, role: true, emailVerified: true, email: true },
-    });
-
-    return dbUser ? { ...user, ...dbUser } : user;
-}
-
 async function isAdmin() {
     const session = await getServerSession(authOptions);
-    const user = await resolveSessionUser(session?.user as SessionUser | undefined);
-    return Boolean(user && user.role === "admin");
+    return session?.user && (session.user as { role?: string }).role === "admin";
+}
+
+async function ensureNewsCategory() {
+    return prisma.blogCategory.upsert({
+        where: { slug: NEWS_CATEGORY_DEFAULTS.slug },
+        update: {
+            name_tr: NEWS_CATEGORY_DEFAULTS.name_tr,
+            name_en: NEWS_CATEGORY_DEFAULTS.name_en,
+            description_tr: NEWS_CATEGORY_DEFAULTS.description_tr,
+            description_en: NEWS_CATEGORY_DEFAULTS.description_en,
+        },
+        create: {
+            name_tr: NEWS_CATEGORY_DEFAULTS.name_tr,
+            name_en: NEWS_CATEGORY_DEFAULTS.name_en,
+            slug: NEWS_CATEGORY_DEFAULTS.slug,
+            description_tr: NEWS_CATEGORY_DEFAULTS.description_tr,
+            description_en: NEWS_CATEGORY_DEFAULTS.description_en,
+        },
+    });
 }
 
 export async function GET(req: Request) {
     try {
-        const session = await getServerSession(authOptions);
-        const sessionUser = await resolveSessionUser(session?.user as SessionUser | undefined);
-        const sessionUserId = sessionUser?.id;
         const { searchParams } = new URL(req.url);
         const all = searchParams.get("all") === "true";
-        const contentType = searchParams.get("type") || "blog";
-        const category = searchParams.get("category");
-        const tag = searchParams.get("tag");
         const search = searchParams.get("search");
         const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
         const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "20", 10)));
         const featured = searchParams.get("featured") === "true";
-        const allowComments = searchParams.get("allow_comments");
         const sort = searchParams.get("sort") || "published";
 
-        const where: Prisma.BlogPostWhereInput = {};
-        if (contentType === "liked") {
-            if (!sessionUserId) {
-                return NextResponse.json({
-                    posts: [],
-                    total: 0,
-                    page,
-                    limit,
-                    totalPages: 0,
-                    requiresAuth: true,
-                });
-            }
-            where.likes = { some: { user_id: sessionUserId } };
-        } else if (contentType === "news") {
-            where.category = { slug: NEWS_CATEGORY_SLUG };
-        } else if (contentType !== "all") {
-            where.NOT = { category: { slug: NEWS_CATEGORY_SLUG } };
-        }
+        const where: Record<string, unknown> = {
+            category: { slug: NEWS_CATEGORY_DEFAULTS.slug },
+        };
+
         if (!all) {
             where.published = true;
         }
-        if (category) {
-            where.category_id = category;
-        }
-        if (tag) {
-            where.tags = { some: { tag: { slug: tag } } };
-        }
         if (search) {
             where.OR = [
-                { title_tr: { contains: search, mode: "insensitive" } },
-                { title_en: { contains: search, mode: "insensitive" } },
-                { excerpt_tr: { contains: search, mode: "insensitive" } },
-                { excerpt_en: { contains: search, mode: "insensitive" } },
-                { content_tr: { contains: search, mode: "insensitive" } },
-                { content_en: { contains: search, mode: "insensitive" } },
-                { category: { name_tr: { contains: search, mode: "insensitive" } } },
-                { category: { name_en: { contains: search, mode: "insensitive" } } },
-                { tags: { some: { tag: { name: { contains: search, mode: "insensitive" } } } } },
+                { title_tr: { contains: search } },
+                { title_en: { contains: search } },
+                { excerpt_tr: { contains: search } },
+                { excerpt_en: { contains: search } },
             ];
         }
         if (featured) {
             where.is_featured = true;
         }
-        if (allowComments === "true") where.allow_comments = true;
-        if (allowComments === "false") where.allow_comments = false;
 
-        const orderBy: Prisma.BlogPostOrderByWithRelationInput[] = sort === "updated"
+        const orderBy: Array<Record<string, "desc">> = sort === "updated"
             ? [{ updated_at: "desc" }]
             : sort === "popular"
                 ? [{ view_count: "desc" }, { published_at: "desc" }]
@@ -118,12 +81,7 @@ export async function GET(req: Request) {
                 include: {
                     category: true,
                     tags: { include: { tag: true } },
-                    _count: {
-                        select: {
-                            comments: { where: { status: "approved" } },
-                            likes: true,
-                        },
-                    },
+                    _count: { select: { comments: true, likes: true } },
                 },
                 orderBy,
                 skip: (page - 1) * limit,
@@ -132,31 +90,16 @@ export async function GET(req: Request) {
             prisma.blogPost.count({ where }),
         ]);
 
-        let likedIds = new Set<string>();
-        if (sessionUserId && posts.length > 0) {
-            const likes = await prisma.blogLike.findMany({
-                where: {
-                    user_id: sessionUserId,
-                    post_id: { in: posts.map((post) => post.id) },
-                },
-                select: { post_id: true },
-            });
-            likedIds = new Set(likes.map((like) => like.post_id));
-        }
-
         return NextResponse.json({
-            posts: posts.map((post) => ({
-                ...post,
-                liked_by_current_user: likedIds.has(post.id),
-            })),
+            posts,
             total,
             page,
             limit,
             totalPages: Math.ceil(total / limit),
         });
     } catch (error) {
-        console.error("Blog fetch error:", error);
-        return NextResponse.json({ error: "Failed to fetch blog posts" }, { status: 500 });
+        console.error("News fetch error:", error);
+        return NextResponse.json({ error: "Failed to fetch news posts" }, { status: 500 });
     }
 }
 
@@ -166,6 +109,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Yetkisiz erişim" }, { status: 403 });
         }
 
+        const category = await ensureNewsCategory();
         const body = await req.json();
         const {
             slug,
@@ -190,7 +134,6 @@ export async function POST(req: Request) {
             seo_keywords_en,
             og_image,
             canonical_url,
-            category_id,
             tag_ids,
             is_featured,
             allow_comments,
@@ -239,7 +182,7 @@ export async function POST(req: Request) {
                 seo_keywords_en: seo_keywords_en?.trim() || null,
                 og_image: og_image || null,
                 canonical_url: canonical_url?.trim() || null,
-                category_id: category_id || null,
+                category_id: category.id,
                 allow_comments: allow_comments !== false,
                 is_featured: !!is_featured,
                 published: status === "published",
@@ -260,13 +203,13 @@ export async function POST(req: Request) {
             where: { id: post.id },
             include: { category: true, tags: { include: { tag: true } } },
         });
+
         return NextResponse.json(updated);
-    } catch (error: unknown) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-            const target = Array.isArray(error.meta?.target) ? error.meta.target[0] : "slug";
-            return NextResponse.json({ error: `Bu slug zaten kullanımda: "${target}"` }, { status: 409 });
+    } catch (error: any) {
+        if (error?.code === "P2002") {
+            return NextResponse.json({ error: `Bu slug zaten kullanımda: "${error.meta?.target?.[0] ?? "slug"}"` }, { status: 409 });
         }
-        console.error("Blog create error:", error);
-        return NextResponse.json({ error: "Blog yazısı oluşturulamadı." }, { status: 500 });
+        console.error("News create error:", error);
+        return NextResponse.json({ error: "Haber oluşturulamadı." }, { status: 500 });
     }
 }

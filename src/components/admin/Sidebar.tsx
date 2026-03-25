@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FolderKanban, Network, LogOut, BookOpen, Users, ChevronRight, Receipt, Package, MessageSquare, LifeBuoy, BarChart3 } from "lucide-react";
+import { LayoutDashboard, FolderKanban, Network, LogOut, BookOpen, Users, ChevronRight, Receipt, Package, MessageSquare, LifeBuoy, BarChart3, Newspaper } from "lucide-react";
 import { signOut } from "next-auth/react";
 
 const navGroups = [
@@ -18,6 +18,7 @@ const navGroups = [
         items: [
             { href: "/admin/products", label: "Mağaza Ürünleri", icon: Package },
             { href: "/admin/blog", label: "Blog Yazıları", icon: BookOpen },
+            { href: "/admin/news", label: "Haberler", icon: Newspaper },
             { href: "/admin/projects", label: "Projeler", icon: FolderKanban },
             { href: "/admin/payments", label: "Ödemeler", icon: Receipt },
         ],

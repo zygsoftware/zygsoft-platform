@@ -3,12 +3,12 @@
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
-    ArrowLeft,
     ArrowDown,
+    ArrowLeft,
     ArrowUp,
     Download,
     FileArchive,
-    GripVertical,
+    FolderPlus,
     Loader2,
     Package2,
     Plus,
@@ -21,10 +21,15 @@ import { ToolLockedGate } from "@/components/dashboard/ToolLockedGate";
 import { ToolPageHint } from "@/components/dashboard/ToolPageHint";
 import { hasToolAccess } from "@/lib/trial-access-client";
 
-type QueuedAppendix = {
+type AppendixFile = {
     id: string;
     file: File;
+};
+
+type AppendixGroup = {
+    id: string;
     label: string;
+    files: AppendixFile[];
 };
 
 type SessionUser = {
@@ -33,35 +38,75 @@ type SessionUser = {
     emailVerified?: boolean | null;
 };
 
+function createAppendixGroup(index: number): AppendixGroup {
+    return {
+        id: Math.random().toString(36).slice(2, 10),
+        label: `Ek ${index + 1}`,
+        files: [],
+    };
+}
+
 export default function AppendixPackagerPage() {
     const t = useTranslations("Dashboard.overview.tools");
     const tAppendix = useTranslations("Dashboard.overview.tools.appendixPackager");
     const { data: session } = useSession();
     const user = (session?.user ?? null) as SessionUser | null;
     const hasSubscription = user ? hasToolAccess(user) : false;
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
 
-    const [items, setItems] = useState<QueuedAppendix[]>([]);
+    const [appendices, setAppendices] = useState<AppendixGroup[]>([createAppendixGroup(0)]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [resultUrl, setResultUrl] = useState<string | null>(null);
     const [maxZipSizeMb, setMaxZipSizeMb] = useState("5");
 
-    const handleFiles = (files: File[]) => {
-        const nextItems = files.map((file) => ({
-            id: Math.random().toString(36).slice(2, 10),
-            file,
-            label: file.name.replace(/\.[^/.]+$/, ""),
-        }));
-        setItems((prev) => [...prev, ...nextItems]);
+    const addAppendix = () => {
+        setAppendices((prev) => [...prev, createAppendixGroup(prev.length)]);
         setError(null);
     };
 
-    const moveItem = (index: number, direction: -1 | 1) => {
-        const target = index + direction;
-        if (target < 0 || target >= items.length) return;
+    const updateAppendixLabel = (appendixId: string, label: string) => {
+        setAppendices((prev) => prev.map((appendix) => (
+            appendix.id === appendixId ? { ...appendix, label } : appendix
+        )));
+    };
 
-        setItems((prev) => {
+    const addFilesToAppendix = (appendixId: string, files: File[]) => {
+        const nextFiles = files.map((file) => ({
+            id: Math.random().toString(36).slice(2, 10),
+            file,
+        }));
+
+        setAppendices((prev) => prev.map((appendix) => (
+            appendix.id === appendixId
+                ? { ...appendix, files: [...appendix.files, ...nextFiles] }
+                : appendix
+        )));
+        setError(null);
+    };
+
+    const removeAppendix = (appendixId: string) => {
+        setAppendices((prev) => {
+            if (prev.length === 1) {
+                return [{ ...prev[0], label: prev[0].label, files: [] }];
+            }
+            return prev.filter((appendix) => appendix.id !== appendixId);
+        });
+    };
+
+    const removeFileFromAppendix = (appendixId: string, fileId: string) => {
+        setAppendices((prev) => prev.map((appendix) => (
+            appendix.id === appendixId
+                ? { ...appendix, files: appendix.files.filter((file) => file.id !== fileId) }
+                : appendix
+        )));
+    };
+
+    const moveAppendix = (index: number, direction: -1 | 1) => {
+        const target = index + direction;
+        if (target < 0 || target >= appendices.length) return;
+
+        setAppendices((prev) => {
             const next = [...prev];
             const [moved] = next.splice(index, 1);
             next.splice(target, 0, moved);
@@ -69,16 +114,9 @@ export default function AppendixPackagerPage() {
         });
     };
 
-    const updateLabel = (id: string, label: string) => {
-        setItems((prev) => prev.map((item) => (item.id === id ? { ...item, label } : item)));
-    };
-
-    const removeItem = (id: string) => {
-        setItems((prev) => prev.filter((item) => item.id !== id));
-    };
-
     const handlePackage = async () => {
-        if (items.length === 0) {
+        const nonEmptyAppendices = appendices.filter((appendix) => appendix.files.length > 0);
+        if (nonEmptyAppendices.length === 0) {
             setError(tAppendix("errorNoFiles"));
             return;
         }
@@ -88,9 +126,23 @@ export default function AppendixPackagerPage() {
 
         try {
             const formData = new FormData();
-            items.forEach((item) => formData.append("files", item.file));
-            formData.append("labels", JSON.stringify(items.map((item) => item.label)));
             formData.append("maxZipSizeMb", maxZipSizeMb);
+            formData.append(
+                "appendices",
+                JSON.stringify(
+                    nonEmptyAppendices.map((appendix) => ({
+                        id: appendix.id,
+                        label: appendix.label,
+                        fileIds: appendix.files.map((file) => file.id),
+                    }))
+                )
+            );
+
+            for (const appendix of nonEmptyAppendices) {
+                for (const file of appendix.files) {
+                    formData.append(`file:${file.id}`, file.file);
+                }
+            }
 
             const response = await fetch("/api/tools/appendix-packager", {
                 method: "POST",
@@ -112,6 +164,8 @@ export default function AppendixPackagerPage() {
             setLoading(false);
         }
     };
+
+    const totalFileCount = appendices.reduce((sum, appendix) => sum + appendix.files.length, 0);
 
     if (!hasSubscription && session?.user) {
         return (
@@ -162,57 +216,32 @@ export default function AppendixPackagerPage() {
                             </div>
                             <button
                                 type="button"
-                                onClick={() => fileInputRef.current?.click()}
+                                onClick={addAppendix}
                                 className="inline-flex items-center gap-2 rounded-xl bg-[#e6c800] px-4 py-3 text-sm font-black text-[#0e0e0e] hover:bg-[#d4b800] transition-colors"
                             >
-                                <Plus size={16} />
-                                {tAppendix("addFiles")}
+                                <FolderPlus size={16} />
+                                {tAppendix("addAppendix")}
                             </button>
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                multiple
-                                onChange={(e) => {
-                                    const files = Array.from(e.target.files ?? []);
-                                    if (files.length > 0) handleFiles(files);
-                                    e.currentTarget.value = "";
-                                }}
-                                className="hidden"
-                            />
                         </div>
 
-                        {items.length === 0 ? (
-                            <div className="rounded-[1.5rem] border border-dashed border-slate-300 bg-slate-50 px-8 py-16 text-center">
-                                <FileArchive size={34} className="mx-auto mb-4 text-slate-400" />
-                                <p className="text-base font-bold text-slate-700">{tAppendix("emptyTitle")}</p>
-                                <p className="mt-2 text-sm font-medium text-slate-500">{tAppendix("emptyDescription")}</p>
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                {items.map((item, index) => (
-                                    <motion.div
-                                        key={item.id}
-                                        layout
-                                        className="rounded-[1.5rem] border border-slate-200 bg-slate-50 px-4 py-4"
-                                    >
+                        <div className="space-y-5">
+                            {appendices.map((appendix, index) => (
+                                <motion.div
+                                    key={appendix.id}
+                                    layout
+                                    className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5"
+                                >
+                                    <div className="flex flex-col gap-4">
                                         <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-                                            <div className="flex items-center gap-3 lg:min-w-[180px]">
-                                                <div className="rounded-xl bg-white p-2 text-slate-400 shadow-sm">
-                                                    <GripVertical size={18} />
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-black text-slate-950">{`Ek-${index + 1}`}</p>
-                                                    <p className="text-xs font-medium text-slate-500">{item.file.name}</p>
-                                                </div>
+                                            <div className="min-w-[140px]">
+                                                <p className="text-sm font-black text-slate-950">{`Ek-${index + 1}`}</p>
+                                                <p className="text-xs font-medium text-slate-500">{tAppendix("appendixLabel")}</p>
                                             </div>
 
                                             <div className="flex-1">
-                                                <label className="mb-1 block text-xs font-bold uppercase tracking-wider text-slate-400">
-                                                    {tAppendix("labelField")}
-                                                </label>
                                                 <input
-                                                    value={item.label}
-                                                    onChange={(e) => updateLabel(item.id, e.target.value)}
+                                                    value={appendix.label}
+                                                    onChange={(e) => updateAppendixLabel(appendix.id, e.target.value)}
                                                     className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 outline-none transition-colors focus:border-[#e6c800]"
                                                 />
                                             </div>
@@ -220,7 +249,7 @@ export default function AppendixPackagerPage() {
                                             <div className="flex items-center gap-2">
                                                 <button
                                                     type="button"
-                                                    onClick={() => moveItem(index, -1)}
+                                                    onClick={() => moveAppendix(index, -1)}
                                                     disabled={index === 0}
                                                     className="rounded-xl border border-slate-200 bg-white p-3 text-slate-500 transition-colors hover:text-slate-950 disabled:opacity-40"
                                                 >
@@ -228,25 +257,80 @@ export default function AppendixPackagerPage() {
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    onClick={() => moveItem(index, 1)}
-                                                    disabled={index === items.length - 1}
+                                                    onClick={() => moveAppendix(index, 1)}
+                                                    disabled={index === appendices.length - 1}
                                                     className="rounded-xl border border-slate-200 bg-white p-3 text-slate-500 transition-colors hover:text-slate-950 disabled:opacity-40"
                                                 >
                                                     <ArrowDown size={16} />
                                                 </button>
                                                 <button
                                                     type="button"
-                                                    onClick={() => removeItem(item.id)}
+                                                    onClick={() => removeAppendix(appendix.id)}
                                                     className="rounded-xl border border-rose-200 bg-white p-3 text-rose-500 transition-colors hover:bg-rose-50"
                                                 >
                                                     <Trash2 size={16} />
                                                 </button>
                                             </div>
                                         </div>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        )}
+
+                                        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-4">
+                                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                                <div>
+                                                    <p className="text-sm font-bold text-slate-900">{tAppendix("filesInAppendix")}</p>
+                                                    <p className="text-xs font-medium text-slate-500">{tAppendix("filesInAppendixHint")}</p>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => fileInputRefs.current[appendix.id]?.click()}
+                                                    className="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-sm font-black text-white hover:bg-slate-800 transition-colors"
+                                                >
+                                                    <Plus size={16} />
+                                                    {tAppendix("addFiles")}
+                                                </button>
+                                                <input
+                                                    ref={(node) => {
+                                                        fileInputRefs.current[appendix.id] = node;
+                                                    }}
+                                                    type="file"
+                                                    multiple
+                                                    onChange={(e) => {
+                                                        const files = Array.from(e.target.files ?? []);
+                                                        if (files.length > 0) addFilesToAppendix(appendix.id, files);
+                                                        e.currentTarget.value = "";
+                                                    }}
+                                                    className="hidden"
+                                                />
+                                            </div>
+
+                                            {appendix.files.length === 0 ? (
+                                                <div className="mt-4 rounded-xl bg-slate-50 px-4 py-6 text-center">
+                                                    <FileArchive size={26} className="mx-auto mb-3 text-slate-400" />
+                                                    <p className="text-sm font-semibold text-slate-500">{tAppendix("emptyAppendix")}</p>
+                                                </div>
+                                            ) : (
+                                                <div className="mt-4 space-y-2">
+                                                    {appendix.files.map((file) => (
+                                                        <div
+                                                            key={file.id}
+                                                            className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3"
+                                                        >
+                                                            <p className="min-w-0 truncate text-sm font-medium text-slate-700">{file.file.name}</p>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeFileFromAppendix(appendix.id, file.id)}
+                                                                className="rounded-lg p-2 text-rose-500 hover:bg-rose-50 transition-colors"
+                                                            >
+                                                                <Trash2 size={15} />
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
                     </div>
 
                     <div className="space-y-6">
@@ -254,12 +338,12 @@ export default function AppendixPackagerPage() {
                             <h3 className="text-lg font-black text-slate-950">{tAppendix("summaryTitle")}</h3>
                             <div className="mt-5 space-y-3">
                                 <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
-                                    <span className="text-sm font-medium text-slate-500">{tAppendix("summaryFiles")}</span>
-                                    <span className="text-sm font-black text-slate-950">{items.length}</span>
+                                    <span className="text-sm font-medium text-slate-500">{tAppendix("summaryAppendices")}</span>
+                                    <span className="text-sm font-black text-slate-950">{appendices.filter((item) => item.files.length > 0).length}</span>
                                 </div>
                                 <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
-                                    <span className="text-sm font-medium text-slate-500">{tAppendix("summaryPattern")}</span>
-                                    <span className="text-sm font-black text-slate-950">Ek-1, Ek-2, Ek-3…</span>
+                                    <span className="text-sm font-medium text-slate-500">{tAppendix("summaryFiles")}</span>
+                                    <span className="text-sm font-black text-slate-950">{totalFileCount}</span>
                                 </div>
                                 <div className="rounded-xl bg-slate-50 px-4 py-3">
                                     <label className="mb-2 block text-sm font-medium text-slate-500">
@@ -284,7 +368,7 @@ export default function AppendixPackagerPage() {
                             <button
                                 type="button"
                                 onClick={handlePackage}
-                                disabled={loading || items.length === 0}
+                                disabled={loading || totalFileCount === 0}
                                 className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0e0e0e] px-5 py-4 text-sm font-black text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {loading ? <Loader2 size={18} className="animate-spin" /> : <Package2 size={18} />}

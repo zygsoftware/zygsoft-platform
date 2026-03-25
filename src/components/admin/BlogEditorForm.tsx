@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { TipTapEditor } from "@/components/editor/TipTapEditor";
 import { Loader2, ImagePlus, Eye, Save, Send, AlertTriangle, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
+import { isNewsCategory } from "@/lib/news";
 
 function generateSlug(title: string) {
     return title
@@ -97,6 +98,11 @@ type BlogEditorFormProps = {
     onSubmit: (data: BlogFormData) => Promise<void>;
     isEdit?: boolean;
     postId?: string;
+    adminBasePath?: string;
+    publicBasePath?: string;
+    publicSectionLabel?: string;
+    hideCategoryField?: boolean;
+    fixedCategoryId?: string;
 };
 
 function completionScore(form: BlogFormData, lang: "tr" | "en"): number {
@@ -107,7 +113,17 @@ function completionScore(form: BlogFormData, lang: "tr" | "en"): number {
     return Math.round((filled / 5) * 100);
 }
 
-export function BlogEditorForm({ initialData, onSubmit, isEdit, postId }: BlogEditorFormProps) {
+export function BlogEditorForm({
+    initialData,
+    onSubmit,
+    isEdit,
+    postId,
+    adminBasePath = "/admin/blog",
+    publicBasePath = "/blog",
+    publicSectionLabel = "Blog",
+    hideCategoryField = false,
+    fixedCategoryId,
+}: BlogEditorFormProps) {
     const [form, setForm] = useState<BlogFormData>({ ...INITIAL, ...initialData });
     const [categories, setCategories] = useState<Category[]>([]);
     const [tags, setTags] = useState<Tag[]>([]);
@@ -127,6 +143,7 @@ export function BlogEditorForm({ initialData, onSubmit, isEdit, postId }: BlogEd
     const hasSeoEn = !!(form.seo_title_en?.trim() || form.seo_description_en?.trim());
     const seoIncomplete = !hasSeoTr || !hasSeoEn;
     const coverImageAltMissing = !!form.cover_image && !form.cover_image_alt_tr?.trim();
+    const selectableCategories = categories.filter((category) => hideCategoryField || !isNewsCategory(category));
 
     const [lastSaved, setLastSaved] = useState<Date | null>(null);
     const [autosaveStatus, setAutosaveStatus] = useState<"idle" | "saving" | "saved">("idle");
@@ -135,6 +152,15 @@ export function BlogEditorForm({ initialData, onSubmit, isEdit, postId }: BlogEd
         fetch("/api/blog/categories").then((r) => r.json()).then(setCategories).catch(() => setCategories([]));
         fetch("/api/blog/tags").then((r) => r.json()).then(setTags).catch(() => setTags([]));
     }, []);
+
+    useEffect(() => {
+        if (!fixedCategoryId) return;
+        setForm((current) => (
+            current.category_id === fixedCategoryId
+                ? current
+                : { ...current, category_id: fixedCategoryId }
+        ));
+    }, [fixedCategoryId]);
 
     useEffect(() => {
         if (!postId || !form.slug?.trim()) return;
@@ -268,7 +294,7 @@ export function BlogEditorForm({ initialData, onSubmit, isEdit, postId }: BlogEd
                         </button>
                         {postId ? (
                             <a
-                                href={`/admin/blog/preview/${postId}`}
+                                href={`${adminBasePath}/preview/${postId}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium hover:bg-slate-50 flex items-center gap-2 transition-colors"
@@ -277,7 +303,7 @@ export function BlogEditorForm({ initialData, onSubmit, isEdit, postId }: BlogEd
                             </a>
                         ) : form.slug ? (
                             <a
-                                href={`${SITE}/blog/${form.slug}`}
+                                href={`${SITE}${publicBasePath}/${form.slug}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="px-4 py-2.5 border border-slate-200 rounded-xl text-sm font-medium hover:bg-slate-50 flex items-center gap-2 transition-colors"
@@ -285,7 +311,7 @@ export function BlogEditorForm({ initialData, onSubmit, isEdit, postId }: BlogEd
                                 <Eye size={16} /> Önizle
                             </a>
                         ) : null}
-                        <a href="/admin/blog" className="px-4 py-2.5 text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors">
+                        <a href={adminBasePath} className="px-4 py-2.5 text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors">
                             İptal
                         </a>
                     </div>
@@ -470,7 +496,7 @@ export function BlogEditorForm({ initialData, onSubmit, isEdit, postId }: BlogEd
                 </div>
                 <div>
                     <label className="block text-xs text-slate-500 mb-2">Canonical URL</label>
-                    <input type="text" value={form.canonical_url} onChange={(e) => setForm((f) => ({ ...f, canonical_url: e.target.value }))} className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" placeholder="https://example.com/blog/slug" />
+                    <input type="text" value={form.canonical_url} onChange={(e) => setForm((f) => ({ ...f, canonical_url: e.target.value }))} className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm" placeholder={`https://example.com${publicBasePath}/slug`} />
                 </div>
             </section>
 
@@ -482,9 +508,9 @@ export function BlogEditorForm({ initialData, onSubmit, isEdit, postId }: BlogEd
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Türkçe</p>
                         <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm">
                             <p className="text-blue-600 text-lg hover:underline cursor-pointer truncate">
-                                {form.seo_title_tr || form.title_tr || "Başlık"} | ZYGSOFT Blog
+                                {form.seo_title_tr || form.title_tr || "Başlık"} | ZYGSOFT {publicSectionLabel}
                             </p>
-                            <p className="text-green-700 text-sm mt-0.5">{SITE}/blog/{form.slug || "slug"}</p>
+                            <p className="text-green-700 text-sm mt-0.5">{SITE}{publicBasePath}/{form.slug || "slug"}</p>
                             <p className="text-slate-600 text-sm mt-1 line-clamp-2">
                                 {form.seo_description_tr || form.excerpt_tr || "Açıklama..."}
                             </p>
@@ -495,9 +521,9 @@ export function BlogEditorForm({ initialData, onSubmit, isEdit, postId }: BlogEd
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">English</p>
                         <div className="p-5 bg-white rounded-xl border border-slate-200/80 shadow-sm">
                             <p className="text-blue-600 text-lg hover:underline cursor-pointer truncate">
-                                {form.seo_title_en || form.title_en || "Title"} | ZYGSOFT Blog
+                                {form.seo_title_en || form.title_en || "Title"} | ZYGSOFT {publicSectionLabel}
                             </p>
-                            <p className="text-green-700 text-sm mt-0.5">{SITE}/en/blog/{form.slug || "slug"}</p>
+                            <p className="text-green-700 text-sm mt-0.5">{SITE}/en{publicBasePath}/{form.slug || "slug"}</p>
                             <p className="text-slate-600 text-sm mt-1 line-clamp-2">
                                 {form.seo_description_en || form.excerpt_en || "Description..."}
                             </p>
@@ -511,15 +537,24 @@ export function BlogEditorForm({ initialData, onSubmit, isEdit, postId }: BlogEd
             <section className="space-y-4">
                 <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Kategori & Etiketler</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label className="block text-xs text-slate-500 mb-2">Kategori</label>
-                        <select value={form.category_id} onChange={(e) => setForm((f) => ({ ...f, category_id: e.target.value }))} className="w-full px-4 py-3 border border-slate-200 rounded-xl">
-                            <option value="">Seçin</option>
-                            {categories.map((c) => (
-                                <option key={c.id} value={c.id}>{c.name_tr}</option>
-                            ))}
-                        </select>
-                    </div>
+                    {!hideCategoryField ? (
+                        <div>
+                            <label className="block text-xs text-slate-500 mb-2">Kategori</label>
+                            <select value={form.category_id} onChange={(e) => setForm((f) => ({ ...f, category_id: e.target.value }))} className="w-full px-4 py-3 border border-slate-200 rounded-xl">
+                                <option value="">Seçin</option>
+                                {selectableCategories.map((c) => (
+                                    <option key={c.id} value={c.id}>{c.name_tr}</option>
+                                ))}
+                            </select>
+                        </div>
+                    ) : (
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3">
+                            <p className="text-xs font-bold uppercase tracking-[0.24em] text-slate-400 mb-1">Kategori</p>
+                            <p className="text-sm font-semibold text-slate-700">
+                                {categories.find((category) => category.id === form.category_id)?.name_tr || "Haberler"}
+                            </p>
+                        </div>
+                    )}
                     <div>
                         <label className="block text-xs text-slate-500 mb-2">Etiketler</label>
                         <div className="flex flex-wrap gap-2">

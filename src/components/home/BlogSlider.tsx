@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, BookOpen, Clock, Tag } from "lucide-react";
+import { ArrowRight, BookOpen, Clock } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -87,7 +87,7 @@ export function BlogSlider() {
                         transition={{ delay: 0.08 }}
                     >
                         <Link
-                            href="/blog"
+                            href={locale === "tr" ? "/blog-haberler" : `/${locale}/blog`}
                             className="btn-secondary inline-flex items-center gap-2"
                         >
                             {t("blogButton")} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
@@ -133,7 +133,7 @@ export function BlogSlider() {
                             posts.map((post) => (
                                 <SwiperSlide key={post.id} className="h-auto">
                                     <Link
-                                        href={`/blog/${post.slug}`}
+                                        href={locale === "tr" ? `/blog-haberler/${post.slug}` : `/${locale}/blog/${post.slug}`}
                                         className="block h-full group"
                                     >
                                         <div className="h-full flex flex-col bg-white border border-black/8 rounded-sm overflow-hidden hover:shadow-lg hover:shadow-black/5 hover:-translate-y-1 transition-all duration-300">

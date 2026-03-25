@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Loader2, Tag } from "lucide-react";
+import { ArrowLeft, Tag } from "lucide-react";
 import { useLocale } from "next-intl";
 import { BlogPostCard, type BlogPostCardData } from "@/components/blog/BlogPostCard";
 
@@ -20,6 +20,7 @@ export default function BlogTagPage() {
     const [posts, setPosts] = useState<BlogPostCardData[]>([]);
     const [tag, setTag] = useState<BlogTag | null>(null);
     const [loading, setLoading] = useState(true);
+    const blogRootHref = locale === "tr" ? "/blog-haberler" : `/${locale}/blog`;
 
     useEffect(() => {
         if (!slug) return;
@@ -45,8 +46,8 @@ export default function BlogTagPage() {
                 <main className="min-h-screen bg-[#fafafc] pt-32 pb-16">
                     <div className="container mx-auto px-6 max-w-4xl text-center">
                         <p className="text-slate-500 text-lg">{isTr ? "Etiket bulunamadı." : "Tag not found."}</p>
-                        <Link href={locale === "tr" ? "/blog" : `/${locale}/blog`} className="inline-flex items-center gap-2 mt-4 text-[#e6c800] font-semibold hover:underline">
-                            <ArrowLeft size={18} /> {isTr ? "Blog'a dön" : "Back to Blog"}
+                        <Link href={blogRootHref} className="inline-flex items-center gap-2 mt-4 text-[#e6c800] font-semibold hover:underline">
+                            <ArrowLeft size={18} /> {isTr ? "Blog & Haberlere dön" : "Back to Blog & News"}
                         </Link>
                     </div>
                 </main>
@@ -62,8 +63,8 @@ export default function BlogTagPage() {
                 <section className="pt-32 pb-16 md:pt-40 md:pb-24 relative overflow-hidden">
                     <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#343131 1px, transparent 1px), linear-gradient(90deg, #343131 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
                     <div className="container mx-auto px-6 max-w-7xl relative z-10">
-                        <Link href={locale === "tr" ? "/blog" : `/${locale}/blog`} className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#343131]/[0.08] rounded-full text-xs font-bold uppercase tracking-wide text-[#343131]/70 hover:text-[#0e0e0e] hover:bg-white/90 mb-6 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-                            <ArrowLeft size={14} /> {isTr ? "Blog'a Geri Dön" : "Back to Blog"}
+                        <Link href={blogRootHref} className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#343131]/[0.08] rounded-full text-xs font-bold uppercase tracking-wide text-[#343131]/70 hover:text-[#0e0e0e] hover:bg-white/90 mb-6 shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+                            <ArrowLeft size={14} /> {isTr ? "Blog & Haberlere Geri Dön" : "Back to Blog & News"}
                         </Link>
                         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-2xl">
                             <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#343131]/50 mb-4 block flex items-center gap-2">
@@ -92,7 +93,7 @@ export default function BlogTagPage() {
                                 </div>
                                 <h3 className="font-display font-bold text-2xl text-[#0e0e0e] mb-2">{isTr ? "Bu etiketle henüz yazı yok" : "No posts with this tag yet"}</h3>
                                 <p className="text-[#343131]/60 max-w-md mx-auto mb-6">{isTr ? "Yakında bu etiketle yeni içerikler eklenecek." : "New content with this tag coming soon."}</p>
-                                <Link href={locale === "tr" ? "/blog" : `/${locale}/blog`} className="inline-flex items-center gap-2 text-[#e6c800] font-semibold hover:underline">
+                                <Link href={blogRootHref} className="inline-flex items-center gap-2 text-[#e6c800] font-semibold hover:underline">
                                     <ArrowLeft size={18} /> {isTr ? "Tüm yazılara git" : "View all posts"}
                                 </Link>
                             </div>

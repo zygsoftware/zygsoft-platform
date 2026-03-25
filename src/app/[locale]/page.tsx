@@ -4,8 +4,8 @@ import { useRef, useEffect } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
-import { Zap, Sparkles, CheckCircle2, Cpu, BarChart3, Rocket } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { Zap, Sparkles, CheckCircle2, Cpu, BarChart3, Rocket, ShieldCheck } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/home/HeroSection";
@@ -64,6 +64,8 @@ const partnerIcons = [BarChart3, Sparkles, Cpu, Rocket];
 
 export default function Home() {
   const t = useTranslations("Homepage");
+  const locale = useLocale();
+  const isTr = locale === "tr";
   const containerRef = useRef(null);
   const reducedMotion = !!useReducedMotion();
 
@@ -89,45 +91,83 @@ export default function Home() {
         </div>
 
         {/* ── SECTION 02: TRUSTED PARTNER ────────────────────────── */}
-        <section className="home-snap-section py-24 md:py-28 bg-[#fafafc] relative overflow-hidden">
-          <div className="container mx-auto px-6">
-            <div className="max-w-4xl mb-16">
-              <BlockReveal>
-                <TextReveal delay={0.05}>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#343131]/45 mb-5 block">{t("partnerSection.tag")}</span>
-                </TextReveal>
-                <TextReveal delay={0.12}>
-                  <h2 className="text-4xl md:text-5xl font-display font-black leading-[1.02] tracking-tighter mb-6 text-[#343131]" dangerouslySetInnerHTML={{ __html: t.raw("partnerSection.title") }} />
-                </TextReveal>
-                <TextReveal delay={0.2}>
-                  <p className="text-[#343131]/55 text-[17px] font-medium leading-relaxed max-w-xl">
-                    {t("partnerSection.description")}
-                  </p>
-                </TextReveal>
-              </BlockReveal>
-            </div>
+        <section className="home-snap-section relative overflow-hidden bg-[linear-gradient(180deg,#fbfaf6_0%,#f7f6f2_100%)] py-16 md:py-18">
+          <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #343131 1px, transparent 0)", backgroundSize: "28px 28px" }} />
+          <div className="absolute left-[-8%] top-6 h-56 w-56 rounded-full bg-[#e6c800]/10 blur-3xl" />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-              {(t.raw("partnerSection.pillars") as PartnerPillar[]).map((pillar, i) => {
-                const PillarIcon = partnerIcons[i];
-
-                return (
-                <BlockReveal key={i} delay={i * 0.08}>
-                  <motion.div
-                    whileHover={{ y: -3 }}
-                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                    className="group relative p-7 bg-white border border-[#343131]/[0.05] rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] transition-all duration-300 h-full overflow-hidden"
-                  >
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#343131]/0 group-hover:bg-[#343131]/[0.03] rounded-full transition-all duration-400 -translate-y-1/2 translate-x-1/2" />
-                    <div className="w-12 h-12 rounded-lg bg-[#fafafc] border border-[#343131]/5 flex items-center justify-center mb-5 group-hover:bg-[#e6c800]/90 group-hover:border-[#e6c800] transition-colors duration-300">
-                      {PillarIcon ? <PillarIcon size={22} /> : null}
-                    </div>
-                    <h3 className="text-lg font-black uppercase tracking-tight mb-2">{pillar.t}</h3>
-                    <p className="text-[#343131]/52 text-[14px] font-medium leading-relaxed">{pillar.d}</p>
-                  </motion.div>
+          <div className="container relative z-10 mx-auto px-6">
+            <div className="rounded-[34px] border border-[#343131]/[0.06] bg-white/88 p-7 shadow-[0_18px_48px_rgba(0,0,0,0.05)] md:p-9">
+              <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_0.9fr] lg:items-end">
+                <BlockReveal>
+                  <div className="max-w-3xl">
+                    <TextReveal delay={0.05}>
+                      <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#343131]/[0.08] bg-[#fafafc] px-4 py-2 text-[10px] font-bold uppercase tracking-[0.32em] text-[#343131]/55">
+                        <ShieldCheck size={13} className="text-[#e6c800]" />
+                        {t("partnerSection.tag")}
+                      </span>
+                    </TextReveal>
+                    <TextReveal delay={0.12}>
+                      <h2
+                        className="text-3xl font-display font-black leading-[0.98] tracking-[-0.04em] text-[#1a1715] md:text-5xl"
+                        dangerouslySetInnerHTML={{ __html: t.raw("partnerSection.title") }}
+                      />
+                    </TextReveal>
+                  </div>
                 </BlockReveal>
-                );
-              })}
+
+                <BlockReveal delay={0.16}>
+                  <div className="rounded-[26px] border border-[#343131]/[0.06] bg-[#fafafc] p-5">
+                    <p className="text-sm font-medium leading-7 text-[#343131]/62 md:text-[15px]">
+                      {t("partnerSection.description")}
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {[
+                        isTr ? "Uçtan uca sistem" : "End-to-end systems",
+                        isTr ? "Hibrit model" : "Hybrid model",
+                        isTr ? "Ölçeklenebilir teslim" : "Scalable delivery",
+                      ].map((item) => (
+                        <span
+                          key={item}
+                          className="inline-flex items-center gap-2 rounded-full border border-[#343131]/[0.08] bg-white px-3 py-1.5 text-xs font-semibold text-[#343131]/72"
+                        >
+                          <CheckCircle2 size={13} className="text-[#e6c800]" />
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </BlockReveal>
+              </div>
+
+              <motion.div
+                className="mt-7 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4"
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="visible"
+                viewport={revealViewport}
+              >
+                {(t.raw("partnerSection.pillars") as PartnerPillar[]).map((pillar, i) => {
+                  const PillarIcon = partnerIcons[i];
+
+                  return (
+                    <motion.div
+                      key={pillar.t}
+                      variants={createRevealUp(reducedMotion, 20, 4)}
+                      className="group rounded-[24px] border border-[#343131]/[0.06] bg-[#fcfcfd] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[#e6c800]/40 hover:bg-white hover:shadow-[0_12px_28px_rgba(0,0,0,0.05)]"
+                    >
+                      <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-[16px] bg-[#faf4d4] text-[#1a1715] transition-colors duration-300 group-hover:bg-[#e6c800]">
+                        {PillarIcon ? <PillarIcon size={20} /> : null}
+                      </div>
+                      <h3 className="text-lg font-black uppercase tracking-tight text-[#1a1715]">
+                        {pillar.t}
+                      </h3>
+                      <p className="mt-2 text-sm font-medium leading-6 text-[#343131]/60">
+                        {pillar.d}
+                      </p>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
             </div>
           </div>
         </section>

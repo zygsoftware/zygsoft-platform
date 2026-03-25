@@ -26,6 +26,7 @@ import {
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { AdminCard, AdminStatsCard, AdminPageHeader, AdminBadge } from "@/components/admin";
+import { NEWS_CATEGORY_SLUG } from "@/lib/news";
 
 type Post = {
   id: string;
@@ -95,7 +96,7 @@ export default function AdminBlogPage() {
   useEffect(() => {
     fetch("/api/blog/categories")
       .then((r) => r.json())
-      .then((d) => setCategories(Array.isArray(d) ? d : []))
+      .then((d) => setCategories(Array.isArray(d) ? d.filter((category) => category.slug !== NEWS_CATEGORY_SLUG) : []))
       .catch(() => setCategories([]));
   }, []);
 

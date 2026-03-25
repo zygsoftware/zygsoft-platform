@@ -47,7 +47,7 @@ export function HomepageBlogSection() {
                         </p>
                     </div>
                     <Link
-                        href={locale === "tr" ? "/blog" : `/${locale}/blog`}
+                        href={locale === "tr" ? "/blog-haberler" : `/${locale}/blog`}
                         className="inline-flex items-center gap-2 px-6 py-3 font-black uppercase tracking-[0.22em] text-[11px] rounded-xl border-2 border-[#343131] text-[#343131] hover:bg-[#343131] hover:text-[#e6c800] transition-all duration-300"
                     >
                         {t("blogButton")}

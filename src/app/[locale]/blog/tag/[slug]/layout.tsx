@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const title = `${tag.name}${isEn ? " | Blog" : " | Blog"}`;
     const description = isEn ? `Posts tagged with ${tag.name}` : `${tag.name} etiketli yazılar`;
 
-    const canonical = isEn ? `${SITE_URL}/en/blog/tag/${slug}` : `${SITE_URL}/blog/tag/${slug}`;
+    const canonical = isEn ? `${SITE_URL}/en/blog/tag/${slug}` : `${SITE_URL}/blog-haberler/etiket/${slug}`;
 
     return {
         title,
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         alternates: {
             canonical,
             languages: {
-                tr: `${SITE_URL}/blog/tag/${slug}`,
+                tr: `${SITE_URL}/blog-haberler/etiket/${slug}`,
                 en: `${SITE_URL}/en/blog/tag/${slug}`,
             },
         },
