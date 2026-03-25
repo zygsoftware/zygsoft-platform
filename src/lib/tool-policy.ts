@@ -3,6 +3,7 @@ const MB = 1024 * 1024;
 export const PAID_PDF_MAX_FILE_BYTES = 500 * MB;
 
 type ToolSlug =
+    | "appendix-packager"
     | "batch-convert"
     | "doc-to-udf"
     | "image-to-pdf"
@@ -25,6 +26,14 @@ type ToolPolicy = {
 };
 
 const TOOL_POLICIES: Record<ToolSlug, ToolPolicy> = {
+    "appendix-packager": {
+        demoMaxFiles: 10,
+        paidMaxFiles: 50,
+        demoDefaultMaxFileBytes: 20 * MB,
+        demoPdfMaxFileBytes: 20 * MB,
+        paidDefaultMaxFileBytes: 50 * MB,
+        paidPdfMaxFileBytes: 50 * MB,
+    },
     "batch-convert": {
         demoMaxFiles: 20,
         paidMaxFiles: null,

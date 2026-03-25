@@ -54,6 +54,10 @@ export const routing = defineRouting({
             tr: "/panel/araclar",
             en: "/dashboard/tools",
         },
+        "/dashboard/tools/appendix-packager": {
+            tr: "/panel/araclar/ek-klasoru",
+            en: "/dashboard/tools/appendix-packager",
+        },
         "/dashboard/tools/batch-convert": {
             tr: "/panel/araclar/toplu-donustur",
             en: "/dashboard/tools/batch-convert",

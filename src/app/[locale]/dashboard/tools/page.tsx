@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { hasToolAccess } from "@/lib/trial-access-client";
 import { toolIdToMessagePrefix } from "@/lib/tool-message-prefix";
 import {
+    Archive,
     FileText,
     FileImage,
     Layers,
@@ -15,7 +16,6 @@ import {
     Sparkles,
     HeadphonesIcon,
     ShoppingCart,
-    Scale,
     FileStack,
     Zap,
     Star,
@@ -42,9 +42,25 @@ interface ToolDef {
     requiredSlugs: string[];
 }
 
+type DashboardUser = {
+    activeProductSlugs?: string[];
+    role?: string;
+    emailVerified?: boolean | null;
+};
+
 const LEGAL_TOOLKIT_SLUG = "legal-toolkit";
 
 const TOOLS: ToolDef[] = [
+    {
+        id:          "appendix-packager",
+        icon:        <Archive size={24} />,
+        iconBg:      "bg-yellow-50",
+        iconColor:   "text-yellow-700",
+        href:        "/dashboard/tools/appendix-packager",
+        group:       "document",
+        featured:    false,
+        requiredSlugs: [LEGAL_TOOLKIT_SLUG],
+    },
     {
         id:          "doc-to-udf",
         icon:        <FileText size={24} />,
@@ -153,7 +169,7 @@ function resolveAccess(
     tool:               ToolDef,
     activeProductSlugs: string[],
     isAdmin:            boolean,
-    user: any,
+    user: DashboardUser | null,
 ): AccessLevel {
     if (tool.requiredSlugs.length === 0) return "login_only_active";
     if (isAdmin) return "active";
@@ -296,138 +312,13 @@ function ToolCard({
     );
 }
 
-/* ── Featured (large) card ───────────────────────────────────────── */
-
-function FeaturedToolCard({
-    tool,
-    access,
-}: {
-    tool:   ToolDef;
-    access: AccessLevel;
-}) {
-    const t = useTranslations("Dashboard.overview.tools");
-    const isLocked = access === "subscription_required";
-    const prefix = toolIdToMessagePrefix(tool.id);
-    const { name } = getToolHubCopy(tool.id, t);
-    const longDesc =
-        tool.id === "doc-to-udf"
-            ? t("docToUdf.featuredLongDesc")
-            : t(`${prefix}.hubDescription`);
-
-    return (
-        <div
-            className="
-                relative overflow-hidden rounded-3xl
-                bg-[#0e0e0e] text-white
-                border border-white/10
-                p-8 md:p-10
-            "
-        >
-            <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center gap-8">
-                {/* Left: content */}
-                <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-3 mb-4">
-                        {/* Icon */}
-                        <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
-                            <Scale size={22} />
-                        </div>
-
-                        {/* Flagship badge */}
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-xs font-black uppercase tracking-wider">
-                            <Star size={10} fill="currentColor" />
-                            {t("featuredFlagshipBadge")}
-                        </span>
-
-                        {/* Access badge */}
-                        {!isLocked ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 text-xs font-bold">
-                                <CheckCircle2 size={11} />
-                                {t("badgeSubscriptionActive")}
-                            </span>
-                        ) : (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/25 text-xs font-bold">
-                                <Lock size={11} />
-                                {t("badgeSubscriptionRequired")}
-                            </span>
-                        )}
-                    </div>
-
-                    <h2 className="font-heading font-black text-2xl text-white mb-2">
-                        {name}
-                    </h2>
-                    <p className="text-white/60 font-medium leading-relaxed max-w-xl">
-                        {longDesc}
-                    </p>
-
-                    <div className="mt-5 flex flex-wrap items-center gap-2">
-                        {(["docxUdf", "kvkk", "batch", "uyap"] as const).map((tag) => (
-                            <span
-                                key={tag}
-                                className="px-2.5 py-1 rounded-md bg-white/8 text-white/50 text-xs font-semibold border border-white/10"
-                            >
-                                {t(`featuredTags.${tag}`)}
-                            </span>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Right: CTA */}
-                <div className="shrink-0 flex flex-col gap-3 w-full lg:w-auto lg:min-w-[200px]">
-                    {isLocked ? (
-                        <>
-                            <Link
-                                href="/dijital-urunler/hukuk-araclari-paketi"
-                                className="
-                                    inline-flex items-center justify-center gap-2
-                                    px-6 py-3.5 rounded-xl
-                                    bg-[#e6c800] text-[#0e0e0e] font-black text-sm
-                                    hover:bg-[#d4b800] transition-colors
-                                    whitespace-nowrap
-                                "
-                            >
-                                <ShoppingCart size={16} />
-                                {t("ctaViewPackage")}
-                            </Link>
-                            <p className="text-white/40 text-xs text-center font-medium">
-                                {t("featuredPricingLine")}
-                            </p>
-                        </>
-                    ) : (
-                        <>
-                            <Link
-                                href={tool.href}
-                                className="
-                                    inline-flex items-center justify-center gap-2
-                                    px-6 py-3.5 rounded-xl
-                                    bg-[#e6c800] text-[#0e0e0e] font-black text-sm
-                                    hover:bg-[#d4b800] transition-colors
-                                    whitespace-nowrap
-                                "
-                            >
-                                <Zap size={16} />
-                                {t("ctaUseTool")}
-                            </Link>
-                            <Link
-                                href="/dashboard/billing"
-                                className="text-white/40 text-xs text-center font-medium hover:text-white/60 transition-colors"
-                            >
-                                {t("linkBillingInfo")}
-                            </Link>
-                        </>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
-
 /* ── Page ────────────────────────────────────────────────────────── */
 
 export default function ToolsHubPage() {
     const { data: session } = useSession();
     const t = useTranslations("Dashboard.overview.tools");
     const locale = useLocale();
-    const user              = session?.user as any;
+    const user              = (session?.user ?? null) as DashboardUser | null;
     const activeProductSlugs: string[] = user?.activeProductSlugs ?? [];
     const isAdmin           = user?.role === "admin";
 

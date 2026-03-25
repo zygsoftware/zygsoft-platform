@@ -1,5 +1,6 @@
 /** Dashboard activity timeline: tool slug → app path (locale added by Link). */
 export const TIMELINE_TOOL_HREFS: Record<string, string> = {
+    "appendix-packager": "/dashboard/tools/appendix-packager",
     "doc-to-udf": "/dashboard/tools/doc-to-udf",
     "pdf-split": "/dashboard/tools/pdf-split",
     "pdf-merge": "/dashboard/tools/pdf-merge",
