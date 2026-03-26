@@ -66,7 +66,7 @@ export function AppStoreShowcase() {
     ];
 
     return (
-        <section className="py-24 md:py-28 bg-[#343131] text-white relative overflow-hidden">
+        <section className="surface-dark py-24 md:py-28 bg-[#343131] text-white relative overflow-hidden">
             <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "64px 64px" }} />
 
             <div className="container mx-auto px-6 max-w-7xl relative z-10">

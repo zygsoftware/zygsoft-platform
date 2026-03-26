@@ -73,8 +73,10 @@ export function InstagramFeedSection() {
   const hasPosts = posts.length > 0;
 
   return (
-    <section className="home-snap-section py-24 md:py-28 bg-[#343131] text-white relative overflow-hidden">
+    <section className="home-snap-section surface-dark py-24 md:py-28 text-white relative overflow-hidden bg-[linear-gradient(180deg,#221f1e_0%,#1a1817_100%)]">
       <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
+      <div className="absolute right-0 top-0 h-72 w-72 rounded-full bg-[#e6c800]/12 blur-3xl pointer-events-none" />
+      <div className="absolute left-[-8rem] bottom-[-8rem] h-72 w-72 rounded-full bg-white/[0.05] blur-3xl pointer-events-none" />
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-16">
@@ -94,19 +96,26 @@ export function InstagramFeedSection() {
             </TextReveal>
           </BlockReveal>
 
-          <BlockReveal delay={0.12} className="flex flex-wrap items-center gap-4 shrink-0">
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-sm font-bold !text-white/92">
-              <Instagram size={18} /> @zygsoft
-            </span>
-            <a
-              href={INSTAGRAM_PROFILE}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#e6c800] !text-[#343131] font-bold text-sm hover:bg-[#c9ad00] transition-colors"
-            >
-              {t("viewProfile")}
-              <ExternalLink size={16} />
-            </a>
+          <BlockReveal delay={0.12} className="shrink-0">
+            <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.05] p-4 backdrop-blur-sm">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-sm font-bold !text-white/92">
+                  <Instagram size={18} /> @zygsoft
+                </span>
+                <span className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-[0.18em] !text-white/55">
+                  {locale === "en" ? "Live social feed" : "Canlı sosyal akış"}
+                </span>
+                <a
+                  href={INSTAGRAM_PROFILE}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#e6c800] !text-[#343131] font-bold text-sm hover:bg-[#c9ad00] transition-colors"
+                >
+                  {t("viewProfile")}
+                  <ExternalLink size={16} />
+                </a>
+              </div>
+            </div>
           </BlockReveal>
         </div>
 

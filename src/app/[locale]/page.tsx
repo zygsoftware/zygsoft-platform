@@ -1,18 +1,17 @@
 "use client";
 
-import { useRef, useEffect } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
 import { Sparkles, CheckCircle2, Cpu, BarChart3, Rocket, ShieldCheck } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/home/HeroSection";
 import { SolutionsSection } from "@/components/home/SolutionsSection";
-import { ContactInquiryForm } from "@/components/forms/ContactInquiryForm";
+import { ContactSection } from "@/components/home/ContactSection";
 import { createRevealUp, revealViewport, staggerContainer } from "@/components/ui/motion";
-import { BlockReveal, TextReveal } from "@/components/ui/reveal";
+import { BlockReveal } from "@/components/ui/reveal";
 
 const PanelShowcase = dynamic(
   () => import("@/components/home/PanelShowcase").then((mod) => mod.PanelShowcase),
@@ -52,19 +51,10 @@ const partnerIcons = [BarChart3, Sparkles, Cpu, Rocket];
 
 export default function Home() {
   const t = useTranslations("Homepage");
-  const locale = useLocale();
-  const isTr = locale === "tr";
-  const containerRef = useRef(null);
   const reducedMotion = !!useReducedMotion();
 
-  // Section-based scroll snapping (homepage only, CSS-only, removed on unmount)
-  useEffect(() => {
-    document.documentElement.classList.add("home-scroll-snap");
-    return () => document.documentElement.classList.remove("home-scroll-snap");
-  }, []);
-
   return (
-    <div ref={containerRef} className="relative min-h-screen bg-white text-[#343131] selection:bg-[#e6c800] selection:text-[#343131] overflow-x-hidden">
+    <div className="relative min-h-screen bg-white text-[#343131] selection:bg-[#e6c800] selection:text-[#343131] overflow-x-hidden">
       <Header />
 
       <main className="relative z-10">
@@ -79,84 +69,58 @@ export default function Home() {
         </div>
 
         {/* ── SECTION 02: TRUSTED PARTNER ────────────────────────── */}
-        <section className="home-snap-section relative overflow-hidden bg-[linear-gradient(180deg,#fbfaf6_0%,#f7f6f2_100%)] py-16 md:py-18">
-          <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #343131 1px, transparent 0)", backgroundSize: "28px 28px" }} />
-          <div className="absolute left-[-8%] top-6 h-56 w-56 rounded-full bg-[#e6c800]/10 blur-3xl" />
+        <section className="home-snap-section bg-[#fbfaf6] py-16 md:py-20">
+          <div className="container mx-auto px-6">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_0.85fr] lg:items-end">
+              <BlockReveal>
+                <div className="max-w-3xl">
+                  <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#343131]/10 bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-[0.28em] text-[#343131]/58">
+                    <ShieldCheck size={13} className="text-[#e6c800]" />
+                    {t("partnerSection.tag")}
+                  </span>
+                  <h2
+                    className="text-3xl md:text-5xl font-display font-black leading-[1] tracking-tight text-[#1a1715]"
+                    dangerouslySetInnerHTML={{ __html: t.raw("partnerSection.title") }}
+                  />
+                </div>
+              </BlockReveal>
 
-          <div className="container relative z-10 mx-auto px-6">
-            <div className="rounded-[34px] border border-[#343131]/[0.06] bg-white/88 p-7 shadow-[0_18px_48px_rgba(0,0,0,0.05)] md:p-9">
-              <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_0.9fr] lg:items-end">
-                <BlockReveal>
-                  <div className="max-w-3xl">
-                    <TextReveal delay={0.05}>
-                      <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#343131]/[0.08] bg-[#fafafc] px-4 py-2 text-[10px] font-bold uppercase tracking-[0.32em] text-[#343131]/55">
-                        <ShieldCheck size={13} className="text-[#e6c800]" />
-                        {t("partnerSection.tag")}
-                      </span>
-                    </TextReveal>
-                    <TextReveal delay={0.12}>
-                      <h2
-                        className="text-3xl font-display font-black leading-[0.98] tracking-[-0.04em] text-[#1a1715] md:text-5xl"
-                        dangerouslySetInnerHTML={{ __html: t.raw("partnerSection.title") }}
-                      />
-                    </TextReveal>
-                  </div>
-                </BlockReveal>
-
-                <BlockReveal delay={0.16}>
-                  <div className="rounded-[26px] border border-[#343131]/[0.06] bg-[#fafafc] p-5">
-                    <p className="text-sm font-medium leading-7 text-[#343131]/62 md:text-[15px]">
-                      {t("partnerSection.description")}
-                    </p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {[
-                        isTr ? "Uçtan uca sistem" : "End-to-end systems",
-                        isTr ? "Hibrit model" : "Hybrid model",
-                        isTr ? "Ölçeklenebilir teslim" : "Scalable delivery",
-                      ].map((item) => (
-                        <span
-                          key={item}
-                          className="inline-flex items-center gap-2 rounded-full border border-[#343131]/[0.08] bg-white px-3 py-1.5 text-xs font-semibold text-[#343131]/72"
-                        >
-                          <CheckCircle2 size={13} className="text-[#e6c800]" />
-                          {item}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </BlockReveal>
-              </div>
-
-              <motion.div
-                className="mt-7 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4"
-                variants={staggerContainer}
-                initial="hidden"
-                whileInView="visible"
-                viewport={revealViewport}
-              >
-                {(t.raw("partnerSection.pillars") as PartnerPillar[]).map((pillar, i) => {
-                  const PillarIcon = partnerIcons[i];
-
-                  return (
-                    <motion.div
-                      key={pillar.t}
-                      variants={createRevealUp(reducedMotion, 20, 4)}
-                      className="group rounded-[24px] border border-[#343131]/[0.06] bg-[#fcfcfd] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-[#e6c800]/40 hover:bg-white hover:shadow-[0_12px_28px_rgba(0,0,0,0.05)]"
-                    >
-                      <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-[16px] bg-[#faf4d4] text-[#1a1715] transition-colors duration-300 group-hover:bg-[#e6c800]">
-                        {PillarIcon ? <PillarIcon size={20} /> : null}
-                      </div>
-                      <h3 className="text-lg font-black uppercase tracking-tight text-[#1a1715]">
-                        {pillar.t}
-                      </h3>
-                      <p className="mt-2 text-sm font-medium leading-6 text-[#343131]/60">
-                        {pillar.d}
-                      </p>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
+              <BlockReveal delay={0.08}>
+                <p className="max-w-xl text-[15px] md:text-base font-medium leading-7 text-[#343131]/62">
+                  {t("partnerSection.description")}
+                </p>
+              </BlockReveal>
             </div>
+
+            <motion.div
+              className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={revealViewport}
+            >
+              {(t.raw("partnerSection.pillars") as PartnerPillar[]).map((pillar, i) => {
+                const PillarIcon = partnerIcons[i];
+
+                return (
+                  <motion.div
+                    key={pillar.t}
+                    variants={createRevealUp(reducedMotion, 16, 4)}
+                    className="rounded-[22px] border border-[#343131]/10 bg-white p-5"
+                  >
+                    <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-[16px] bg-[#faf4d4] text-[#1a1715]">
+                      {PillarIcon ? <PillarIcon size={20} /> : null}
+                    </div>
+                    <h3 className="text-lg font-black uppercase tracking-tight text-[#1a1715]">
+                      {pillar.t}
+                    </h3>
+                    <p className="mt-2 text-sm font-medium leading-6 text-[#343131]/60">
+                      {pillar.d}
+                    </p>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
           </div>
         </section>
 
@@ -167,11 +131,12 @@ export default function Home() {
           <SolutionsSection />
         </div>
 
-        {/* Transition: white → dark (neutral gradient, no yellow) */}
+        {/* Transition: warm light → dark */}
         <div
-          className="h-24 md:h-28"
+          className="h-24 md:h-32 lg:h-40"
           style={{
-            background: "linear-gradient(to bottom, #ffffff 0%, #f0f0f2 25%, #d8d8dc 50%, #909098 75%, #2a2c30 90%, #343131 100%)",
+            background:
+              "linear-gradient(to bottom, #f7f2e8 0%, #f2ede3 16%, #e8e1d3 34%, #d5cdc0 52%, #a8a097 72%, #6c6660 88%, #343131 100%)",
           }}
           aria-hidden
         />
@@ -184,59 +149,72 @@ export default function Home() {
         {/* ── SECTION 07: INSTAGRAM FEED ────────────────────────── */}
         <InstagramFeedSection />
 
-        {/* Transition: dark → warm neutral (Instagram → Blog) */}
-        <div className="h-12 bg-gradient-to-b from-[#343131] via-[#1a1c22] to-[#f3f0ea]" aria-hidden />
+        {/* Transition: dark → warm editorial */}
+        <div className="h-8 bg-gradient-to-b from-[#1d1a19] via-[#645f58] to-[#f3f0ea]" aria-hidden />
 
         {/* ── SECTION 09: BLOG ────────────────────────── */}
         <div className="home-snap-section">
           <HomepageBlogSection />
         </div>
 
-        {/* Transition: cream → off-white (Blog → Contact) */}
-        <div className="h-8 bg-gradient-to-b from-[#f3f0ea] to-[#fafafc]" aria-hidden />
+        {/* Transition: cream → contact surface */}
+        <div className="h-6 bg-gradient-to-b from-[#f3f0ea] to-[#fafafc]" aria-hidden />
 
         {/* ── SECTION 09.5: CONTACT INQUIRY ────────────────────────── */}
-        <section className="home-snap-section py-20 md:py-24 bg-[#fafafc] border-y border-[#343131]/[0.06]">
-          <div className="container mx-auto px-6 max-w-5xl">
-            <BlockReveal>
-              <ContactInquiryForm
-                title={t("contactStrip.title")}
-                subtitle={t("contactStrip.subtitle")}
-              />
-            </BlockReveal>
-          </div>
-        </section>
+        <div className="home-snap-section">
+          <ContactSection
+            title={t("contactStrip.title")}
+            subtitle={t("contactStrip.subtitle")}
+          />
+        </div>
 
-        {/* Transition: light → dark (Contact → CTA, cinematic) */}
+        {/* Transition: contact → closing CTA */}
         <div
-          className="h-24 md:h-28"
+          className="h-10 md:h-12"
           style={{
-            background: "linear-gradient(to bottom, #fafafc 0%, #f0f0f2 20%, #d8d8dc 45%, #909098 70%, #2a2c30 88%, #343131 100%)",
+            background: "linear-gradient(to bottom, #fafafc 0%, #f2eee8 55%, #ede3c1 100%)",
           }}
           aria-hidden
         />
 
-        {/* ── SECTION 10: CINEMATIC CTA ────────────────────────── */}
-        <section className="home-snap-section relative py-28 md:py-36 lg:py-40 bg-[#343131] overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 1px)', backgroundSize: '64px 64px' }} />
+        {/* ── SECTION 10: FINAL CTA ────────────────────────── */}
+        <section className="home-snap-section py-20 md:py-24 bg-[#f3f0ea]">
+          <div className="container mx-auto px-6">
+            <BlockReveal>
+              <div className="mx-auto max-w-4xl rounded-[2rem] border border-[#343131]/10 bg-white px-8 py-10 text-center shadow-[0_18px_40px_rgba(0,0,0,0.04)] md:px-12 md:py-14">
+                <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#343131]/10 bg-[#faf7ef] px-4 py-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#343131]/60">
+                  <ShieldCheck size={13} className="text-[#e6c800]" />
+                  {t("ctaSection.tag")}
+                </span>
+                <h2
+                  className="text-3xl md:text-5xl font-display font-black leading-[1] tracking-tight text-[#1a1715] mb-5"
+                  dangerouslySetInnerHTML={{ __html: t.raw("ctaSection.title") }}
+                />
+                <p className="mx-auto max-w-2xl text-[15px] md:text-lg font-medium leading-8 text-[#343131]/62 mb-8">
+                  {t("ctaSection.description")}
+                </p>
 
-          <div className="container mx-auto px-6 relative z-10 text-center">
-            <BlockReveal className="flex flex-col items-center">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.4em] !text-white/55 mb-6 block">{t("ctaSection.tag")}</span>
-                <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-black leading-[0.94] tracking-tight !text-white uppercase mb-10 max-w-3xl mx-auto" dangerouslySetInnerHTML={{ __html: t.raw("ctaSection.title") }} />
-              </div>
+                <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
+                  {(["acceleration", "resilience", "precision"] as const).map((key) => (
+                    <span
+                      key={key}
+                      className="inline-flex items-center gap-2 rounded-full border border-[#343131]/10 bg-[#fafafc] px-4 py-2 text-xs font-semibold text-[#343131]/72"
+                    >
+                      <CheckCircle2 size={13} className="text-[#e6c800]" />
+                      {t(`ctaSection.features.${key}.title`)}
+                    </span>
+                  ))}
+                </div>
 
-              <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-                <Link href="/contact" className="home-btn-primary-yellow group relative px-9 py-3.5 font-black uppercase tracking-[0.22em] text-[11px] rounded-xl overflow-hidden transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-[0_16px_48px_rgba(230,200,0,0.2)]">
-                  <span className="relative z-10">{t("ctaSection.cta") || t("ctaSection.button")}</span>
-                  <div className="absolute inset-0 border border-white/30 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </Link>
-
-                <Link href="/portfolio" className="group flex items-center gap-4 !text-white/90 font-bold uppercase tracking-[0.24em] text-[11px] hover:!text-[#e6c800] transition-colors duration-200">
-                  <span>{t("ctaSection.ctaSecondary") || "Explore Portfolio"}</span>
-                  <div className="w-8 h-px bg-white/50 group-hover:bg-[#e6c800] group-hover:w-12 transition-all duration-300" />
-                </Link>
+                <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+                  <Link href="/contact" className="home-btn-primary-yellow px-9 py-3.5 font-black uppercase tracking-[0.22em] text-[11px] rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-[0_16px_48px_rgba(230,200,0,0.2)]">
+                    {t("ctaSection.cta") || t("ctaSection.button")}
+                  </Link>
+                  <Link href="/portfolio" className="inline-flex items-center gap-3 rounded-xl border border-[#343131]/12 bg-[#fafafc] px-6 py-3 text-[11px] font-black uppercase tracking-[0.22em] text-[#343131] transition-colors hover:border-[#e6c800]/40 hover:bg-[#fff8da]">
+                    <span>{t("ctaSection.ctaSecondary") || "Explore Portfolio"}</span>
+                    <div className="w-7 h-px bg-[#343131]/40" />
+                  </Link>
+                </div>
               </div>
             </BlockReveal>
           </div>

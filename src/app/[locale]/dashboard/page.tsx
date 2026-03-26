@@ -325,16 +325,17 @@ export default function DashboardPage() {
                                 rounded-2xl border border-slate-700
                                 hover:border-slate-600 hover:shadow-lg
                                 transition-all duration-200 group
+                                surface-dark
                             ">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center border border-amber-100 shrink-0">
                                         <CheckCircle2 size={22} />
                                     </div>
                                     <div>
-                                        <div className="font-black text-white text-sm leading-tight">
+                                        <div className="font-black !text-white text-sm leading-tight">
                                             {t("sections.legalToolkitCardTitle")}
                                         </div>
-                                        <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider mt-0.5">
+                                        <p className="text-[10px] !text-amber-400 font-bold uppercase tracking-wider mt-0.5">
                                             {t("sections.legalToolkitCardBadge")}
                                         </p>
                                     </div>

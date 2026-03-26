@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
-import { pushDataLayerEvent } from "@/lib/analytics";
+import { pushDataLayerEvent, pushTrialStartEvent } from "@/lib/analytics";
 
 type StepStatus = "pending" | "active" | "completed";
 
@@ -95,6 +95,12 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
             const data = await res.json();
             if (res.ok) {
                 pushDataLayerEvent("trial_start", {
+                    source: "onboarding",
+                    trial_days: 3,
+                    trial_product: "legal-toolkit",
+                    locale,
+                });
+                pushTrialStartEvent({
                     source: "onboarding",
                     trial_days: 3,
                     trial_product: "legal-toolkit",

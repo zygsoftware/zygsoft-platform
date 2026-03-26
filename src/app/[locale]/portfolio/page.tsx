@@ -172,14 +172,14 @@ export default function Portfolio() {
                 </section>
 
                 {/* ── CTA ── */}
-                <section className="py-20" style={{ background: "#0e0e0e" }}>
+                <section className="surface-dark py-20" style={{ background: "#0e0e0e" }}>
                     <div className="container mx-auto px-6 max-w-7xl text-center">
                         <BlockReveal>
                             <TextReveal delay={0.08}>
-                                <span className="section-label" style={{ color: "#e6c800", borderColor: "#e6c800" }}>Benzer Bir Proje?</span>
+                                <span className="section-label !text-[#e6c800]" style={{ borderColor: "#e6c800" }}>Benzer Bir Proje?</span>
                             </TextReveal>
                             <TextReveal delay={0.16}>
-                                <h2 className="font-display font-extrabold text-white mt-4 mb-8" style={{ fontSize: "clamp(32px,4vw,56px)" }}>
+                                <h2 className="font-display font-extrabold !text-white mt-4 mb-8" style={{ fontSize: "clamp(32px,4vw,56px)" }}>
                                     Sizin Projenizi De Konuşalım
                                 </h2>
                             </TextReveal>

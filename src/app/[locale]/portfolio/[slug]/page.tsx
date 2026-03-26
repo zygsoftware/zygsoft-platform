@@ -430,17 +430,17 @@ export default async function PortfolioDetailPage({
                 )}
 
                 {/* ── Bottom CTA ── */}
-                <section className="py-20" style={{ background: "#0e0e0e" }}>
+                <section className="surface-dark py-20" style={{ background: "#0e0e0e" }}>
                     <div className="container mx-auto px-6 max-w-7xl">
                         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
                             <div>
                                 <h2
-                                    className="font-display font-extrabold text-white mb-3"
+                                    className="font-display font-extrabold !text-white mb-3"
                                     style={{ fontSize: "clamp(28px, 3.5vw, 48px)" }}
                                 >
                                     {isEn ? "Let's Build Something Together" : "Sizin Projenizi De Konuşalım"}
                                 </h2>
-                                <p className="text-white/50 text-lg">
+                                <p className="text-[rgba(248,250,252,0.72)] text-lg">
                                     {isEn
                                         ? "Ready to start your next digital project?"
                                         : "Dijital dönüşümünüze birlikte başlayalım."}
@@ -449,7 +449,7 @@ export default async function PortfolioDetailPage({
                             <div className="flex items-center gap-4 shrink-0">
                                 <Link
                                     href={portfolioHref}
-                                    className="inline-flex items-center gap-2 px-6 py-3 border border-white/20 text-white text-sm font-bold rounded-xl hover:border-white/50 transition-colors"
+                                    className="inline-flex items-center gap-2 px-6 py-3 border border-white/20 text-[rgba(248,250,252,0.96)] text-sm font-bold rounded-xl hover:border-white/50 transition-colors"
                                 >
                                     <ArrowLeft size={16} />
                                     {isEn ? "All Projects" : "Tüm Projeler"}

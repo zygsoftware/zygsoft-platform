@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { NextIntlClientProvider } from 'next-intl';
@@ -11,7 +11,32 @@ import { AnimatedMeshBackground } from "@/components/layout/AnimatedMeshBackgrou
 import { GoogleTag } from "@/components/analytics/GoogleTag";
 import { ClientEnhancements } from "@/components/layout/ClientEnhancements";
 
-const inter = Inter({ subsets: ["latin"] });
+const linuxLibertine = localFont({
+  src: [
+    {
+      path: "../../linux_libertine/LinLibertine_R.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../linux_libertine/LinLibertine_RI.ttf",
+      weight: "400",
+      style: "italic",
+    },
+    {
+      path: "../../linux_libertine/LinLibertine_RB.ttf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../../linux_libertine/LinLibertine_RBI.ttf",
+      weight: "700",
+      style: "italic",
+    },
+  ],
+  variable: "--font-linux-libertine",
+  display: "swap",
+});
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.zygsoft.com";
 
@@ -141,7 +166,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className="scroll-smooth">
-      <body className={`${inter.className} min-h-screen flex flex-col`}>
+      <body className={`${linuxLibertine.className} ${linuxLibertine.variable} min-h-screen flex flex-col`}>
         <GoogleTag />
         <script
           type="application/ld+json"

@@ -4,10 +4,10 @@ import { useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
 import { useLocale } from "next-intl";
-import { Loader2, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { TrialStartConfirmModal } from "./TrialStartConfirmModal";
-import { pushDataLayerEvent } from "@/lib/analytics";
+import { pushDataLayerEvent, pushTrialStartEvent } from "@/lib/analytics";
 
 type TrialRequestCTAProps = {
     emailVerified: boolean;
@@ -30,7 +30,7 @@ export function TrialRequestCTA({
     source,
     className = "",
 }: TrialRequestCTAProps) {
-    const { data: session, update: updateSession } = useSession();
+    const { update: updateSession } = useSession();
     const locale = useLocale();
     const [modalOpen, setModalOpen] = useState(false);
 
@@ -50,6 +50,12 @@ export function TrialRequestCTA({
             const data = await res.json();
             if (res.ok) {
                 pushDataLayerEvent("trial_start", {
+                    source,
+                    trial_days: 3,
+                    trial_product: "legal-toolkit",
+                    locale,
+                });
+                pushTrialStartEvent({
                     source,
                     trial_days: 3,
                     trial_product: "legal-toolkit",

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Zap, Loader2, ShoppingCart } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { pushDataLayerEvent } from "@/lib/analytics";
+import { pushDataLayerEvent, pushTrialStartEvent } from "@/lib/analytics";
 
 type TrialCardProps = {
     trialStatus: string;
@@ -43,6 +43,11 @@ export function TrialCard({
             const data = await res.json();
             if (res.ok) {
                 pushDataLayerEvent("trial_start", {
+                    source: "dashboard-card",
+                    trial_days: 3,
+                    trial_product: "legal-toolkit",
+                });
+                pushTrialStartEvent({
                     source: "dashboard-card",
                     trial_days: 3,
                     trial_product: "legal-toolkit",

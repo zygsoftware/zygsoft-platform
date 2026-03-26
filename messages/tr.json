@@ -727,9 +727,9 @@
       "tag": "/ DİJİTAL DÖNÜŞÜM ORTAĞI",
       "eyebrow": "Yazılım · Otomasyon · Dijital Dönüşüm",
       "ctaProducts": "DİJİTAL ÜRÜNLER",
-      "title1": "GELECEĞE HAZIR",
-      "title2": "DİJİTAL SİSTEMLER",
-      "title3": "İNŞA EDİYORUZ.",
+      "title1": "Geleceğe hazır",
+      "title2": "dijital sistemler",
+      "title3": "inşa ediyoruz.",
       "description": "Zygsoft, işletmeleri teknolojiyle büyüten, süreçlerini otomatize eden ve ölçeklenebilir dijital altyapılar tasarlayan Antalya merkezli bir teknoloji şirketidir. Profesyonel çözüm ortağınızla tanışın.",
       "subtext": "Yazılım platformları, otomasyon sistemleri ve dijital dönüşüm çözümleri ile kurumların teknoloji altyapısını yeniden inşa ediyoruz. İşletmeler, ekipler ve profesyoneller için.",
       "cta": "DÖNÜŞÜMÜ BAŞLAT",
@@ -896,6 +896,13 @@
     "contactStrip": {
       "title": "Proje veya Hizmet Teklifi Alın",
       "subtitle": "Profesyonel hizmetler (web, otomasyon, dijital strateji) için kapsam ve teklif detaylarıyla hızlı geri dönüş sağlayalım."
+    },
+    "contactPanel": {
+      "eyebrow": "Hızlı Başlangıç",
+      "title": "İhtiyacınızı netleştirelim, doğru akışı birlikte kuralım.",
+      "description": "Web, otomasyon, dijital strateji veya özel yazılım ihtiyaçlarınız için önce kapsamı netleştiriyor, sonra en doğru yol haritasını çıkarıyoruz.",
+      "flow": "İlk temas, kapsam ve uygulama tek akışta ilerler.",
+      "cta": "İletişim Sayfasına Git"
     },
     "whyChooseUsPanel": {
       "metric1": "BAŞARI ORANI",

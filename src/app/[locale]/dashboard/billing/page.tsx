@@ -1,12 +1,11 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
-import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { motion } from "framer-motion";
-import { pushDataLayerEvent } from "@/lib/analytics";
+import { pushDataLayerEvent, pushLeadEvent } from "@/lib/analytics";
 import {
     Receipt, CheckCircle, UploadCloud, Building, Calendar,
     ArrowRight, Loader2, Info, AlertCircle, Clock, XCircle,
@@ -169,10 +168,10 @@ function PaymentHistory({ refreshKey }: { refreshKey: number }) {
     const [loading,  setLoading]  = useState(true);
     const [error,    setError]    = useState<string | null>(null);
 
-    useEffect(() => {
+    const loadPayments = useCallback(() => {
         setLoading(true);
         setError(null);
-        fetch("/api/payments/history")
+        return fetch("/api/payments/history")
             .then(async (res) => {
                 if (!res.ok) throw new Error(t("loadError"));
                 const data = await res.json();
@@ -180,7 +179,11 @@ function PaymentHistory({ refreshKey }: { refreshKey: number }) {
             })
             .catch((e) => setError(e.message ?? t("genericError")))
             .finally(() => setLoading(false));
-    }, [refreshKey, t]);
+    }, [t]);
+
+    useEffect(() => {
+        void loadPayments();
+    }, [refreshKey, loadPayments]);
 
     return (
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
@@ -388,7 +391,6 @@ function PaymentHistory({ refreshKey }: { refreshKey: number }) {
 /* ── Main page ───────────────────────────────────────────────────── */
 
 export default function BillingPage() {
-    const { data: session } = useSession();
     const t = useTranslations("Dashboard.billing");
     const locale = useLocale();
     const searchParams = useSearchParams();
@@ -454,6 +456,14 @@ export default function BillingPage() {
             } else {
                 pushDataLayerEvent("payment_notify", {
                     payment_amount: parseFloat(amount),
+                    payment_locale: locale,
+                    payment_product_id: productId,
+                    payment_product_name: productDetails[productId]?.descKey ?? productId,
+                });
+                pushLeadEvent({
+                    lead_type: "payment_notification",
+                    value: parseFloat(amount),
+                    currency: "TRY",
                     payment_locale: locale,
                     payment_product_id: productId,
                     payment_product_name: productDetails[productId]?.descKey ?? productId,

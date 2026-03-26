@@ -727,9 +727,9 @@
       "ctaProducts": "DIGITAL PRODUCTS",
       "tag": "/ DIGITAL TRANSFORMATION PARTNER",
       "eyebrow": "Software · Automation · Digital Transformation",
-      "title1": "BUILD THE",
-      "title2": "FUTURE-READY",
-      "title3": "DIGITAL SYSTEMS.",
+      "title1": "We build",
+      "title2": "future-ready",
+      "title3": "digital systems.",
       "description": "Zygsoft is an Antalya-based technology company that grows businesses with technology, automates processes, and designs scalable digital infrastructures. Meet your professional partner.",
       "subtext": "We rebuild technology infrastructure for organizations with software platforms, automation systems, and digital transformation solutions. For businesses, teams, and professionals.",
       "cta": "START TRANSFORMATION",
@@ -896,6 +896,13 @@
     "contactStrip": {
       "title": "Request a Project or Service Quote",
       "subtitle": "For professional services (web, automation, digital strategy) — we'll respond quickly with scope and proposal details."
+    },
+    "contactPanel": {
+      "eyebrow": "Quick Start",
+      "title": "Let's clarify the need and build the right flow together.",
+      "description": "For web, automation, digital strategy, or custom software needs, we first define the scope clearly and then shape the most suitable roadmap.",
+      "flow": "First contact, scope, and execution move in one clear flow.",
+      "cta": "Go to Contact Page"
     },
     "whyChooseUsPanel": {
       "metric1": "SUCCESS RATE",

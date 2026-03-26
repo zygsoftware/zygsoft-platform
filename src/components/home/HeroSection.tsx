@@ -3,7 +3,6 @@
 import { Link } from "@/i18n/navigation";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
@@ -13,9 +12,6 @@ const HeroOrbitNetwork = dynamic(
   { ssr: false },
 );
 
-const NOISE_SVG =
-  "data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E";
-
 export function HeroSection() {
   const t = useTranslations("Homepage.hero");
   const [showEnhancedVisuals, setShowEnhancedVisuals] = useState(false);
@@ -23,11 +19,21 @@ export function HeroSection() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-    const prefersTouch = window.matchMedia("(pointer: coarse)").matches;
+    const updateVisualMode = () => {
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+      const prefersTouch = window.matchMedia("(pointer: coarse)").matches;
 
-    setShowEnhancedVisuals(isDesktop && !prefersReducedMotion && !prefersTouch);
+      setShowEnhancedVisuals(isDesktop && !prefersReducedMotion && !prefersTouch);
+    };
+
+    const frameId = window.requestAnimationFrame(updateVisualMode);
+    window.addEventListener("resize", updateVisualMode);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("resize", updateVisualMode);
+    };
   }, []);
 
   return (
@@ -58,20 +64,20 @@ export function HeroSection() {
 
       {/* Main content */}
       <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-center px-6 pb-16 pt-20 lg:min-h-[100vh] lg:px-12 lg:pb-24 lg:pt-28 xl:px-16 2xl:px-24">
-        <div className="max-w-2xl">
-          <p className="mb-8 text-[10px] font-bold uppercase tracking-[0.28em] text-[#343131]/50 lg:mb-10">
+        <div className="max-w-[40rem]">
+          <p className="mb-8 text-[10px] font-bold uppercase tracking-[0.28em] text-[#343131]/62 lg:mb-10">
             {t("eyebrow")}
           </p>
 
-          <h1 className="mb-10 font-display text-[clamp(2.25rem,5vw,4.25rem)] font-black leading-[0.92] tracking-[-0.02em] text-[#343131] lg:mb-12 lg:text-[clamp(2.75rem,4.2vw,5rem)] lg:tracking-[-0.03em]">
-            <span className="block font-black tracking-tight">{t("title1")}</span>
-            <span className="mt-0.5 block font-black tracking-tight">{t("title2")}</span>
-            <span className="mt-1 block font-extrabold tracking-[0.01em] text-[#e6c800]">
+          <h1 className="mb-8 max-w-[12.5ch] font-display text-[clamp(2rem,3.9vw,4.1rem)] font-semibold leading-[1.02] tracking-[-0.045em] text-[#343131] lg:mb-10 lg:max-w-[13ch] lg:text-[clamp(2.5rem,4vw,4.6rem)]">
+            <span className="block font-semibold tracking-[-0.05em]">{t("title1")}</span>
+            <span className="mt-1 block font-semibold tracking-[-0.05em]">{t("title2")}</span>
+            <span className="mt-1.5 block font-medium tracking-[-0.04em] text-[#e6c800]">
               {t("title3")}
             </span>
           </h1>
 
-          <p className="mb-12 max-w-md text-[15px] font-medium leading-[1.72] text-[#343131]/55 lg:mb-14 lg:text-[16px]">
+          <p className="mb-12 max-w-lg text-[15px] font-medium leading-[1.72] text-[#343131]/64 lg:mb-14 lg:text-[16px]">
             {t("subtext")}
           </p>
 
@@ -116,12 +122,12 @@ export function HeroSection() {
         className="group absolute bottom-6 left-6 z-10 flex cursor-default flex-col items-start gap-1.5 lg:bottom-8 lg:left-12 xl:left-16 2xl:left-24"
         aria-hidden
       >
-        <span className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#343131]/35 transition-colors duration-300 group-hover:text-[#343131]/50">
+        <span className="text-[8px] font-bold uppercase tracking-[0.24em] text-[#343131]/52 transition-colors duration-300 group-hover:text-[#343131]/72">
           {t("scroll")}
         </span>
         <ChevronDown
           size={16}
-          className="animate-hero-scroll text-[#343131]/25"
+          className="animate-hero-scroll text-[#343131]/44"
           aria-hidden
         />
       </div>

@@ -39,15 +39,15 @@ function StaticPanel({ t }: { t: PanelT }) {
     return (
         <div className="w-full max-w-[340px] mx-auto rounded-2xl bg-white border border-[#343131]/[0.06] shadow-[0_24px_64px_rgba(0,0,0,0.08)] overflow-hidden">
             <div className="h-10 bg-[#343131]/[0.02] border-b border-[#343131]/[0.06] flex items-center px-4">
-                <span className="text-[11px] font-bold text-[#343131]/60">{t("panelName")}</span>
+                <span className="text-[11px] font-bold text-[#343131]/72">{t("panelName")}</span>
             </div>
             <div className="p-6 flex flex-col items-center gap-4">
                 <div className="w-16 h-16 rounded-xl bg-[#343131]/[0.04] flex items-center justify-center">
-                    <FileText size={28} className="text-[#343131]/50" />
+                    <FileText size={28} className="text-[#343131]/70" />
                 </div>
                 <div className="text-center">
                     <p className="text-base font-bold text-[#343131]">{t("docxConverterLine1")}</p>
-                    <p className="text-[12px] text-[#343131]/50 mt-1">{t("docxConverterLine2")}</p>
+                    <p className="text-[12px] text-[#343131]/62 mt-1">{t("docxConverterLine2")}</p>
                 </div>
                 <div className="flex items-center gap-2 text-[#e6c800]">
                     <CheckCircle2 size={18} />
@@ -66,7 +66,7 @@ function DocxUdfDemo({ state, t }: { state: DocxUdfState; t: PanelT }) {
                 <div className="flex items-center justify-between mb-4">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-[#343131]/70">{t("docxInput")}</span>
                     {state !== "idle" && state !== "reset" && (
-                        <span className="text-[10px] font-medium text-[#343131]/55">dava_dilekcesi.docx</span>
+                        <span className="text-[10px] font-medium text-[#343131]/64">dava_dilekcesi.docx</span>
                     )}
                 </div>
                 <AnimatePresence mode="wait">
@@ -79,7 +79,7 @@ function DocxUdfDemo({ state, t }: { state: DocxUdfState; t: PanelT }) {
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.25 }}
                         >
-                            <p className="text-[13px] font-medium text-[#343131]/55">{t("docxDragHint")}</p>
+                            <p className="text-[13px] font-medium text-[#343131]/66">{t("docxDragHint")}</p>
                         </motion.div>
                     )}
                     {state === "file-arrives" && (
@@ -102,7 +102,7 @@ function DocxUdfDemo({ state, t }: { state: DocxUdfState; t: PanelT }) {
                                 </div>
                                 <div>
                                     <p className="text-[15px] font-bold text-[#343131]">dava_dilekcesi.docx</p>
-                                    <p className="text-[12px] text-[#343131]/45">124 KB</p>
+                                    <p className="text-[12px] text-[#343131]/58">124 KB</p>
                                 </div>
                             </motion.div>
                         </motion.div>
@@ -150,7 +150,7 @@ function DocxUdfDemo({ state, t }: { state: DocxUdfState; t: PanelT }) {
                                 </div>
                                 <div className="flex-1">
                                     <p className="text-[15px] font-bold text-[#343131]">dava_dilekcesi.docx</p>
-                                    <p className="text-[12px] text-[#343131]/50 flex items-center gap-2 mt-0.5">
+                                    <p className="text-[12px] text-[#343131]/62 flex items-center gap-2 mt-0.5">
                                         <Loader2 size={14} className="animate-spin shrink-0" />
                                         {t("docxConverting")}
                                     </p>
@@ -195,7 +195,7 @@ function DocxUdfDemo({ state, t }: { state: DocxUdfState; t: PanelT }) {
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.2 }}
                         >
-                            <p className="text-[13px] font-medium text-[#343131]/55">{t("docxDragHint")}</p>
+                            <p className="text-[13px] font-medium text-[#343131]/66">{t("docxDragHint")}</p>
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -215,8 +215,8 @@ function DocxUdfDemo({ state, t }: { state: DocxUdfState; t: PanelT }) {
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <p className="text-[12px] text-[#343131]/45">—</p>
-                                <p className="text-[11px] text-[#343131]/40 mt-1">{t("docxWaiting")}</p>
+                                <p className="text-[12px] text-[#343131]/56">—</p>
+                                <p className="text-[11px] text-[#343131]/52 mt-1">{t("docxWaiting")}</p>
                             </motion.div>
                         )}
                         {state === "ready" && (
@@ -281,7 +281,7 @@ function PdfMergeDemo({ reducedMotion, t }: { reducedMotion: boolean; t: PanelT 
                                     animate={{ x: 0, opacity: 1 }}
                                     transition={{ delay: i * 0.15, duration: 0.35, ease: EASE }}
                                 >
-                                    <FileText size={14} className="text-[#343131]/50" />
+                                    <FileText size={14} className="text-[#343131]/66" />
                                     <span className="text-[13px] font-medium text-[#343131]">{name}</span>
                                 </motion.div>
                             ))}
@@ -300,11 +300,11 @@ function PdfMergeDemo({ reducedMotion, t }: { reducedMotion: boolean; t: PanelT 
                                 animate={{ opacity: [0.5, 1, 0.5] }}
                                 transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
                             >
-                                <FileText size={14} className="text-[#343131]/50" />
-                                <FileText size={14} className="text-[#343131]/50" />
-                                <FileText size={14} className="text-[#343131]/50" />
+                                <FileText size={14} className="text-[#343131]/66" />
+                                <FileText size={14} className="text-[#343131]/66" />
+                                <FileText size={14} className="text-[#343131]/66" />
                             </motion.div>
-                            <p className="text-[12px] text-[#343131]/50">{t("pdfMerging")}</p>
+                            <p className="text-[12px] text-[#343131]/62">{t("pdfMerging")}</p>
                             <div className="w-full h-1.5 rounded-full bg-[#343131]/[0.06] overflow-hidden">
                                 <motion.div
                                     className="h-full rounded-full bg-[#e6c800]"
@@ -373,9 +373,9 @@ function OcrDemo({ reducedMotion, t }: { reducedMotion: boolean; t: PanelT }) {
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.5 }}
                             >
-                                <ScanText size={32} className="text-[#343131]/30" />
+                                <ScanText size={32} className="text-[#343131]/48" />
                             </motion.div>
-                            <p className="text-[12px] text-[#343131]/40 mt-3">{t("ocrPagePreview")}</p>
+                            <p className="text-[12px] text-[#343131]/54 mt-3">{t("ocrPagePreview")}</p>
                         </motion.div>
                     )}
                     {phase === "extracting" && (
@@ -386,7 +386,7 @@ function OcrDemo({ reducedMotion, t }: { reducedMotion: boolean; t: PanelT }) {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                         >
-                            <div className="flex items-center gap-2 text-[12px] text-[#343131]/50">
+                            <div className="flex items-center gap-2 text-[12px] text-[#343131]/62">
                                 <Loader2 size={14} className="animate-spin shrink-0" />
                                 {t("ocrExtracting")}
                             </div>
@@ -429,7 +429,7 @@ function OcrDemo({ reducedMotion, t }: { reducedMotion: boolean; t: PanelT }) {
                                     </motion.p>
                                 ))}
                             </div>
-                            <p className="text-[11px] text-[#343131]/40 mt-2">{t("ocrCopyExport")}</p>
+                            <p className="text-[11px] text-[#343131]/52 mt-2">{t("ocrCopyExport")}</p>
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -542,12 +542,12 @@ export function PanelShowcase() {
                         <h2 className="text-2xl md:text-3xl font-display font-black text-[#343131] mb-4">
                             {t("staticHeroTitle")}
                         </h2>
-                        <p className="text-[#343131]/60 text-[15px] font-medium leading-relaxed mb-6">
+                        <p className="text-[#343131]/66 text-[15px] font-medium leading-relaxed mb-6">
                             {t("staticHeroDesc")}
                         </p>
                         <div className="flex flex-wrap justify-center gap-3">
                             {valuePoints.map((p) => (
-                                <span key={p} className="text-[12px] font-medium text-[#343131]/50 px-3 py-1.5 rounded-full bg-[#343131]/[0.04]">
+                                <span key={p} className="text-[12px] font-medium text-[#343131]/62 px-3 py-1.5 rounded-full bg-[#343131]/[0.04]">
                                     {p}
                                 </span>
                             ))}

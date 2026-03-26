@@ -1,18 +1,22 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 
 export function SmoothScroll({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname();
+
     useEffect(() => {
         if (typeof window === "undefined") return;
 
         const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         const prefersTouch = window.matchMedia("(pointer: coarse)").matches;
         const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+        const isHomepage = /^\/(?:tr|en)?\/?$/.test(pathname || "/");
 
-        // Keep scroll handling lightweight on mobile / touch devices.
-        if (prefersReducedMotion || prefersTouch || !isDesktop) {
+        // Homepage keeps native scrolling for smoother section-to-section performance.
+        if (prefersReducedMotion || prefersTouch || !isDesktop || isHomepage) {
             return;
         }
 
@@ -39,7 +43,7 @@ export function SmoothScroll({ children }: { children: React.ReactNode }) {
             cancelAnimationFrame(rafId);
             lenis.destroy();
         };
-    }, []);
+    }, [pathname]);
 
     return <>{children}</>;
 }

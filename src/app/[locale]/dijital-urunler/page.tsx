@@ -106,7 +106,7 @@ export default function DijitalUrunlerPage() {
                         viewport={{ once: true, margin: "-100px" }}
                         transition={{ duration: 0.8 }}
                     >
-                        <div className="relative w-full rounded-[2.5rem] md:rounded-[3.5rem] bg-[#141313] text-white p-8 md:p-16 lg:p-20 overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.15)] group">
+                        <div className="surface-dark relative w-full rounded-[2.5rem] md:rounded-[3.5rem] bg-[#141313] text-white p-8 md:p-16 lg:p-20 overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.15)] group">
                             
                             {/* Inner glows for dark card */}
                             <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-[#e6c800]/20 to-transparent rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3" />
@@ -116,16 +116,16 @@ export default function DijitalUrunlerPage() {
                                 
                                 {/* Left: Info */}
                                 <div>
-                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#e6c800]/10 text-[#e6c800] border border-[#e6c800]/20 text-[10px] font-black uppercase tracking-widest mb-8">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#e6c800]/10 !text-[#e6c800] border border-[#e6c800]/20 text-[10px] font-black uppercase tracking-widest mb-8">
                                         <Star size={12} fill="currentColor" />
                                         {t("flagshipBadge")}
                                     </div>
                                     
-                                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-black text-white mb-6 tracking-tight leading-[1.05]">
+                                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-black !text-white mb-6 tracking-tight leading-[1.05]">
                                         {t("services.legalToolkitName")}
                                     </h2>
                                     
-                                    <p className="text-white/60 text-lg md:text-xl leading-relaxed mb-8 font-medium">
+                                    <p className="text-[rgba(248,250,252,0.76)] text-lg md:text-xl leading-relaxed mb-8 font-medium">
                                         {t("services.legalToolkitDesc")}
                                     </p>
 
@@ -135,7 +135,7 @@ export default function DijitalUrunlerPage() {
                                             "Aynı gün aktivasyon", 
                                             "KVKK uyumlu & İşlem sonrası otomatik silinme"
                                         ].map((item, idx) => (
-                                            <div key={idx} className="flex items-center gap-3 text-white/80 font-medium">
+                                            <div key={idx} className="flex items-center gap-3 text-[rgba(248,250,252,0.9)] font-medium">
                                                 <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
                                                     <CheckCircle2 size={12} className="text-emerald-400" />
                                                 </div>
@@ -154,13 +154,13 @@ export default function DijitalUrunlerPage() {
                                             </Link>
                                             <Link
                                                 href={PRODUCT_URL}
-                                                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-8 py-4 text-[12px] font-black uppercase tracking-[0.18em] !text-white transition-colors hover:bg-white/10 hover:!text-white"
+                                                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-8 py-4 text-[12px] font-black uppercase tracking-[0.18em] text-[rgba(248,250,252,0.96)] transition-colors hover:bg-white/10 hover:text-white"
                                             >
                                                 {t("viewDetails")}
                                             </Link>
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-2xl font-black text-white">₺3.000 <span className="text-sm text-white/40 font-bold">{t("services.legalToolkitPeriod")}</span></span>
+                                            <span className="text-2xl font-black text-white">₺3.000 <span className="text-sm text-[rgba(248,250,252,0.58)] font-bold">{t("services.legalToolkitPeriod")}</span></span>
                                             <span className="text-xs font-bold text-[#e6c800] uppercase tracking-wider mt-1">{t("services.legalToolkitToolCount")}</span>
                                         </div>
                                     </div>
@@ -168,28 +168,28 @@ export default function DijitalUrunlerPage() {
 
                                 {/* Right: Features Grid (Bento style inside the card) */}
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-colors">
+                                    <div className="home-card-dark p-6 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-colors">
                                         <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center mb-4">
                                             <FileText size={24} />
                                         </div>
                                         <div className="text-sm font-bold text-white mb-2">{t("services.legalToolkitF1")}</div>
                                     </div>
                                     
-                                    <div className="bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-colors translate-y-0 lg:translate-y-8">
+                                    <div className="home-card-dark p-6 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-colors translate-y-0 lg:translate-y-8">
                                         <div className="w-12 h-12 rounded-xl bg-violet-500/10 text-violet-400 flex items-center justify-center mb-4">
                                             <Layers size={24} />
                                         </div>
                                         <div className="text-sm font-bold text-white mb-2">{t("services.legalToolkitF4")}</div>
                                     </div>
 
-                                    <div className="bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-colors">
+                                    <div className="home-card-dark p-6 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-colors">
                                         <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-4">
                                             <Scissors size={24} />
                                         </div>
                                         <div className="text-sm font-bold text-white mb-2">{t("services.legalToolkitF5")}</div>
                                     </div>
 
-                                    <div className="bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-colors translate-y-0 lg:translate-y-8">
+                                    <div className="home-card-dark p-6 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-colors translate-y-0 lg:translate-y-8">
                                         <div className="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center mb-4">
                                             <ImageIcon size={24} />
                                         </div>
@@ -201,8 +201,8 @@ export default function DijitalUrunlerPage() {
                                             <Zap size={24} />
                                         </div>
                                         <div>
-                                            <div className="text-sm font-bold text-white mb-1">OCR & AI Desktekli Toplu İşlemler</div>
-                                            <p className="text-xs font-medium text-white/50 leading-relaxed">Yeni nesil belge yönetimi. Süreçlerinizi saniyelere indirin.</p>
+                                            <div className="text-sm font-bold text-white mb-1">OCR & AI Destekli Toplu İşlemler</div>
+                                            <p className="text-xs font-medium text-[rgba(248,250,252,0.7)] leading-relaxed">Yeni nesil belge yönetimi. Sureclerinizi saniyelere indirin.</p>
                                         </div>
                                     </div>
                                 </div>

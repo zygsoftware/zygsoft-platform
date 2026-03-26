@@ -63,7 +63,7 @@ export function Header() {
 
                         {/* Services dropdown */}
                         <div className="relative" onMouseEnter={() => setIsServicesOpen(true)} onMouseLeave={() => setIsServicesOpen(false)}>
-                            <button className={`flex items-center gap-1.5 text-[13px] font-bold tracking-tight transition-colors duration-200 ${pathname.includes("/services") ? "text-slate-950" : "text-slate-600 hover:text-slate-950"}`}>
+                            <button className={`flex items-center gap-1.5 text-[13px] font-extrabold tracking-tight transition-colors duration-200 ${pathname.includes("/services") ? "text-[#343131]" : "text-[#343131]/72 hover:text-[#343131]"}`}>
                                 {nav("services")} <ChevronDown size={14} className={`transition-transform duration-300 ${isServicesOpen ? "rotate-180" : ""}`} />
                             </button>
                             <AnimatePresence>
@@ -79,7 +79,7 @@ export function Header() {
                                             <Link
                                                 key={link.href}
                                                 href={link.href}
-                                                className="group flex items-center justify-between px-4 py-3 text-[14px] text-slate-700 hover:bg-[#fafafc] hover:text-slate-950 rounded-xl transition-all font-bold"
+                                                className="group flex items-center justify-between px-4 py-3 text-[14px] text-[#343131]/84 hover:bg-[#fafafc] hover:text-[#343131] rounded-xl transition-all font-extrabold"
                                             >
                                                 {link.name}
                                                 <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -113,7 +113,7 @@ export function Header() {
                             </div>
                         ) : (
                             <div className="flex items-center gap-3">
-                                <Link href="/login" className="text-slate-600 hover:text-slate-950 text-[13px] font-bold transition-colors px-3 py-2 rounded-lg hover:bg-slate-50/80">
+                                <Link href="/login" className="text-[#343131]/78 hover:text-[#343131] text-[13px] font-extrabold transition-colors px-3 py-2 rounded-lg hover:bg-slate-50/80">
                                     {nav("login")}
                                 </Link>
                                 <Magnetic strength={20}>
@@ -160,7 +160,7 @@ export function Header() {
                                     key={link.href}
                                     href={link.href}
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="text-xl font-semibold text-[#1e293b] py-4 border-b border-gray-100"
+                                    className="text-xl font-bold text-[#343131] py-4 border-b border-gray-100"
                                 >
                                     {link.name}
                                 </Link>
@@ -199,7 +199,7 @@ function NavLink({ href, active, children }: { href: string; active?: boolean; c
         <Link
             href={href}
             aria-current={active ? "page" : undefined}
-            className={`group relative text-[13px] font-bold tracking-tight transition-colors duration-200 ${active ? "text-slate-950" : "text-slate-600 hover:text-slate-950"}`}
+            className={`group relative text-[13px] font-extrabold tracking-tight transition-colors duration-200 ${active ? "text-[#343131]" : "text-[#343131]/72 hover:text-[#343131]"}`}
         >
             {children}
             <span className={`absolute -bottom-1 left-0 h-0.5 rounded-full bg-[#e6c800] transition-all duration-200 ${active ? "w-full opacity-100" : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"}`} />

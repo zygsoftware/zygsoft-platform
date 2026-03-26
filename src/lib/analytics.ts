@@ -19,3 +19,11 @@ export function pushDataLayerEvent(event: string, payload: AnalyticsPayload = {}
         ...payload,
     });
 }
+
+export function pushLeadEvent(payload: AnalyticsPayload = {}) {
+    pushDataLayerEvent("generate_lead", payload);
+}
+
+export function pushTrialStartEvent(payload: AnalyticsPayload = {}) {
+    pushDataLayerEvent("start_trial", payload);
+}
