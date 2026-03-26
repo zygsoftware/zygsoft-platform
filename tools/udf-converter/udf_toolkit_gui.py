@@ -1,9 +1,9 @@
 """
-UDF Toolkit Pro - Ultra Modern Professional GUI
-Sabit boyut, mükemmel scroll, profesyonel tasarım
+UDF Toolkit Pro
+Premium masaustu arayuzu, kalici ayarlar ve guclu donusum akisleri.
 """
 
-import os, sys, json, tempfile, threading, zipfile, traceback, tkinter as tk
+import os, sys, json, tempfile, threading, zipfile, traceback, shutil, tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
 from tkinterdnd2 import DND_FILES, TkinterDnD
 from PIL import Image, ImageTk
@@ -17,34 +17,119 @@ try:
 except Exception as e:
     raise RuntimeError(f"Modül yükleme hatası: {e}")
 
+APP_TITLE = "UDF Toolkit Pro"
+APP_BUILD_LABEL = "Premium Build 2026-03-26"
+
+def _app_base_dir():
+    if getattr(sys, "frozen", False):
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.abspath(__file__))
+
+def _resource_path(*parts):
+    candidates = []
+    app_base = _app_base_dir()
+    if app_base:
+        candidates.append(os.path.join(app_base, *parts))
+    meipass = getattr(sys, "_MEIPASS", "")
+    if meipass:
+        candidates.append(os.path.join(meipass, *parts))
+    candidates.append(os.path.join(os.getcwd(), *parts))
+
+    for candidate in candidates:
+        if os.path.exists(candidate):
+            return candidate
+    return candidates[0]
+
 APPDATA_DIR = os.path.join(os.getenv("APPDATA", os.path.expanduser("~")), "UDF-Toolkit")
 os.makedirs(APPDATA_DIR, exist_ok=True)
 CONFIG_FILE = os.path.join(APPDATA_DIR, "config.json")
+LOCAL_CONFIG_FILE = os.path.join(_app_base_dir(), "config.json")
+CONFIG_FILES = [CONFIG_FILE, LOCAL_CONFIG_FILE]
 
-# Premium Colors
 C = {
-    'primary': '#4f46e5', 'primary_dark': '#4338ca', 'success': '#059669', 'success_light': '#10b981',
-    'danger': '#dc2626', 'accent': '#7c3aed', 'warning': '#f59e0b',
-    'bg': '#f1f5f9', 'card': '#ffffff', 'terminal': '#0f172a',
-    'text': '#0f172a', 'text2': '#475569', 'text3': '#94a3b8',
+    'primary': '#0f4c81',
+    'primary_dark': '#0c3d68',
+    'primary_soft': '#1d5f97',
+    'success': '#0f766e',
+    'success_light': '#14b8a6',
+    'danger': '#b91c1c',
+    'accent': '#d97706',
+    'accent_soft': '#f59e0b',
+    'warning': '#d97706',
+    'bg': '#edf6fb',
+    'bg_alt': '#dbeafe',
+    'card': '#fcfdff',
+    'card_2': '#f4faff',
+    'border': '#c9dff0',
+    'terminal': '#164e63',
+    'hero_text': '#e2e8f0',
+    'gold': '#fbbf24',
+    'text': '#0f172a',
+    'text2': '#475569',
+    'text3': '#94a3b8',
 }
 
+F = {
+    'title': ("Segoe UI", 28, "bold"),
+    'h1': ("Segoe UI", 24, "bold"),
+    'h2': ("Segoe UI", 13, "bold"),
+    'body': ("Segoe UI", 11),
+    'body_bold': ("Segoe UI", 11, "bold"),
+    'small': ("Segoe UI", 10),
+    'mono': ("Consolas", 10),
+}
+
+def _default_config():
+    return {
+        "template_path": "",
+        "template_xml_cache": "",
+        "last_input_dir": "",
+        "last_output_dir": "",
+        "last_merge_dir": "",
+        "last_tab": 0,
+    }
+
 def load_config():
-    try:
-        with open(CONFIG_FILE, "r") as f:
-            return json.load(f)
-    except:
-        return {"template_path": ""}
+    cfg = _default_config()
+    for path in CONFIG_FILES:
+        if not os.path.exists(path):
+            continue
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                loaded = json.load(f)
+            if isinstance(loaded, dict):
+                cfg.update({k: v for k, v in loaded.items() if v is not None})
+        except Exception:
+            continue
+
+    template_path = cfg.get("template_path") or ""
+    if template_path:
+        cfg["template_path"] = os.path.normpath(template_path)
+    return cfg
 
 def save_config(cfg):
-    try:
-        with open(CONFIG_FILE, "w") as f:
-            json.dump(cfg, f, ensure_ascii=False, indent=2)
-    except:
-        pass
+    payload = _default_config()
+    payload.update(cfg or {})
+
+    template_path = payload.get("template_path") or ""
+    if template_path:
+        payload["template_path"] = os.path.normpath(template_path)
+
+    for path in dict.fromkeys(CONFIG_FILES):
+        try:
+            folder = os.path.dirname(path)
+            if folder:
+                os.makedirs(folder, exist_ok=True)
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(payload, f, ensure_ascii=False, indent=2)
+        except Exception:
+            continue
 
 def ensure_template_xml_path(template_path, cfg):
     if not template_path or not os.path.exists(template_path):
+        cached = (cfg or {}).get("template_xml_cache") or ""
+        if cached and os.path.exists(cached):
+            return cached
         raise RuntimeError("Şablon bulunamadı")
     ext = os.path.splitext(template_path)[1].lower()
     if ext == ".xml":
@@ -52,11 +137,35 @@ def ensure_template_xml_path(template_path, cfg):
     if ext == ".udf":
         with zipfile.ZipFile(template_path, "r") as z:
             data = z.read("content.xml")
-        cache = os.path.join(tempfile.gettempdir(), f"udf_tpl_{os.path.basename(template_path)}.xml")
+        cache_dir = os.path.join(APPDATA_DIR, "cache")
+        os.makedirs(cache_dir, exist_ok=True)
+        cache = os.path.join(cache_dir, f"udf_tpl_{os.path.basename(template_path)}.xml")
         with open(cache, "wb") as out:
             out.write(data)
+        cfg["template_xml_cache"] = cache
+        save_config(cfg)
         return cache
     raise RuntimeError("Sadece .xml/.udf")
+
+def _default_template_xml_path():
+    fallback = _resource_path("calisanudfcontent.xml")
+    cached = os.path.join(APPDATA_DIR, "calisanudfcontent.xml")
+    if os.path.exists(fallback):
+        try:
+            if os.path.abspath(fallback) != os.path.abspath(cached):
+                shutil.copyfile(fallback, cached)
+                return cached
+        except Exception:
+            pass
+        return fallback
+
+    if os.path.exists(cached):
+        return cached
+
+    raise RuntimeError(
+        "Varsayilan antet dosyasi bulunamadi: calisanudfcontent.xml. "
+        "EXE ile ayni klasorde bulundugundan emin olun."
+    )
 
 def docx_or_udf_to_pdf(inp, out, template_xml_path=None):
     ext = os.path.splitext(inp)[1].lower()
@@ -115,109 +224,142 @@ class ScrollFrame(tk.Frame):
 class App(TkinterDnD.Tk):
     def __init__(self):
         super().__init__()
-        self.title("UDF Toolkit Pro")
+        self.title(APP_TITLE)
         self.geometry("1400x850")
-        self.resizable(False, False)  # Sabit boyut
+        self.minsize(1240, 760)
         self.configure(bg=C['bg'])
         
         self.cfg = load_config()
         self._setup_styles()
         self._build_ui()
+        self.protocol("WM_DELETE_WINDOW", self._on_close)
 
     def _setup_styles(self):
         style = ttk.Style()
         style.theme_use('clam')
         
         style.configure("TFrame", background=C['bg'])
-        style.configure("TLabel", background=C['card'], foreground=C['text'], font=("Segoe UI", 10))
-        style.configure("Modern.TEntry", fieldbackground="white", padding=12, font=("Segoe UI", 11))
-        style.configure("TCheckbutton", background=C['card'], foreground=C['text'], font=("Segoe UI", 10))
-        style.configure("TRadiobutton", background=C['card'], foreground=C['text'], font=("Segoe UI", 10))
+        style.configure("TLabel", background=C['card'], foreground=C['text'], font=F['small'])
+        style.configure("Modern.TEntry", fieldbackground="white", padding=12, font=F['body'])
+        style.configure("TCheckbutton", background=C['card'], foreground=C['text'], font=F['small'])
+        style.configure("TRadiobutton", background=C['card'], foreground=C['text'], font=F['small'])
+        style.configure("TProgressbar", troughcolor=C['bg_alt'], bordercolor=C['bg_alt'],
+                        background=C['accent'], lightcolor=C['accent_soft'], darkcolor=C['accent'])
         
         style.configure("TNotebook", background=C['bg'], borderwidth=0)
-        style.configure("TNotebook.Tab", padding=(30, 15), font=("Segoe UI", 12, "bold"))
+        style.configure("TNotebook.Tab", padding=(26, 14), font=F['body_bold'])
         style.map("TNotebook.Tab",
-                 background=[("selected", C['primary']), ("!selected", "#e2e8f0")],
+                 background=[("selected", C['primary']), ("!selected", C['card_2'])],
                  foreground=[("selected", "white"), ("!selected", C['text2'])])
 
     def _build_ui(self):
-        # Header
-        header = tk.Frame(self, bg=C['primary'], height=130)
+        header = tk.Frame(self, bg=C['primary'], height=156)
         header.pack(fill="x")
         header.pack_propagate(False)
         
         h_inner = tk.Frame(header, bg=C['primary'])
-        h_inner.pack(fill="both", expand=True, padx=40, pady=25)
+        h_inner.pack(fill="both", expand=True, padx=38, pady=24)
         
-        # Logo
         try:
-            base_dir = sys._MEIPASS if getattr(sys, "frozen", False) else os.path.dirname(__file__)
-            logo_path = os.path.join(base_dir, "assets", "logo.png")
+            logo_path = _resource_path("assets", "logo.png")
             if os.path.exists(logo_path):
-                img = Image.open(logo_path).resize((140, 58))
+                img = Image.open(logo_path).resize((144, 60))
                 self.logo_img = ImageTk.PhotoImage(img)
                 tk.Label(h_inner, image=self.logo_img, bg=C['primary']).pack(side="left", padx=(0, 25))
         except:
             pass
         
-        # Title
         t_box = tk.Frame(h_inner, bg=C['primary'])
         t_box.pack(side="left", fill="both", expand=True)
         
-        tk.Label(t_box, text="UDF Toolkit Pro", font=("Segoe UI", 28, "bold"),
+        tk.Label(t_box, text="Premium Donusum Calisma Alani", font=F['small'],
+                bg=C['primary'], fg=C['gold']).pack(anchor="w", pady=(0, 4))
+        tk.Label(t_box, text=APP_TITLE, font=F['title'],
                 bg=C['primary'], fg="white").pack(anchor="w")
-        tk.Label(t_box, text="⚡ Profesyonel UDF Dönüştürme · PDF Yönetimi · Toplu İşlemler",
-                font=("Segoe UI", 12), bg=C['primary'], fg="#e0e7ff").pack(anchor="w", pady=(5, 0))
-        
-        # Template
+        tk.Label(
+            t_box,
+            text="DOCX, UDF ve PDF islerini daha temiz liste hizasi, daha saglam antet yonetimi ve hizli toplu akislariyla yonetin.",
+            font=F['body'], bg=C['primary'], fg=C['hero_text'], wraplength=760, justify="left"
+        ).pack(anchor="w", pady=(8, 0))
+
+        stat_row = tk.Frame(t_box, bg=C['primary'])
+        stat_row.pack(anchor="w", pady=(14, 0))
+        for text in (APP_BUILD_LABEL, "Liste Mantigi Iyilestirildi", "Kalici Antet Hafizasi", "Toplu Islem Merkezi"):
+            chip = tk.Label(
+                stat_row,
+                text=text,
+                font=F['small'],
+                bg=C['primary_soft'],
+                fg="white",
+                padx=14,
+                pady=7,
+            )
+            chip.pack(side="left", padx=(0, 10))
+
         t_badge = tk.Frame(h_inner, bg=C['primary'])
         t_badge.pack(side="right")
         
-        self.template_badge = tk.Frame(t_badge, bg='#1e293b')
+        self.template_badge = tk.Frame(t_badge, bg=C['primary_soft'], highlightthickness=1, highlightbackground="#334155")
         self.template_badge.pack(pady=(0, 10))
         
+        tk.Label(self.template_badge, text="AKTIF ANTET", font=("Segoe UI", 8, "bold"),
+                bg=self.template_badge["bg"], fg=C['gold']).pack(anchor="w", padx=16, pady=(10, 0))
         self.lbl_template = tk.Label(self.template_badge, text="📋 Şablon: Seçilmedi",
-                                    font=("Segoe UI", 10, "bold"), bg='#1e293b', fg='#fca5a5', padx=15, pady=8)
+                                    font=F['body_bold'], bg=self.template_badge["bg"], fg='#fca5a5', padx=16, pady=8)
         self.lbl_template.pack()
         
-        btn_outer = tk.Frame(t_badge, bg='white', cursor="hand2")
+        btn_outer = tk.Frame(t_badge, bg=C['gold'], cursor="hand2")
         btn_outer.pack()
         
         def template_click():
             self.on_choose_template()
         
         def template_enter(e):
-            btn_outer.configure(bg='#e0e7ff')
-            btn_label.configure(bg='#e0e7ff')
+            btn_outer.configure(bg='#fcd34d')
+            btn_label.configure(bg='#fcd34d')
         
         def template_leave(e):
-            btn_outer.configure(bg='white')
-            btn_label.configure(bg='white')
+            btn_outer.configure(bg=C['gold'])
+            btn_label.configure(bg=C['gold'])
         
         btn_outer.bind('<Button-1>', lambda e: template_click())
         btn_outer.bind('<Enter>', template_enter)
         btn_outer.bind('<Leave>', template_leave)
         
-        btn_label = tk.Label(btn_outer, text="📁 Şablon Seç", bg='white', fg=C['primary'],
-                            font=("Segoe UI", 11, "bold"), cursor="hand2", padx=25, pady=12)
+        btn_label = tk.Label(btn_outer, text="📁 Antet Sec", bg=C['gold'], fg=C['primary_dark'],
+                            font=F['body_bold'], cursor="hand2", padx=26, pady=12)
         btn_label.pack()
         btn_label.bind('<Button-1>', lambda e: template_click())
         
         self._refresh_template_label()
         
-        # Main
         main = tk.Frame(self, bg=C['bg'])
         main.pack(fill="both", expand=True, padx=25, pady=(20, 10))
+
+        overview = tk.Frame(main, bg=C['bg'])
+        overview.pack(fill="x", pady=(0, 16))
+        for title, desc in [
+            ("Akilli Liste Motoru", "Bullet, roman ve harfli listeler icin daha temiz akis."),
+            ("Kalici Antet Hafizasi", "Secilen antet yeniden acilista otomatik geri gelir."),
+            ("Premium Masaustu", "Daha belirgin paneller, daha guclu renk hiyerarsisi."),
+        ]:
+            card = tk.Frame(overview, bg=C['card'], highlightthickness=1, highlightbackground=C['border'])
+            card.pack(side="left", fill="both", expand=True, padx=8)
+            tk.Label(card, text=title, font=F['body_bold'], bg=C['card'], fg=C['text']).pack(anchor="w", padx=18, pady=(16, 6))
+            tk.Label(card, text=desc, font=F['small'], bg=C['card'], fg=C['text2'], wraplength=260, justify="left").pack(anchor="w", padx=18, pady=(0, 16))
         
-        # Notebook
         self.notebook = ttk.Notebook(main)
         self.notebook.pack(fill="both", expand=True)
+        self.notebook.bind("<<NotebookTabChanged>>", self._remember_active_tab)
         
         self._build_single_tab()
         self._build_batch_tab()
         self._build_merge_tab()
+        try:
+            self.notebook.select(int(self.cfg.get("last_tab", 0)))
+        except Exception:
+            pass
         
-        # Status
         status = tk.Frame(self, bg=C['terminal'], height=45)
         status.pack(fill="x")
         status.pack_propagate(False)
@@ -239,17 +381,17 @@ class App(TkinterDnD.Tk):
 
     def _build_single_tab(self):
         tab_frame = ScrollFrame(self.notebook, bg=C['bg'])
-        self.notebook.add(tab_frame, text="Tekli Dönüştürme  ")
+        self.notebook.add(tab_frame, text="Tekli Donusum  ")
         
         content = tab_frame.scrollable_frame
         container = tk.Frame(content, bg=C['bg'])
         container.pack(fill="both", padx=40, pady=35)
         
         # Title
-        tk.Label(container, text="Hızlı Tek Dosya Dönüştürme", font=("Segoe UI", 24, "bold"),
+        tk.Label(container, text="Hizli Tek Dosya Donusumu", font=F['h1'],
                 bg=C['bg'], fg=C['text']).pack(anchor="w")
-        tk.Label(container, text="Sürükle-bırak ile saniyeler içinde dönüştürün",
-                font=("Segoe UI", 12), bg=C['bg'], fg=C['text2']).pack(anchor="w", pady=(8, 30))
+        tk.Label(container, text="Sürukle-birak ile daha temiz cikti alin; antet secimi ve PDF akisini ayni yerden yonetin.",
+                font=F['body'], bg=C['bg'], fg=C['text2']).pack(anchor="w", pady=(8, 30))
         
         # Buttons
         btn_row = tk.Frame(container, bg=C['bg'])
@@ -277,17 +419,17 @@ class App(TkinterDnD.Tk):
 
     def _build_batch_tab(self):
         tab_frame = ScrollFrame(self.notebook, bg=C['bg'])
-        self.notebook.add(tab_frame, text="Toplu Dönüştürme  ")
+        self.notebook.add(tab_frame, text="Toplu Donusum  ")
         
         content = tab_frame.scrollable_frame
         container = tk.Frame(content, bg=C['bg'])
         container.pack(fill="both", padx=40, pady=35)
         
         # Title
-        tk.Label(container, text="Toplu Dönüştürme", font=("Segoe UI", 24, "bold"),
+        tk.Label(container, text="Toplu Donusum Merkezi", font=F['h1'],
                 bg=C['bg'], fg=C['text']).pack(anchor="w")
-        tk.Label(container, text="Bir klasördeki tüm dosyaları otomatik dönüştürün",
-                font=("Segoe UI", 12), bg=C['bg'], fg=C['text2']).pack(anchor="w", pady=(8, 30))
+        tk.Label(container, text="Klasor veya secili dosya listesiyle buyuk isleri daha kontrollu sekilde yurutun.",
+                font=F['body'], bg=C['bg'], fg=C['text2']).pack(anchor="w", pady=(8, 30))
         
         # Operations
         op_card = self._card(container, "Dönüştürme İşlemi")
@@ -476,17 +618,17 @@ class App(TkinterDnD.Tk):
 
     def _build_merge_tab(self):
         tab_frame = ScrollFrame(self.notebook, bg=C['bg'])
-        self.notebook.add(tab_frame, text="  🔗 PDF Birleştir  ")
+        self.notebook.add(tab_frame, text="PDF Birlestir  ")
         
         content = tab_frame.scrollable_frame
         container = tk.Frame(content, bg=C['bg'])
         container.pack(fill="both", padx=40, pady=35)
         
         # Title
-        tk.Label(container, text="PDF Birleştirme", font=("Segoe UI", 24, "bold"),
+        tk.Label(container, text="PDF Birlestirme Studyo", font=F['h1'],
                 bg=C['bg'], fg=C['text']).pack(anchor="w")
-        tk.Label(container, text="Birden fazla PDF'i tek dosyada birleştirin",
-                font=("Segoe UI", 12), bg=C['bg'], fg=C['text2']).pack(anchor="w", pady=(8, 30))
+        tk.Label(container, text="Dosyalari siralayin, yer imleri ekleyin ve tek bir premium cikti alin.",
+                font=F['body'], bg=C['bg'], fg=C['text2']).pack(anchor="w", pady=(8, 30))
         
         # Mode
         mode_card = self._card(container, "🎯 Mod")
@@ -630,41 +772,41 @@ class App(TkinterDnD.Tk):
 
     # UI Components
     def _card(self, parent, title):
-        card = tk.Frame(parent, bg=C['card'], relief="solid", bd=1)
+        card = tk.Frame(parent, bg=C['card'], bd=0, highlightthickness=1, highlightbackground=C['border'])
         
-        header = tk.Frame(card, bg=C['card'], height=50)
+        header = tk.Frame(card, bg=C['card_2'], height=52)
         header.pack(fill="x")
         header.pack_propagate(False)
         
-        tk.Label(header, text=title, font=("Segoe UI", 13, "bold"),
-                bg=C['card'], fg=C['text'], anchor="w").pack(side="left", padx=25, pady=15)
+        tk.Label(header, text=title, font=F['h2'],
+                bg=C['card_2'], fg=C['text'], anchor="w").pack(side="left", padx=22, pady=14)
         
         return card
 
     def _btn(self, parent, title, subtitle, cmd, color):
-        btn = tk.Frame(parent, bg=color, cursor="hand2")
+        btn = tk.Frame(parent, bg=color, cursor="hand2", highlightthickness=1, highlightbackground=color)
         btn.bind('<Button-1>', lambda e: cmd())
         btn.bind('<Enter>', lambda e: btn.configure(bg=self._lighter(color)))
         btn.bind('<Leave>', lambda e: btn.configure(bg=color))
         
         tk.Label(btn, text=title, font=("Segoe UI", 18, "bold"),
                 bg=color, fg="white").pack(pady=(20, 5))
-        tk.Label(btn, text=subtitle, font=("Segoe UI", 11),
-                bg=color, fg="#e0e7ff").pack(pady=(0, 20))
+        tk.Label(btn, text=subtitle, font=F['body'],
+                bg=color, fg="#e2e8f0").pack(pady=(0, 20))
         
         return btn
 
     def _drop(self, parent, title, msg, bg_light, color, handler, typ):
-        card = tk.Frame(parent, bg=C['card'], relief="solid", bd=2)
+        card = tk.Frame(parent, bg=C['card'], bd=0, highlightthickness=1, highlightbackground=C['border'])
         
         tk.Label(card, text=title, font=("Segoe UI", 14, "bold"),
                 bg=C['card'], fg=color, pady=15).pack()
         
-        area = tk.Frame(card, bg=bg_light, relief="solid", bd=3)
+        area = tk.Frame(card, bg=bg_light, bd=0, highlightthickness=2, highlightbackground=color)
         area.pack(fill="both", expand=True, padx=25, pady=(0, 25))
         
         label = tk.Label(area, text=msg, font=("Segoe UI", 14),
-                        bg=bg_light, fg=color, justify="center", pady=50)
+                        bg=bg_light, fg=color, justify="center", pady=50, wraplength=420)
         label.pack(expand=True)
         
         area.drop_target_register(DND_FILES)
@@ -682,13 +824,13 @@ class App(TkinterDnD.Tk):
     def _folder(self, parent, label, var, cmd, is_file=False):
         row = tk.Frame(parent, bg=C['card'])
         
-        tk.Label(row, text=label, font=("Segoe UI", 11, "bold"),
+        tk.Label(row, text=label, font=F['body_bold'],
                 bg=C['card'], fg=C['text'], width=13, anchor="w").pack(side="left", padx=(0, 10))
         
-        box = tk.Frame(row, bg='#cbd5e1', bd=2)
+        box = tk.Frame(row, bg=C['border'], bd=1)
         box.pack(side="left", fill="x", expand=True, padx=(0, 15))
         
-        tk.Entry(box, textvariable=var, font=("Segoe UI", 11),
+        tk.Entry(box, textvariable=var, font=F['body'],
                 bg="white", fg=C['text'], relief="flat", bd=0).pack(fill="x", padx=12, pady=10)
         
         btn = tk.Frame(row, bg=C['primary'], cursor="hand2")
@@ -711,7 +853,7 @@ class App(TkinterDnD.Tk):
         
         txt = "📄 Seç" if is_file else "📁 Seç"
         btn_label = tk.Label(btn, text=txt, bg=C['primary'], fg="white",
-                font=("Segoe UI", 11, "bold"), cursor="hand2", padx=25, pady=11)
+                font=F['body_bold'], cursor="hand2", padx=25, pady=11)
         btn_label.pack()
         btn_label.bind('<Button-1>', btn_click)
         
@@ -722,17 +864,44 @@ class App(TkinterDnD.Tk):
             return C['success_light']
         elif color == C['primary']:
             return C['primary_dark']
+        elif color == C['accent']:
+            return C['accent_soft']
         return color
 
     # Methods
+    def _remember_active_tab(self, event=None):
+        try:
+            self.cfg["last_tab"] = int(self.notebook.index(self.notebook.select()))
+            save_config(self.cfg)
+        except Exception:
+            pass
+
+    def _last_dir(self, key, fallback=None):
+        path = self.cfg.get(key) or ""
+        if path and os.path.exists(path):
+            return path
+        return fallback or _app_base_dir()
+
+    def _store_dir(self, key, path):
+        if not path:
+            return
+        self.cfg[key] = os.path.normpath(path)
+        save_config(self.cfg)
+
     def _refresh_template_label(self):
         tpl = self.cfg.get("template_path") or ""
         if tpl and os.path.exists(tpl):
-            self.lbl_template.configure(text=f"✅ Özel: {os.path.basename(tpl)}", fg='#86efac')
-            self.template_badge.configure(bg='#14532d')
+            badge_bg = '#163026'
+            self.template_badge.configure(bg=badge_bg, highlightbackground='#275b4a')
+            for child in self.template_badge.winfo_children():
+                child.configure(bg=badge_bg)
+            self.lbl_template.configure(text=f"✅ {os.path.basename(tpl)}", fg='#a7f3d0')
         else:
-            self.lbl_template.configure(text="📋 Varsayılan Şablon", fg='#93c5fd')
-            self.template_badge.configure(bg='#1e40af')
+            badge_bg = C['primary_soft']
+            self.template_badge.configure(bg=badge_bg, highlightbackground="#334155")
+            for child in self.template_badge.winfo_children():
+                child.configure(bg=badge_bg)
+            self.lbl_template.configure(text="📋 Varsayilan Antet", fg='#bfdbfe')
 
     def _set_status(self, text, icon="✨"):
         self.status.configure(text=f"{icon} {text}")
@@ -754,12 +923,21 @@ class App(TkinterDnD.Tk):
         self.update_idletasks()
 
     def on_choose_template(self):
-        path = filedialog.askopenfilename(title="Şablon Seç", filetypes=[("UDF/XML", "*.udf *.xml"), ("Tümü", "*.*")])
+        path = filedialog.askopenfilename(
+            title="Antet / Sablon Sec",
+            initialdir=self._last_dir("last_input_dir", _app_base_dir()),
+            filetypes=[("UDF/XML", "*.udf *.xml"), ("Tum Dosyalar", "*.*")],
+        )
         if path:
-            self.cfg["template_path"] = path
-            save_config(self.cfg)
-            self._refresh_template_label()
-            self._set_status(f"Şablon: {os.path.basename(path)}", "✅")
+            try:
+                self.cfg["template_path"] = os.path.normpath(path)
+                ensure_template_xml_path(self.cfg["template_path"], self.cfg)
+                self._store_dir("last_input_dir", os.path.dirname(path))
+                save_config(self.cfg)
+                self._refresh_template_label()
+                self._set_status(f"Antet kaydedildi: {os.path.basename(path)}", "✅")
+            except Exception as e:
+                messagebox.showerror("Antet Hatasi", str(e))
 
     def update_batch_ui(self):
         if self.batch_operation.get() == "convert-and-merge":
@@ -787,13 +965,15 @@ class App(TkinterDnD.Tk):
             self.batch_input_files_row.pack(fill="x", pady=(0, 15))
 
     def select_batch_input(self):
-        f = filedialog.askdirectory(title="Giriş Klasörü")
+        f = filedialog.askdirectory(title="Giris Klasoru", initialdir=self._last_dir("last_input_dir"))
         if f:
             self.batch_input_var.set(f)
+            self._store_dir("last_input_dir", f)
 
     def select_batch_input_files(self):
         files = filedialog.askopenfilenames(
-            title="Dosyalar Seç",
+            title="Dosyalar Sec",
+            initialdir=self._last_dir("last_input_dir"),
             filetypes=[
                 ("Desteklenen Dosyalar", "*.docx *.udf *.pdf"),
                 ("Word Dosyaları", "*.docx"),
@@ -807,16 +987,19 @@ class App(TkinterDnD.Tk):
             self.batch_files_listbox.delete(0, "end")
             for f in files:
                 self.batch_files_listbox.insert("end", os.path.basename(f))
+            self._store_dir("last_input_dir", os.path.dirname(files[0]))
 
     def select_batch_output(self):
-        f = filedialog.askdirectory(title="Çıkış Klasörü")
+        f = filedialog.askdirectory(title="Cikis Klasoru", initialdir=self._last_dir("last_output_dir"))
         if f:
             self.batch_output_var.set(f)
+            self._store_dir("last_output_dir", f)
 
     def select_batch_merge_folder(self):
-        f = filedialog.askdirectory(title="PDF Klasörü")
+        f = filedialog.askdirectory(title="PDF Klasoru", initialdir=self._last_dir("last_output_dir"))
         if f:
             self.batch_merge_folder_var.set(f)
+            self._store_dir("last_output_dir", f)
 
     # Drag & Drop
     def on_drop_udf(self, event):
@@ -845,7 +1028,7 @@ class App(TkinterDnD.Tk):
             if tpl and os.path.exists(tpl):
                 tpl_xml = ensure_template_xml_path(tpl, self.cfg)
             else:
-                tpl_xml = "calisanudfcontent.xml"
+                tpl_xml = _default_template_xml_path()
             
             out = os.path.splitext(docx)[0] + ".udf"
 
@@ -873,7 +1056,7 @@ class App(TkinterDnD.Tk):
                 if t and os.path.exists(t):
                     tpl = ensure_template_xml_path(t, self.cfg)
                 else:
-                    tpl = "calisanudfcontent.xml"
+                    tpl = _default_template_xml_path()
 
             out = os.path.splitext(inp)[0] + ".pdf"
             self._set_status("PDF oluşturuluyor...", "⏳")
@@ -892,16 +1075,21 @@ class App(TkinterDnD.Tk):
     @run_in_thread
     def handle_docx_to_udf(self):
         try:
-            docx = filedialog.askopenfilename(title="Word Seç", filetypes=[("Word", "*.docx")])
+            docx = filedialog.askopenfilename(
+                title="Word Sec",
+                initialdir=self._last_dir("last_input_dir"),
+                filetypes=[("Word", "*.docx")]
+            )
             if not docx:
                 return
+            self._store_dir("last_input_dir", os.path.dirname(docx))
 
             # Şablon varsa kullan, yoksa varsayılan
             tpl = self.cfg.get("template_path") or ""
             if tpl and os.path.exists(tpl):
                 tpl_xml = ensure_template_xml_path(tpl, self.cfg)
             else:
-                tpl_xml = "calisanudfcontent.xml"
+                tpl_xml = _default_template_xml_path()
             
             out = os.path.splitext(docx)[0] + ".udf"
 
@@ -916,9 +1104,14 @@ class App(TkinterDnD.Tk):
     @run_in_thread
     def handle_to_pdf(self):
         try:
-            inp = filedialog.askopenfilename(title="Dosya Seç", filetypes=[("DOCX/UDF", "*.docx *.udf")])
+            inp = filedialog.askopenfilename(
+                title="Dosya Sec",
+                initialdir=self._last_dir("last_input_dir"),
+                filetypes=[("DOCX/UDF", "*.docx *.udf")]
+            )
             if not inp:
                 return
+            self._store_dir("last_input_dir", os.path.dirname(inp))
             
             ext = os.path.splitext(inp)[1].lower()
             tpl = None
@@ -928,7 +1121,7 @@ class App(TkinterDnD.Tk):
                 if t and os.path.exists(t):
                     tpl = ensure_template_xml_path(t, self.cfg)
                 else:
-                    tpl = "calisanudfcontent.xml"
+                    tpl = _default_template_xml_path()
 
             out = os.path.splitext(inp)[0] + ".pdf"
             self._set_status("PDF...", "⏳")
@@ -980,7 +1173,7 @@ class App(TkinterDnD.Tk):
                 out_pdf = None
 
             # Şablon - varsa kullan, yoksa varsayılan
-            tpl_xml = "calisanudfcontent.xml"
+            tpl_xml = _default_template_xml_path()
             if op in ["docx-to-udf", "all-to-pdf", "convert-and-merge"]:
                 tpl = self.cfg.get("template_path") or ""
                 if tpl and os.path.exists(tpl):
@@ -1167,10 +1360,16 @@ class App(TkinterDnD.Tk):
 
     # PDF Merge
     def add_pdf_files(self):
-        files = filedialog.askopenfilenames(title="PDF Seç", filetypes=[("PDF", "*.pdf")])
+        files = filedialog.askopenfilenames(
+            title="PDF Sec",
+            initialdir=self._last_dir("last_merge_dir", self._last_dir("last_input_dir")),
+            filetypes=[("PDF", "*.pdf")],
+        )
         for f in files:
             # Store full path but display only filename
             self.pdf_listbox.insert("end", f"{os.path.basename(f)}|{f}")
+        if files:
+            self._store_dir("last_merge_dir", os.path.dirname(files[0]))
 
     def remove_pdf_file(self):
         sel = self.pdf_listbox.curselection()
@@ -1199,14 +1398,22 @@ class App(TkinterDnD.Tk):
         self.pdf_listbox.delete(0, "end")
 
     def select_merge_folder(self):
-        f = filedialog.askdirectory(title="Klasör")
+        f = filedialog.askdirectory(title="Klasor", initialdir=self._last_dir("last_merge_dir"))
         if f:
             self.merge_folder_var.set(f)
+            self._store_dir("last_merge_dir", f)
 
     def select_merge_output(self):
-        f = filedialog.asksaveasfilename(title="Çıkış PDF", defaultextension=".pdf", filetypes=[("PDF", "*.pdf")], initialfile="birlestirilmis.pdf")
+        f = filedialog.asksaveasfilename(
+            title="Cikis PDF",
+            defaultextension=".pdf",
+            filetypes=[("PDF", "*.pdf")],
+            initialfile="birlestirilmis.pdf",
+            initialdir=self._last_dir("last_output_dir", self._last_dir("last_merge_dir")),
+        )
         if f:
             self.merge_output_var.set(f)
+            self._store_dir("last_output_dir", os.path.dirname(f))
 
     @run_in_thread
     def start_pdf_merge(self):
@@ -1252,6 +1459,10 @@ class App(TkinterDnD.Tk):
         except Exception as e:
             self._set_status("Hata", "❌")
             messagebox.showerror("Hata", str(e))
+
+    def _on_close(self):
+        save_config(self.cfg)
+        self.destroy()
 
 
 if __name__ == "__main__":

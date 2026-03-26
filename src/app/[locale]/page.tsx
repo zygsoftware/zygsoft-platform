@@ -11,7 +11,6 @@ import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/home/HeroSection";
 import { SolutionsSection } from "@/components/home/SolutionsSection";
 import { ContactInquiryForm } from "@/components/forms/ContactInquiryForm";
-import { ParticleField } from "@/components/ui/ParticleField";
 import { createRevealUp, revealViewport, staggerContainer } from "@/components/ui/motion";
 import { BlockReveal, TextReveal } from "@/components/ui/reveal";
 
@@ -45,12 +44,6 @@ const InstagramFeedSection = dynamic(
 );
 
 type PartnerPillar = {
-  t: string;
-  d: string;
-};
-
-type ProcessStep = {
-  n: string;
   t: string;
   d: string;
 };
@@ -183,107 +176,10 @@ export default function Home() {
           aria-hidden
         />
 
-        {/* ── SECTION 04: PROCESS ────────────────────────── */}
-        <section className="home-snap-section py-24 md:py-28 bg-[#343131] text-white relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none">
-            <ParticleField variant="dark" count={12} opacity={0.35} />
-          </div>
-          <div className="container mx-auto px-6">
-            <div className="flex flex-col lg:flex-row items-end justify-between gap-12 mb-24">
-              <BlockReveal className="max-w-3xl">
-                <TextReveal delay={0.05}>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.32em] !text-white/55 mb-5 block">{t("processSection.tag")}</span>
-                </TextReveal>
-                <TextReveal delay={0.12}>
-                  <h2 className="text-4xl md:text-5xl font-display font-black leading-[0.94] tracking-tighter uppercase !text-white" dangerouslySetInnerHTML={{ __html: t.raw("processSection.title") }} />
-                </TextReveal>
-              </BlockReveal>
-              <BlockReveal delay={0.12} className="max-w-md lg:text-right">
-                <TextReveal delay={0.18}>
-                  <p className="!text-white/58 text-[16px] font-medium italic max-w-sm">
-                    {t("processSection.description")}
-                  </p>
-                </TextReveal>
-              </BlockReveal>
-            </div>
-
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 relative"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={revealViewport}
-            >
-              <div className="absolute top-1/2 left-0 w-full h-px bg-white/[0.08] hidden lg:block -translate-y-1/2 -z-10" />
-
-              {(t.raw("processSection.steps") as ProcessStep[]).map((step, i) => (
-                <motion.div key={i} variants={createRevealUp(reducedMotion, 36, 6)}>
-                  <motion.div
-                    whileHover={{ y: -3, borderColor: "rgba(230,200,0,0.2)", backgroundColor: "rgba(255,255,255,0.05)" }}
-                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                    className="home-card-dark group relative rounded-xl p-10 h-full flex flex-col justify-between transition-all duration-300"
-                  >
-                    <span className="text-5xl font-black !text-white/15 group-hover:!text-[#e6c800]/40 transition-colors leading-none mb-8">{step.n}</span>
-                    <div>
-                      <h4 className="text-xl font-black uppercase mb-4 tracking-tight !text-white transition-colors">{step.t}</h4>
-                      <p className="!text-white/72 font-medium transition-colors leading-relaxed text-[15px]">{step.d}</p>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Process and AppStore share same dark bg — no divider needed */}
-
         {/* ── SECTION 04B: DIGITAL PRODUCTS & UDF FLAGSHIP ────────────────────────── */}
         <div className="home-snap-section">
           <AppStoreShowcase />
         </div>
-
-        {/* Transition: dark → light (neutral gradient, cinematic) */}
-        <div
-          className="h-20 md:h-24"
-          style={{
-            background: "linear-gradient(to bottom, #343131 0%, #474a50 22%, #6e7278 45%, #b8bcc1 72%, #eceef1 90%, #ffffff 100%)",
-          }}
-          aria-hidden
-        />
-
-        {/* ── SECTION 06: CAPABILITIES (TECH STACK) ────────────────────────── */}
-        <section className="home-snap-section py-20 md:py-24 bg-[#fafafc] border-y border-[#343131]/[0.04] overflow-hidden">
-          <div className="container mx-auto px-6 mb-16 text-center">
-            <BlockReveal>
-              <TextReveal delay={0.05}>
-                <span className="text-[10px] font-bold uppercase tracking-[0.32em] text-[#343131]/45 mb-5 block">{t("capabilities.tag")}</span>
-              </TextReveal>
-              <TextReveal delay={0.12}>
-                <h2 className="text-4xl md:text-5xl font-display font-black leading-[0.96] tracking-tighter text-[#343131] uppercase mb-6 max-w-2xl mx-auto">
-                  {t("capabilities.title1")}<br />{t("capabilities.title2")}
-                </h2>
-              </TextReveal>
-              <TextReveal delay={0.2}>
-                <p className="text-[#343131]/52 text-[17px] font-medium max-w-lg mx-auto">
-                  {t("capabilities.desc")}
-                </p>
-              </TextReveal>
-            </BlockReveal>
-          </div>
-
-          <div className="flex whitespace-nowrap animate-marquee py-10 opacity-30 select-none pointer-events-none">
-            {[...Array(2)].map((_, j) => (
-              <div key={j} className="flex items-center gap-32 px-16">
-                {["NEXT.JS", "REACT", "TYPESCRIPT", "TAILWIND", "NODE.JS", "PYTHON", "AWS", "DOCKER", "MONGODB", "GRAPHQL"].map((tech, i) => (
-                  <span key={i} className="text-6xl font-black tracking-tighter">{tech}</span>
-                ))}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Transition: off-white → white (Capabilities → Instagram) */}
-        <div className="h-8 bg-gradient-to-b from-[#fafafc] to-white" aria-hidden />
 
         {/* ── SECTION 07: INSTAGRAM FEED ────────────────────────── */}
         <InstagramFeedSection />

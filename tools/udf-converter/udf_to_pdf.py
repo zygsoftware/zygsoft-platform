@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer, Image, PageBreak, KeepTogether
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Image, PageBreak, KeepTogether
 from reportlab.platypus.para import Paragraph as Para
 from reportlab.lib import colors
 from reportlab.lib.units import mm, inch
@@ -176,7 +176,9 @@ def udf_to_pdf(udf_file, pdf_file):
             'CustomNormal', 
             parent=styles['Normal'],
             fontName='DejaVuSerif',  # Setting DejaVuSerif as default font
-            encoding='utf-8'
+            encoding='utf-8',
+            spaceBefore=0,
+            spaceAfter=0,
         )
         
         # Process styles from the XML
@@ -302,6 +304,8 @@ def udf_to_pdf(udf_file, pdf_file):
             right_indent = float(para_elem.get('RightIndent', '0'))
             first_line_indent = float(para_elem.get('FirstLineIndent', '0'))
             line_spacing = float(para_elem.get('LineSpacing', '1.2'))
+            space_before = float(para_elem.get('SpaceBefore', para_elem.get('SpaceAbove', '0')) or '0')
+            space_after = float(para_elem.get('SpaceAfter', para_elem.get('SpaceBelow', '0')) or '0')
             
             # Get paragraph font family - always use DejaVuSerif regardless of what's in the XML
             family = 'DejaVuSerif'
@@ -317,7 +321,9 @@ def udf_to_pdf(udf_file, pdf_file):
                 firstLineIndent=first_line_indent,
                 fontName=family,
                 fontSize=para_default_size,
-                leading=para_default_size * line_spacing  # Leading is the line spacing
+                leading=para_default_size * line_spacing,  # Leading is the line spacing
+                spaceBefore=space_before,
+                spaceAfter=space_after,
             )
             
             # Process the paragraph content - collect text blocks with their styles
@@ -337,6 +343,8 @@ def udf_to_pdf(udf_file, pdf_file):
                     start_offset = int(child.get('startOffset', '0'))
                     length = int(child.get('length', '0'))
                     text_content = content_text[start_offset:start_offset+length]
+                    if text_content in {'\n', '\r', '\r\n'}:
+                        continue
                     
                     # Determine font size for this block
                     # Use block's size if specified, otherwise use paragraph default
@@ -382,6 +390,8 @@ def udf_to_pdf(udf_file, pdf_file):
                         start_offset = int(child.get('startOffset', '0'))
                         length = int(child.get('length', '0'))
                         field_text = content_buffer[start_offset:start_offset+length]
+                        if field_text in {'\n', '\r', '\r\n'}:
+                            continue
                     else:
                         # Use the fieldName as fallback
                         field_text = field_name
@@ -630,7 +640,6 @@ def udf_to_pdf(udf_file, pdf_file):
                 pdf_elements.append(para)
                 if img:
                     pdf_elements.append(img)
-                pdf_elements.append(Spacer(1, 5))
             elif elem.tag == 'page-break':
                 pdf_elements.append(PageBreak())
             elif elem.tag == 'table':
@@ -691,7 +700,6 @@ def udf_to_pdf(udf_file, pdf_file):
                 table = Table(table_data, colWidths=col_widths)
                 table.setStyle(TableStyle(table_style))
                 pdf_elements.append(table)
-                pdf_elements.append(Spacer(1, 5))
             # Skip header and footer here as they're handled separately
             elif elem.tag not in ['header', 'footer']:
                 pass

@@ -9,8 +9,11 @@
  *   GIFT_MONTHS=12                    (varsayılan: ürünün billingPeriod'una göre; legal-toolkit için 12 ay)
  */
 
+const { loadEnvConfig } = require("@next/env");
 const { PrismaPg } = require("@prisma/adapter-pg");
 const { PrismaClient } = require("@prisma/client");
+
+loadEnvConfig(process.cwd());
 
 if (!process.env.DATABASE_URL) {
     throw new Error("DATABASE_URL is required.");

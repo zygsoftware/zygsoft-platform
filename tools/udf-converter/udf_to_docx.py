@@ -221,6 +221,8 @@ def udf_to_docx(udf_file, docx_file):
                         start_offset = int(child.get('startOffset', '0'))
                         length = int(child.get('length', '0'))
                         text = content_text[start_offset:start_offset+length]
+                        if text in {'\n', '\r', '\r\n'}:
+                            continue
                         
                         run = header_para.add_run(text)
                         
@@ -285,6 +287,8 @@ def udf_to_docx(udf_file, docx_file):
                         start_offset = int(child.get('startOffset', '0'))
                         length = int(child.get('length', '0'))
                         text = content_text[start_offset:start_offset+length]
+                        if text in {'\n', '\r', '\r\n'}:
+                            continue
                         
                         run = footer_para.add_run(text)
                         
@@ -343,6 +347,12 @@ def udf_to_docx(udf_file, docx_file):
                 line_spacing = elem.get('LineSpacing')
                 if line_spacing:
                     paragraph.paragraph_format.line_spacing = float(line_spacing)
+                space_before = elem.get('SpaceBefore', elem.get('SpaceAbove'))
+                space_after = elem.get('SpaceAfter', elem.get('SpaceBelow'))
+                if space_before:
+                    paragraph.paragraph_format.space_before = Pt(float(space_before))
+                if space_after:
+                    paragraph.paragraph_format.space_after = Pt(float(space_after))
                 
                 # Set list properties
                 bulleted = elem.get('Bulleted', 'false') == 'true'
@@ -367,6 +377,8 @@ def udf_to_docx(udf_file, docx_file):
                         start_offset = int(child.get('startOffset', '0'))
                         length = int(child.get('length', '0'))
                         text = content_text[start_offset:start_offset+length]
+                        if text in {'\n', '\r', '\r\n'}:
+                            continue
 
                         run = paragraph.add_run(text)
 
@@ -413,6 +425,8 @@ def udf_to_docx(udf_file, docx_file):
                             start_offset = int(child.get('startOffset', '0'))
                             length = int(child.get('length', '0'))
                             field_text = content_text[start_offset:start_offset+length]
+                            if field_text in {'\n', '\r', '\r\n'}:
+                                continue
                         else:
                             # Use the fieldName as fallback
                             field_text = field_name
@@ -521,6 +535,18 @@ def udf_to_docx(udf_file, docx_file):
                                 cell_paragraph.paragraph_format.left_indent = Pt(float(left_indent))
                             if right_indent:
                                 cell_paragraph.paragraph_format.right_indent = Pt(float(right_indent))
+                            first_line_indent = para.get('FirstLineIndent')
+                            line_spacing = para.get('LineSpacing')
+                            space_before = para.get('SpaceBefore', para.get('SpaceAbove'))
+                            space_after = para.get('SpaceAfter', para.get('SpaceBelow'))
+                            if first_line_indent:
+                                cell_paragraph.paragraph_format.first_line_indent = Pt(float(first_line_indent))
+                            if line_spacing:
+                                cell_paragraph.paragraph_format.line_spacing = float(line_spacing)
+                            if space_before:
+                                cell_paragraph.paragraph_format.space_before = Pt(float(space_before))
+                            if space_after:
+                                cell_paragraph.paragraph_format.space_after = Pt(float(space_after))
                             
                             # Process paragraph content
                             for child in para:
@@ -529,6 +555,8 @@ def udf_to_docx(udf_file, docx_file):
                                     start_offset = int(child.get('startOffset', '0'))
                                     length = int(child.get('length', '0'))
                                     text = content_text[start_offset:start_offset+length]
+                                    if text in {'\n', '\r', '\r\n'}:
+                                        continue
 
                                     run = cell_paragraph.add_run(text)
 
