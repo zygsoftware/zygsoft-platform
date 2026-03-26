@@ -18,7 +18,12 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.zygsoft.com";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   icons: {
-    icon: "/brand/ZYG_Logo_SQR.png",
+    icon: [
+      { url: "/icon.png", type: "image/png", sizes: "500x500" },
+      { url: "/favicon.ico", rel: "shortcut icon" },
+    ],
+    shortcut: ["/favicon.ico"],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   title: {
     default:  "ZYGSOFT | Antalya Yazılım Şirketi ve Dijital Ajans",
@@ -33,6 +38,11 @@ export const metadata: Metadata = {
   authors:   [{ name: "ZYGSOFT", url: SITE_URL }],
   creator:   "ZYGSOFT",
   publisher: "ZYGSOFT",
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? {
+        google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+      }
+    : undefined,
   robots: {
     index: true,
     follow: true,
@@ -123,7 +133,7 @@ export default async function RootLayout({
 }) {
   const { locale } = await params;
 
-  if (!['en', 'tr'].includes(locale as any)) {
+  if (!["en", "tr"].includes(locale)) {
     notFound();
   }
 
