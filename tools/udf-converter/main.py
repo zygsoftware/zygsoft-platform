@@ -1,10 +1,12 @@
 import re
 import zipfile
 from docx import Document
-from paragraph_processor import process_paragraph, is_pseudo_list_paragraph, get_list_kind, is_numbered_heading_paragraph
+from paragraph_processor import process_paragraph
 from table_processor import process_table
 
 W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+
+_BULLET_MARKERS = ("•", "◦", "▪", "▫", "‣", "-", "*", "–", "—")
 
 def _cdata_safe(s: str) -> str:
     return (s or "").replace("]]>", "]]]]><![CDATA[>")
@@ -22,27 +24,33 @@ def _is_real_list_paragraph(paragraph) -> bool:
         return False
 
 def _is_pseudo_list_paragraph(paragraph) -> bool:
+    """
+    numPr yok ama satır(lar) bullet ile başlıyor.
+    """
     try:
         if paragraph is None:
             return False
-        return is_pseudo_list_paragraph(paragraph)
+        if _is_real_list_paragraph(paragraph):
+            return False
+
+        raw = paragraph.text or ""
+        raw = _normalize_newlines(raw).replace("\t", "\n").strip()
+        if not raw:
+            return False
+
+        for ln in raw.split("\n"):
+            s = ln.strip()
+            if not s:
+                continue
+            for mk in _BULLET_MARKERS:
+                if s.startswith(mk):
+                    return True
+        return False
     except Exception:
         return False
 
 def _is_list_like_paragraph(paragraph) -> bool:
     return _is_real_list_paragraph(paragraph) or _is_pseudo_list_paragraph(paragraph)
-
-def _is_bullet_list_paragraph(paragraph, document=None) -> bool:
-    try:
-        return get_list_kind(paragraph, document) == "bullet"
-    except Exception:
-        return False
-
-def _is_heading_paragraph(paragraph) -> bool:
-    try:
-        return is_numbered_heading_paragraph(paragraph)
-    except Exception:
-        return False
 
 def _is_empty_paragraph(paragraph) -> bool:
     """
@@ -59,10 +67,14 @@ def _is_empty_paragraph(paragraph) -> bool:
 
 def _emit_blank_paragraph(current_offset: int):
     """
-    Tam bos paragraf yerine tek NBSP kullan.
-    Bu, hem UDF tarafinda bos satiri korur hem PDF render'da fazladan satir kirilmasi yaratmaz.
+    UDF motorlarının 'tam boş paragraf'ı bazen göstermemesi nedeniyle:
+    placeholder olarak " \\n\\t " (space + newline + tab + space) kullanıyoruz.
+    Bu, UDF editöründe görsel olarak 1 boş satır üretir.
+
+    placeholder uzunluğu = 4
+    offset +4
     """
-    placeholder = "\u00a0"
+    placeholder = " \n\t "
     para_text = placeholder
 
     para_element = (
@@ -74,7 +86,7 @@ def _emit_blank_paragraph(current_offset: int):
 
     return para_text, para_element, current_offset + len(placeholder)
 
-def _find_next_meaningful_kind(body_elems, kind_flags, p_map, start_idx):
+def _find_next_meaningful_listflag(body_elems, list_flags, p_map, start_idx):
     """
     start_idx'ten sonra boş paragraf(ları) atlayıp ilk anlamlı elemana bakar.
     Dönen değer: True/False (o anlamlı eleman liste mi?)
@@ -87,12 +99,13 @@ def _find_next_meaningful_kind(body_elems, kind_flags, p_map, start_idx):
                 continue
             if _is_empty_paragraph(p):
                 continue
-            return kind_flags[j]
+            return bool(list_flags[j])
         else:
-            return None
-    return None
+            # tablo/diğer elemanlar anlamlıdır; liste kabul etmeyelim
+            return False
+    return False
 
-def _find_prev_meaningful_kind(body_elems, kind_flags, p_map, start_idx):
+def _find_prev_meaningful_listflag(body_elems, list_flags, p_map, start_idx):
     """
     start_idx'ten önce boş paragraf(ları) atlayıp ilk anlamlı elemana bakar.
     """
@@ -104,27 +117,13 @@ def _find_prev_meaningful_kind(body_elems, kind_flags, p_map, start_idx):
                 continue
             if _is_empty_paragraph(p):
                 continue
-            return kind_flags[j]
+            return bool(list_flags[j])
         else:
-            return None
-    return None
-
-def _has_next_meaningful_element(body_elems, p_map, start_idx):
-    for j in range(start_idx + 1, len(body_elems)):
-        el = body_elems[j]
-        if el.tag.endswith('p'):
-            p = p_map.get(el)
-            if p is None:
-                continue
-            if _is_empty_paragraph(p):
-                continue
-            return True
-        return True
+            return False
     return False
 
 def _process_document_elements(docx_path: str):
     document = Document(docx_path)
-    process_paragraph.list_counters = {}
 
     elements = []
     content = []
@@ -135,14 +134,14 @@ def _process_document_elements(docx_path: str):
 
     body_elems = list(document.element.body)
 
-    # paragraph kind: bullet / number / None
-    kind_flags = []
+    # liste-like flag (yalnız paragraflar için)
+    list_flags = []
     for el in body_elems:
         if el.tag.endswith('p'):
             p = p_map.get(el)
-            kind_flags.append(get_list_kind(p, document) if p else None)
+            list_flags.append(_is_list_like_paragraph(p) if p else False)
         else:
-            kind_flags.append(None)
+            list_flags.append(False)
 
     def _append_blank():
         nonlocal current_offset
@@ -152,36 +151,22 @@ def _process_document_elements(docx_path: str):
         current_offset = new_off
 
     for idx, el in enumerate(body_elems):
-        kind_now = kind_flags[idx]
-        prev_kind = _find_prev_meaningful_kind(body_elems, kind_flags, p_map, idx)
-        next_kind = _find_next_meaningful_kind(body_elems, kind_flags, p_map, idx)
-        is_bullet_now = kind_now == "bullet"
-        is_bullet_prev_meaningful = prev_kind == "bullet"
-        is_bullet_next_meaningful = next_kind == "bullet"
-        should_add_blank_before_next_bullet = False
+        is_list_now = bool(list_flags[idx])
+
+        is_list_prev_meaningful = _find_prev_meaningful_listflag(body_elems, list_flags, p_map, idx)
+        is_list_next_meaningful = _find_next_meaningful_listflag(body_elems, list_flags, p_map, idx)
+
+        # Liste bloğu başlangıcı: önce anlamlı eleman liste değil, şimdi liste
+        if is_list_now and not is_list_prev_meaningful and (elements or content):
+            _append_blank()
 
         if el.tag.endswith('p'):
             paragraph = p_map.get(el)
             if paragraph:
-                is_heading_now = _is_heading_paragraph(paragraph)
-                if _is_empty_paragraph(paragraph) and (is_bullet_prev_meaningful or is_bullet_next_meaningful):
-                    continue
-
-                suppress_space_after = is_bullet_now or is_bullet_next_meaningful or is_heading_now
-                para_text, para_element, new_offset = process_paragraph(
-                    paragraph,
-                    document,
-                    current_offset,
-                    {"suppress_space_after": suppress_space_after},
-                )
+                para_text, para_element, new_offset = process_paragraph(paragraph, document, current_offset, {})
                 elements.append(para_element)
                 content.append(para_text)
                 current_offset = new_offset
-                should_add_blank_before_next_bullet = (
-                    not is_bullet_now and
-                    is_bullet_next_meaningful and
-                    not _is_empty_paragraph(paragraph)
-                )
 
         elif el.tag.endswith('tbl'):
             table = t_map.get(el)
@@ -190,36 +175,18 @@ def _process_document_elements(docx_path: str):
                 elements.append(table_element)
                 content.append(table_text)
                 current_offset = new_offset
-                should_add_blank_before_next_bullet = is_bullet_next_meaningful
 
-        if should_add_blank_before_next_bullet:
+        # Liste bloğu bitişi: şimdi liste, sonraki anlamlı eleman liste değil
+        if is_list_now and not is_list_next_meaningful:
             _append_blank()
-
-        # Bullet liste bloğu bitişi: şimdi bullet, sonraki anlamlı eleman bullet değil
-        if is_bullet_now and not is_bullet_next_meaningful:
-            _append_blank()
-            continue
-
-        if el.tag.endswith('p'):
-            paragraph = p_map.get(el)
-            if paragraph and _is_heading_paragraph(paragraph) and _has_next_meaningful_element(body_elems, p_map, idx) and not is_bullet_next_meaningful:
-                _append_blank()
 
     return "\n".join(elements), "".join(content)
 
 def convert_docx_to_udf(docx_file: str, udf_file: str, template_xml_path: str = "calisanudfcontent.xml"):
-    import logging
-    _log = logging.getLogger(__name__)
-    _log.info("[main.convert_docx_to_udf] template_xml_path=%s", template_xml_path)
-
     elements_xml, content_text = _process_document_elements(docx_file)
 
     with open(template_xml_path, "r", encoding="utf-8", errors="ignore") as f:
         tpl_xml = f.read()
-
-    tpl_bg_match = re.search(r'bgImageData\s*=\s*["\']([^"\']*)["\']', tpl_xml, re.I)
-    tpl_bg_len = len(tpl_bg_match.group(1)) if tpl_bg_match else 0
-    _log.info("[main.convert_docx_to_udf] template bgImageData length=%d", tpl_bg_len)
 
     xml = tpl_xml
 
@@ -256,12 +223,6 @@ def convert_docx_to_udf(docx_file: str, udf_file: str, template_xml_path: str = 
             f'\\1\n<elements resolver="hvl-default">\n{elements_xml}\n</elements>',
             xml, count=1, flags=re.I
         )
-
-    out_bg_match = re.search(r'bgImageData\s*=\s*["\']([^"\']*)["\']', xml, re.I)
-    out_bg_len = len(out_bg_match.group(1)) if out_bg_match else 0
-    _log.info("[main.convert_docx_to_udf] final xml bgImageData length=%d before write", out_bg_len)
-    if tpl_bg_len > 0 and out_bg_len == 0:
-        _log.warning("[main.convert_docx_to_udf] bgImageData LOST: template had %d chars, output has 0", tpl_bg_len)
 
     with zipfile.ZipFile(udf_file, "w", compression=zipfile.ZIP_STORED) as z:
         z.writestr("content.xml", xml.encode("utf-8"))
