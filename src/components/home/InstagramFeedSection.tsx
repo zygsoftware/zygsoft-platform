@@ -100,16 +100,18 @@ export function InstagramFeedSection() {
             <div className="rounded-[1.6rem] border border-white/10 bg-white/[0.05] p-4 backdrop-blur-sm">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-sm font-bold !text-white/92">
-                  <Instagram size={18} /> @zygsoft
+                  <span className="[font-family:var(--font-button)] inline-flex items-center gap-2">
+                    <Instagram size={18} /> @zygsoft
+                  </span>
                 </span>
-                <span className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-[0.18em] !text-white/55">
+                <span className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-white/10 text-xs font-bold uppercase tracking-[0.18em] !text-white/55 [font-family:var(--font-button)]">
                   {locale === "en" ? "Live social feed" : "Canlı sosyal akış"}
                 </span>
                 <a
                   href={INSTAGRAM_PROFILE}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#e6c800] !text-[#343131] font-bold text-sm hover:bg-[#c9ad00] transition-colors"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#e6c800] !text-[#343131] font-bold text-sm [font-family:var(--font-button)] hover:bg-[#c9ad00] transition-colors"
                 >
                   {t("viewProfile")}
                   <ExternalLink size={16} />
@@ -137,7 +139,7 @@ export function InstagramFeedSection() {
               href={INSTAGRAM_PROFILE}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#e6c800] !text-[#343131] font-bold hover:bg-[#c9ad00] transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#e6c800] !text-[#343131] font-bold [font-family:var(--font-button)] hover:bg-[#c9ad00] transition-colors"
             >
               {t("viewProfile")}
               <ExternalLink size={18} />
@@ -202,7 +204,7 @@ export function InstagramFeedSection() {
               href={INSTAGRAM_PROFILE}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/20 !text-white/82 font-bold text-sm hover:border-[#e6c800]/50 hover:text-[#e6c800] transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/20 !text-white/82 font-bold text-sm [font-family:var(--font-button)] hover:border-[#e6c800]/50 hover:text-[#e6c800] transition-colors"
             >
               {t("visitAccount")}
               <ExternalLink size={16} />

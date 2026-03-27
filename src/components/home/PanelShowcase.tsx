@@ -232,7 +232,7 @@ function DocxUdfDemo({ state, t }: { state: DocxUdfState; t: PanelT }) {
                                     <FileText size={18} className="text-[#e6c800]" />
                                 </div>
                                 <p className="text-[13px] font-bold text-[#343131] text-center">dava_dilekcesi.udf</p>
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#e6c800]/15 text-[10px] font-bold text-[#e6c800] border border-[#e6c800]/25">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#e6c800]/15 text-[10px] font-bold text-[#e6c800] border border-[#e6c800]/25 [font-family:var(--font-button)]">
                                     <Zap size={10} />
                                     {t("docxUyapBadge")}
                                 </span>
@@ -443,8 +443,9 @@ export function PanelShowcase() {
     const [docxState, setDocxState] = useState<DocxUdfState>("idle");
     const [activeTab, setActiveTab] = useState<ToolTab>("docx-udf");
     const [isMobile, setIsMobile] = useState(true);
+    const [performanceMode, setPerformanceMode] = useState<"static" | "animated">("static");
     const reduceMotion = !!useReducedMotion();
-    const useStatic = reduceMotion || isMobile;
+    const useStatic = reduceMotion || isMobile || performanceMode === "static";
 
     const valuePoints = t.raw("valuePoints") as string[];
 
@@ -473,6 +474,17 @@ export function PanelShowcase() {
     useEffect(() => {
         const syncViewportMode = () => {
             setIsMobile(window.innerWidth < 768);
+            const isWideDesktop = window.innerWidth >= 1440;
+            const deviceMemory = "deviceMemory" in navigator ? (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4 : 4;
+            const cpuCores = navigator.hardwareConcurrency ?? 4;
+            const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            const prefersTouch = window.matchMedia("(pointer: coarse)").matches;
+
+            setPerformanceMode(
+                !prefersReducedMotion && !prefersTouch && isWideDesktop && deviceMemory >= 8 && cpuCores >= 8
+                    ? "animated"
+                    : "static"
+            );
         };
 
         syncViewportMode();
@@ -582,7 +594,7 @@ export function PanelShowcase() {
                                 <span className="text-[13px] font-bold text-[#343131]/80">{t("panelName")}</span>
                             </div>
                             <div className="flex items-center gap-3">
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e6c800]/15 text-[#343131]/80 text-[10px] font-bold uppercase tracking-[0.18em] border border-[#e6c800]/25">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e6c800]/15 text-[#343131]/80 text-[10px] font-bold uppercase tracking-[0.18em] border border-[#e6c800]/25 [font-family:var(--font-button)]">
                                     <span className="w-1.5 h-1.5 rounded-full bg-[#e6c800]" />
                                     {t("liveSystem")}
                                 </span>
@@ -730,7 +742,7 @@ export function PanelShowcase() {
                         {valuePoints.map((p) => (
                             <div
                                 key={p}
-                                className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-white border border-[#343131]/10 text-[13px] font-medium text-[#343131]/75 shadow-[0_16px_34px_rgba(0,0,0,0.06)]"
+                                className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-white border border-[#343131]/10 text-[12px] font-bold uppercase tracking-[0.14em] text-[#343131]/75 [font-family:var(--font-button)] shadow-[0_16px_34px_rgba(0,0,0,0.06)]"
                             >
                                 <CheckCircle2 size={16} className="text-[#e6c800] shrink-0" />
                                 {p}

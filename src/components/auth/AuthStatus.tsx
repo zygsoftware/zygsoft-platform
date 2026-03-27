@@ -1,7 +1,8 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 type AuthStatusProps =
   | { type: "error"; children: React.ReactNode }
@@ -9,6 +10,7 @@ type AuthStatusProps =
   | { type: "loading"; children?: React.ReactNode };
 
 export function AuthStatus(props: AuthStatusProps) {
+  const t = useTranslations("Auth.shared");
   if (props.type === "loading") {
     return (
       <motion.div
@@ -20,7 +22,7 @@ export function AuthStatus(props: AuthStatusProps) {
       >
         <Loader2 size={20} className="animate-spin motion-reduce:animate-none text-[#e6c800] shrink-0" />
         <span className="text-[14px] font-medium text-slate-700">
-          {props.children ?? "İşleniyor..."}
+          {props.children ?? t("processing")}
         </span>
       </motion.div>
     );

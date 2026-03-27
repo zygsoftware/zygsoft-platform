@@ -221,23 +221,31 @@
         },
         "pdfSplit": {
           "hubName": "PDF Bölme",
-          "hubDescription": "PDF dosyanızdan belirli sayfaları seçerek yeni bir PDF oluşturun.",
+          "hubDescription": "PDF dosyanızdan belirli sayfaları seçin veya dosyayı eşit parçalara bölün.",
           "title": "PDF Bölme Aracı",
-          "description": "PDF dosyanızdan belirli sayfaları seçerek yeni bir PDF oluşturun.",
+          "description": "PDF dosyanızdan belirli sayfaları seçin veya dosyayı 100'er sayfa gibi parçalara ayırın.",
           "uploadTitle": "PDF Yükleyin",
           "uploadHint": "Tek bir PDF dosyası sürükleyin veya tıklayın",
+          "modeLabel": "Bölme Türü",
+          "modeRange": "Sayfa Aralığı",
+          "modeChunks": "Parçalara Böl",
           "pageRangeLabel": "Sayfa Aralığı",
           "pageRangePlaceholder": "Örn: 1-3, 5, 7-10",
           "pageRangeHelp": "Tek sayfa: 5 | Aralık: 1-5 | Karışık: 1,3,5-7",
-          "tip1": "Sayfa numaraları 1'den başlar. Virgülle ayırarak birden fazla sayfa veya aralık belirtebilirsiniz.",
-          "tip2": "Sıralama girilen sıraya göre korunur.",
+          "chunkSizeLabel": "Her Parçadaki Sayfa Adedi",
+          "chunkSizePlaceholder": "Örn: 100",
+          "chunkSizeHelp": "PDF dosyası belirttiğiniz sayfa adedine göre parçalara ayrılır ve ZIP olarak indirilir.",
+          "tip1": "Sayfa aralığı modunda tekil sayfaları veya aralıkları seçebilirsiniz.",
+          "tip2": "Parçalara böl modunda örneğin 100 girerseniz belge 100'er sayfalık PDF'ler halinde ZIP'e alınır.",
           "splitButton": "Böl",
           "successTitle": "Bölme Tamamlandı!",
           "successDesc": "Seçtiğiniz sayfalar yeni bir PDF olarak hazırlandı.",
+          "successDescChunks": "PDF dosyanız çoklu parçalara ayrıldı ve ZIP arşivi olarak hazırlandı.",
           "downloadButton": "İndir",
           "newButton": "Yeni İşlem",
           "errorNoFile": "Lütfen bir PDF dosyası yükleyin.",
           "errorNoPageRange": "Sayfa aralığı girin.",
+          "errorNoChunkSize": "Parça sayfa adedi girin.",
           "errorService": "Dönüştürme servisi şu an devre dışı. Lütfen destek ile iletişime geçin.",
           "errorGeneric": "Bir hata oluştu."
         },
@@ -607,7 +615,84 @@
       "emailVerification": "E-posta Doğrulama",
       "verified": "Doğrulandı",
       "notVerified": "Doğrulanmadı",
-      "securityDescExtra": "Ekibimiz hesap güncellemeleri, güvenlik ayarları ve siber koruma gibi tüm konularda size yardımcı olmaya hazırdır."
+      "securityDescExtra": "Ekibimiz hesap güncellemeleri, güvenlik ayarları ve siber koruma gibi tüm konularda size yardımcı olmaya hazırdır.",
+      "verifyCta": "Doğrula",
+      "endsLabel": "Bitiş",
+      "billingPrompt": "Fatura oluşturmak veya havale bildirimi yapmak ister misiniz?",
+      "securityBadge": "Güvenlik & Destek",
+      "changePassword": "Şifre Değiştir",
+      "passwordUpdateTitle": "Şifre Güncelleme",
+      "cancel": "İptal",
+      "passwordUpdatedTitle": "Harika!",
+      "passwordUpdatedDesc": "Şifreniz başarıyla güncellendi.",
+      "currentPasswordLabel": "Mevcut Şifre",
+      "currentPasswordPlaceholder": "Şu anki şifrenizi girin",
+      "newPasswordLabel": "Yeni Şifre",
+      "newPasswordPlaceholder": "En az 6 karakter",
+      "confirmPasswordLabel": "Yeni Şifre (Tekrar)",
+      "confirmPasswordPlaceholder": "Şifreyi onaylayın",
+      "updating": "Güncelleniyor...",
+      "updatePassword": "Şifreyi Güncelle"
+    },
+    "shared": {
+      "onboarding": {
+        "title": "Başlangıç Kontrol Listesi",
+        "completedCount": "{completed} / {total} tamamlandı",
+        "dismiss": "Onboarding'i gizle",
+        "stepEmail": "E-posta adresinizi doğrulayın",
+        "stepTrial": "3 günlük demo erişimini başlatın",
+        "stepFirstTool": "İlk belgenizi dönüştürün",
+        "stepEvaluate": "Hukuk Araçları Paketini değerlendirin",
+        "verify": "Doğrula",
+        "startDemo": "Demo Başlat",
+        "firstTool": "İlk Aracı Kullan",
+        "reviewPackage": "Paketi İncele",
+        "genericError": "Bir hata oluştu.",
+        "connectionError": "Bağlantı hatası."
+      },
+      "trial": {
+        "availableTitle": "3 Günlük Ücretsiz Demo",
+        "availableDesc": "20 işlem hakkı ile tüm belge araçlarını deneyin.",
+        "starting": "Başlatılıyor...",
+        "start": "Demo Başlat",
+        "activeTitle": "Demo süreniz aktif",
+        "activeEndingSoon": "Demo sürenizin bitmesine çok az kaldı",
+        "activeEndsToday": "Demo süreniz bugün sona eriyor",
+        "expiredTitle": "Demo süreniz sona erdi",
+        "expiredDesc": "Tam erişim için Hukuk Araçları Paketini satın alın.",
+        "timeLabel": "Süre",
+        "timeRemainingPct": "{percent}% kaldı",
+        "usageLabel": "İşlem kullanımı",
+        "usageUsed": "{used} / {limit} işlem kullandınız",
+        "usageRemainingLast": "Son {count} kullanım hakkınız kaldı",
+        "activatePackage": "Paketi Etkinleştir",
+        "buyPackage": "Paketi Satın Al",
+        "zeroHours": "0 saat",
+        "daysHoursLeft": "{days} gün {hours} saat kaldı",
+        "hoursMinutesLeft": "{hours} saat {minutes} dakika kaldı",
+        "minutesLeft": "{minutes} dakika kaldı",
+        "compactZero": "0s",
+        "compactDaysHours": "{days}g {hours}s kaldı",
+        "compactHours": "{hours}s kaldı",
+        "compactMinutes": "{minutes}dk kaldı"
+      },
+      "trialBanner": {
+        "title": "Demo kullanıyorsunuz",
+        "desc": "Tam erişim için Hukuk Araçları Paketini etkinleştirin.",
+        "cta": "Paketi Etkinleştir"
+      },
+      "toolLocked": {
+        "title": "Erişim Kısıtlı",
+        "desc": "Bu aracı kullanabilmek için aktif bir Hukuk Araçları Paketi aboneliğinizin veya demo erişiminizin olması gerekmektedir.",
+        "viewPackage": "Paketi İncele",
+        "reportPayment": "Ödeme Bildir"
+      },
+      "shell": {
+        "menuOpen": "Menüyü aç",
+        "menuClose": "Menüyü kapat",
+        "panelTitle": "ZYGSOFT Panel",
+        "panelSubtitle": "Hesabınız ve hukuk araçları"
+      }
     },
     "verification": {
       "warningTitle": "E-posta doğrulanmadı",
@@ -618,6 +703,23 @@
     }
   },
   "Auth": {
+    "shared": {
+      "processing": "İşleniyor...",
+      "forgotPassword": "Şifremi unuttum",
+      "showPassword": "Şifreyi göster",
+      "hidePassword": "Şifreyi gizle",
+      "heroFeatures": {
+        "secureProcessing": "Güvenli belge işleme",
+        "uyapTools": "UYAP uyumlu araçlar",
+        "kvkkInfrastructure": "KVKK uyumlu altyapı"
+      },
+      "passwordStrength": {
+        "weak": "Zayıf",
+        "fair": "Orta",
+        "good": "İyi",
+        "strong": "Güçlü"
+      }
+    },
     "login": {
       "title": "Hoş geldiniz",
       "subtitle": "Panelinize erişmek için hesabınıza giriş yapın.",
@@ -629,7 +731,11 @@
       "noAccount": "Hesabınız yok mu?",
       "registerLink": "Kayıt olun",
       "backToHome": "Ana sayfaya dön",
-      "errorInvalid": "E-posta veya şifre hatalı. Lütfen tekrar deneyin."
+      "errorInvalid": "E-posta veya şifre hatalı. Lütfen tekrar deneyin.",
+      "errorVerifyRequired": "Giriş yapmadan önce e-posta adresinizi doğrulamanız gerekiyor.",
+      "resendVerification": "Doğrulama mailini tekrar gönder",
+      "sendingVerification": "Gönderiliyor...",
+      "verificationSent": "Doğrulama maili tekrar gönderildi. Gelen kutunuzu kontrol edin."
     },
     "register": {
       "title": "Yeni hesap",
@@ -1387,15 +1493,20 @@
     "copyright": "Geleceği birlikte inşa ediyoruz."
   },
   "HeroOrbit": {
-    "apiLabel": "API",
-    "apiDesc": "Güvenli ve ölçeklenebilir entegrasyon",
-    "webLabel": "Web",
-    "webDesc": "Modern web uygulamaları",
-    "seoLabel": "SEO",
-    "seoDesc": "Arama motoru optimizasyonu",
-    "cloudLabel": "Cloud",
-    "cloudDesc": "Sunucu ve bulut mimarisi",
-    "wwwLabel": "www",
-    "wwwDesc": "Dijital varlık ve performans"
+    "legalLabel": "Hukuk Araçları",
+    "legalDesc": "UYAP uyumlu belge akışı, PDF işlemleri ve OCR araçları tek çekirdekte birleşir.",
+    "legalMeta": "Dijital Ürün",
+    "webLabel": "Web Platformları",
+    "webDesc": "Hızlı, premium ve yönetilebilir kurumsal arayüzler ile güçlü dijital vitrinler kurulur.",
+    "webMeta": "Proje Katmanı",
+    "automationLabel": "Otomasyon",
+    "automationDesc": "Tekrarlayan operasyonlar akıllı akışlara dönüşür, ekip yükü azalır ve süreçler hızlanır.",
+    "automationMeta": "Sistem Katmanı",
+    "brandLabel": "Marka Tasarımı",
+    "brandDesc": "Kimlik, tipografi ve arayüz dili tek sistem altında daha tutarlı bir marka deneyimi üretir.",
+    "brandMeta": "Yaratıcı Katman",
+    "growthLabel": "Dijital Büyüme",
+    "growthDesc": "SEO, içerik ve performans stratejileriyle görünürlükten dönüşüme uzanan daha net bir büyüme hattı kurulur.",
+    "growthMeta": "Büyüme Katmanı"
   }
 }

@@ -1,23 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, Reorder, AnimatePresence } from "framer-motion";
 import {
     UploadCloud,
-    FileImage,
     ArrowLeft,
     Loader2,
     Download,
     Trash2,
-    CheckCircle2,
     Image as ImageIcon,
-    Plus,
-    FileText,
     Zap
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ToolPageHint } from "@/components/dashboard/ToolPageHint";
 import { ToolLockedGate } from "@/components/dashboard/ToolLockedGate";
 import { hasToolAccess } from "@/lib/trial-access-client";
@@ -25,11 +22,15 @@ import { ConversionResultPanel } from "@/components/dashboard/ConversionResultPa
 import { PdfPreview } from "@/components/dashboard/PdfPreview";
 import { getPdfPageCount } from "@/lib/pdf-utils";
 
+type ToolAccessUser = Parameters<typeof hasToolAccess>[0];
+
 export default function ImageToPdfTool() {
     const t = useTranslations("Dashboard.overview.tools");
     const tImg = useTranslations("Dashboard.overview.tools.imageToPdf");
+    const locale = useLocale();
+    const isTr = locale === "tr";
     const { data: session } = useSession();
-    const hasSubscription = session?.user && hasToolAccess(session.user as any);
+    const hasSubscription = session?.user && hasToolAccess(session.user as ToolAccessUser);
     const [files, setFiles] = useState<{ id: string; file: File; previewUrl: string }[]>([]);
     const [isDragging, setIsDragging] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -90,6 +91,13 @@ export default function ImageToPdfTool() {
         if (files.length === 0) return;
         setLoading(true);
         const start = Date.now();
+        const copy = {
+            serviceError: isTr
+                ? "Dönüştürme servisi şu an devre dışı. Lütfen destek ile iletişime geçin."
+                : "Conversion service is currently unavailable. Please contact support.",
+            createFailed: isTr ? "PDF oluşturma başarısız oldu." : "PDF creation failed.",
+            genericError: isTr ? "Bir hata oluştu." : "An error occurred.",
+        };
 
         try {
             const formData = new FormData();
@@ -101,12 +109,12 @@ export default function ImageToPdfTool() {
                 method: "POST",
                 body: formData
             }).catch(() => {
-                throw new Error("Dönüştürme servisi şu an devre dışı. Lütfen destek ile iletişime geçin.");
+                throw new Error(copy.serviceError);
             });
 
             if (!res.ok) {
                 const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.error || "PDF oluşturma başarısız oldu.");
+                throw new Error(errorData.error || copy.createFailed);
             }
 
             const blob = await res.blob();
@@ -116,12 +124,25 @@ export default function ImageToPdfTool() {
             setConversionTimeMs(Date.now() - start);
             const count = await getPdfPageCount(blob);
             setPageCount(count);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err);
-            alert(err.message || "Bir hata oluştu.");
+            alert(err instanceof Error ? err.message : copy.genericError);
         } finally {
             setLoading(false);
         }
+    };
+
+    const copy = {
+        title: isTr ? "Resim → PDF Kitapçığı" : "Image → PDF Booklet",
+        description: isTr
+            ? "TIFF, JPG ve PNG dosyalarınızı saniyeler içinde profesyonel bir PDF dosyasına çevirin."
+            : "Convert your TIFF, JPG, and PNG files into a professional PDF in seconds.",
+        uploadTitle: isTr ? "Resim Ekleyin" : "Add Images",
+        selectedImages: isTr ? "Seçilen Resimler" : "Selected Images",
+        createPdf: isTr ? "PDF Oluştur" : "Create PDF",
+        emptyState: isTr ? "Henüz dosya seçilmedi" : "No files selected yet",
+        conversionType: isTr ? "Resim → PDF" : "Image → PDF",
+        filename: isTr ? "zygsoft_pdf_kitapcigi.pdf" : "zygsoft_pdf_booklet.pdf",
     };
 
     const reset = () => {
@@ -157,9 +178,9 @@ export default function ImageToPdfTool() {
                 <div className="mb-12">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div>
-                            <h1 className="text-4xl font-display font-black text-[#0e0e0e] mb-3">Resim → PDF Kitapçığı</h1>
+                            <h1 className="text-4xl font-display font-black text-[#0e0e0e] mb-3">{copy.title}</h1>
                             <p className="text-[#666] font-medium text-lg max-w-2xl">
-                                TIFF, JPG ve PNG dosyalarınızı saniyeler içinde profesyonel bir PDF dosyasına çevirin.
+                                {copy.description}
                             </p>
                         </div>
                     </div>
@@ -193,7 +214,7 @@ export default function ImageToPdfTool() {
                             <div className="w-16 h-16 bg-[#0e0e0e] rounded-2xl flex items-center justify-center text-[#e6c800] mb-6 shadow-xl">
                                 <UploadCloud size={28} />
                             </div>
-                            <h3 className="text-xl font-display font-bold text-[#0e0e0e] mb-2">Resim Ekleyin</h3>
+                            <h3 className="text-xl font-display font-bold text-[#0e0e0e] mb-2">{copy.uploadTitle}</h3>
                             <p className="text-[#888] text-sm font-medium leading-relaxed">
                                 {tImg("uploadHint")}
                             </p>
@@ -207,7 +228,7 @@ export default function ImageToPdfTool() {
                                     <div className="flex items-center justify-between mb-8">
                                         <h3 className="text-xl font-display font-bold text-[#0e0e0e] flex items-center gap-3">
                                             <ImageIcon size={20} className="text-[#e6c800]" />
-                                            Seçilen Resimler ({files.length})
+                                            {copy.selectedImages} ({files.length})
                                         </h3>
                                         {files.length > 0 && (
                                             <button
@@ -216,7 +237,7 @@ export default function ImageToPdfTool() {
                                                 className="bg-[#0e0e0e] text-white px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-black disabled:opacity-50 transition-all flex items-center gap-2"
                                             >
                                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} fill="white" />}
-                                                PDF Oluştur
+                                                {copy.createPdf}
                                             </button>
                                         )}
                                     </div>
@@ -225,7 +246,7 @@ export default function ImageToPdfTool() {
                                         {files.length === 0 ? (
                                             <div className="flex flex-col items-center justify-center py-20 text-[#888]">
                                                 <ImageIcon size={48} className="opacity-10 mb-4" />
-                                                <p className="text-sm font-bold uppercase tracking-widest opacity-40">Henüz dosya seçilmedi</p>
+                                                <p className="text-sm font-bold uppercase tracking-widest opacity-40">{copy.emptyState}</p>
                                             </div>
                                         ) : (
                                             <Reorder.Group axis="y" values={files} onReorder={setFiles} className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -242,7 +263,14 @@ export default function ImageToPdfTool() {
                                                                 <Trash2 size={14} />
                                                             </button>
                                                             <div className="flex-1 relative">
-                                                                <img src={item.previewUrl} alt={item.file.name} className="absolute inset-0 w-full h-full object-cover" />
+                                                                <Image
+                                                                    src={item.previewUrl}
+                                                                    alt={item.file.name}
+                                                                    fill
+                                                                    unoptimized
+                                                                    className="object-cover"
+                                                                    sizes="(max-width: 768px) 50vw, 33vw"
+                                                                />
                                                             </div>
                                                             <div className="bg-white p-2 text-[10px] font-bold text-[#0e0e0e] truncate border-t border-slate-100">
                                                                 {item.file.name}
@@ -257,9 +285,9 @@ export default function ImageToPdfTool() {
                             ) : resultUrl && resultBlob ? (
                                 <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex-1 flex flex-col">
                                     <ConversionResultPanel
-                                        filename="zygsoft_pdf_kitapcigi.pdf"
+                                        filename={copy.filename}
                                         fileSize={resultBlob.size}
-                                        conversionType="Image → PDF"
+                                        conversionType={copy.conversionType}
                                         conversionTimeMs={conversionTimeMs ?? undefined}
                                         pageCount={pageCount ?? undefined}
                                         pageCountLabel={pageCount === 1 ? t("resultPanel.pageCountOne") : t("resultPanel.pageCount")}
@@ -267,7 +295,7 @@ export default function ImageToPdfTool() {
                                         downloadOptions={
                                             <a
                                                 href={resultUrl}
-                                                download="zygsoft_pdf_kitapcigi.pdf"
+                                                download={copy.filename}
                                                 className="bg-[#0e0e0e] text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-black transition-all flex items-center gap-2"
                                             >
                                                 <Download size={16} /> {tImg("downloadButton")}

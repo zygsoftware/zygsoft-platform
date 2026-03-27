@@ -88,7 +88,7 @@ export function BlogSlider() {
                     >
                         <Link
                             href={locale === "tr" ? "/blog-haberler" : `/${locale}/blog`}
-                            className="btn-secondary inline-flex items-center gap-2"
+                            className="btn-secondary inline-flex items-center gap-2 !text-[#343131] hover:!text-[#f9f7f3]"
                         >
                             {t("blogButton")} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                         </Link>

@@ -5,8 +5,25 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, ShieldCheck, Mail, Calendar, LogOut, ArrowRight, Activity, Receipt, CheckCircle, Clock, LayoutDashboard, Loader2, AlertCircle, Fingerprint, Lock, ShieldAlert, BadgeCheck, KeyRound } from "lucide-react";
+import { ShieldCheck, Mail, Calendar, LogOut, ArrowRight, Activity, Receipt, CheckCircle, Clock, LayoutDashboard, Loader2, AlertCircle, Fingerprint, Lock, ShieldAlert, BadgeCheck, KeyRound } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+
+type AccountSubscription = {
+    id: string;
+    status?: string;
+    endsAt?: string | null;
+    product?: {
+        name?: string | null;
+    } | null;
+};
+
+type AccountUser = {
+    name?: string | null;
+    email?: string | null;
+    role?: string | null;
+    emailVerified?: boolean | Date | null;
+    subscriptions?: AccountSubscription[];
+};
 
 export default function AccountPage() {
     const { data: session, status } = useSession();
@@ -32,7 +49,7 @@ export default function AccountPage() {
         );
     }
 
-    const { user } = session as any;
+    const user = session.user as typeof session.user & AccountUser;
 
     const handlePasswordChange = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -86,7 +103,6 @@ export default function AccountPage() {
 
                     {/* Bento Grid layout */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                        {/* Sol Sütun - Kullanıcı Kimlik Kartı */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -148,7 +164,7 @@ export default function AccountPage() {
                                                     onClick={() => router.push('/verify-email')}
                                                     className="px-4 py-2 bg-white text-amber-700 hover:bg-amber-100 hover:text-amber-900 rounded-xl text-[10px] font-black transition-colors uppercase tracking-widest border border-amber-200 shadow-sm shrink-0"
                                                 >
-                                                    Doğrula
+                                                    {t("verifyCta")}
                                                 </button>
                                             )}
                                         </div>
@@ -157,14 +173,12 @@ export default function AccountPage() {
                             </div>
                         </motion.div>
 
-                        {/* Orta Sütun - Abonelik & Hizmet Özeti */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
                             className="lg:col-span-8 flex flex-col gap-6"
                         >
-                            {/* Aktif Ürünlerim Block */}
                             <div className="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-sm flex flex-col h-full">
                                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8">
                                     <div>
@@ -185,7 +199,7 @@ export default function AccountPage() {
                                 <div className="flex-1 flex flex-col justify-center">
                                     {user?.subscriptions && user.subscriptions.length > 0 ? (
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {user.subscriptions.map((sub: any) => (
+                                            {user.subscriptions.map((sub) => (
                                                 <div key={sub.id} className="p-6 bg-slate-50/80 rounded-[2rem] border border-slate-100 flex flex-col gap-5 hover:border-[#e6c800]/30 hover:bg-white transition-all group">
                                                     <div className="flex items-start justify-between">
                                                         <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm group-hover:scale-110 transition-transform">
@@ -212,7 +226,7 @@ export default function AccountPage() {
                                                         <p className="text-lg font-heading font-black text-slate-900 mb-1">{sub.product?.name}</p>
                                                         <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
                                                             <Calendar size={14} className="text-slate-400" />
-                                                            Bitiş: <strong className="text-slate-800">{sub.endsAt ? new Date(sub.endsAt).toLocaleDateString() : "-"}</strong>
+                                                            {t("endsLabel")}: <strong className="text-slate-800">{sub.endsAt ? new Date(sub.endsAt).toLocaleDateString() : "-"}</strong>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -230,7 +244,7 @@ export default function AccountPage() {
                                 </div>
 
                                 <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
-                                    <p className="text-sm font-medium text-slate-500 hidden sm:block">Fatura oluşturmak veya havale bildirimi yapmak ister misiniz?</p>
+                                    <p className="text-sm font-medium text-slate-500 hidden sm:block">{t("billingPrompt")}</p>
                                     <Link
                                         href="/dashboard/billing"
                                         className="px-6 py-3 bg-slate-50 hover:bg-slate-900 hover:text-[#e6c800] !text-black font-black rounded-xl transition-all flex items-center justify-center gap-2 text-xs border border-slate-200 w-full sm:w-auto"
@@ -241,7 +255,6 @@ export default function AccountPage() {
                             </div>
                         </motion.div>
 
-                        {/* Güvenlik & Destek Block - Tam Genişlik */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -257,7 +270,7 @@ export default function AccountPage() {
                                     <div className="relative z-10 flex-1 max-w-2xl">
                                         <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/10 border border-white/5 text-[10px] font-black uppercase tracking-widest rounded-full mb-6">
                                             <Lock size={12} className="text-[#e6c800]" />
-                                            <span className="text-[#e6c800]">Güvenlik & Destek</span>
+                                            <span className="text-[#e6c800]">{t("securityBadge")}</span>
                                         </div>
                                         <h3 className="text-2xl lg:text-3xl font-heading font-black text-white mb-4 flex items-center gap-3">
                                             {t("security")}
@@ -267,14 +280,13 @@ export default function AccountPage() {
                                         </p>
                                     </div>
 
-                                    {/* Action Buttons */}
                                     {!showPasswordForm && (
                                         <div className="relative z-10 w-full md:w-auto shrink-0 flex flex-col sm:flex-row items-center gap-4">
                                             <button 
                                                 onClick={() => setShowPasswordForm(true)}
                                                 className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 !text-white border border-white/10 px-8 py-4 rounded-2xl font-black text-sm transition-all"
                                             >
-                                                <KeyRound size={18} className="text-[#e6c800]" /> <span className="!text-white">Şifre Değiştir</span>
+                                                <KeyRound size={18} className="text-[#e6c800]" /> <span className="!text-white">{t("changePassword")}</span>
                                             </button>
                                             <Link 
                                                 href="/contact" 
@@ -286,7 +298,6 @@ export default function AccountPage() {
                                     )}
                                 </div>
 
-                                {/* Password Change Form Animation */}
                                 <AnimatePresence>
                                     {showPasswordForm && (
                                         <motion.div
@@ -298,14 +309,14 @@ export default function AccountPage() {
                                             <form onSubmit={handlePasswordChange} className="bg-slate-950/50 border border-white/10 p-6 md:p-8 rounded-[2rem] max-w-2xl">
                                                 <div className="flex items-center justify-between mb-6">
                                                     <h4 className="text-xl font-heading font-black text-white flex items-center gap-3">
-                                                        <KeyRound size={20} className="text-[#e6c800]" /> Şifre Güncelleme
+                                                        <KeyRound size={20} className="text-[#e6c800]" /> {t("passwordUpdateTitle")}
                                                     </h4>
                                                     <button 
                                                         type="button" 
                                                         onClick={() => setShowPasswordForm(false)}
                                                         className="text-slate-400 hover:text-white text-sm font-bold transition-colors"
                                                     >
-                                                        İptal
+                                                        {t("cancel")}
                                                     </button>
                                                 </div>
 
@@ -313,26 +324,26 @@ export default function AccountPage() {
                                                     <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-6 rounded-2xl flex items-center gap-4">
                                                         <CheckCircle size={24} />
                                                         <div>
-                                                            <p className="font-black text-emerald-300">Harika!</p>
-                                                            <p className="text-sm font-medium">Şifreniz başarıyla güncellendi.</p>
+                                                            <p className="font-black text-emerald-300">{t("passwordUpdatedTitle")}</p>
+                                                            <p className="text-sm font-medium">{t("passwordUpdatedDesc")}</p>
                                                         </div>
                                                     </div>
                                                 ) : (
                                                     <div className="space-y-4">
                                                         <div>
-                                                            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Mevcut Şifre</label>
+                                                            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">{t("currentPasswordLabel")}</label>
                                                             <input 
                                                                 type="password" 
                                                                 required
                                                                 value={passwordData.current}
                                                                 onChange={(e) => setPasswordData({...passwordData, current: e.target.value})}
                                                                 className="w-full bg-black/30 border border-white/10 rounded-xl px-5 py-3.5 text-white placeholder-slate-600 focus:outline-none focus:border-[#e6c800] focus:ring-1 focus:ring-[#e6c800] transition-all text-sm"
-                                                                placeholder="Şu anki şifrenizi girin"
+                                                                placeholder={t("currentPasswordPlaceholder")}
                                                             />
                                                         </div>
                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                             <div>
-                                                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Yeni Şifre</label>
+                                                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">{t("newPasswordLabel")}</label>
                                                                 <input 
                                                                     type="password" 
                                                                     required
@@ -340,11 +351,11 @@ export default function AccountPage() {
                                                                     value={passwordData.new}
                                                                     onChange={(e) => setPasswordData({...passwordData, new: e.target.value})}
                                                                     className="w-full bg-black/30 border border-white/10 rounded-xl px-5 py-3.5 text-white placeholder-slate-600 focus:outline-none focus:border-[#e6c800] focus:ring-1 focus:ring-[#e6c800] transition-all text-sm"
-                                                                    placeholder="En az 6 karakter"
+                                                                    placeholder={t("newPasswordPlaceholder")}
                                                                 />
                                                             </div>
                                                             <div>
-                                                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Yeni Şifre (Tekrar)</label>
+                                                                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">{t("confirmPasswordLabel")}</label>
                                                                 <input 
                                                                     type="password" 
                                                                     required
@@ -352,7 +363,7 @@ export default function AccountPage() {
                                                                     value={passwordData.confirm}
                                                                     onChange={(e) => setPasswordData({...passwordData, confirm: e.target.value})}
                                                                     className="w-full bg-black/30 border border-white/10 rounded-xl px-5 py-3.5 text-white placeholder-slate-600 focus:outline-none focus:border-[#e6c800] focus:ring-1 focus:ring-[#e6c800] transition-all text-sm"
-                                                                    placeholder="Şifreyi onaylayın"
+                                                                    placeholder={t("confirmPasswordPlaceholder")}
                                                                 />
                                                             </div>
                                                         </div>
@@ -363,9 +374,9 @@ export default function AccountPage() {
                                                                 className="bg-[#e6c800] hover:bg-[#ffe000] text-slate-900 disabled:opacity-50 disabled:hover:bg-[#e6c800] px-8 py-3.5 rounded-xl font-black text-sm transition-all flex items-center gap-3"
                                                             >
                                                                 {isSubmitting ? (
-                                                                    <><Loader2 size={16} className="animate-spin" /> Güncelleniyor...</>
+                                                                    <><Loader2 size={16} className="animate-spin" /> {t("updating")}</>
                                                                 ) : (
-                                                                    "Şifreyi Güncelle"
+                                                                    t("updatePassword")
                                                                 )}
                                                             </button>
                                                         </div>

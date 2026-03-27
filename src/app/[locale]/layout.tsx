@@ -38,6 +38,23 @@ const linuxLibertine = localFont({
   display: "swap",
 });
 
+const montserrat = localFont({
+  src: [
+    {
+      path: "../../Montserrat/Montserrat-VariableFont_wght.ttf",
+      weight: "100 900",
+      style: "normal",
+    },
+    {
+      path: "../../Montserrat/Montserrat-Italic-VariableFont_wght.ttf",
+      weight: "100 900",
+      style: "italic",
+    },
+  ],
+  variable: "--font-montserrat",
+  display: "swap",
+});
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.zygsoft.com";
 
 export const metadata: Metadata = {
@@ -166,7 +183,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} className="scroll-smooth">
-      <body className={`${linuxLibertine.className} ${linuxLibertine.variable} min-h-screen flex flex-col`}>
+      <body className={`${montserrat.className} ${linuxLibertine.variable} ${montserrat.variable} min-h-screen flex flex-col`}>
         <GoogleTag />
         <script
           type="application/ld+json"

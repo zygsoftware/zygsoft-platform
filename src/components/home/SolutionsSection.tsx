@@ -81,7 +81,7 @@ export function SolutionsSection() {
           <div className="xl:col-span-8">
             <motion.span
               variants={createRevealUp(reducedMotion, 16, 4)}
-              className="inline-flex items-center gap-2 rounded-full border border-black/8 bg-white/70 px-4 py-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#343131]/60 mb-6"
+              className="inline-flex items-center gap-2 rounded-full border border-black/8 bg-white/70 px-4 py-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#343131]/60 mb-6 [font-family:var(--font-button)]"
             >
               {t("tag")}
             </motion.span>
@@ -99,7 +99,7 @@ export function SolutionsSection() {
             className="xl:col-span-4 xl:justify-self-end"
           >
             <div className="rounded-[2rem] border border-black/8 bg-white/85 backdrop-blur p-6 shadow-[0_18px_40px_rgba(0,0,0,0.05)]">
-              <div className="text-[10px] font-black uppercase tracking-[0.22em] text-[#343131]/40 mb-2">
+              <div className="text-[10px] font-black uppercase tracking-[0.22em] text-[#343131]/40 mb-2 [font-family:var(--font-button)]">
                 {lang === "en" ? "What you see here" : "Bu alanda ne var?"}
               </div>
               <p className="text-[#343131] font-medium leading-relaxed">
@@ -138,7 +138,7 @@ export function SolutionsSection() {
                           {serviceIcons[service.slug]}
                         </div>
                         <div>
-                          <div className="text-[10px] font-black uppercase tracking-[0.22em] text-[#343131]/40 mb-1">
+                          <div className="text-[10px] font-black uppercase tracking-[0.22em] text-[#343131]/40 mb-1 [font-family:var(--font-button)]">
                             {service.highlight}
                           </div>
                           <div className="text-sm font-bold text-[#343131]/60">
@@ -162,7 +162,7 @@ export function SolutionsSection() {
                       {service.chips.map((chip) => (
                         <span
                           key={`${service.slug}-${chip.label}`}
-                          className="inline-flex items-center gap-1.5 rounded-full border border-[#343131]/10 bg-[#fcfaf5] px-3 py-1.5 text-[11px] font-bold text-[#343131]/72"
+                          className="inline-flex items-center gap-1.5 rounded-full border border-[#343131]/10 bg-[#fcfaf5] px-3 py-1.5 text-[11px] font-bold text-[#343131]/72 [font-family:var(--font-button)]"
                         >
                           {chip.key ? platformIcons[chip.key] : <span className="w-1.5 h-1.5 rounded-full bg-[#e6c800]" />}
                           {chip.label}
@@ -170,7 +170,7 @@ export function SolutionsSection() {
                       ))}
                     </div>
 
-                    <div className="mt-auto flex items-center text-sm font-black uppercase tracking-[0.18em] text-[#343131] group-hover:text-[#c9ad00] transition-colors">
+                    <div className="mt-auto flex items-center text-sm font-black uppercase tracking-[0.18em] text-[#343131] [font-family:var(--font-button)] group-hover:text-[#c9ad00] transition-colors">
                       {lang === "en" ? "Explore details" : "Detaylı incele"}
                       <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                     </div>
@@ -190,7 +190,7 @@ export function SolutionsSection() {
         >
           <Link
             href="/services"
-            className="group inline-flex items-center gap-3 font-black text-sm uppercase tracking-[0.2em] text-[#343131] hover:text-[#e6c800] transition-colors"
+            className="group inline-flex items-center gap-3 font-black text-sm uppercase tracking-[0.2em] text-[#343131] [font-family:var(--font-button)] hover:text-[#e6c800] transition-colors"
           >
             {t("viewAll")}
             <div className="w-12 h-px bg-[#343131] group-hover:bg-[#e6c800] group-hover:w-16 transition-all duration-300" />

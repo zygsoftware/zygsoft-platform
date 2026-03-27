@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, FolderKanban, Network, LogOut, BookOpen, Users, ChevronRight, Receipt, Package, MessageSquare, LifeBuoy, BarChart3, Newspaper } from "lucide-react";
@@ -52,7 +53,7 @@ export function AdminSidebar({ className = "", onNavigate }: AdminSidebarProps) 
             {/* Logo */}
             <div className="px-6 py-8 border-b border-slate-200/60">
                 <Link href="/admin/dashboard" className="flex items-center gap-3 group" onClick={onNavigate}>
-                    <img
+                    <Image
                         src="/brand/ZYG_Logo_SQR.png"
                         alt="ZYGSOFT"
                         className="w-10 h-10 shrink-0"
@@ -60,7 +61,13 @@ export function AdminSidebar({ className = "", onNavigate }: AdminSidebarProps) 
                         height={40}
                     />
                     <div>
-                        <span className="text-sm font-bold text-slate-900 block tracking-tight">Zygsoft</span>
+                        <Image
+                            src="/brand/ZYGLogo.png"
+                            alt="ZYGSOFT"
+                            className="h-5 w-auto"
+                            width={112}
+                            height={20}
+                        />
                         <span className="text-xs font-medium text-slate-500 uppercase tracking-widest">Admin Panel</span>
                     </div>
                 </Link>

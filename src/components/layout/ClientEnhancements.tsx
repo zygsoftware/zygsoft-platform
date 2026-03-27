@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 
 const FloatingWhatsApp = dynamic(
   () => import("@/components/layout/FloatingWhatsApp").then((mod) => mod.FloatingWhatsApp),
@@ -20,13 +21,24 @@ const CookieConsentBanner = dynamic(
 );
 
 export function ClientEnhancements({ locale }: { locale: string }) {
+  const pathname = usePathname();
+  const normalizedPath = pathname?.replace(/^\/en/, "") || "/";
+  const isHomepage = normalizedPath === "/";
+  const isAuthRoute =
+    normalizedPath === "/login" ||
+    normalizedPath === "/register" ||
+    normalizedPath === "/forgot-password" ||
+    normalizedPath === "/reset-password" ||
+    normalizedPath === "/verify-email" ||
+    normalizedPath === "/verify-email-required" ||
+    normalizedPath === "/admin/login";
+
   return (
     <>
-      <CustomCursor />
-      <Preloader />
-      <FloatingWhatsApp />
-      <CookieConsentBanner locale={locale} />
+      {!isAuthRoute && !isHomepage && <CustomCursor />}
+      {!isAuthRoute && !isHomepage && <Preloader />}
+      {!isAuthRoute && <FloatingWhatsApp />}
+      {!isAuthRoute && <CookieConsentBanner locale={locale} />}
     </>
   );
 }
-

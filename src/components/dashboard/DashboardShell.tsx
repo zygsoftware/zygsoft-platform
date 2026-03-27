@@ -8,11 +8,20 @@ import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { Breadcrumbs } from "@/components/dashboard/Breadcrumbs";
 import { EmailVerificationBanner } from "@/components/dashboard/EmailVerificationBanner";
 import { TrialConversionBanner } from "@/components/dashboard/TrialConversionBanner";
+import { useTranslations } from "next-intl";
+
+type DashboardShellUser = {
+    emailVerified?: boolean | Date | null;
+    role?: string | null;
+    trialStatus?: string;
+    activeProductSlugs?: string[];
+};
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession();
     const router = useRouter();
-    const user = session?.user as any;
+    const t = useTranslations("Dashboard.shared.shell");
+    const user = session?.user as (typeof session.user & DashboardShellUser) | undefined;
     const [mobileOpen, setMobileOpen] = useState(false);
 
     useEffect(() => {
@@ -60,14 +69,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                             type="button"
                             onClick={() => setMobileOpen((prev) => !prev)}
                             className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-50"
-                            aria-label={mobileOpen ? "Menüyü kapat" : "Menüyü aç"}
+                            aria-label={mobileOpen ? t("menuClose") : t("menuOpen")}
                             aria-expanded={mobileOpen}
                         >
                             {mobileOpen ? <X size={18} /> : <Menu size={18} />}
                         </button>
                         <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-black tracking-tight text-slate-950">ZYGSOFT Panel</p>
-                            <p className="truncate text-xs font-medium text-slate-400">Hesabiniz ve hukuk araclari</p>
+                            <p className="truncate text-sm font-black tracking-tight text-slate-950">{t("panelTitle")}</p>
+                            <p className="truncate text-xs font-medium text-slate-400">{t("panelSubtitle")}</p>
                         </div>
                     </div>
                 </div>

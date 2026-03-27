@@ -6,7 +6,6 @@ import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
-const DarkVeil = dynamic(() => import("@/components/effects/DarkVeil"), { ssr: false });
 const HeroOrbitNetwork = dynamic(
   () => import("@/components/home/HeroOrbitNetwork").then((mod) => mod.HeroOrbitNetwork),
   { ssr: false },
@@ -15,6 +14,7 @@ const HeroOrbitNetwork = dynamic(
 export function HeroSection() {
   const t = useTranslations("Homepage.hero");
   const [showEnhancedVisuals, setShowEnhancedVisuals] = useState(false);
+  const [orbitFocus, setOrbitFocus] = useState<"products" | "portfolio" | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -22,9 +22,19 @@ export function HeroSection() {
     const updateVisualMode = () => {
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+      const isLargeDesktop = window.matchMedia("(min-width: 1440px)").matches;
       const prefersTouch = window.matchMedia("(pointer: coarse)").matches;
+      const deviceMemory = "deviceMemory" in navigator ? (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4 : 4;
+      const cpuCores = navigator.hardwareConcurrency ?? 4;
+      const isHighPerformanceDevice = deviceMemory >= 8 && cpuCores >= 8;
 
-      setShowEnhancedVisuals(isDesktop && !prefersReducedMotion && !prefersTouch);
+      setShowEnhancedVisuals(
+        isDesktop &&
+        isLargeDesktop &&
+        isHighPerformanceDevice &&
+        !prefersReducedMotion &&
+        !prefersTouch
+      );
     };
 
     const frameId = window.requestAnimationFrame(updateVisualMode);
@@ -41,27 +51,6 @@ export function HeroSection() {
       className="relative flex min-h-[100vh] flex-col overflow-hidden bg-[#ffffff]"
       aria-label="Hero"
     >
-      {/* DarkVeil: tam ekran, çok düşük opaklık — gri yok, hafif sarı doku */}
-      {showEnhancedVisuals ? (
-        <div
-          className="pointer-events-none absolute inset-0 z-[2]"
-          style={{
-            mixBlendMode: "multiply",
-            opacity: 0.32,
-            filter: "invert(1) sepia(1) saturate(3) brightness(2.5)",
-          }}
-        >
-          <DarkVeil
-            hueShift={198}
-            noiseIntensity={0}
-            scanlineIntensity={0}
-            speed={1.1}
-            scanlineFrequency={0.5}
-            warpAmount={2.35}
-          />
-        </div>
-      ) : null}
-
       {/* Main content */}
       <div className="relative z-10 flex min-h-0 flex-1 flex-col justify-center px-6 pb-16 pt-20 lg:min-h-[100vh] lg:px-12 lg:pb-24 lg:pt-28 xl:px-16 2xl:px-24">
         <div className="max-w-[40rem]">
@@ -84,7 +73,11 @@ export function HeroSection() {
           <div className="flex flex-col items-start gap-5 sm:flex-row sm:gap-6">
             <Link
               href="/dijital-urunler/hukuk-araclari-paketi"
-              className="group inline-flex items-center gap-2.5 rounded-2xl bg-[#e6c800] px-9 py-4.5 text-[11px] font-black uppercase tracking-[0.22em] text-[#343131] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.02] hover:bg-[#d4b800] active:scale-[0.98]"
+              onMouseEnter={() => setOrbitFocus("products")}
+              onMouseLeave={() => setOrbitFocus(null)}
+              onFocus={() => setOrbitFocus("products")}
+              onBlur={() => setOrbitFocus(null)}
+              className="font-button-force group inline-flex items-center gap-2.5 rounded-2xl bg-[#e6c800] px-9 py-4.5 text-[11px] font-black uppercase tracking-[0.22em] !text-[#343131] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.02] hover:bg-[#d4b800] active:scale-[0.98]"
             >
               {t("ctaPrimary")}
               <ArrowRight
@@ -95,14 +88,18 @@ export function HeroSection() {
 
             <Link
               href="/portfolio"
-              className="group relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-2xl border-2 border-[#343131] px-9 py-4.5 text-[11px] font-black uppercase tracking-[0.22em] text-[#343131] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:text-white active:scale-[0.98]"
+              onMouseEnter={() => setOrbitFocus("portfolio")}
+              onMouseLeave={() => setOrbitFocus(null)}
+              onFocus={() => setOrbitFocus("portfolio")}
+              onBlur={() => setOrbitFocus(null)}
+              className="font-button-force group relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-2xl border-2 border-[#343131] bg-white px-9 py-4.5 text-[11px] font-black uppercase tracking-[0.22em] !text-[#343131] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:!text-white active:scale-[0.98]"
             >
               <span className="absolute inset-0 -translate-x-full bg-[#343131] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-0" />
-              <span className="relative z-10 flex items-center gap-2.5">
+              <span className="relative z-10 flex items-center gap-2.5 text-inherit transition-colors duration-300 group-hover:!text-white">
                 {t("ctaSecondary")}
                 <ArrowRight
                   size={15}
-                  className="transition-transform duration-300 group-hover:translate-x-1"
+                  className="transition-transform duration-300 group-hover:translate-x-1 group-hover:!text-white"
                 />
               </span>
             </Link>
@@ -113,7 +110,7 @@ export function HeroSection() {
       {/* Sağ: orbital solar sistem */}
       {showEnhancedVisuals ? (
         <div className="absolute inset-y-0 right-0 z-20 hidden w-[58%] lg:block">
-          <HeroOrbitNetwork />
+          <HeroOrbitNetwork focusGroup={orbitFocus} />
         </div>
       ) : null}
 

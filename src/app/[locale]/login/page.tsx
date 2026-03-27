@@ -30,6 +30,9 @@ function LoginPageContent() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [verificationEmail, setVerificationEmail] = useState("");
+    const [verificationSending, setVerificationSending] = useState(false);
+    const [verificationSent, setVerificationSent] = useState(false);
     const [resetSuccess, setResetSuccess] = useState(false);
     const router = useRouter();
 
@@ -42,10 +45,54 @@ function LoginPageContent() {
     const registered = searchParams.get("registered") === "true";
     const verified = searchParams.get("verified") === "success";
 
+    const handleResendVerification = async () => {
+        if (!verificationEmail) return;
+
+        setVerificationSending(true);
+        setVerificationSent(false);
+        try {
+            const res = await fetch("/api/auth/send-verification-email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    locale,
+                    email: verificationEmail,
+                }),
+            });
+
+            if (res.ok) {
+                setVerificationSent(true);
+            }
+        } finally {
+            setVerificationSending(false);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError("");
+        setVerificationEmail("");
+        setVerificationSent(false);
+
+        const precheck = await fetch("/api/auth/login-precheck", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+        });
+
+        if (!precheck.ok) {
+            const data = await precheck.json().catch(() => ({}));
+            if (data?.error === "EMAIL_NOT_VERIFIED") {
+                setVerificationEmail(email.trim().toLowerCase());
+                setError(t("errorVerifyRequired"));
+            } else {
+                setError(t("errorInvalid"));
+            }
+            setLoading(false);
+            return;
+        }
+
         const result = await signIn("credentials", { email, password, redirect: false });
         if (!result?.ok) {
             setError(t("errorInvalid"));
@@ -121,7 +168,26 @@ function LoginPageContent() {
                             exit={{ opacity: 0, height: 0 }}
                             className="mb-6 overflow-hidden"
                         >
-                            <AuthStatus type="error">{error}</AuthStatus>
+                            <div className="space-y-3">
+                                <AuthStatus type="error">{error}</AuthStatus>
+                                {verificationEmail ? (
+                                    <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+                                        <button
+                                            type="button"
+                                            onClick={handleResendVerification}
+                                            disabled={verificationSending}
+                                            className="w-full rounded-xl bg-[#e6c800] px-4 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-[#343131] transition-colors hover:bg-[#d4b800] disabled:opacity-70"
+                                        >
+                                            {verificationSending ? t("sendingVerification") : t("resendVerification")}
+                                        </button>
+                                        {verificationSent ? (
+                                            <p className="mt-3 text-center text-sm font-medium text-emerald-700">
+                                                {t("verificationSent")}
+                                            </p>
+                                        ) : null}
+                                    </div>
+                                ) : null}
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>

@@ -61,7 +61,7 @@ export function ContactSection({ title, subtitle }: ContactSectionProps) {
               className="h-full min-h-[420px] rounded-[2rem] border border-[#343131]/10 bg-[#f7f4ee] p-6 md:p-8"
             >
               <div className="flex h-full flex-col">
-                <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#343131]/10 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#343131]/60">
+                <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#343131]/10 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-[0.3em] text-[#343131]/60 [font-family:var(--font-button)]">
                   <Zap size={12} className="text-[#e6c800]" />
                   {t("eyebrow")}
                 </span>
@@ -85,7 +85,7 @@ export function ContactSection({ title, subtitle }: ContactSectionProps) {
                     >
                       <Icon size={18} className="text-[#c9ad00] shrink-0" />
                       <div>
-                        <p className="text-[#1a1715] font-black text-sm">{label}</p>
+                        <p className="text-[#1a1715] font-black text-sm [font-family:var(--font-button)]">{label}</p>
                         <p className="text-[#343131]/50 text-[11px]">{sub}</p>
                       </div>
                     </div>
@@ -103,7 +103,7 @@ export function ContactSection({ title, subtitle }: ContactSectionProps) {
                           {stage.index}
                         </div>
                         <div>
-                          <p className="text-sm font-black uppercase tracking-[0.16em] text-[#1a1715]">
+                          <p className="text-sm font-black uppercase tracking-[0.16em] text-[#1a1715] [font-family:var(--font-button)]">
                             {stage.title}
                           </p>
                           <p className="mt-1 text-sm leading-6 text-[#343131]/62">
@@ -118,7 +118,7 @@ export function ContactSection({ title, subtitle }: ContactSectionProps) {
                 <div className="mt-auto pt-8">
                   <Link
                     href="/contact"
-                    className="group inline-flex items-center gap-2 text-[13px] font-bold text-[#343131] hover:text-[#c9ad00] transition-colors"
+                    className="group inline-flex items-center gap-2 text-[13px] font-bold text-[#343131] [font-family:var(--font-button)] hover:text-[#c9ad00] transition-colors"
                   >
                     {t("cta")}
                     <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />

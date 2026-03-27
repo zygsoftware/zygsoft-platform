@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { AdminSidebar } from "@/components/admin/Sidebar";
 
@@ -31,7 +32,13 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                             {mobileOpen ? <X size={18} /> : <Menu size={18} />}
                         </button>
                         <div className="flex flex-col gap-0.5 min-w-0">
-                            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold leading-none">ZYGSOFT</p>
+                            <Image
+                                src="/brand/ZYGLogo.png"
+                                alt="ZYGSOFT"
+                                className="h-4 w-auto"
+                                width={90}
+                                height={16}
+                            />
                             <h2 className="text-sm font-bold text-slate-900 tracking-tight leading-tight truncate">Yönetim Paneli</h2>
                         </div>
                     </div>

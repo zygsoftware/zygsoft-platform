@@ -8,7 +8,6 @@ import {
     Loader2,
     Download,
     Trash2,
-    CheckCircle2,
     Zap,
     FileText,
     Layers,
@@ -18,24 +17,13 @@ import {
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ToolPageHint } from "@/components/dashboard/ToolPageHint";
 import { ToolLockedGate } from "@/components/dashboard/ToolLockedGate";
 import { hasToolAccess } from "@/lib/trial-access-client";
 import { ConversionResultPanel } from "@/components/dashboard/ConversionResultPanel";
 
 export type BatchToolType = "doc-to-udf" | "image-to-pdf" | "tiff-to-pdf" | "ocr-text";
-
-const TOOL_OPTIONS: { value: BatchToolType; label: string; accept: string; icon: React.ReactNode }[] = [
-    { value: "doc-to-udf", label: "DOCX → UDF", accept: ".docx", icon: <FileText size={20} /> },
-    { value: "image-to-pdf", label: "Görsel → PDF", accept: ".jpg,.jpeg,.png,image/jpeg,image/png", icon: <FileImage size={20} /> },
-    { value: "tiff-to-pdf", label: "TIFF → PDF", accept: ".tif,.tiff,image/tiff", icon: <Layers size={20} /> },
-    { value: "ocr-text", label: "OCR Metin Çıkarma", accept: ".pdf,.png,.jpg,.jpeg,.tif,.tiff,image/tiff,application/pdf", icon: <ScanText size={20} /> },
-];
-
-function getAcceptForTool(tool: BatchToolType): string {
-    return TOOL_OPTIONS.find((o) => o.value === tool)?.accept || "";
-}
 
 function isValidForTool(file: File, tool: BatchToolType): boolean {
     const ext = "." + (file.name.split(".").pop()?.toLowerCase() ?? "");
@@ -51,8 +39,17 @@ function isValidForTool(file: File, tool: BatchToolType): boolean {
 export default function BatchConvertTool() {
     const t = useTranslations("Dashboard.overview.tools");
     const tBatch = useTranslations("Dashboard.overview.tools.batchConvert");
+    const locale = useLocale();
+    const isTr = locale === "tr";
     const { data: session } = useSession();
-    const hasSubscription = session?.user && hasToolAccess(session.user as any);
+    const hasSubscription = session?.user && hasToolAccess(session.user as Parameters<typeof hasToolAccess>[0]);
+    const toolOptions: { value: BatchToolType; label: string; accept: string; icon: React.ReactNode }[] = [
+        { value: "doc-to-udf", label: "DOCX → UDF", accept: ".docx", icon: <FileText size={20} /> },
+        { value: "image-to-pdf", label: isTr ? "Görsel → PDF" : "Image → PDF", accept: ".jpg,.jpeg,.png,image/jpeg,image/png", icon: <FileImage size={20} /> },
+        { value: "tiff-to-pdf", label: "TIFF → PDF", accept: ".tif,.tiff,image/tiff", icon: <Layers size={20} /> },
+        { value: "ocr-text", label: isTr ? "OCR Metin Çıkarma" : "OCR Text Extraction", accept: ".pdf,.png,.jpg,.jpeg,.tif,.tiff,image/tiff,application/pdf", icon: <ScanText size={20} /> },
+    ];
+    const getAcceptForTool = (tool: BatchToolType) => toolOptions.find((o) => o.value === tool)?.accept || "";
 
     const [files, setFiles] = useState<{ id: string; file: File }[]>([]);
     const [toolType, setToolType] = useState<BatchToolType>("doc-to-udf");
@@ -138,8 +135,8 @@ export default function BatchConvertTool() {
             setResultUrl(url);
             setResultBlob(blob);
             setConversionTimeMs(Date.now() - start);
-        } catch (err: any) {
-            setError(err.message || tBatch("errorGeneric"));
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : tBatch("errorGeneric"));
         } finally {
             setLoading(false);
         }
@@ -157,9 +154,9 @@ export default function BatchConvertTool() {
     const getConversionTypeLabel = () => {
         const labels: Record<BatchToolType, string> = {
             "doc-to-udf": "DOCX → UDF",
-            "image-to-pdf": "Image → PDF",
+            "image-to-pdf": isTr ? "Görsel → PDF" : "Image → PDF",
             "tiff-to-pdf": "TIFF → PDF",
-            "ocr-text": "OCR",
+            "ocr-text": isTr ? "OCR Metin Çıkarma" : "OCR Text Extraction",
         };
         return labels[toolType];
     };
@@ -224,7 +221,7 @@ export default function BatchConvertTool() {
                         <div className="glass rounded-3xl border border-slate-200 p-6">
                             <label className="block text-sm font-bold text-[#0e0e0e] mb-3">{tBatch("toolSelectorLabel")}</label>
                             <div className="space-y-2">
-                                {TOOL_OPTIONS.map((opt) => (
+                                {toolOptions.map((opt) => (
                                     <button
                                         key={opt.value}
                                         type="button"

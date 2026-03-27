@@ -4,20 +4,18 @@ import { useState } from "react";
 import { motion, Reorder, AnimatePresence } from "framer-motion";
 import {
     UploadCloud,
-    Layers,
     ArrowLeft,
     Loader2,
     Download,
     Trash2,
     GripVertical,
-    CheckCircle2,
     Zap,
     Files,
     FileText
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useSession } from "next-auth/react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ToolPageHint } from "@/components/dashboard/ToolPageHint";
 import { ToolLockedGate } from "@/components/dashboard/ToolLockedGate";
 import { hasToolAccess } from "@/lib/trial-access-client";
@@ -25,11 +23,15 @@ import { ConversionResultPanel } from "@/components/dashboard/ConversionResultPa
 import { PdfPreview } from "@/components/dashboard/PdfPreview";
 import { getPdfPageCount } from "@/lib/pdf-utils";
 
+type ToolAccessUser = Parameters<typeof hasToolAccess>[0];
+
 export default function PdfMergeTool() {
     const t = useTranslations("Dashboard.overview.tools");
     const tPdf = useTranslations("Dashboard.overview.tools.pdfMerge");
+    const locale = useLocale();
+    const isTr = locale === "tr";
     const { data: session } = useSession();
-    const hasSubscription = session?.user && hasToolAccess(session.user as any);
+    const hasSubscription = session?.user && hasToolAccess(session.user as ToolAccessUser);
     const [files, setFiles] = useState<{ id: string; file: File }[]>([]);
     const [isDragging, setIsDragging] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -86,6 +88,13 @@ export default function PdfMergeTool() {
         if (files.length < 2) return;
         setLoading(true);
         const start = Date.now();
+        const copy = {
+            serviceError: isTr
+                ? "Dönüştürme servisi şu an devre dışı. Lütfen destek ile iletişime geçin."
+                : "Conversion service is currently unavailable. Please contact support.",
+            mergeFailed: isTr ? "Birleştirme başarısız oldu." : "Merge failed.",
+            genericError: isTr ? "Bir hata oluştu." : "An error occurred.",
+        };
 
         try {
             const formData = new FormData();
@@ -97,12 +106,12 @@ export default function PdfMergeTool() {
                 method: "POST",
                 body: formData
             }).catch(() => {
-                throw new Error("Dönüştürme servisi şu an devre dışı. Lütfen destek ile iletişime geçin.");
+                throw new Error(copy.serviceError);
             });
 
             if (!res.ok) {
                 const errorData = await res.json().catch(() => ({}));
-                throw new Error(errorData.error || "Birleştirme başarısız oldu.");
+                throw new Error(errorData.error || copy.mergeFailed);
             }
 
             const blob = await res.blob();
@@ -112,12 +121,24 @@ export default function PdfMergeTool() {
             setConversionTimeMs(Date.now() - start);
             const count = await getPdfPageCount(blob);
             setPageCount(count);
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err);
-            alert(err.message || "Bir hata oluştu.");
+            alert(err instanceof Error ? err.message : copy.genericError);
         } finally {
             setLoading(false);
         }
+    };
+
+    const copy = {
+        title: isTr ? "PDF Birleştirici" : "PDF Merger",
+        description: isTr
+            ? "Birden fazla PDF belgesini tek bir dosyada birleştirin ve sıralamayı dilediğiniz gibi özelleştirin."
+            : "Merge multiple PDF documents into a single file and customize the order however you like.",
+        uploadTitle: isTr ? "PDF Ekleyin" : "Add PDF Files",
+        fileList: isTr ? "Dosya Listesi" : "File List",
+        mergeButton: isTr ? "Dosyaları Birleştir" : "Merge Files",
+        emptyQueue: isTr ? "Kuyruk Boş" : "Queue Empty",
+        conversionType: isTr ? "PDF Birleştirme" : "PDF Merge",
     };
 
     if (!hasSubscription && session?.user) {
@@ -143,9 +164,9 @@ export default function PdfMergeTool() {
                 <div className="mb-12">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div>
-                            <h1 className="text-4xl font-display font-black text-[#0e0e0e] mb-3">PDF Birleştirici</h1>
+                            <h1 className="text-4xl font-display font-black text-[#0e0e0e] mb-3">{copy.title}</h1>
                             <p className="text-[#666] font-medium text-lg max-w-2xl">
-                                Birden fazla PDF belgesini tek bir dosyada birleştirin ve sıralamayı dilediğiniz gibi özelleştirin.
+                                {copy.description}
                             </p>
                         </div>
                     </div>
@@ -179,7 +200,7 @@ export default function PdfMergeTool() {
                             <div className="w-16 h-16 bg-[#0e0e0e] rounded-2xl flex items-center justify-center text-[#e6c800] mb-6 shadow-xl">
                                 <UploadCloud size={28} />
                             </div>
-                            <h3 className="text-xl font-display font-bold text-[#0e0e0e] mb-2">PDF Ekleyin</h3>
+                            <h3 className="text-xl font-display font-bold text-[#0e0e0e] mb-2">{copy.uploadTitle}</h3>
                             <p className="text-[#888] text-sm font-medium leading-relaxed">
                                 {tPdf("uploadHint")}
                             </p>
@@ -193,7 +214,7 @@ export default function PdfMergeTool() {
                                     <div className="flex items-center justify-between mb-8">
                                         <h3 className="text-xl font-display font-bold text-[#0e0e0e] flex items-center gap-3">
                                             <Files size={20} className="text-[#e6c800]" />
-                                            Dosya Listesi ({files.length})
+                                            {copy.fileList} ({files.length})
                                         </h3>
                                         {files.length > 1 && (
                                             <button
@@ -202,7 +223,7 @@ export default function PdfMergeTool() {
                                                 className="bg-[#0e0e0e] text-white px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-black disabled:opacity-50 transition-all flex items-center gap-2"
                                             >
                                                 {loading ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} fill="white" />}
-                                                Dosyaları Birleştir
+                                                {copy.mergeButton}
                                             </button>
                                         )}
                                     </div>
@@ -211,7 +232,7 @@ export default function PdfMergeTool() {
                                         {files.length === 0 ? (
                                             <div className="flex flex-col items-center justify-center py-20 text-[#888]">
                                                 <FileText size={48} className="opacity-10 mb-4" />
-                                                <p className="text-sm font-bold uppercase tracking-widest opacity-40">Kuyruk Boş</p>
+                                                <p className="text-sm font-bold uppercase tracking-widest opacity-40">{copy.emptyQueue}</p>
                                             </div>
                                         ) : (
                                             <Reorder.Group axis="y" values={files} onReorder={setFiles} className="space-y-3">
@@ -244,7 +265,7 @@ export default function PdfMergeTool() {
                                     <ConversionResultPanel
                                         filename="zygsoft_merged.pdf"
                                         fileSize={resultBlob.size}
-                                        conversionType="PDF Merge"
+                                        conversionType={copy.conversionType}
                                         conversionTimeMs={conversionTimeMs ?? undefined}
                                         pageCount={pageCount ?? undefined}
                                         pageCountLabel={pageCount === 1 ? t("resultPanel.pageCountOne") : t("resultPanel.pageCount")}

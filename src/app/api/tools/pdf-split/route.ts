@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { PDFDocument } from "pdf-lib";
+import JSZip from "jszip";
 import { prisma } from "@/lib/prisma";
 import { checkToolAccess, incrementTrialUsage } from "@/lib/trial-guard";
 import { formatMbLimit, getToolMaxFileBytes } from "@/lib/tool-policy";
 
 export const dynamic = "force-dynamic";
+
+type SplitMode = "range" | "chunks";
 
 /* ── Limits ─────────────────────────────────────────────────────── */
 // Limits will be determined dynamically
@@ -83,6 +84,28 @@ function parsePageRange(
     return { indices: unique };
 }
 
+function parseChunkSize(input: string): { chunkSize: number } | { error: string } {
+    const trimmed = input.trim();
+    if (!trimmed) {
+        return { error: "Parça sayfa adedi boş bırakılamaz." };
+    }
+
+    const chunkSize = Number.parseInt(trimmed, 10);
+    if (!Number.isFinite(chunkSize) || Number.isNaN(chunkSize)) {
+        return { error: "Parça sayfa adedi bir tam sayı olmalıdır." };
+    }
+    if (chunkSize < 1) {
+        return { error: "Parça sayfa adedi 1'den küçük olamaz." };
+    }
+
+    return { chunkSize };
+}
+
+function getSafeBaseName(filename: string) {
+    const withoutExt = filename.replace(/\.pdf$/i, "");
+    return withoutExt.replace(/[^a-z0-9-_]+/gi, "_").replace(/^_+|_+$/g, "") || "split";
+}
+
 /* ── Route handler ──────────────────────────────────────────────── */
 export async function POST(req: Request) {
     try {
@@ -90,8 +113,6 @@ export async function POST(req: Request) {
         if (!guard.allowed) return guard.response;
 
         const hasPaidAccess = !guard.incrementTrial;
-
-        const session = await getServerSession(authOptions);
 
         /* Parse multipart */
         let formData: FormData;
@@ -102,14 +123,22 @@ export async function POST(req: Request) {
         }
 
         const file = formData.get("file");
+        const splitModeValue = formData.get("splitMode");
         const pageRange = formData.get("pageRange");
+        const chunkSizeValue = formData.get("chunkSize");
 
         if (!file || !(file instanceof File) || file.size === 0) {
             return NextResponse.json({ error: "Lütfen bir PDF dosyası yükleyin." }, { status: 400 });
         }
 
-        if (!pageRange || typeof pageRange !== "string") {
+        const splitMode: SplitMode = splitModeValue === "chunks" ? "chunks" : "range";
+
+        if (splitMode === "range" && (!pageRange || typeof pageRange !== "string")) {
             return NextResponse.json({ error: "Sayfa aralığı belirtilmedi." }, { status: 400 });
+        }
+
+        if (splitMode === "chunks" && (!chunkSizeValue || typeof chunkSizeValue !== "string")) {
+            return NextResponse.json({ error: "Parça sayfa adedi belirtilmedi." }, { status: 400 });
         }
 
         const isPdf =
@@ -150,6 +179,53 @@ export async function POST(req: Request) {
             );
         }
 
+        if (splitMode === "chunks") {
+            const parsedChunk = parseChunkSize(chunkSizeValue);
+            if ("error" in parsedChunk) {
+                return NextResponse.json({ error: parsedChunk.error }, { status: 400 });
+            }
+
+            const { chunkSize } = parsedChunk;
+            const zip = new JSZip();
+            const baseName = getSafeBaseName(file.name);
+            let fileCount = 0;
+
+            for (let start = 0; start < pageCount; start += chunkSize) {
+                const end = Math.min(start + chunkSize, pageCount);
+                const indices = Array.from({ length: end - start }, (_, i) => start + i);
+                const outDoc = await PDFDocument.create();
+                const copiedPages = await outDoc.copyPages(srcDoc, indices);
+                copiedPages.forEach((page) => outDoc.addPage(page));
+
+                const chunkBytes = await outDoc.save();
+                fileCount += 1;
+                const partLabel = String(fileCount).padStart(3, "0");
+                zip.file(`${baseName}_part_${partLabel}.pdf`, chunkBytes, { binary: true });
+            }
+
+            const zipBytes = await zip.generateAsync({
+                type: "uint8array",
+                compression: "STORE",
+            });
+
+            const userId = guard.userId;
+            prisma.toolUsage.create({ data: { userId, toolSlug: "pdf-split" } }).catch(() => {});
+            if (guard.incrementTrial && guard.userId) {
+                incrementTrialUsage(guard.userId).catch(() => {});
+            }
+
+            return new NextResponse(Buffer.from(zipBytes), {
+                status: 200,
+                headers: {
+                    "Content-Type": "application/zip",
+                    "Content-Disposition": `attachment; filename="${getSafeBaseName(file.name)}_split.zip"`,
+                    "Cache-Control": "no-store",
+                    "X-Zygsoft-File-Count": String(fileCount),
+                    "X-Zygsoft-Page-Count": String(pageCount),
+                },
+            });
+        }
+
         const parsed = parsePageRange(pageRange, pageCount);
         if ("error" in parsed) {
             return NextResponse.json({ error: parsed.error }, { status: 400 });
@@ -176,6 +252,8 @@ export async function POST(req: Request) {
                 "Content-Type":        "application/pdf",
                 "Content-Disposition": 'attachment; filename="zygsoft_split.pdf"',
                 "Cache-Control":       "no-store",
+                "X-Zygsoft-File-Count": "1",
+                "X-Zygsoft-Page-Count": String(indices.length),
             },
         });
     } catch (err) {

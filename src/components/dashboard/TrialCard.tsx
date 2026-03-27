@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Zap, Loader2, ShoppingCart } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { pushDataLayerEvent, pushTrialStartEvent } from "@/lib/analytics";
+import { useTranslations } from "next-intl";
 
 type TrialCardProps = {
     trialStatus: string;
@@ -13,16 +14,16 @@ type TrialCardProps = {
     hasSubscription: boolean;
 };
 
-function formatTimeLeft(endsAt: string | null): string {
+function formatTimeLeft(endsAt: string | null, t: ReturnType<typeof useTranslations<"Dashboard.shared.trial">>): string {
     if (!endsAt) return "";
     const end = new Date(endsAt);
     const now = new Date();
     const diff = end.getTime() - now.getTime();
-    if (diff <= 0) return "0 saat";
+    if (diff <= 0) return t("zeroHours");
     const days = Math.floor(diff / (24 * 60 * 60 * 1000));
     const hours = Math.floor((diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
-    if (days > 0) return `${days} gün ${hours} saat kaldı`;
-    return `${hours} saat kaldı`;
+    if (days > 0) return t("daysHoursLeft", { days, hours });
+    return t("hoursMinutesLeft", { hours, minutes: 0 });
 }
 
 export function TrialCard({
@@ -32,6 +33,8 @@ export function TrialCard({
     trialOperationsLimit,
     hasSubscription,
 }: TrialCardProps) {
+    const t = useTranslations("Dashboard.shared.trial");
+    const tCommon = useTranslations("Dashboard.shared.onboarding");
     const [starting, setStarting] = useState(false);
 
     if (hasSubscription) return null;
@@ -54,10 +57,10 @@ export function TrialCard({
                 });
                 window.location.reload();
             } else {
-                alert(data.error || "Bir hata oluştu.");
+                alert(data.error || tCommon("genericError"));
             }
         } catch {
-            alert("Bağlantı hatası.");
+            alert(tCommon("connectionError"));
         } finally {
             setStarting(false);
         }
@@ -72,9 +75,9 @@ export function TrialCard({
                             <Zap size={24} />
                         </div>
                         <div>
-                            <h3 className="font-black text-slate-950 text-lg">3 Günlük Ücretsiz Demo</h3>
+                            <h3 className="font-black text-slate-950 text-lg">{t("availableTitle")}</h3>
                             <p className="text-slate-600 text-sm mt-0.5">
-                                20 işlem hakkı ile tüm belge araçlarını deneyin.
+                                {t("availableDesc")}
                             </p>
                         </div>
                     </div>
@@ -86,10 +89,10 @@ export function TrialCard({
                         {starting ? (
                             <>
                                 <Loader2 size={18} className="animate-spin" />
-                                Başlatılıyor...
+                                {t("starting")}
                             </>
                         ) : (
-                            "Demo Başlat"
+                            t("start")
                         )}
                     </button>
                 </div>
@@ -112,15 +115,15 @@ export function TrialCard({
                         <Zap size={24} />
                     </div>
                     <div>
-                        <h3 className="font-black text-slate-950 text-lg">Demo süreniz aktif</h3>
-                        <p className="text-slate-600 text-sm mt-0.5">{formatTimeLeft(trialEndsAt)}</p>
+                        <h3 className="font-black text-slate-950 text-lg">{t("activeTitle")}</h3>
+                        <p className="text-slate-600 text-sm mt-0.5">{formatTimeLeft(trialEndsAt, t)}</p>
                     </div>
                 </div>
                 <div className="space-y-3">
                     <div>
                         <div className="flex justify-between text-xs font-bold text-slate-600 mb-1">
-                            <span>Süre</span>
-                            <span>{Math.round(timeRemainingPct)}% kaldı</span>
+                            <span>{t("timeLabel")}</span>
+                            <span>{t("timeRemainingPct", { percent: Math.round(timeRemainingPct) })}</span>
                         </div>
                         <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
                             <div
@@ -131,7 +134,7 @@ export function TrialCard({
                     </div>
                     <div>
                         <div className="flex justify-between text-xs font-bold text-slate-600 mb-1">
-                            <span>İşlem kullanımı</span>
+                            <span>{t("usageLabel")}</span>
                             <span>{trialOperationsUsed} / {trialOperationsLimit}</span>
                         </div>
                         <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
@@ -155,9 +158,9 @@ export function TrialCard({
                             <Zap size={24} />
                         </div>
                         <div>
-                            <h3 className="font-black text-slate-950 text-lg">Demo süreniz sona erdi</h3>
+                            <h3 className="font-black text-slate-950 text-lg">{t("expiredTitle")}</h3>
                             <p className="text-slate-600 text-sm mt-0.5">
-                                Tam erişim için Hukuk Araçları Paketini satın alın.
+                                {t("expiredDesc")}
                             </p>
                         </div>
                     </div>
@@ -165,7 +168,7 @@ export function TrialCard({
                         href="/dijital-urunler/hukuk-araclari-paketi"
                         className="flex items-center gap-2 px-6 py-3 bg-[#e6c800] text-slate-950 font-black rounded-xl hover:bg-[#d4b800] transition-all shrink-0"
                     >
-                        Paketi Satın Al <ShoppingCart size={18} />
+                        {t("buyPackage")} <ShoppingCart size={18} />
                     </Link>
                 </div>
             </div>

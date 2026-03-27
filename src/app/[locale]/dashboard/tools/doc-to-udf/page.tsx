@@ -60,6 +60,7 @@ export default function DocToUdfTool() {
     const t = useTranslations("Dashboard.overview.tools");
     const tUdf = useTranslations("Dashboard.overview.tools.docToUdf");
     const locale = useLocale();
+    const isTr = locale === "tr";
     const { data: session } = useSession();
     const [files, setFiles] = useState<QueuedFile[]>([]);
     const [isDragging, setIsDragging] = useState(false);
@@ -72,7 +73,40 @@ export default function DocToUdfTool() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const letterheadInputRef = useRef<HTMLInputElement>(null);
 
-    const hasSubscription = session?.user && hasToolAccess(session.user as any);
+    const hasSubscription = session?.user && hasToolAccess(session.user as Parameters<typeof hasToolAccess>[0]);
+    const copy = {
+        invalidDocx: isTr ? "Sadece .docx dosyaları desteklenir" : "Only .docx files are supported",
+        uploadFailed: isTr ? "Yükleme başarısız" : "Upload failed",
+        deleteFailed: isTr ? "Silme başarısız" : "Delete failed",
+        genericError: isTr ? "Hata oluştu." : "An error occurred.",
+        title: isTr ? "UDF Dönüştürme Merkezi" : "UDF Conversion Center",
+        description: isTr
+            ? "DOCX dosyalarınızı UYAP uyumlu UDF formatına saniyeler içinde dönüştürün. Belgeleriniz işlendikten sonra otomatik olarak silinir."
+            : "Convert your DOCX files to the UYAP-compatible UDF format in seconds. Your documents are automatically deleted after processing.",
+        maxTime: isTr ? "Maks. 60 sn işlem süresi" : "Max. 60 sec processing time",
+        letterheadTitle: isTr ? "Antetli Kağıt (Letterhead)" : "Letterhead",
+        loading: isTr ? "Yükleniyor..." : "Loading...",
+        savedLetterhead: isTr ? "Kayıtlı antet mevcut" : "Saved letterhead available",
+        change: isTr ? "Değiştir" : "Change",
+        delete: isTr ? "Sil" : "Delete",
+        convertWithoutLetterhead: isTr ? "Antet yüklemeden dönüştürme yapılır." : "Conversion will continue without a letterhead.",
+        uploadLetterhead: isTr ? "Antet Yükle" : "Upload Letterhead",
+        useLetterhead: isTr ? "Antet kullan" : "Use letterhead",
+        letterheadDisabled: isTr ? "Antet yüklemeden bu seçenek kullanılamaz." : "This option cannot be used without uploading a letterhead.",
+        letterheadWillApply: isTr ? "Bu dönüşümde kayıtlı antet uygulanacak." : "The saved letterhead will be applied to this conversion.",
+        letterheadWillNotApply: isTr ? "Bu dönüşümde antet uygulanmayacak." : "No letterhead will be applied to this conversion.",
+        uploadDocs: isTr ? "Belgeleri Yükle" : "Upload Documents",
+        queue: isTr ? "İşlem Kuyruğu" : "Processing Queue",
+        startConversion: isTr ? "Dönüştürmeyi Başlat" : "Start Conversion",
+        addFile: isTr ? "Dosya ekleyin" : "Add files",
+        dragDocx: isTr ? "DOCX dosyalarınızı sürükleyin veya yukarıdan seçin" : "Drag your DOCX files here or choose them above",
+        conversionFailed: isTr ? "Dönüşüm başarısız" : "Conversion failed",
+        completed: isTr ? "Tamamlandı" : "Completed",
+        converting: isTr ? "Dönüştürülüyor" : "Converting",
+        pending: isTr ? "Beklemede" : "Pending",
+        download: isTr ? "İndir" : "Download",
+        footer: isTr ? "Belgeleriniz işlendikten sonra sunucudan silinir. KVKK uyumlu." : "Your documents are deleted from the server after processing. KVKK compliant.",
+    };
 
     useEffect(() => {
         if (!hasSubscription) return;
@@ -109,7 +143,7 @@ export default function DocToUdfTool() {
                 id: Math.random().toString(36).substr(2, 9),
                 file: f,
                 status: "idle" as const,
-                error: isValid ? "" : "Sadece .docx dosyaları desteklenir",
+                error: isValid ? "" : copy.invalidDocx,
                 progress: 0
             };
         });
@@ -131,11 +165,11 @@ export default function DocToUdfTool() {
             const res = await fetch("/api/tools/letterhead", { method: "POST", body: fd });
             if (!res.ok) {
                 const err = await res.json();
-                throw new Error(err.error || "Yükleme başarısız");
+                throw new Error(err.error || copy.uploadFailed);
             }
             setHasLetterhead(true);
         } catch (err: unknown) {
-            alert(err instanceof Error ? err.message : "Yükleme başarısız");
+            alert(err instanceof Error ? err.message : copy.uploadFailed);
         } finally {
             setLetterheadUploading(false);
         }
@@ -146,11 +180,11 @@ export default function DocToUdfTool() {
         setLetterheadDeleting(true);
         try {
             const res = await fetch("/api/tools/letterhead", { method: "DELETE" });
-            if (!res.ok) throw new Error("Silme başarısız");
+            if (!res.ok) throw new Error(copy.deleteFailed);
             setHasLetterhead(false);
             setUseLetterhead(false);
         } catch (err: unknown) {
-            alert(err instanceof Error ? err.message : "Silme başarısız");
+            alert(err instanceof Error ? err.message : copy.deleteFailed);
         } finally {
             setLetterheadDeleting(false);
         }
@@ -186,7 +220,7 @@ export default function DocToUdfTool() {
 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.error || "Hata oluştu.");
+                    throw new Error(errorData.error || copy.genericError);
                 }
 
                 const blob = await response.blob();
@@ -213,8 +247,8 @@ export default function DocToUdfTool() {
                     output_size: blob.size,
                     conversion_time_ms: Date.now() - start,
                 });
-            } catch (err: any) {
-                setFiles(prev => prev.map(f => f.id === fileItem.id ? { ...f, status: "error", error: err.message } : f));
+            } catch (err: unknown) {
+                setFiles(prev => prev.map(f => f.id === fileItem.id ? { ...f, status: "error", error: err instanceof Error ? err.message : copy.conversionFailed } : f));
             }
         }
         setIsProcessing(false);
@@ -230,16 +264,16 @@ export default function DocToUdfTool() {
                 <div className="mb-12">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                         <div>
-                            <h1 className="text-3xl md:text-4xl font-display font-black text-[#343131] mb-3 tracking-tight">UDF Dönüştürme Merkezi</h1>
+                            <h1 className="text-3xl md:text-4xl font-display font-black text-[#343131] mb-3 tracking-tight">{copy.title}</h1>
                             <p className="text-[#343131]/60 font-medium text-lg max-w-xl leading-relaxed">
-                                DOCX dosyalarınızı UYAP uyumlu UDF formatına saniyeler içinde dönüştürün. Belgeleriniz işlendikten sonra otomatik olarak silinir.
+                                {copy.description}
                             </p>
                         </div>
                         <div className="flex flex-wrap items-center gap-3">
                             <div className="px-4 py-2.5 bg-[#343131] text-[#e6c800] rounded-xl text-xs font-bold uppercase tracking-widest flex items-center gap-2">
                                 <FileText size={14} /> {SUPPORTED_LABEL}
                             </div>
-                            <p className="text-[11px] text-[#343131]/50 font-medium">Maks. 60 sn işlem süresi</p>
+                            <p className="text-[11px] text-[#343131]/50 font-medium">{copy.maxTime}</p>
                         </div>
                     </div>
                 </div>
@@ -268,12 +302,12 @@ export default function DocToUdfTool() {
                             <div className="bg-white rounded-[2rem] border border-[#343131]/[0.06] p-6 shadow-sm">
                                 <h3 className="text-base font-black text-[#343131] flex items-center gap-2 mb-4">
                                     <ImageIcon size={18} className="text-[#e6c800]" />
-                                    Antetli Kağıt (Letterhead)
+                                    {copy.letterheadTitle}
                                 </h3>
                                 {letterheadLoading ? (
                                     <div className="flex items-center gap-2 text-[#343131]/50 text-sm">
                                         <Loader2 size={16} className="animate-spin" />
-                                        Yükleniyor…
+                                        {copy.loading}
                                     </div>
                                 ) : (
                                     <div className="space-y-4">
@@ -281,7 +315,7 @@ export default function DocToUdfTool() {
                                             {hasLetterhead ? (
                                                 <>
                                                     <span className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-700 text-sm font-bold">
-                                                        Kayıtlı antet mevcut
+                                                        {copy.savedLetterhead}
                                                     </span>
                                                     <button
                                                         onClick={() => letterheadInputRef.current?.click()}
@@ -289,7 +323,7 @@ export default function DocToUdfTool() {
                                                         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#343131] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#343131]/90 disabled:opacity-50 transition-all"
                                                     >
                                                         {letterheadUploading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-                                                        Değiştir
+                                                        {copy.change}
                                                     </button>
                                                     <button
                                                         onClick={handleLetterheadDelete}
@@ -297,19 +331,19 @@ export default function DocToUdfTool() {
                                                         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 text-red-600 text-xs font-bold uppercase tracking-wider hover:bg-red-500/20 disabled:opacity-50 transition-all"
                                                     >
                                                         {letterheadDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
-                                                        Sil
+                                                        {copy.delete}
                                                     </button>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <span className="text-sm text-[#343131]/60">Antet yüklemeden dönüştürme yapılır.</span>
+                                                    <span className="text-sm text-[#343131]/60">{copy.convertWithoutLetterhead}</span>
                                                     <button
                                                         onClick={() => letterheadInputRef.current?.click()}
                                                         disabled={letterheadUploading}
                                                         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#e6c800] text-[#343131] text-xs font-bold uppercase tracking-wider hover:bg-[#c9ad00] disabled:opacity-50 transition-all"
                                                     >
                                                         {letterheadUploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-                                                        Antet Yükle
+                                                        {copy.uploadLetterhead}
                                                     </button>
                                                 </>
                                             )}
@@ -331,14 +365,14 @@ export default function DocToUdfTool() {
                                                     className="sr-only peer"
                                                 />
                                                 <div className="w-11 h-6 bg-[#343131]/[0.12] peer-focus:ring-2 peer-focus:ring-[#e6c800]/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#e6c800] peer-disabled:opacity-50 peer-disabled:cursor-not-allowed" />
-                                                <span className="ml-3 text-sm font-bold text-[#343131]">Antet kullan</span>
+                                                <span className="ml-3 text-sm font-bold text-[#343131]">{copy.useLetterhead}</span>
                                             </label>
                                             <span className="text-xs text-[#343131]/50">
                                                 {!hasLetterhead
-                                                    ? "Antet yüklemeden bu seçenek kullanılamaz."
+                                                    ? copy.letterheadDisabled
                                                     : useLetterhead
-                                                        ? "Bu dönüşümde kayıtlı antet uygulanacak."
-                                                        : "Bu dönüşümde antet uygulanmayacak."}
+                                                        ? copy.letterheadWillApply
+                                                        : copy.letterheadWillNotApply}
                                             </span>
                                         </div>
                                     </div>
@@ -374,7 +408,7 @@ export default function DocToUdfTool() {
                                 <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-colors ${isDragging ? "bg-[#e6c800]/20 text-[#e6c800]" : "bg-[#343131] text-[#e6c800]"}`}>
                                     <Upload size={28} />
                                 </div>
-                                <h3 className="text-lg font-black text-[#343131] mb-2">Belgeleri Yükle</h3>
+                                <h3 className="text-lg font-black text-[#343131] mb-2">{copy.uploadDocs}</h3>
                                 <p className="text-[#343131]/50 text-sm font-medium leading-relaxed mb-4">
                                     {tUdf("uploadHint")}
                                 </p>
@@ -389,7 +423,7 @@ export default function DocToUdfTool() {
                                 <div className="flex items-center justify-between mb-8">
                                     <h3 className="text-lg font-black text-[#343131] flex items-center gap-2">
                                         <Files size={18} className="text-[#e6c800]" />
-                                        İşlem Kuyruğu ({files.length})
+                                        {copy.queue} ({files.length})
                                     </h3>
                                     {files.length > 0 && (
                                         <button
@@ -398,7 +432,7 @@ export default function DocToUdfTool() {
                                             className="px-6 py-3 bg-[#e6c800] text-[#343131] rounded-xl text-xs font-black uppercase tracking-wider hover:bg-[#c9ad00] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 shadow-sm"
                                         >
                                             {isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
-                                            Dönüştürmeyi Başlat
+                                            {copy.startConversion}
                                         </button>
                                     )}
                                 </div>
@@ -409,8 +443,8 @@ export default function DocToUdfTool() {
                                             <div className="w-20 h-20 bg-[#fafafc] rounded-2xl flex items-center justify-center mb-4 border border-[#343131]/[0.06]">
                                                 <FileIcon size={36} className="opacity-40" />
                                             </div>
-                                            <p className="text-[11px] font-bold uppercase tracking-wider">Dosya ekleyin</p>
-                                            <p className="text-[10px] text-[#343131]/40 mt-1">DOCX dosyalarınızı sürükleyin veya yukarıdan seçin</p>
+                                            <p className="text-[11px] font-bold uppercase tracking-wider">{copy.addFile}</p>
+                                            <p className="text-[10px] text-[#343131]/40 mt-1">{copy.dragDocx}</p>
                                         </div>
                                     ) : (
                                         <AnimatePresence>
@@ -437,9 +471,9 @@ export default function DocToUdfTool() {
                                                         <div className="min-w-0">
                                                             <p className="text-[13px] font-bold text-[#343131] truncate">{f.file.name}</p>
                                                             <p className={`text-[10px] font-bold uppercase tracking-wider ${f.status === "error" ? "text-red-600" : "text-[#343131]/50"}`}>
-                                                                {f.status === "error" ? (f.error?.includes("Dönüşüm hatası:") ? "Dönüşüm Başarısız" : f.error) : f.status === "success" ? (
-                                                                    [f.resultSize != null && `${(f.resultSize / 1024).toFixed(1)} KB`, f.conversionTimeMs != null && `${(f.conversionTimeMs / 1000).toFixed(1)} sn`].filter(Boolean).join(" • ") || "Tamamlandı"
-                                                                ) : f.status === "converting" ? "Dönüştürülüyor" : "Beklemede"}
+                                                                {f.status === "error" ? (f.error || copy.conversionFailed) : f.status === "success" ? (
+                                                                    [f.resultSize != null && `${(f.resultSize / 1024).toFixed(1)} KB`, f.conversionTimeMs != null && `${(f.conversionTimeMs / 1000).toFixed(1)} ${isTr ? "sn" : "sec"}`].filter(Boolean).join(" • ") || copy.completed
+                                                                ) : f.status === "converting" ? copy.converting : copy.pending}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -450,7 +484,7 @@ export default function DocToUdfTool() {
                                                                 download={f.resultFilename}
                                                                 className="p-2 text-emerald-600 hover:bg-emerald-500/10 rounded-lg transition-all flex items-center gap-1 text-xs font-bold"
                                                             >
-                                                                <Download size={14} /> İndir
+                                                                <Download size={14} /> {copy.download}
                                                             </a>
                                                         )}
                                                         <button
@@ -472,7 +506,7 @@ export default function DocToUdfTool() {
 
                                 <div className="mt-auto pt-6 border-t border-[#343131]/[0.06] text-center">
                                     <p className="text-[10px] font-bold uppercase tracking-wider text-[#343131]/40">
-                                        Belgeleriniz işlendikten sonra sunucudan silinir. KVKK uyumlu.
+                                        {copy.footer}
                                     </p>
                                 </div>
                             </div>

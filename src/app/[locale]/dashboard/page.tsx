@@ -33,11 +33,26 @@ type Summary = {
     openTickets: number;
 };
 
+type DashboardUser = {
+    name?: string | null;
+    email?: string | null;
+    role?: string | null;
+    activeProductSlugs?: string[];
+    emailVerified?: boolean | Date | null;
+    trialStatus?: string;
+    trialEndsAt?: string | Date | null;
+    trialStartedAt?: string | Date | null;
+    trialOperationsUsed?: number;
+    trialOperationsLimit?: number;
+    onboardingCompleted?: boolean;
+};
+
 export default function DashboardPage() {
     const { data: session } = useSession();
     const t = useTranslations("Dashboard.overview");
+    const tTrial = useTranslations("Dashboard.shared.trial");
     const locale = useLocale();
-    const user = session?.user as any;
+    const user = session?.user as (typeof session.user & DashboardUser) | undefined;
     const activeProductSlugs: string[] = user?.activeProductSlugs || [];
 
     const [summary, setSummary] = useState<Summary | null>(null);
@@ -135,7 +150,7 @@ export default function DashboardPage() {
                     {!hasLegalToolkitAccess && user?.trialStatus === "active" && (
                         <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-xl">
                             <Sparkles size={13} className="text-amber-500" />
-                            {t("sections.demoPrefix")} {formatTimeLeftCompact(user?.trialEndsAt ?? null)}
+                            {t("sections.demoPrefix")} {formatTimeLeftCompact(user?.trialEndsAt ?? null, tTrial)}
                         </div>
                     )}
                     <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl">
@@ -162,7 +177,6 @@ export default function DashboardPage() {
             {!hasPaidSubscription && (user?.role === "customer" || !user?.role) && (
                 <TrialCountdownCard
                     trialStatus={user?.trialStatus ?? "none"}
-                    trialStartedAt={user?.trialStartedAt ?? null}
                     trialEndsAt={user?.trialEndsAt ?? null}
                     trialOperationsUsed={user?.trialOperationsUsed ?? 0}
                     trialOperationsLimit={user?.trialOperationsLimit ?? 20}
@@ -174,7 +188,6 @@ export default function DashboardPage() {
             {/* ── Onboarding strip (context-aware next step) ── */}
             {!loading && summary && (
                 (() => {
-                    const ap = summary.activeProducts ?? 0;
                     const pp = summary.pendingPayments ?? 0;
                     const ot = summary.openTickets ?? 0;
                     if (pp > 0) {

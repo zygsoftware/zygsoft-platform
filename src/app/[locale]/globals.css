@@ -6,6 +6,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: "MontserratButton";
+  src: url("../../Montserrat/static/Montserrat-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @keyframes marquee {
   0% {
     transform: translateX(0);
@@ -31,8 +39,9 @@
 /* ─── Design Tokens ────────────────────────── */
 @theme {
   --font-display: var(--font-linux-libertine), serif;
-  --font-body: var(--font-linux-libertine), serif;
-  --font-ui: var(--font-linux-libertine), serif;
+  --font-body: var(--font-montserrat), "Montserrat", sans-serif;
+  --font-ui: var(--font-montserrat), "Montserrat", sans-serif;
+  --font-button: "MontserratButton", var(--font-montserrat), "Montserrat", sans-serif;
 
   /* Brand Colors */
   --color-brand-400: #f5d002;
@@ -117,13 +126,13 @@
 /* ─── Base ─────────────────────────────────── */
 html {
   scroll-behavior: smooth;
-  font-family: var(--font-linux-libertine), Georgia, serif;
+  font-family: var(--font-montserrat), "Montserrat", sans-serif;
 }
 
 body {
   color: var(--text);
   background: var(--bg);
-  font-family: var(--font-linux-libertine), Georgia, serif;
+  font-family: var(--font-montserrat), "Montserrat", sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   font-size: 16px;
@@ -212,7 +221,7 @@ h4 {
   padding: 14px 28px;
   background: var(--text);
   color: var(--bg);
-  font-family: var(--font-ui);
+  font-family: var(--font-button);
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 0.04em;
@@ -221,6 +230,18 @@ h4 {
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
   text-decoration: none;
+}
+
+.btn-primary :is(span, svg, div, strong, small),
+.btn-secondary :is(span, svg, div, strong, small),
+.home-btn-primary-yellow :is(span, svg, div, strong, small),
+.home-btn-secondary-dark :is(span, svg, div, strong, small),
+.home-btn-outline-light :is(span, svg, div, strong, small),
+.admin-btn-primary :is(span, svg, div, strong, small),
+.admin-btn-gold :is(span, svg, div, strong, small) {
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
 }
 
 .btn-primary:hover {
@@ -241,8 +262,8 @@ h4 {
   gap: 10px;
   padding: 13px 27px;
   background: transparent;
-  color: var(--text);
-  font-family: var(--font-ui);
+  color: var(--text) !important;
+  font-family: var(--font-button);
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 0.04em;
@@ -273,7 +294,7 @@ h4 {
   padding: 14px 28px;
   background: var(--brand);
   color: var(--text);
-  font-family: var(--font-ui);
+  font-family: var(--font-button);
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 0.04em;
@@ -675,8 +696,9 @@ html.home-scroll-snap .home-snap-section {
 /* ─── Homepage Readability Tokens ─────────────────────────────── */
 .home-btn-primary-yellow {
   background: var(--brand);
-  color: var(--text);
-  font-family: var(--font-ui);
+  color: var(--text) !important;
+  font-family: var(--font-button);
+  font-weight: 700;
   border: none;
   border-radius: var(--radius-btn);
   box-shadow: var(--shadow-brand);
@@ -685,6 +707,7 @@ html.home-scroll-snap .home-snap-section {
 .home-btn-primary-yellow:hover,
 .home-btn-primary-yellow:focus-visible {
   background: var(--brand-hover);
+  color: var(--text) !important;
   transform: translateY(-1px);
   box-shadow: var(--shadow-brand-hover);
 }
@@ -694,8 +717,9 @@ html.home-scroll-snap .home-snap-section {
 
 .home-btn-secondary-dark {
   background: var(--surface-dark);
-  color: #f8fafc;
-  font-family: var(--font-ui);
+  color: #f8fafc !important;
+  font-family: var(--font-button);
+  font-weight: 700;
   border: 1px solid rgba(248, 250, 252, 0.12);
   border-radius: var(--radius-btn);
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
@@ -703,6 +727,7 @@ html.home-scroll-snap .home-snap-section {
 .home-btn-secondary-dark:hover,
 .home-btn-secondary-dark:focus-visible {
   background: #151922;
+  color: #f8fafc !important;
   border-color: rgba(248, 250, 252, 0.2);
   transform: translateY(-1px);
 }
@@ -712,8 +737,8 @@ html.home-scroll-snap .home-snap-section {
 
 .home-btn-outline-light {
   background: transparent;
-  color: #f8fafc;
-  font-family: var(--font-ui);
+  color: #f8fafc !important;
+  font-family: var(--font-button);
   border: 1px solid rgba(248, 250, 252, 0.25);
   border-radius: var(--radius-btn);
   transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
@@ -722,7 +747,7 @@ html.home-scroll-snap .home-snap-section {
 .home-btn-outline-light:focus-visible,
 .home-btn-outline-light:active {
   background: #f8fafc;
-  color: var(--text);
+  color: var(--text) !important;
   border-color: rgba(248, 250, 252, 0.5);
 }
 
@@ -763,17 +788,148 @@ html.home-scroll-snap .home-snap-section {
   color: inherit;
 }
 
+.product-surface-dark {
+  color: #f8fafc;
+}
+
+.product-surface-dark :is(h1, h2, h3, h4, h5, h6, p, li, span, small, label, legend, blockquote, dt, dd, a, button) {
+  color: inherit;
+}
+
+.product-surface-dark .product-surface-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(248, 250, 252, 0.1);
+  color: #f8fafc;
+}
+
+.product-surface-dark .product-surface-card :is(h1, h2, h3, h4, h5, h6) {
+  color: #ffffff !important;
+}
+
+.product-surface-dark .product-surface-card :is(p, span, small, li) {
+  color: rgba(248, 250, 252, 0.78) !important;
+}
+
+.product-surface-dark .product-surface-muted {
+  color: rgba(248, 250, 252, 0.78) !important;
+}
+
+.product-surface-dark .product-surface-soft {
+  color: rgba(248, 250, 252, 0.64) !important;
+}
+
+.product-surface-dark .product-surface-strong {
+  color: #ffffff !important;
+}
+
+.product-surface-dark .product-surface-accent {
+  color: var(--brand) !important;
+}
+
+.font-button-force {
+  font-family: "MontserratButton", var(--font-montserrat), "Montserrat", sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em;
+}
+
+.font-button-force :is(span, svg, div, p, strong, small, em, i, b, h1, h2, h3, h4, h5, h6) {
+  font-family: inherit !important;
+  font-weight: inherit !important;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
 :is(
   button,
   [type="button"],
   [type="submit"],
   [type="reset"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  [role="button"],
+  [data-slot="button"],
   a[class*="btn-"],
   a[class*="home-btn-"],
-  a[class*="admin-btn-"]
+  a[class*="admin-btn-"],
+  a[class*="rounded"][class*="px-"][class*="py-"],
+  a[class*="inline-flex"][class*="rounded"][class*="px-"][class*="py-"],
+  a[class*="flex"][class*="rounded"][class*="px-"][class*="py-"]
 ) {
-  font-family: var(--font-ui);
+  font-family: var(--font-button) !important;
+  font-weight: 700 !important;
   letter-spacing: 0.04em;
+}
+
+:is(
+  button,
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  [role="button"],
+  [data-slot="button"],
+  a[class*="btn-"],
+  a[class*="home-btn-"],
+  a[class*="admin-btn-"],
+  a[class*="rounded"][class*="px-"][class*="py-"],
+  a[class*="inline-flex"][class*="rounded"][class*="px-"][class*="py-"],
+  a[class*="flex"][class*="rounded"][class*="px-"][class*="py-"]
+) :where(*) {
+  font-family: var(--font-button) !important;
+}
+
+:is(
+  button,
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  [role="button"],
+  [data-slot="button"],
+  a[class*="btn-"],
+  a[class*="home-btn-"],
+  a[class*="admin-btn-"],
+  a[class*="rounded"][class*="px-"][class*="py-"],
+  a[class*="inline-flex"][class*="rounded"][class*="px-"][class*="py-"],
+  a[class*="flex"][class*="rounded"][class*="px-"][class*="py-"]
+) :is(span, svg, div, p, strong, small, em, i, b, h1, h2, h3, h4, h5, h6) {
+  font-family: inherit !important;
+  font-weight: inherit !important;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+:is(
+  button,
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  [role="button"],
+  [data-slot="button"],
+  a[class*="btn-"],
+  a[class*="home-btn-"],
+  a[class*="admin-btn-"],
+  a[class*="inline-flex"][class*="rounded"][class*="px-"][class*="py-"],
+  a[class*="flex"][class*="rounded"][class*="px-"][class*="py-"]
+):is(
+  .btn-primary,
+  .admin-btn-primary,
+  .home-btn-secondary-dark,
+  [class~="bg-[#0e0e0e]"],
+  [class~="bg-[#141313]"],
+  [class~="bg-[#1a1a1a]"],
+  [class~="bg-[#343131]"],
+  [class~="bg-black"]
+) {
+  color: #ffffff !important;
 }
 
 .surface-dark :is(
@@ -788,7 +944,27 @@ html.home-scroll-snap .home-snap-section {
   color: #f8fafc !important;
 }
 
+.product-surface-dark :is(
+  [class*="text-[#0e0e0e]"],
+  [class*="text-[#1a1715]"],
+  [class*="text-[#343131]"],
+  [class*="text-black"],
+  [class*="text-slate-9"],
+  [class*="text-zinc-9"],
+  [class*="text-neutral-9"]
+) {
+  color: #f8fafc !important;
+}
+
 .surface-dark :is(
+  [class*="text-[#e6c800]"],
+  [class*="text-brand-"],
+  [class*="text-yellow"]
+) {
+  color: var(--brand) !important;
+}
+
+.product-surface-dark :is(
   [class*="text-[#e6c800]"],
   [class*="text-brand-"],
   [class*="text-yellow"]
@@ -854,6 +1030,24 @@ html.home-scroll-snap .home-snap-section {
   color: #f8fafc !important;
 }
 
+:is(
+  .surface-dark,
+  .product-surface-dark,
+  .home-card-dark,
+  [class*="bg-[#0e0e0e]"],
+  [class*="bg-[#141313]"],
+  [class~="bg-[#343131]"],
+  [class*="bg-[#343131]"],
+  [class*="bg-black"],
+  [class*="bg-slate-9"],
+  [class*="bg-zinc-9"],
+  [class*="bg-neutral-9"]
+)
+  :is(div, h1, h2, h3, h4, h5, h6, p, li, span, small, label, legend, blockquote, dt, dd, a, strong, button) {
+  color: #f8fafc;
+  -webkit-text-fill-color: currentColor;
+}
+
 /* Solid light surfaces can safely inherit dark text. Avoid broad bg-white matching,
    because translucent cards like bg-white/5 often live inside dark sections. */
 :is(
@@ -888,6 +1082,38 @@ html.home-scroll-snap .home-snap-section {
   .home-btn-primary-yellow
 ) {
   color: #343131 !important;
+}
+
+/* Footer should remain readable regardless of global surface heuristics. */
+.site-footer,
+.site-footer * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  opacity: 1 !important;
+}
+
+.site-footer .footer-action-primary,
+.site-footer .footer-action-primary * {
+  color: #313434 !important;
+  -webkit-text-fill-color: #313434 !important;
+}
+
+.site-footer .footer-accent-icon,
+.site-footer .footer-accent-icon * {
+  color: var(--brand) !important;
+  -webkit-text-fill-color: var(--brand) !important;
+}
+
+.site-footer a:hover,
+.site-footer a:hover * {
+  color: var(--brand) !important;
+  -webkit-text-fill-color: var(--brand) !important;
+}
+
+.site-footer .footer-action-primary:hover,
+.site-footer .footer-action-primary:hover * {
+  color: #313434 !important;
+  -webkit-text-fill-color: #313434 !important;
 }
 
 :is(
@@ -1116,8 +1342,8 @@ html.home-scroll-snap .home-snap-section {
 .prose-article hr { margin: 2em 0; border: none; border-top: 1px solid rgba(10, 12, 16, 0.1); }
 
 @theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: var(--font-sans);
+  --font-heading: var(--font-montserrat), "Montserrat", sans-serif;
+  --font-sans: var(--font-montserrat), "Montserrat", sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -1198,6 +1424,7 @@ html.home-scroll-snap .home-snap-section {
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-montserrat), "Montserrat", sans-serif;
   }
   html {
     @apply font-sans;

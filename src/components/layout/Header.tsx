@@ -17,6 +17,7 @@ export function Header() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isServicesOpen, setIsServicesOpen] = useState(false);
+    const [isAboutOpen, setIsAboutOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 40);
@@ -33,6 +34,10 @@ export function Header() {
         { name: s("branding"), href: "/services/marka-kimligi-ve-grafik-tasarim" },
         { name: s("digitalStrategy"), href: "/services/dijital-strateji-ve-pazarlama" },
         { name: s("adsManagement"), href: "/services/google-ads-ve-meta-pixel-reklam-yonetimi" },
+    ];
+    const aboutLinks = [
+        { name: nav("about"), href: "/about" },
+        { name: nav("portfolio"), href: "/portfolio" },
     ];
 
     return (
@@ -91,8 +96,33 @@ export function Header() {
                         </div>
 
                         <NavLink href="/dijital-urunler" active={pathname.includes("/dijital-urunler")}>{nav("products")}</NavLink>
-                        <NavLink href="/about" active={pathname.includes("/about")}>{nav("about")}</NavLink>
-                        <NavLink href="/portfolio" active={pathname.includes("/projeler") || pathname.includes("/projects")}>{nav("portfolio")}</NavLink>
+                        <div className="relative" onMouseEnter={() => setIsAboutOpen(true)} onMouseLeave={() => setIsAboutOpen(false)}>
+                            <button className={`flex items-center gap-1.5 text-[13px] font-extrabold tracking-tight transition-colors duration-200 ${pathname.includes("/about") || pathname.includes("/projeler") || pathname.includes("/projects") || pathname.includes("/portfolio") ? "text-[#343131]" : "text-[#343131]/72 hover:text-[#343131]"}`}>
+                                {nav("about")} <ChevronDown size={14} className={`transition-transform duration-300 ${isAboutOpen ? "rotate-180" : ""}`} />
+                            </button>
+                            <AnimatePresence>
+                                {isAboutOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 15 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 15 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="absolute top-full left-0 mt-4 w-60 bg-white/95 backdrop-blur-xl border border-[#343131]/10 shadow-2xl rounded-2xl overflow-hidden p-2"
+                                    >
+                                        {aboutLinks.map((link) => (
+                                            <Link
+                                                key={link.href}
+                                                href={link.href}
+                                                className="group flex items-center justify-between px-4 py-3 text-[14px] text-[#343131]/84 hover:bg-[#fafafc] hover:text-[#343131] rounded-xl transition-all font-extrabold"
+                                            >
+                                                {link.name}
+                                                <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            </Link>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
                         <NavLink href="/blog" active={pathname.includes("/blog") || pathname.includes("/haberler") || pathname.includes("/news")}>{nav("blog")}</NavLink>
                         <NavLink href="/contact" active={pathname.includes("/contact")}>{nav("contact")}</NavLink>
                     </nav>
@@ -103,9 +133,9 @@ export function Header() {
                         {session ? (
                             <div className="flex items-center gap-3">
                                 <Magnetic strength={18}>
-                                    <Link href="/dashboard" className="bg-slate-950 !text-white text-[11px] font-black uppercase tracking-[0.2em] py-2.5 px-6 rounded-full hover:bg-[#e6c800] hover:!text-slate-950 transition-all duration-200 shadow-lg shadow-slate-900/10" data-magnetic="true">
-                                        {nav("dashboard")}
-                                    </Link>
+                                <Link href="/dashboard" className="font-button-force bg-slate-950 !text-white text-[11px] font-black uppercase tracking-[0.2em] py-2.5 px-6 rounded-full hover:bg-[#e6c800] hover:!text-slate-950 transition-all duration-200 shadow-lg shadow-slate-900/10" data-magnetic="true">
+                                    {nav("dashboard")}
+                                </Link>
                                 </Magnetic>
                                 <button onClick={() => signOut()} className="p-2 text-slate-400 hover:text-red-500 transition-colors">
                                     <LogOut size={20} />
@@ -113,11 +143,11 @@ export function Header() {
                             </div>
                         ) : (
                             <div className="flex items-center gap-3">
-                                <Link href="/login" className="text-[#343131]/78 hover:text-[#343131] text-[13px] font-extrabold transition-colors px-3 py-2 rounded-lg hover:bg-slate-50/80">
+                                <Link href="/login" className="font-button-force text-[#343131]/78 hover:text-[#343131] text-[13px] font-extrabold transition-colors px-3 py-2 rounded-lg hover:bg-slate-50/80">
                                     {nav("login")}
                                 </Link>
                                 <Magnetic strength={20}>
-                                    <Link href="/register" className="bg-slate-950 !text-white text-[11px] font-black uppercase tracking-[0.2em] py-2.5 px-6 rounded-full hover:bg-[#e6c800] hover:!text-slate-950 transition-all duration-200 shadow-lg shadow-slate-900/10" data-magnetic="true">
+                                    <Link href="/register" className="font-button-force bg-slate-950 !text-white text-[11px] font-black uppercase tracking-[0.2em] py-2.5 px-6 rounded-full hover:bg-[#e6c800] hover:!text-slate-950 transition-all duration-200 shadow-lg shadow-slate-900/10" data-magnetic="true">
                                         {nav("register")}
                                     </Link>
                                 </Magnetic>
@@ -129,7 +159,7 @@ export function Header() {
                     {/* Mobile menu button */}
                     <button
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="md:hidden p-2 text-[#1e293b] hover:bg-gray-50 rounded-lg transition-colors"
+                        className="font-button-force md:hidden p-2 text-[#1e293b] hover:bg-gray-50 rounded-lg transition-colors"
                     >
                         {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
@@ -169,19 +199,19 @@ export function Header() {
                         <div className="mt-8 flex flex-col gap-3">
                             {session ? (
                                 <>
-                                    <Link href="/dashboard" className="bg-[#e6c800] text-[#1e293b] py-4 px-6 rounded-xl font-bold text-center block" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <Link href="/dashboard" className="font-button-force bg-[#e6c800] text-[#1e293b] py-4 px-6 rounded-xl font-bold text-center block" onClick={() => setIsMobileMenuOpen(false)}>
                                         {nav("dashboard")}
                                     </Link>
-                                    <button onClick={() => { signOut(); setIsMobileMenuOpen(false); }} className="bg-red-50 text-red-500 py-4 px-6 rounded-xl font-bold text-center block w-full transition-colors">
+                                    <button onClick={() => { signOut(); setIsMobileMenuOpen(false); }} className="font-button-force bg-red-50 text-red-500 py-4 px-6 rounded-xl font-bold text-center block w-full transition-colors">
                                         {nav("signOut")}
                                     </button>
                                 </>
                             ) : (
                                 <>
-                                    <Link href="/login" className="bg-slate-100 hover:bg-slate-200 text-slate-950 py-4 px-6 rounded-xl font-bold text-center block transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <Link href="/login" className="font-button-force bg-slate-100 hover:bg-slate-200 text-slate-950 py-4 px-6 rounded-xl font-bold text-center block transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
                                         {nav("login")}
                                     </Link>
-                                    <Link href="/register" className="bg-[#e6c800] text-[#1e293b] py-4 px-6 rounded-xl font-bold text-center block" onClick={() => setIsMobileMenuOpen(false)}>
+                                    <Link href="/register" className="font-button-force bg-[#e6c800] text-[#1e293b] py-4 px-6 rounded-xl font-bold text-center block" onClick={() => setIsMobileMenuOpen(false)}>
                                         {nav("register")}
                                     </Link>
                                 </>

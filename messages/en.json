@@ -221,23 +221,31 @@
         },
         "pdfSplit": {
           "hubName": "PDF split",
-          "hubDescription": "Extract selected pages into a new PDF.",
+          "hubDescription": "Extract selected pages or split the document into equal chunks.",
           "title": "PDF Split Tool",
-          "description": "Extract specific pages from your PDF to create a new document.",
+          "description": "Extract specific pages from your PDF or split the file into chunks such as 100 pages each.",
           "uploadTitle": "Upload PDF",
           "uploadHint": "Drag and drop or click to add a single PDF file",
+          "modeLabel": "Split Mode",
+          "modeRange": "Page Range",
+          "modeChunks": "Split Into Chunks",
           "pageRangeLabel": "Page Range",
           "pageRangePlaceholder": "e.g. 1-3, 5, 7-10",
           "pageRangeHelp": "Single: 5 | Range: 1-5 | Mixed: 1,3,5-7",
-          "tip1": "Page numbers start at 1. Use commas to separate multiple pages or ranges.",
-          "tip2": "Page order is preserved as entered.",
+          "chunkSizeLabel": "Pages Per Chunk",
+          "chunkSizePlaceholder": "e.g. 100",
+          "chunkSizeHelp": "The PDF will be split into multiple files based on this page count and downloaded as a ZIP archive.",
+          "tip1": "In page range mode, page numbers start at 1 and you can combine ranges with commas.",
+          "tip2": "In chunk mode, entering 100 creates 100-page PDF parts inside a ZIP archive.",
           "splitButton": "Split",
           "successTitle": "Split Complete!",
           "successDesc": "Selected pages have been extracted into a new PDF.",
+          "successDescChunks": "Your PDF has been split into multiple parts and prepared as a ZIP archive.",
           "downloadButton": "Download",
           "newButton": "New Operation",
           "errorNoFile": "Please upload a PDF file.",
           "errorNoPageRange": "Enter a page range.",
+          "errorNoChunkSize": "Enter pages per chunk.",
           "errorService": "Conversion service is currently unavailable. Please contact support.",
           "errorGeneric": "An error occurred."
         },
@@ -607,7 +615,84 @@
       "verified": "Verified",
       "notVerified": "Not verified",
       "logout": "Sign out",
-      "securityDescExtra": "Our team is ready to help with account updates, security settings, and related topics."
+      "securityDescExtra": "Our team is ready to help with account updates, security settings, and related topics.",
+      "verifyCta": "Verify",
+      "endsLabel": "Ends",
+      "billingPrompt": "Would you like to create an invoice or submit a bank transfer notification?",
+      "securityBadge": "Security & support",
+      "changePassword": "Change Password",
+      "passwordUpdateTitle": "Password Update",
+      "cancel": "Cancel",
+      "passwordUpdatedTitle": "All set!",
+      "passwordUpdatedDesc": "Your password has been updated successfully.",
+      "currentPasswordLabel": "Current Password",
+      "currentPasswordPlaceholder": "Enter your current password",
+      "newPasswordLabel": "New Password",
+      "newPasswordPlaceholder": "At least 6 characters",
+      "confirmPasswordLabel": "New Password (Repeat)",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "updating": "Updating...",
+      "updatePassword": "Update Password"
+    },
+    "shared": {
+      "onboarding": {
+        "title": "Getting Started Checklist",
+        "completedCount": "{completed} / {total} completed",
+        "dismiss": "Hide onboarding",
+        "stepEmail": "Verify your email address",
+        "stepTrial": "Start your 3-day demo access",
+        "stepFirstTool": "Convert your first document",
+        "stepEvaluate": "Review the Legal Toolkit",
+        "verify": "Verify",
+        "startDemo": "Start demo",
+        "firstTool": "Use first tool",
+        "reviewPackage": "View package",
+        "genericError": "Something went wrong.",
+        "connectionError": "Connection error."
+      },
+      "trial": {
+        "availableTitle": "3-Day Free Demo",
+        "availableDesc": "Try all document tools with 20 operations.",
+        "starting": "Starting...",
+        "start": "Start Demo",
+        "activeTitle": "Your demo is active",
+        "activeEndingSoon": "Your demo is about to end",
+        "activeEndsToday": "Your demo ends today",
+        "expiredTitle": "Your demo has ended",
+        "expiredDesc": "Purchase the Legal Toolkit for full access.",
+        "timeLabel": "Time",
+        "timeRemainingPct": "{percent}% left",
+        "usageLabel": "Usage",
+        "usageUsed": "{used} / {limit} used",
+        "usageRemainingLast": "You have {count} uses left",
+        "activatePackage": "Activate package",
+        "buyPackage": "Buy package",
+        "zeroHours": "0 hours",
+        "daysHoursLeft": "{days} days {hours} hours left",
+        "hoursMinutesLeft": "{hours} hours {minutes} minutes left",
+        "minutesLeft": "{minutes} minutes left",
+        "compactZero": "0h",
+        "compactDaysHours": "{days}d {hours}h left",
+        "compactHours": "{hours}h left",
+        "compactMinutes": "{minutes}m left"
+      },
+      "trialBanner": {
+        "title": "You are using a demo",
+        "desc": "Activate the Legal Toolkit for full access.",
+        "cta": "Activate package"
+      },
+      "toolLocked": {
+        "title": "Access Restricted",
+        "desc": "To use this tool, you need an active Legal Toolkit subscription or demo access.",
+        "viewPackage": "View package",
+        "reportPayment": "Report payment"
+      },
+      "shell": {
+        "menuOpen": "Open menu",
+        "menuClose": "Close menu",
+        "panelTitle": "ZYGSOFT Panel",
+        "panelSubtitle": "Your account and legal tools"
+      }
     },
     "verification": {
       "warningTitle": "Email not verified",
@@ -618,6 +703,23 @@
     }
   },
   "Auth": {
+    "shared": {
+      "processing": "Processing...",
+      "forgotPassword": "Forgot password?",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "heroFeatures": {
+        "secureProcessing": "Secure document processing",
+        "uyapTools": "UYAP-ready tools",
+        "kvkkInfrastructure": "KVKK-compliant infrastructure"
+      },
+      "passwordStrength": {
+        "weak": "Weak",
+        "fair": "Fair",
+        "good": "Good",
+        "strong": "Strong"
+      }
+    },
     "login": {
       "title": "Welcome back",
       "subtitle": "Sign in to access your dashboard.",
@@ -629,7 +731,11 @@
       "noAccount": "Don't have an account?",
       "registerLink": "Sign up",
       "backToHome": "Back to home",
-      "errorInvalid": "Invalid email or password. Please try again."
+      "errorInvalid": "Invalid email or password. Please try again.",
+      "errorVerifyRequired": "You need to verify your email address before signing in.",
+      "resendVerification": "Resend verification email",
+      "sendingVerification": "Sending...",
+      "verificationSent": "Verification email sent again. Please check your inbox."
     },
     "register": {
       "title": "Create account",
@@ -1389,15 +1495,20 @@
     "copyright": "We are building the future together."
   },
   "HeroOrbit": {
-    "apiLabel": "API",
-    "apiDesc": "Secure & scalable integrations",
-    "webLabel": "Web",
-    "webDesc": "Modern web applications",
-    "seoLabel": "SEO",
-    "seoDesc": "Search engine optimization",
-    "cloudLabel": "Cloud",
-    "cloudDesc": "Cloud infra & deployment",
-    "wwwLabel": "www",
-    "wwwDesc": "Digital presence & performance"
+    "legalLabel": "Legal Tools",
+    "legalDesc": "UYAP-ready document flows, PDF operations, and OCR tools connect into one central product layer.",
+    "legalMeta": "Digital Product",
+    "webLabel": "Web Platforms",
+    "webDesc": "Fast, premium, and manageable web experiences become the front layer of the system.",
+    "webMeta": "Project Layer",
+    "automationLabel": "Automation",
+    "automationDesc": "Repetitive operations turn into structured flows, reducing workload and speeding execution.",
+    "automationMeta": "System Layer",
+    "brandLabel": "Brand Design",
+    "brandDesc": "Identity, typography, and interface language align into a more coherent brand experience.",
+    "brandMeta": "Creative Layer",
+    "growthLabel": "Digital Growth",
+    "growthDesc": "SEO, content, and performance strategy build a clearer path from visibility to conversion.",
+    "growthMeta": "Growth Layer"
   }
 }

@@ -74,7 +74,7 @@ export default function Home() {
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_0.85fr] lg:items-end">
               <BlockReveal>
                 <div className="max-w-3xl">
-                  <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#343131]/10 bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-[0.28em] text-[#343131]/58">
+                  <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#343131]/10 bg-white px-4 py-2 text-[10px] font-bold uppercase tracking-[0.28em] text-[#343131]/58 [font-family:var(--font-button)]">
                     <ShieldCheck size={13} className="text-[#e6c800]" />
                     {t("partnerSection.tag")}
                   </span>
@@ -182,7 +182,7 @@ export default function Home() {
           <div className="container mx-auto px-6">
             <BlockReveal>
               <div className="mx-auto max-w-4xl rounded-[2rem] border border-[#343131]/10 bg-white px-8 py-10 text-center shadow-[0_18px_40px_rgba(0,0,0,0.04)] md:px-12 md:py-14">
-                <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#343131]/10 bg-[#faf7ef] px-4 py-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#343131]/60">
+                <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#343131]/10 bg-[#faf7ef] px-4 py-2 text-[10px] font-black uppercase tracking-[0.28em] text-[#343131]/60 [font-family:var(--font-button)]">
                   <ShieldCheck size={13} className="text-[#e6c800]" />
                   {t("ctaSection.tag")}
                 </span>
@@ -198,7 +198,7 @@ export default function Home() {
                   {(["acceleration", "resilience", "precision"] as const).map((key) => (
                     <span
                       key={key}
-                      className="inline-flex items-center gap-2 rounded-full border border-[#343131]/10 bg-[#fafafc] px-4 py-2 text-xs font-semibold text-[#343131]/72"
+                      className="inline-flex items-center gap-2 rounded-full border border-[#343131]/10 bg-[#fafafc] px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-[#343131]/72 [font-family:var(--font-button)]"
                     >
                       <CheckCircle2 size={13} className="text-[#e6c800]" />
                       {t(`ctaSection.features.${key}.title`)}
@@ -207,10 +207,10 @@ export default function Home() {
                 </div>
 
                 <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                  <Link href="/contact" className="home-btn-primary-yellow px-9 py-3.5 font-black uppercase tracking-[0.22em] text-[11px] rounded-xl transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-[0_16px_48px_rgba(230,200,0,0.2)]">
+                  <Link href="/contact" className="home-btn-primary-yellow px-9 py-3.5 font-black uppercase tracking-[0.22em] text-[11px] rounded-xl !text-[#343131] [font-family:var(--font-button)] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-[0_16px_48px_rgba(230,200,0,0.2)]">
                     {t("ctaSection.cta") || t("ctaSection.button")}
                   </Link>
-                  <Link href="/portfolio" className="inline-flex items-center gap-3 rounded-xl border border-[#343131]/12 bg-[#fafafc] px-6 py-3 text-[11px] font-black uppercase tracking-[0.22em] text-[#343131] transition-colors hover:border-[#e6c800]/40 hover:bg-[#fff8da]">
+                  <Link href="/portfolio" className="inline-flex items-center gap-3 rounded-xl border border-[#343131]/12 bg-[#fafafc] px-6 py-3 text-[11px] font-black uppercase tracking-[0.22em] !text-[#343131] [font-family:var(--font-button)] transition-colors hover:border-[#e6c800]/40 hover:bg-[#fff8da]">
                     <span>{t("ctaSection.ctaSecondary") || "Explore Portfolio"}</span>
                     <div className="w-7 h-px bg-[#343131]/40" />
                   </Link>

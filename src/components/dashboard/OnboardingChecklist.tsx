@@ -13,7 +13,7 @@ import {
     ChevronRight,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { pushDataLayerEvent, pushTrialStartEvent } from "@/lib/analytics";
 
 type StepStatus = "pending" | "active" | "completed";
@@ -27,26 +27,10 @@ type OnboardingChecklistProps = {
 };
 
 const STEPS = [
-    {
-        id: "email",
-        label: "Email adresinizi doğrulayın",
-        icon: Mail,
-    },
-    {
-        id: "trial",
-        label: "3 günlük demo erişimini başlatın",
-        icon: Zap,
-    },
-    {
-        id: "first-tool",
-        label: "İlk belgenizi dönüştürün",
-        icon: FileText,
-    },
-    {
-        id: "evaluate",
-        label: "Hukuk Araçları Paketini değerlendirin",
-        icon: ShoppingBag,
-    },
+    { id: "email", icon: Mail },
+    { id: "trial", icon: Zap },
+    { id: "first-tool", icon: FileText },
+    { id: "evaluate", icon: ShoppingBag },
 ] as const;
 
 function getStepStatus(
@@ -80,6 +64,7 @@ function getStepStatus(
 export function OnboardingChecklist(props: OnboardingChecklistProps) {
     const { hasSubscription, onDismiss } = props;
     const locale = useLocale();
+    const t = useTranslations("Dashboard.shared.onboarding");
     const [startingTrial, setStartingTrial] = useState(false);
     const [dismissing, setDismissing] = useState(false);
 
@@ -108,10 +93,10 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
                 });
                 window.location.reload();
             } else {
-                alert(data.error || "Bir hata oluştu.");
+                alert(data.error || t("genericError"));
             }
         } catch {
-            alert("Bağlantı hatası.");
+            alert(t("connectionError"));
         } finally {
             setStartingTrial(false);
         }
@@ -146,9 +131,9 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
                         <CheckCircle2 size={18} className="text-[#e6c800]" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-bold text-[#343131]">Başlangıç Kontrol Listesi</h3>
+                        <h3 className="text-sm font-bold text-[#343131]">{t("title")}</h3>
                         <p className="text-xs text-slate-500">
-                            {completedCount} / {STEPS.length} tamamlandı
+                            {t("completedCount", { completed: completedCount, total: STEPS.length })}
                         </p>
                     </div>
                 </div>
@@ -158,7 +143,7 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
                     className="flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors disabled:opacity-50"
                 >
                     {dismissing ? <Loader2 size={14} className="animate-spin" /> : <X size={14} />}
-                    Onboarding&apos;i gizle
+                    {t("dismiss")}
                 </button>
             </div>
 
@@ -212,7 +197,7 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
                                         status === "completed" ? "text-slate-500 line-through" : "text-[#343131]"
                                     }`}
                                 >
-                                    {step.label}
+                                    {step.id === "email" ? t("stepEmail") : step.id === "trial" ? t("stepTrial") : step.id === "first-tool" ? t("stepFirstTool") : t("stepEvaluate")}
                                 </p>
                             </div>
                             <div className="shrink-0">
@@ -221,7 +206,7 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
                                         href={locale === "en" ? "/en/verify-email-required" : "/verify-email-required"}
                                         className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#343131] bg-[#e6c800] rounded-lg hover:bg-[#d4b800] transition-colors"
                                     >
-                                        Doğrula <ChevronRight size={14} />
+                                        {t("verify")} <ChevronRight size={14} />
                                     </Link>
                                 )}
                                 {step.id === "trial" && status === "active" && (
@@ -234,7 +219,7 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
                                             <Loader2 size={14} className="animate-spin" />
                                         ) : (
                                             <>
-                                                Demo Başlat <ChevronRight size={14} />
+                                                {t("startDemo")} <ChevronRight size={14} />
                                             </>
                                         )}
                                     </button>
@@ -244,7 +229,7 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
                                         href={toolsHref}
                                         className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#343131] bg-[#e6c800] rounded-lg hover:bg-[#d4b800] transition-colors"
                                     >
-                                        İlk Aracı Kullan <ChevronRight size={14} />
+                                        {t("firstTool")} <ChevronRight size={14} />
                                     </Link>
                                 )}
                                 {step.id === "evaluate" && status === "active" && (
@@ -252,7 +237,7 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
                                         href={packageHref}
                                         className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-[#343131] bg-[#e6c800] rounded-lg hover:bg-[#d4b800] transition-colors"
                                     >
-                                        Paketi İncele <ChevronRight size={14} />
+                                        {t("reviewPackage")} <ChevronRight size={14} />
                                     </Link>
                                 )}
                             </div>

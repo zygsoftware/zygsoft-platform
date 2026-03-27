@@ -4,10 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Zap, ShoppingCart, ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { TrialRequestCTA } from "@/components/trial/TrialRequestCTA";
+import { useTranslations } from "next-intl";
 
 type TrialCountdownCardProps = {
     trialStatus: string;
-    trialStartedAt: string | null;
     trialEndsAt: string | null;
     trialOperationsUsed: number;
     trialOperationsLimit: number;
@@ -25,40 +25,43 @@ function getRemainingMs(endsAt: string | null): number {
     return Math.max(0, end.getTime() - now.getTime());
 }
 
-function formatTimeLeft(endsAt: string | null): string {
+function formatTimeLeft(endsAt: string | null, t: ReturnType<typeof useTranslations<"Dashboard.shared.trial">>): string {
     const diff = getRemainingMs(endsAt);
-    if (diff <= 0) return "0 saat";
+    if (diff <= 0) return t("zeroHours");
     const days = Math.floor(diff / DAY_MS);
     const hours = Math.floor((diff % DAY_MS) / HOUR_MS);
-    if (days > 0) return `${days} gün ${hours} saat kaldı`;
+    if (days > 0) return t("daysHoursLeft", { days, hours });
     const mins = Math.floor((diff % HOUR_MS) / (60 * 1000));
-    if (hours > 0) return `${hours} saat ${mins} dakika kaldı`;
-    return `${mins} dakika kaldı`;
+    if (hours > 0) return t("hoursMinutesLeft", { hours, minutes: mins });
+    return t("minutesLeft", { minutes: mins });
 }
 
 /** Compact format for header badge: "2g 4s kaldı" */
-export function formatTimeLeftCompact(endsAt: string | null): string {
+export function formatTimeLeftCompact(
+    endsAt: string | null,
+    t?: ReturnType<typeof useTranslations<"Dashboard.shared.trial">>
+): string {
     const diff = getRemainingMs(endsAt);
-    if (diff <= 0) return "0s";
+    if (diff <= 0) return t ? t("compactZero") : "0h";
     const days = Math.floor(diff / DAY_MS);
     const hours = Math.floor((diff % DAY_MS) / HOUR_MS);
-    if (days > 0) return `${days}g ${hours}s kaldı`;
-    if (hours > 0) return `${hours}s kaldı`;
+    if (days > 0) return t ? t("compactDaysHours", { days, hours }) : `${days}d ${hours}h left`;
+    if (hours > 0) return t ? t("compactHours", { hours }) : `${hours}h left`;
     const mins = Math.floor((diff % HOUR_MS) / (60 * 1000));
-    return `${mins}dk kaldı`;
+    return t ? t("compactMinutes", { minutes: mins }) : `${mins}m left`;
 }
 
 type TrialCountdownCardPropsWithEmail = TrialCountdownCardProps & { emailVerified?: boolean };
 
 export function TrialCountdownCard({
     trialStatus,
-    trialStartedAt,
     trialEndsAt,
     trialOperationsUsed,
     trialOperationsLimit,
     hasSubscription,
     emailVerified = true,
 }: TrialCountdownCardPropsWithEmail) {
+    const t = useTranslations("Dashboard.shared.trial");
     if (hasSubscription) return null;
 
     /* ── trialStatus === "none" ── */
@@ -77,9 +80,9 @@ export function TrialCountdownCard({
                             <Zap size={24} />
                         </div>
                         <div>
-                            <h3 className="font-black text-[#343131] text-lg">3 Günlük Ücretsiz Demo</h3>
+                            <h3 className="font-black text-[#343131] text-lg">{t("availableTitle")}</h3>
                             <p className="text-slate-600 text-sm mt-0.5">
-                                20 işlem hakkı ile tüm belge araçlarını deneyin.
+                                {t("availableDesc")}
                             </p>
                         </div>
                     </div>
@@ -113,10 +116,10 @@ export function TrialCountdownCard({
                 : "border-emerald-200 bg-emerald-50/30";
 
         const urgencyTitle = isTimeUrgent6h
-            ? "Demo sürenizin bitmesine çok az kaldı"
+            ? t("activeEndingSoon")
             : isTimeUrgent24h
-                ? "Demo süreniz bugün sona eriyor"
-                : "Demo süreniz aktif";
+                ? t("activeEndsToday")
+                : t("activeTitle");
 
         return (
             <motion.div
@@ -138,9 +141,9 @@ export function TrialCountdownCard({
                             </div>
                             <div>
                                 <h3 className="font-black text-[#343131] text-lg">{urgencyTitle}</h3>
-                                <p className="text-slate-600 text-sm mt-0.5">{formatTimeLeft(trialEndsAt)}</p>
+                                <p className="text-slate-600 text-sm mt-0.5">{formatTimeLeft(trialEndsAt, t)}</p>
                                 <p className="text-slate-500 text-sm mt-1">
-                                    {trialOperationsUsed} / {trialOperationsLimit} işlem kullandınız
+                                    {t("usageUsed", { used: trialOperationsUsed, limit: trialOperationsLimit })}
                                 </p>
                             </div>
                         </div>
@@ -148,8 +151,8 @@ export function TrialCountdownCard({
                         <div className="space-y-3">
                             <div>
                                 <div className="flex justify-between text-xs font-bold text-slate-600 mb-1">
-                                    <span>Süre</span>
-                                    <span>{Math.round(timeRemainingPct)}% kaldı</span>
+                                    <span>{t("timeLabel")}</span>
+                                    <span>{t("timeRemainingPct", { percent: Math.round(timeRemainingPct) })}</span>
                                 </div>
                                 <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
                                     <motion.div
@@ -164,7 +167,7 @@ export function TrialCountdownCard({
                             </div>
                             <div>
                                 <div className="flex justify-between text-xs font-bold text-slate-600 mb-1">
-                                    <span>İşlem kullanımı</span>
+                                    <span>{t("usageLabel")}</span>
                                     <span>{trialOperationsUsed} / {trialOperationsLimit}</span>
                                 </div>
                                 <div className="h-2 rounded-full bg-slate-200 overflow-hidden">
@@ -186,7 +189,7 @@ export function TrialCountdownCard({
                                     exit={{ opacity: 0, height: 0 }}
                                     className="mt-3 text-amber-700 text-sm font-medium"
                                 >
-                                    Son {operationsRemaining} kullanım hakkınız kaldı
+                                    {t("usageRemainingLast", { count: operationsRemaining })}
                                 </motion.p>
                             )}
                         </AnimatePresence>
@@ -197,7 +200,7 @@ export function TrialCountdownCard({
                             href="/dijital-urunler/hukuk-araclari-paketi"
                             className="inline-flex items-center gap-2 px-6 py-3 bg-[#e6c800] text-[#343131] font-black rounded-xl hover:bg-[#d4b800] transition-all shadow-sm"
                         >
-                            Paketi Etkinleştir
+                            {t("activatePackage")}
                             <ArrowRight size={18} />
                         </Link>
                     </div>
@@ -222,9 +225,9 @@ export function TrialCountdownCard({
                             <Zap size={24} />
                         </div>
                         <div>
-                            <h3 className="font-black text-[#343131] text-lg">Demo süreniz sona erdi</h3>
+                            <h3 className="font-black text-[#343131] text-lg">{t("expiredTitle")}</h3>
                             <p className="text-slate-600 text-sm mt-0.5">
-                                Tam erişim için Hukuk Araçları Paketini satın alın.
+                                {t("expiredDesc")}
                             </p>
                         </div>
                     </div>
@@ -232,7 +235,7 @@ export function TrialCountdownCard({
                         href="/dijital-urunler/hukuk-araclari-paketi"
                         className="flex items-center gap-2 px-6 py-3 bg-[#e6c800] text-[#343131] font-black rounded-xl hover:bg-[#d4b800] transition-all shrink-0"
                     >
-                        Paketi Satın Al <ShoppingCart size={18} />
+                        {t("buyPackage")} <ShoppingCart size={18} />
                     </Link>
                 </div>
             </motion.div>

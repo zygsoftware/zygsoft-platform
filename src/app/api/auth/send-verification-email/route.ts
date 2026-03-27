@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     );
   }
 
-  let body: { locale?: string };
+  let body: { locale?: string; email?: string };
   try {
     body = await req.json().catch(() => ({}));
   } catch {
@@ -41,17 +41,25 @@ export async function POST(req: Request) {
 
   const locale = (body?.locale === "en" ? "en" : "tr") as "tr" | "en";
 
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) {
-    return NextResponse.json({ message: genericMessage(locale) }, { status: 200 });
-  }
-
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-    });
+    const session = await getServerSession(authOptions);
+    const normalizedEmail = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+
+    const user = session?.user?.id
+      ? await prisma.user.findUnique({
+          where: { id: session.user.id },
+        })
+      : normalizedEmail
+        ? await prisma.user.findUnique({
+            where: { email: normalizedEmail },
+          })
+        : null;
 
     if (!user?.email) {
+      return NextResponse.json({ message: genericMessage(locale) }, { status: 200 });
+    }
+
+    if (user.role !== "customer" || user.status !== "active") {
       return NextResponse.json({ message: genericMessage(locale) }, { status: 200 });
     }
 

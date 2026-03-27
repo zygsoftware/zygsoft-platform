@@ -78,6 +78,10 @@ export const authOptions: NextAuthOptions = {
                     return null;
                 }
 
+                if (user.role === "customer" && !user.emailVerified) {
+                    return null;
+                }
+
                 const isValid = await bcrypt.compare(credentials.password, user?.password || "");
                 if (user && isValid) {
                     return {

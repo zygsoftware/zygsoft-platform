@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 type Strength = "weak" | "fair" | "good" | "strong";
 
 function getStrength(password: string): Strength {
@@ -16,13 +18,6 @@ function getStrength(password: string): Strength {
     return "strong";
 }
 
-const labels: Record<Strength, string> = {
-    weak: "Zayıf",
-    fair: "Orta",
-    good: "İyi",
-    strong: "Güçlü",
-};
-
 const colors: Record<Strength, string> = {
     weak: "bg-red-400",
     fair: "bg-amber-500",
@@ -35,7 +30,8 @@ type PasswordStrengthMeterProps = {
     locale?: "tr" | "en";
 };
 
-export function PasswordStrengthMeter({ password, locale = "tr" }: PasswordStrengthMeterProps) {
+export function PasswordStrengthMeter({ password }: PasswordStrengthMeterProps) {
+    const t = useTranslations("Auth.shared.passwordStrength");
     const strength = getStrength(password);
     if (!password) return null;
 
@@ -51,7 +47,7 @@ export function PasswordStrengthMeter({ password, locale = "tr" }: PasswordStren
                     />
                 </div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500">
-                    {locale === "en" ? strength : labels[strength]}
+                    {locale === "en" ? t(strength) : t(strength)}
                 </span>
             </div>
         </div>

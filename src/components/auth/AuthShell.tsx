@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
+import zygLogo from "@/ZYGLogo.png";
 
 type AuthShellProps = {
   children: React.ReactNode;
@@ -21,14 +23,14 @@ export function AuthShell({ children, hero, showHero = true }: AuthShellProps) {
 
       {/* Mobile: Hero above */}
       {showHero && hero && (
-        <aside className="lg:hidden w-full flex-shrink-0 bg-[#343131] relative overflow-hidden min-h-[200px] flex items-center justify-center p-8">
+        <aside className="surface-dark lg:hidden w-full flex-shrink-0 relative overflow-hidden min-h-[220px] flex items-center justify-center p-8 bg-[#343131]">
           {hero}
         </aside>
       )}
 
       {/* Desktop: Hero left panel */}
       {showHero && hero && (
-        <aside className="hidden lg:flex lg:w-[42%] xl:w-[46%] flex-shrink-0 flex-col justify-between p-12 xl:p-16 2xl:p-20 bg-[#343131] relative overflow-hidden">
+        <aside className="surface-dark hidden lg:flex lg:w-[42%] xl:w-[46%] flex-shrink-0 flex-col justify-between p-12 xl:p-16 2xl:p-20 relative overflow-hidden bg-[#343131]">
           {hero}
         </aside>
       )}
@@ -45,15 +47,16 @@ export function AuthLogo() {
   return (
     <Link
       href="/"
-      className="block hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e6c800] focus-visible:ring-offset-2 focus-visible:ring-offset-[#343131] rounded"
+      className="inline-flex w-fit items-center justify-center rounded-[18px] border border-black/10 bg-white p-2 shadow-[0_12px_30px_rgba(0,0,0,0.12)] transition-transform hover:scale-[1.01] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e6c800] focus-visible:ring-offset-2 focus-visible:ring-offset-[#343131]"
       aria-label="ZYGSOFT Ana Sayfa"
     >
-      <img
-        src="/brand/ZYGLogo.png"
+      <Image
+        src={zygLogo}
         alt="ZYGSOFT"
-        className="h-8 xl:h-9 w-auto"
-        width={198}
-        height={36}
+        className="block h-auto w-[126px] xl:w-[138px]"
+        width={171}
+        height={60}
+        priority
       />
     </Link>
   );

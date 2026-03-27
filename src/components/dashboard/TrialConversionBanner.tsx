@@ -2,6 +2,7 @@
 
 import { Link } from "@/i18n/navigation";
 import { Zap, ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface TrialConversionBannerProps {
     trialStatus: string;
@@ -9,6 +10,7 @@ interface TrialConversionBannerProps {
 }
 
 export function TrialConversionBanner({ trialStatus, hasSubscription }: TrialConversionBannerProps) {
+    const t = useTranslations("Dashboard.shared.trialBanner");
     if (trialStatus !== "active" || hasSubscription) return null;
 
     return (
@@ -19,10 +21,10 @@ export function TrialConversionBanner({ trialStatus, hasSubscription }: TrialCon
                 </div>
                 <div>
                     <h4 className="font-heading font-black text-white text-sm mb-0.5">
-                        Demo kullanıyorsunuz
+                        {t("title")}
                     </h4>
                     <p className="text-slate-400 text-sm font-medium">
-                        Tam erişim için Hukuk Araçları Paketini etkinleştirin.
+                        {t("desc")}
                     </p>
                 </div>
             </div>
@@ -30,7 +32,7 @@ export function TrialConversionBanner({ trialStatus, hasSubscription }: TrialCon
                 href="/dijital-urunler/hukuk-araclari-paketi"
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#e6c800] text-[#343131] font-black rounded-xl text-sm hover:bg-white transition-all shrink-0"
             >
-                Paketi Etkinleştir
+                {t("cta")}
                 <ArrowRight size={16} />
             </Link>
         </div>

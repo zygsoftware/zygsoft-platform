@@ -80,7 +80,7 @@ export function AppStoreShowcase() {
                     >
                         <div className="inline-flex items-center gap-3 mb-8 px-5 py-2.5 bg-white/8 border border-white/15 rounded-full backdrop-blur">
                             <Blocks size={12} className="text-[#e6c800]" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em] !text-white/80">{t("storeBadge") || "Dijital Ürünler & Yazılım Araçları"}</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] !text-white/80 [font-family:var(--font-button)]">{t("storeBadge") || "Dijital Ürünler & Yazılım Araçları"}</span>
                         </div>
 
                         <motion.h2
@@ -123,13 +123,13 @@ export function AppStoreShowcase() {
 
                         <Link
                             href={primaryHref}
-                            className="home-btn-primary-yellow inline-flex items-center gap-2.5 px-8 py-4 font-black uppercase tracking-[0.24em] text-[11px] rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
+                            className="home-btn-primary-yellow inline-flex items-center gap-2.5 px-8 py-4 font-black uppercase tracking-[0.24em] text-[11px] rounded-2xl !text-[#343131] [font-family:var(--font-button)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
                         >
                             {primaryLabel} <ArrowRight size={18} />
                         </Link>
                         <Link
                             href="/dijital-urunler/hukuk-araclari-paketi#pricing"
-                            className="ml-0 mt-4 inline-flex items-center gap-2.5 text-[11px] font-black uppercase tracking-[0.2em] !text-white/72 transition-colors hover:!text-white md:ml-6 md:mt-0"
+                            className="ml-0 mt-4 inline-flex items-center gap-2.5 text-[11px] font-black uppercase tracking-[0.2em] !text-white/72 [font-family:var(--font-button)] transition-colors hover:!text-white md:ml-6 md:mt-0"
                         >
                             {isTr ? "Paket detayını gör" : "View package details"}
                             <ArrowRight size={14} />
@@ -149,7 +149,7 @@ export function AppStoreShowcase() {
                                 <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, #fff 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
 
                                 <div className="relative z-10 flex items-start justify-between mb-6">
-                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e6c800] !text-[#343131] text-[10px] font-black uppercase tracking-[0.24em]">
+                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#e6c800] !text-[#343131] text-[10px] font-black uppercase tracking-[0.24em] [font-family:var(--font-button)]">
                                         <Sparkles size={12} />
                                         {previewProducts[0].tag}
                                     </div>
@@ -233,11 +233,11 @@ export function AppStoreShowcase() {
                                 </div>
 
                                 <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                                    <Link href={primaryHref} className="home-btn-primary-yellow inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-colors">
+                                    <Link href={primaryHref} className="home-btn-primary-yellow inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] !text-[#343131] [font-family:var(--font-button)] transition-colors">
                                         {primaryLabel}
                                         <ArrowRight size={14} />
                                     </Link>
-                                    <Link href="/dijital-urunler/hukuk-araclari-paketi#pricing" className="home-btn-outline-light inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] transition-colors">
+                                    <Link href="/dijital-urunler/hukuk-araclari-paketi#pricing" className="home-btn-outline-light inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] !text-white [font-family:var(--font-button)] transition-colors">
                                         {isTr ? "Fiyat ve detay" : "Pricing & details"}
                                     </Link>
                                 </div>

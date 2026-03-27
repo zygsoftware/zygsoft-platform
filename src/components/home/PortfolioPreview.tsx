@@ -67,7 +67,7 @@ export function PortfolioPreview() {
           <motion.div variants={createRevealUp(reducedMotion, 20, 4)}>
             <Link
               href="/portfolio"
-              className="group inline-flex items-center gap-3 font-black text-sm uppercase tracking-[0.2em] text-[#343131] hover:text-[#e6c800] transition-colors"
+              className="group inline-flex items-center gap-3 font-black text-sm uppercase tracking-[0.2em] text-[#343131] [font-family:var(--font-button)] hover:text-[#e6c800] transition-colors"
             >
               {t("exploreMore")}
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -126,7 +126,7 @@ export function PortfolioPreview() {
                         <p className="text-[#343131]/55 text-sm leading-relaxed line-clamp-2 mb-4">
                           {excerpt}
                         </p>
-                        <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#343131]/70 group-hover:text-[#e6c800] transition-colors">
+                        <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#343131]/70 [font-family:var(--font-button)] group-hover:text-[#e6c800] transition-colors">
                           {t("viewProject")}
                           <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
                         </span>
@@ -150,7 +150,7 @@ export function PortfolioPreview() {
             </p>
             <Link
               href="/portfolio"
-              className="inline-flex items-center gap-2 font-bold text-[#e6c800] hover:text-[#343131] transition-colors"
+              className="inline-flex items-center gap-2 font-bold text-[#e6c800] [font-family:var(--font-button)] hover:text-[#343131] transition-colors"
             >
               {t("exploreMore")}
               <ArrowRight size={16} />

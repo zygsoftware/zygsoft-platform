@@ -9,7 +9,6 @@ import {
     Check,
     ChevronDown,
     LayoutDashboard,
-    FileStack,
     ScanText,
     Merge,
     Image,
@@ -107,6 +106,12 @@ const PRICE_FEATURES = [
     "Belgeler işlem sonrası silinir",
 ];
 
+type ProductSessionUser = {
+    activeProductSlugs?: string[];
+    emailVerified?: boolean;
+    trialStatus?: string;
+};
+
 function DashboardMock() {
     return (
         <div className="w-full max-w-[420px] rounded-2xl bg-white border border-[#343131]/[0.06] shadow-[0_24px_64px_rgba(0,0,0,0.08)] overflow-hidden">
@@ -115,7 +120,7 @@ function DashboardMock() {
             </div>
             <div className="flex min-h-[280px]">
                 <aside className="w-[140px] shrink-0 border-r border-[#343131]/[0.06] py-4 bg-[#343131]/[0.01]">
-                    {["Genel Bakış", "Belge Araçları", "PDF Araçları", "OCR", "Ayarlar"].map((label, i) => (
+                    {["Genel Bakış", "Belge Araçları", "PDF Araçları", "OCR", "Ayarlar"].map((label) => (
                         <div key={label} className="flex items-center gap-2 px-3 py-2.5 mx-2 rounded-lg text-[11px] font-medium text-[#343131]/50">
                             <LayoutDashboard size={14} className="shrink-0 opacity-70" />
                             <span className="truncate">{label}</span>
@@ -176,8 +181,9 @@ function FaqItem({ q, a, isOpen, onToggle }: { q: string; a: string; isOpen: boo
 export default function HukukAraclariPaketiPage() {
     const { data: session, status } = useSession();
     const reducedMotion = !!useReducedMotion();
-    const hasLegalToolkit = (session?.user as any)?.activeProductSlugs?.includes("legal-toolkit");
-    const emailVerified = (session?.user as any)?.emailVerified ?? false;
+    const sessionUser = session?.user as (typeof session.user & ProductSessionUser) | undefined;
+    const hasLegalToolkit = sessionUser?.activeProductSlugs?.includes("legal-toolkit") ?? false;
+    const emailVerified = sessionUser?.emailVerified ?? false;
     const [activeStep, setActiveStep] = useState(0);
     const [faqOpen, setFaqOpen] = useState<number | null>(0);
 
@@ -344,7 +350,7 @@ export default function HukukAraclariPaketiPage() {
                             viewport={revealViewport}
                             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
                         >
-                            {TOOLS.map((tool, i) => {
+                            {TOOLS.map((tool) => {
                                 const Icon = tool.icon;
                                 return (
                                     <motion.div
@@ -432,7 +438,7 @@ export default function HukukAraclariPaketiPage() {
                             viewport={revealViewport}
                             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
                         >
-                            {PROBLEMS.map((p, i) => (
+                            {PROBLEMS.map((p) => (
                                 <motion.div
                                     key={p.problem}
                                     variants={createRevealUp(reducedMotion, 24, 4)}
@@ -556,16 +562,16 @@ export default function HukukAraclariPaketiPage() {
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            className="relative rounded-[2rem] p-8 md:p-12 bg-[#343131] border border-white/10 overflow-hidden"
+                            className="surface-dark product-surface-dark relative rounded-[2rem] p-8 md:p-12 bg-[#343131] border border-white/10 overflow-hidden"
                         >
                             <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
                             <div className="relative z-10 text-center">
-                                <h2 className="text-2xl md:text-3xl font-display font-black text-white mb-6">
+                                <h2 className="product-surface-strong text-2xl md:text-3xl font-display font-black mb-6">
                                     Hukuk Araçları Paketi
                                 </h2>
                                 <div className="relative inline-block mb-6">
-                                    <span className="text-4xl md:text-5xl font-black text-white">₺3.000</span>
-                                    <span className="text-white/70 text-lg font-bold ml-1">/ yıl</span>
+                                    <span className="product-surface-strong text-4xl md:text-5xl font-black">₺3.000</span>
+                                    <span className="product-surface-muted text-lg font-bold ml-1">/ yıl</span>
                                     {!reducedMotion && (
                                         <motion.div
                                             className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg"
@@ -584,7 +590,7 @@ export default function HukukAraclariPaketiPage() {
                                 </div>
                                 <ul className="space-y-3 mb-8 text-left max-w-sm mx-auto">
                                     {PRICE_FEATURES.map((f) => (
-                                        <li key={f} className="flex items-center gap-3 text-white/80 text-sm">
+                                        <li key={f} className="product-surface-muted flex items-center gap-3 text-sm">
                                             <Check size={18} className="text-[#e6c800] shrink-0" />
                                             {f}
                                         </li>
@@ -597,10 +603,10 @@ export default function HukukAraclariPaketiPage() {
                                 ) : status === "authenticated" ? (
                                     <div className="flex flex-col gap-3">
                                         <div className="p-3 rounded-xl bg-white/10">
-                                            <p className="text-sm font-medium text-white/80 mb-2">Önce deneyin, sonra karar verin</p>
+                                            <p className="product-surface-muted text-sm font-medium mb-2">Önce deneyin, sonra karar verin</p>
                                             <TrialRequestCTA
                                                 emailVerified={emailVerified}
-                                                trialStatus={(session?.user as any)?.trialStatus ?? "none"}
+                                                trialStatus={sessionUser?.trialStatus ?? "none"}
                                                 hasSubscription={false}
                                                 source="product-page"
                                                 className="!bg-[#e6c800] !text-[#343131]"
@@ -615,7 +621,7 @@ export default function HukukAraclariPaketiPage() {
                                         <Link href="/register" className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl">
                                             Abone Ol ve Ödeme Bildir <ArrowRight size={18} />
                                         </Link>
-                                        <p className="text-sm text-white/60">Hesap aç, ödeme bildir, aynı gün aktivasyon al.</p>
+                                        <p className="product-surface-soft text-sm">Hesap aç, ödeme bildir, aynı gün aktivasyon al.</p>
                                     </div>
                                 )}
                             </div>
@@ -660,17 +666,17 @@ export default function HukukAraclariPaketiPage() {
                 </section>
 
                 {/* SECTION 10 — FINAL CTA */}
-                <section className="py-20 md:py-28 bg-[#343131] border-t border-white/10">
+                <section className="surface-dark product-surface-dark py-20 md:py-28 bg-[#343131] border-t border-white/10">
                     <div className="container mx-auto px-6 max-w-4xl text-center">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                         >
-                            <h2 className="text-3xl md:text-4xl font-display font-black text-white mb-6">
+                            <h2 className="product-surface-strong text-3xl md:text-4xl font-display font-black mb-6">
                                 UYAP belge işlemlerini hızlandırın.
                             </h2>
-                            <p className="text-white/60 text-lg mb-8 max-w-xl mx-auto">
+                            <p className="product-surface-muted text-lg mb-8 max-w-xl mx-auto">
                                 Hukuk Araçları Paketi ile belge iş akışlarınızı tek platformda yönetin.
                             </p>
                             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
@@ -688,13 +694,13 @@ export default function HukukAraclariPaketiPage() {
                                 </Link>
                             </div>
                             <div className="mt-10 flex flex-wrap justify-center gap-6 text-sm">
-                                <Link href="/dijital-urunler" className="text-white/50 hover:text-white transition-colors">
+                                <Link href="/dijital-urunler" className="product-surface-soft hover:text-white transition-colors">
                                     Dijital Ürünler
                                 </Link>
-                                <Link href="/blog" className="text-white/50 hover:text-white transition-colors">
+                                <Link href="/blog" className="product-surface-soft hover:text-white transition-colors">
                                     Blog
                                 </Link>
-                                <Link href="/dashboard/tools" className="text-white/50 hover:text-white transition-colors">
+                                <Link href="/dashboard/tools" className="product-surface-soft hover:text-white transition-colors">
                                     Araçlar
                                 </Link>
                             </div>
