@@ -19,6 +19,20 @@ const KNOWN_PRODUCTS: Record<
     },
 };
 
+type PaymentSessionUser = {
+    id: string;
+    role?: string | null;
+    emailVerified?: boolean | Date | null;
+    name?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    company?: string | null;
+};
+
+function getErrorMessage(error: unknown, fallback: string): string {
+    return error instanceof Error && error.message ? error.message : fallback;
+}
+
 function parseReceiptDataUrl(dataUrl: string): { buffer: Buffer; contentType: string; extension: string } {
     const match = dataUrl.match(/^data:(.+?);base64,(.+)$/);
     if (!match) {
@@ -54,7 +68,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Oturum açmanız gerekiyor." }, { status: 401 });
         }
 
-        const user = session.user as any;
+        const user = session.user as PaymentSessionUser;
         if (user.role !== "admin" && !user.emailVerified) {
             return NextResponse.json(
                 { error: "Ödeme bildirimi yapmak için e-posta adresinizi doğrulamanız gerekiyor." },
@@ -62,10 +76,10 @@ export async function POST(req: Request) {
             );
         }
 
-        const { amount, receiptImage, productId } = await req.json();
+        const { amount, receiptImage, productId, note } = await req.json();
 
-        if (!amount || !receiptImage || !productId) {
-            return NextResponse.json({ error: "Tutar, dekont görüntüsü ve ürün seçimi zorunludur." }, { status: 400 });
+        if (!amount || !productId) {
+            return NextResponse.json({ error: "Tutar ve ürün seçimi zorunludur." }, { status: 400 });
         }
 
         // Reject oversized receipt uploads (base64 ~4/3 of binary — cap at ~8 MB)
@@ -79,22 +93,24 @@ export async function POST(req: Request) {
         }
 
         let receiptUrl: string | null = null;
-        try {
-            const parsedReceipt = parseReceiptDataUrl(receiptImage);
-            const receiptPath = buildStorageObjectPath([
-                session.user.id,
-                `${Date.now()}-${crypto.randomUUID()}${parsedReceipt.extension}`,
-            ]);
-            const uploaded = await uploadToStorage({
-                bucket: storageBuckets.payments,
-                objectPath: receiptPath,
-                body: new Uint8Array(parsedReceipt.buffer),
-                contentType: parsedReceipt.contentType,
-                upsert: false,
-            });
-            receiptUrl = uploaded.publicUrl;
-        } catch (receiptError: any) {
-            return NextResponse.json({ error: receiptError.message || "Dekont yüklenemedi." }, { status: 400 });
+        if (typeof receiptImage === "string" && receiptImage.trim()) {
+            try {
+                const parsedReceipt = parseReceiptDataUrl(receiptImage);
+                const receiptPath = buildStorageObjectPath([
+                    session.user.id,
+                    `${Date.now()}-${crypto.randomUUID()}${parsedReceipt.extension}`,
+                ]);
+                const uploaded = await uploadToStorage({
+                    bucket: storageBuckets.payments,
+                    objectPath: receiptPath,
+                    body: new Uint8Array(parsedReceipt.buffer),
+                    contentType: parsedReceipt.contentType,
+                    upsert: false,
+                });
+                receiptUrl = uploaded.publicUrl;
+            } catch (receiptError: unknown) {
+                return NextResponse.json({ error: getErrorMessage(receiptError, "Dekont yüklenemedi.") }, { status: 400 });
+            }
         }
 
         const normalizedProductSlug = String(productId).trim();
@@ -160,6 +176,7 @@ export async function POST(req: Request) {
                 createdAt: newPayment.createdAt,
                 amount: parsedAmount,
                 receiptUrl,
+                note: typeof note === "string" && note.trim() ? note.trim() : null,
                 productName: dbProduct.name,
                 productSlug: dbProduct.slug,
                 userName: user.name ?? null,
@@ -175,13 +192,13 @@ export async function POST(req: Request) {
             { message: "Ödeme bildirimi başarıyla alındı.", paymentId: newPayment.id },
             { status: 201 }
         );
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("PAYMENT_NOTIFY_ERROR", error);
 
         let errorMessage = "Bildirim oluşturulurken hata oluştu.";
-        if (error?.message && error.message.includes("product")) {
+        if (error instanceof Error && error.message.includes("product")) {
             errorMessage = "Veritabanı değişikliği algılandı. Lütfen terminali (npm run dev) kapatıp YENİDEN BAŞLATIN.";
-        } else if (error?.message) {
+        } else if (error instanceof Error && error.message) {
             errorMessage = error.message;
         }
 

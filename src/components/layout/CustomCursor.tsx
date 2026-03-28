@@ -6,7 +6,15 @@ import { motion, useSpring, useMotionValue } from "framer-motion";
 export function CustomCursor() {
     const [isHovered, setIsHovered] = useState(false);
     const [hidden, setHidden] = useState(true);
-    const [disabled, setDisabled] = useState(true);
+    const [disabled] = useState(() => {
+        if (typeof window === "undefined") {
+            return true;
+        }
+
+        const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        return hasTouch || prefersReducedMotion;
+    });
 
     const cursorX = useMotionValue(-100);
     const cursorY = useMotionValue(-100);
@@ -20,17 +28,6 @@ export function CustomCursor() {
 
     const trailingXSpring = useSpring(cursorX, springConfigTrailing);
     const trailingYSpring = useSpring(cursorY, springConfigTrailing);
-
-    useEffect(() => {
-        // Hide on touch devices
-        const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-        if (hasTouch || prefersReducedMotion) {
-            setDisabled(true);
-            return;
-        }
-        setDisabled(false);
-    }, []);
 
     useEffect(() => {
         if (disabled) return;
@@ -75,7 +72,7 @@ export function CustomCursor() {
         <>
             {/* Small solid inner dot */}
             <motion.div
-                className="fixed top-0 left-0 w-1 h-1 rounded-full bg-[#343131] pointer-events-none z-[100000] hidden md:block"
+                className="custom-cursor-dot fixed top-0 left-0 w-1 h-1 rounded-full bg-[#343131] pointer-events-none z-[100000] hidden md:block"
                 style={{
                     x: cursorXSpring,
                     y: cursorYSpring,
@@ -86,7 +83,7 @@ export function CustomCursor() {
             />
             {/* Thin outer ring */}
             <motion.div
-                className="fixed top-0 left-0 w-8 h-8 rounded-full border-[0.5px] border-[#343131]/15 pointer-events-none z-[99999] hidden md:block"
+                className="custom-cursor-ring fixed top-0 left-0 w-8 h-8 rounded-full border-[0.5px] border-[#343131]/15 pointer-events-none z-[99999] hidden md:block"
                 style={{
                     x: trailingXSpring,
                     y: trailingYSpring,

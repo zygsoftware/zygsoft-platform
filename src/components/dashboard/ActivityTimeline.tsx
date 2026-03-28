@@ -168,7 +168,7 @@ function mapItemToRow(
             title,
             description,
             date: item.date,
-            href: "/dashboard/billing",
+            href: "/payment",
         };
     }
 
@@ -248,7 +248,7 @@ export function ActivityTimeline() {
                 <p className="text-slate-300 text-xs font-medium mt-1.5">{t("emptyHint")}</p>
                 <div className="flex flex-wrap justify-center gap-2 mt-4">
                     <Link
-                        href="/dashboard/billing"
+                        href="/payment"
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-50 text-amber-700 text-xs font-bold hover:bg-amber-100 transition-colors"
                     >
                         <Receipt size={14} />

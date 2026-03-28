@@ -139,6 +139,13 @@ body {
   line-height: 1.6;
 }
 
+body.payment-modal-open .custom-cursor-dot,
+body.payment-modal-open .custom-cursor-ring,
+body.payment-modal-open .floating-whatsapp {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* ─── Typography ───────────────────────────── */
 .font-display {
   font-family: var(--font-linux-libertine), serif;

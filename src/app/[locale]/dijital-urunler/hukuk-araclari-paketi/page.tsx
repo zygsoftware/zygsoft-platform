@@ -31,6 +31,7 @@ import { TrialRequestCTA } from "@/components/trial/TrialRequestCTA";
 import { Footer } from "@/components/layout/Footer";
 import { PanelShowcase } from "@/components/home/PanelShowcase";
 import { createRevealUp, revealViewport, staggerContainer } from "@/components/ui/motion";
+import { PaymentModalTrigger } from "@/components/payment/PaymentModalTrigger";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -187,16 +188,9 @@ export default function HukukAraclariPaketiPage() {
     const [activeStep, setActiveStep] = useState(0);
     const [faqOpen, setFaqOpen] = useState<number | null>(0);
 
-    const ctaHref = hasLegalToolkit
-        ? "/dashboard/tools"
-        : status === "authenticated"
-            ? "/dashboard/billing?product=legal-toolkit"
-            : "/register";
     const ctaLabel = hasLegalToolkit
         ? "Araçları Aç"
-        : status === "authenticated"
-            ? "Şimdi Abone Ol"
-            : "Hesap Aç ve Başla";
+        : "Şimdi Satın Al";
     const secondaryCtaHref = hasLegalToolkit
         ? "/dashboard/tools"
         : "/dijital-urunler#pricing";
@@ -274,12 +268,18 @@ export default function HukukAraclariPaketiPage() {
                                     DOCX → UDF dönüştürme, PDF araçları, OCR metin çıkarma ve toplu belge işlemleri tek platformda.
                                 </p>
                                 <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                                    <Link
-                                        href={ctaHref}
-                                        className="home-btn-primary-yellow inline-flex min-h-12 items-center justify-center gap-2.5 px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-lg shadow-[#e6c800]/25 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                                    >
-                                        {ctaLabel} <ArrowRight size={18} />
-                                    </Link>
+                                    {hasLegalToolkit ? (
+                                        <Link
+                                            href="/dashboard/tools"
+                                            className="home-btn-primary-yellow inline-flex min-h-12 items-center justify-center gap-2.5 px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-lg shadow-[#e6c800]/25 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                                        >
+                                            {ctaLabel} <ArrowRight size={18} />
+                                        </Link>
+                                    ) : (
+                                        <PaymentModalTrigger className="home-btn-primary-yellow inline-flex min-h-12 items-center justify-center gap-2.5 px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-lg shadow-[#e6c800]/25 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                                            {ctaLabel} <ArrowRight size={18} />
+                                        </PaymentModalTrigger>
+                                    )}
                                     <a
                                         href="#pricing"
                                         className="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-2xl border border-[#343131]/[0.12] px-8 py-4 text-[11px] font-bold uppercase tracking-[0.2em] text-[#343131]/80 transition-all duration-200 hover:bg-[#343131]/[0.04]"
@@ -612,15 +612,15 @@ export default function HukukAraclariPaketiPage() {
                                                 className="!bg-[#e6c800] !text-[#343131]"
                                             />
                                         </div>
-                                        <Link href="/dashboard/billing?product=legal-toolkit" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 px-5 py-3 text-sm font-bold text-white/85 transition-colors hover:bg-white/10">
+                                        <PaymentModalTrigger className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 px-5 py-3 text-sm font-bold text-white/85 transition-colors hover:bg-white/10">
                                             Doğrudan abone ol <ArrowRight size={16} />
-                                        </Link>
+                                        </PaymentModalTrigger>
                                     </div>
                                 ) : (
                                     <div className="flex flex-col items-center gap-3">
-                                        <Link href="/register" className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl">
+                                        <PaymentModalTrigger className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl">
                                             Abone Ol ve Ödeme Bildir <ArrowRight size={18} />
-                                        </Link>
+                                        </PaymentModalTrigger>
                                         <p className="product-surface-soft text-sm">Hesap aç, ödeme bildir, aynı gün aktivasyon al.</p>
                                     </div>
                                 )}
@@ -680,12 +680,18 @@ export default function HukukAraclariPaketiPage() {
                                 Hukuk Araçları Paketi ile belge iş akışlarınızı tek platformda yönetin.
                             </p>
                             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                                <Link
-                                    href={ctaHref}
-                                    className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
-                                >
-                                    {ctaLabel} <ArrowRight size={20} />
-                                </Link>
+                                {hasLegalToolkit ? (
+                                    <Link
+                                        href="/dashboard/tools"
+                                        className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
+                                    >
+                                        {ctaLabel} <ArrowRight size={20} />
+                                    </Link>
+                                ) : (
+                                    <PaymentModalTrigger className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25">
+                                        {ctaLabel} <ArrowRight size={20} />
+                                    </PaymentModalTrigger>
+                                )}
                                 <Link
                                     href={secondaryCtaHref}
                                     className="inline-flex items-center gap-3 rounded-2xl border border-white/15 px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-white/85 transition-colors hover:bg-white/10"
@@ -716,13 +722,10 @@ export default function HukukAraclariPaketiPage() {
                             <p className="text-[11px] font-black uppercase tracking-[0.18em] text-[#343131]/45">Hukuk Araçları Paketi</p>
                             <p className="text-lg font-black text-[#343131]">₺3.000 <span className="text-sm font-bold text-[#343131]/45">/ yıl</span></p>
                         </div>
-                        <Link
-                            href={ctaHref}
-                            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#343131] px-5 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-white transition-colors hover:bg-black"
-                        >
+                        <PaymentModalTrigger className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-2xl bg-[#343131] px-5 py-3 text-[11px] font-black uppercase tracking-[0.18em] text-white transition-colors hover:bg-black">
                             {ctaLabel}
                             <ArrowRight size={16} />
-                        </Link>
+                        </PaymentModalTrigger>
                     </div>
                 </div>
             ) : null}

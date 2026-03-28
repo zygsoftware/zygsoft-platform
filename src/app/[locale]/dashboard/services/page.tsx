@@ -10,13 +10,11 @@ import {
     Clock,
     AlertCircle,
     XCircle,
-    ArrowRight,
     Layers,
     Globe,
     FileText,
     HeadphonesIcon,
     RefreshCw,
-    MessageSquare,
     Zap,
     CreditCard,
     LayoutGrid,
@@ -241,7 +239,7 @@ function ServiceCard({ item }: { item: ServiceItem }) {
                     )}
                     {(item.derivedStatus === "expired" || item.derivedStatus === "payment_rejected" || item.derivedStatus === "inactive") && (
                         <Link
-                            href={`/dashboard/billing?product=${item.productSlug}`}
+                            href={`/payment?product=${item.productSlug}`}
                             className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#e6c800] text-[#343131] text-xs font-black uppercase tracking-wider hover:bg-[#c9ad00] transition-colors shadow-lg shadow-[#e6c800]/20"
                         >
                             <RefreshCw size={14} />
@@ -335,7 +333,7 @@ function EmptyState() {
                         {t("exploreServices")}
                     </Link>
                     <Link
-                        href="/dashboard/billing"
+                        href="/payment"
                         className="w-full sm:w-auto inline-flex justify-center items-center gap-2 px-8 py-4 rounded-xl bg-white text-[#343131] border border-[#343131]/10 text-sm font-black uppercase tracking-wider hover:bg-[#fafafc] transition-all"
                     >
                         <CreditCard size={16} />

@@ -12,7 +12,6 @@ import {
     Sparkles,
     CreditCard,
     Wrench,
-    Receipt,
     MessageSquare,
     ShoppingCart,
     Activity,
@@ -118,7 +117,6 @@ export default function DashboardPage() {
 
     const quickActions = [
         { label: t("quickActions.tools"),     href: "/dashboard/tools",     icon: Wrench },
-        { label: t("quickActions.billing"),   href: "/dashboard/billing",   icon: Receipt },
         { label: t("quickActions.support"),  href: "/dashboard/support",   icon: MessageSquare },
         { label: t("quickActions.services"), href: "/dashboard/services",   icon: Briefcase },
         { label: t("quickActions.subscriptions"), href: "/dijital-urunler/hukuk-araclari-paketi", icon: ShoppingCart },
@@ -193,7 +191,7 @@ export default function DashboardPage() {
                     if (pp > 0) {
                         return (
                             <Link
-                                href={`/${locale}/dashboard/billing`}
+                                href={`/payment`}
                                 className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-amber-50 border border-amber-100 hover:bg-amber-100/80 transition-colors group"
                             >
                                 <div className="flex items-center gap-3">

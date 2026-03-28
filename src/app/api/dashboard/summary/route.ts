@@ -92,7 +92,7 @@ export async function GET() {
                 description: `₺${p.amount.toLocaleString("tr-TR", { minimumFractionDigits: 0 })} · ${statusLabel}`,
                 status: p.status,
                 date: p.createdAt.toISOString(),
-                href: "/dashboard/billing",
+                href: "/payment",
             });
         }
 

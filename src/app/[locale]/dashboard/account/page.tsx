@@ -246,7 +246,7 @@ export default function AccountPage() {
                                 <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
                                     <p className="text-sm font-medium text-slate-500 hidden sm:block">{t("billingPrompt")}</p>
                                     <Link
-                                        href="/dashboard/billing"
+                                        href="/payment"
                                         className="px-6 py-3 bg-slate-50 hover:bg-slate-900 hover:text-[#e6c800] !text-black font-black rounded-xl transition-all flex items-center justify-center gap-2 text-xs border border-slate-200 w-full sm:w-auto"
                                     >
                                         <Receipt size={16} /> <span className="!text-slate-900">{t("notifyPayment")}</span>

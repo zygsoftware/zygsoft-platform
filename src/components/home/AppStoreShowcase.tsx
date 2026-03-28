@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { TiltCard } from "@/components/ui/TiltCard";
 import { createHeadingReveal, createRevealUp, revealViewport, staggerContainer } from "@/components/ui/motion";
 import { useSession } from "next-auth/react";
+import { PaymentModalTrigger } from "@/components/payment/PaymentModalTrigger";
 
 
 export function AppStoreShowcase() {
@@ -14,18 +15,11 @@ export function AppStoreShowcase() {
     const t = useTranslations("AppStore");
     const reducedMotion = !!useReducedMotion();
     const isTr = locale === "tr";
-    const { status, data: session } = useSession();
+    const { data: session } = useSession();
     const hasLegalToolkit = session?.user?.activeProductSlugs?.includes("legal-toolkit") ?? false;
-    const primaryHref = hasLegalToolkit
-        ? "/dashboard/tools"
-        : status === "authenticated"
-            ? "/dashboard/billing?product=legal-toolkit"
-            : "/register";
     const primaryLabel = hasLegalToolkit
         ? (isTr ? "Araçları Aç" : "Open tools")
-        : status === "authenticated"
-            ? (isTr ? "Hemen Abone Ol" : "Subscribe now")
-            : (isTr ? "Hesap Aç ve Başla" : "Create account");
+        : (isTr ? "Şimdi Satın Al" : "Buy now");
 
     const showcaseFeatures = [
         {
@@ -121,12 +115,20 @@ export function AppStoreShowcase() {
                             ))}
                         </motion.div>
 
-                        <Link
-                            href={primaryHref}
-                            className="home-btn-primary-yellow inline-flex items-center gap-2.5 px-8 py-4 font-black uppercase tracking-[0.24em] text-[11px] rounded-2xl !text-[#343131] [font-family:var(--font-button)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
-                        >
-                            {primaryLabel} <ArrowRight size={18} />
-                        </Link>
+                        {hasLegalToolkit ? (
+                            <Link
+                                href="/dashboard/tools"
+                                className="home-btn-primary-yellow inline-flex items-center gap-2.5 px-8 py-4 font-black uppercase tracking-[0.24em] text-[11px] rounded-2xl !text-[#343131] [font-family:var(--font-button)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
+                            >
+                                {primaryLabel} <ArrowRight size={18} />
+                            </Link>
+                        ) : (
+                            <PaymentModalTrigger
+                                className="home-btn-primary-yellow inline-flex items-center gap-2.5 px-8 py-4 font-black uppercase tracking-[0.24em] text-[11px] rounded-2xl !text-[#343131] [font-family:var(--font-button)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
+                            >
+                                {primaryLabel} <ArrowRight size={18} />
+                            </PaymentModalTrigger>
+                        )}
                         <Link
                             href="/dijital-urunler/hukuk-araclari-paketi#pricing"
                             className="ml-0 mt-4 inline-flex items-center gap-2.5 text-[11px] font-black uppercase tracking-[0.2em] !text-white/72 [font-family:var(--font-button)] transition-colors hover:!text-white md:ml-6 md:mt-0"
@@ -233,10 +235,17 @@ export function AppStoreShowcase() {
                                 </div>
 
                                 <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                                    <Link href={primaryHref} className="home-btn-primary-yellow inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] !text-[#343131] [font-family:var(--font-button)] transition-colors">
-                                        {primaryLabel}
-                                        <ArrowRight size={14} />
-                                    </Link>
+                                    {hasLegalToolkit ? (
+                                        <Link href="/dashboard/tools" className="home-btn-primary-yellow inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] !text-[#343131] [font-family:var(--font-button)] transition-colors">
+                                            {primaryLabel}
+                                            <ArrowRight size={14} />
+                                        </Link>
+                                    ) : (
+                                        <PaymentModalTrigger className="home-btn-primary-yellow inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] !text-[#343131] [font-family:var(--font-button)] transition-colors">
+                                            {primaryLabel}
+                                            <ArrowRight size={14} />
+                                        </PaymentModalTrigger>
+                                    )}
                                     <Link href="/dijital-urunler/hukuk-araclari-paketi#pricing" className="home-btn-outline-light inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] !text-white [font-family:var(--font-button)] transition-colors">
                                         {isTr ? "Fiyat ve detay" : "Pricing & details"}
                                     </Link>

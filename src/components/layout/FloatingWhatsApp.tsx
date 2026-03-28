@@ -11,7 +11,7 @@ export function FloatingWhatsApp() {
             initial={{ opacity: 0, scale: 0.5, y: 50 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            className="fixed bottom-5 right-5 z-50 pointer-events-auto"
+            className="floating-whatsapp fixed bottom-5 right-5 z-50 pointer-events-auto"
         >
             <a
                 href={whatsappUrl}

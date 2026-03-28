@@ -8,11 +8,11 @@ import {
     Briefcase,
     LifeBuoy,
     Settings,
-    CreditCard,
     ChevronRight,
     LogOut,
     ArrowLeft,
     Wrench,
+    ReceiptText,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { signOut } from "next-auth/react";
@@ -34,8 +34,8 @@ export function DashboardSidebar({ className = "", onNavigate }: DashboardSideba
         { name: t("products"),  href: "/dashboard/products",  icon: Box },
         { name: t("tools"),     href: "/dashboard/tools",     icon: Wrench },
         { name: t("services"),  href: "/dashboard/services",  icon: Briefcase },
+        { name: t("payments"),  href: "/dashboard/payments",  icon: ReceiptText },
         { name: t("support"),   href: "/dashboard/support",   icon: LifeBuoy },
-        { name: t("billing"),   href: "/dashboard/billing",   icon: CreditCard },
     ];
 
     return (

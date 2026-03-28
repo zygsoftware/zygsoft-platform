@@ -130,6 +130,7 @@ export interface PaymentNotificationMailPayload {
     createdAt: Date;
     amount: number;
     receiptUrl: string | null;
+    note?: string | null;
     productName: string;
     productSlug: string;
     userName: string | null;
@@ -188,6 +189,7 @@ export async function sendPaymentNotification(data: PaymentNotificationMailPaylo
               ${row("Tutar", amountStr)}
               ${row("Ürün", data.productName)}
               ${row("Ürün Kodu", data.productSlug)}
+              ${row("Satın Alma Notu", data.note)}
               ${row("Kullanıcı", data.userName)}
               ${row("E-posta", data.userEmail)}
               ${row("Telefon", data.userPhone)}
@@ -215,6 +217,7 @@ export async function sendPaymentNotification(data: PaymentNotificationMailPaylo
         `Tutar      : ${amountStr}`,
         `Ürün       : ${data.productName}`,
         `Ürün Kodu  : ${data.productSlug}`,
+        `Not        : ${data.note ?? "-"}`,
         `Kullanıcı  : ${data.userName ?? "-"}`,
         `E-posta    : ${data.userEmail}`,
         `Telefon    : ${data.userPhone ?? "-"}`,

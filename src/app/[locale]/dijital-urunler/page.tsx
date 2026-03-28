@@ -1,249 +1,331 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { 
-    ArrowRight, 
-    FileText, 
-    Layers, 
-    Scissors, 
-    ImageIcon, 
-    Zap, 
-    CheckCircle2, 
-    Star,
-    ShieldCheck
+import {
+    ArrowRight,
+    Boxes,
+    FileText,
+    Layers,
+    ShieldCheck,
+    Sparkles,
+    Wand2,
+    Zap,
 } from "lucide-react";
-import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { useSession } from "next-auth/react";
+import { Link } from "@/i18n/navigation";
+import { Footer } from "@/components/layout/Footer";
+import { Header } from "@/components/layout/Header";
+import { PaymentModalTrigger } from "@/components/payment/PaymentModalTrigger";
+import { PRODUCTS, type ProductSlug } from "@/components/payment/payment-config";
 
-const PRODUCT_URL = "/dijital-urunler/hukuk-araclari-paketi";
+const PRODUCT_DETAILS: Partial<
+    Record<
+        ProductSlug,
+        {
+            href?: string;
+            accessHref?: string;
+            categoryTr: string;
+            categoryEn: string;
+            badgeTr: string;
+            badgeEn: string;
+            highlightsTr: string[];
+            highlightsEn: string[];
+        }
+    >
+> = {
+    "legal-toolkit": {
+        href: "/dijital-urunler/hukuk-araclari-paketi",
+        accessHref: "/dashboard/tools",
+        categoryTr: "Belge otomasyonu",
+        categoryEn: "Document automation",
+        badgeTr: "Canlı ürün",
+        badgeEn: "Live product",
+        highlightsTr: ["UYAP uyumlu akış", "OCR ve toplu işlemler", "Yıllık lisans"],
+        highlightsEn: ["UYAP-ready workflow", "OCR and bulk actions", "Annual license"],
+    },
+};
 
 export default function DijitalUrunlerPage() {
-    const t = useTranslations("AppStore");
-    const { status, data: session } = useSession();
-    const hasLegalToolkit = session?.user?.activeProductSlugs?.includes("legal-toolkit") ?? false;
-    const primaryHref = hasLegalToolkit
-        ? "/dashboard/tools"
-        : status === "authenticated"
-            ? "/dashboard/billing?product=legal-toolkit"
-            : "/register";
-    const primaryLabel = hasLegalToolkit
-        ? "Araçlara Git"
-        : status === "authenticated"
-            ? "Şimdi Abone Ol"
-            : "Hesap Aç ve Başla";
+    const locale = useLocale();
+    const isTr = locale === "tr";
+    const { data: session } = useSession();
+    const activeProductSlugs = ((session?.user as { activeProductSlugs?: string[] } | undefined)?.activeProductSlugs ?? []);
+
+    const copy = isTr
+        ? {
+              badge: "Dijital ürün kataloğu",
+              title: "Tek ürüne değil, büyüyen bir ürün ekosistemine hazırlanan mağaza.",
+              desc: "Bu alan artık yalnızca Hukuk Araçları Paketi için değil. Yeni dijital ürünler eklendikçe aynı mağaza yapısı içinde listelenecek, satın alınacak ve yönetilecek.",
+              primaryCta: "Ürünleri İncele",
+              secondaryCta: "Satın Alma Akışı",
+              liveTitle: "Canlı ürünler",
+              liveDesc: "Şu anda satışta olan ürünler. Yeni ürün eklediğinizde bu alan otomatik olarak genişler.",
+              processTitle: "Satın alma ve erişim akışı",
+              processDesc: "Her yeni ürün için aynı net satın alma yapısı kullanılabilir.",
+              buyNow: "Şimdi Satın Al",
+              viewDetails: "Detayları Gör",
+              goToProduct: "Ürüne Git",
+              comingSoon: "Yakında",
+              pricing: "Fiyatı Gör",
+              accessLabel: "Erişim",
+              annual: "yıllık",
+              active: "Aktif ürün",
+          }
+        : {
+              badge: "Digital product catalog",
+              title: "A storefront built for a growing product ecosystem, not a single package.",
+              desc: "This page is no longer locked to one product. As new digital products are added, they can be listed, sold, and managed through the same storefront structure.",
+              primaryCta: "Explore Products",
+              secondaryCta: "Purchase Flow",
+              liveTitle: "Live products",
+              liveDesc: "Products currently available for purchase. This section expands automatically as you add more items.",
+              processTitle: "Purchase and access flow",
+              processDesc: "The same clean purchase pattern can support every new product you launch.",
+              buyNow: "Buy Now",
+              viewDetails: "View Details",
+              goToProduct: "Open Product",
+              comingSoon: "Coming soon",
+              pricing: "View Pricing",
+              accessLabel: "Access",
+              annual: "annual",
+              active: "Active product",
+          };
+
+    const liveProducts = (Object.entries(PRODUCTS) as [ProductSlug, (typeof PRODUCTS)[ProductSlug]][]).map(([slug, product]) => {
+        const details = PRODUCT_DETAILS[slug];
+        const owned = activeProductSlugs.includes(slug);
+
+        return {
+            slug,
+            title: isTr ? product.titleTr : product.titleEn,
+            description: isTr ? product.descTr : product.descEn,
+            features: isTr ? product.featuresTr : product.featuresEn,
+            priceLabel: `₺${product.price.toLocaleString(isTr ? "tr-TR" : "en-US")}`,
+            badge: details ? (isTr ? details.badgeTr : details.badgeEn) : copy.active,
+            category: details ? (isTr ? details.categoryTr : details.categoryEn) : copy.badge,
+            highlights: details ? (isTr ? details.highlightsTr : details.highlightsEn) : (isTr ? product.featuresTr : product.featuresEn),
+            href: details?.href,
+            accessHref: details?.accessHref,
+            owned,
+        };
+    });
 
     const storeJsonLd = {
         "@context": "https://schema.org",
         "@type": "ItemList",
-        name: "ZYGSOFT Dijital Ürünler",
-        itemListElement: [
-            {
-                "@type": "ListItem",
-                position: 1,
-                url: `https://www.zygsoft.com${PRODUCT_URL}`,
-                name: "Hukuk Araçları Paketi",
-            },
-        ],
+        name: isTr ? "ZYGSOFT Dijital Ürünler" : "ZYGSOFT Digital Products",
+        itemListElement: liveProducts.map((product, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            url: product.href ? `https://www.zygsoft.com${product.href}` : "https://www.zygsoft.com/dijital-urunler",
+            name: product.title,
+        })),
     };
 
+    const processItems = isTr
+        ? [
+              { step: "01", title: "Ürünü seçin", desc: "Katalogtan uygun ürünü inceleyin ve satın alma akışını başlatın.", icon: <Boxes size={22} /> },
+              { step: "02", title: "Ödemeyi tamamlayın", desc: "Ödeme popup’ında banka havalesiyle işlemi kısa adımlarda bitirin.", icon: <FileText size={22} /> },
+              { step: "03", title: "Onay ve erişim", desc: "Bildirim incelendikten sonra ürün hesabınıza tanımlanır.", icon: <ShieldCheck size={22} /> },
+          ]
+        : [
+              { step: "01", title: "Choose a product", desc: "Review the catalog and start the purchase flow for the right product.", icon: <Boxes size={22} /> },
+              { step: "02", title: "Complete payment", desc: "Finish the bank transfer flow in a short modal checkout.", icon: <FileText size={22} /> },
+              { step: "03", title: "Approval and access", desc: "After review, the product is assigned to your account.", icon: <ShieldCheck size={22} /> },
+          ];
+
     return (
-        <div className="min-h-screen flex flex-col font-sans bg-[#fafafc] selection:bg-[#e6c800] selection:text-[#343131]">
+        <div className="min-h-screen bg-[#fafafc] font-sans text-[#343131] selection:bg-[#e6c800] selection:text-[#343131]">
             <Header />
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }}
             />
 
-            <main className="flex-1 pt-32 pb-32 relative overflow-hidden">
-                {/* Background ambient glows */}
-                <div className="absolute right-0 top-0 w-[800px] h-[800px] bg-gradient-to-bl from-[#e6c800]/5 to-transparent rounded-full blur-[120px] pointer-events-none -translate-y-1/2 translate-x-1/3" />
-                <div className="absolute left-0 bottom-0 w-[600px] h-[600px] bg-gradient-to-tr from-slate-200/50 to-transparent rounded-full blur-[100px] pointer-events-none translate-y-1/3 -translate-x-1/3" />
+            <main className="relative overflow-hidden pb-28 pt-32">
+                <div className="pointer-events-none absolute right-0 top-0 h-[700px] w-[700px] translate-x-1/3 -translate-y-1/3 rounded-full bg-gradient-to-bl from-[#e6c800]/8 to-transparent blur-[120px]" />
+                <div className="pointer-events-none absolute bottom-0 left-0 h-[540px] w-[540px] -translate-x-1/3 translate-y-1/3 rounded-full bg-gradient-to-tr from-slate-200/70 to-transparent blur-[100px]" />
 
-                <div className="container mx-auto px-6 max-w-6xl relative z-10">
-                    
-                    {/* Page Header */}
-                    <div className="text-center max-w-3xl mx-auto mb-20 md:mb-32">
+                <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col gap-24 px-6">
+                    <section className="mx-auto max-w-4xl text-center">
                         <motion.div
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 24 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6 }}
                         >
-                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#343131]/[0.05] text-[#343131] text-[10px] font-black uppercase tracking-[0.3em] mb-6 shadow-sm">
-                                <span className="w-2 h-2 rounded-full bg-[#e6c800]" />
-                                {t("storeBadge")}
+                            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#343131]/10 bg-white px-4 py-2 text-[10px] font-black uppercase tracking-[0.28em] shadow-sm">
+                                <span className="h-2 w-2 rounded-full bg-[#e6c800]" />
+                                {copy.badge}
                             </div>
-                            <h1 className="text-4xl md:text-6xl font-display font-black tracking-tight text-[#343131] mb-6 leading-[1.1]">
-                                {t("storeTitle")}
+                            <h1 className="text-4xl font-display font-black leading-[1.05] tracking-tight text-[#343131] md:text-6xl">
+                                {copy.title}
                             </h1>
-                            <p className="text-[#343131]/60 text-lg md:text-xl font-medium leading-relaxed">
-                                {t("storeDesc")}
+                            <p className="mx-auto mt-6 max-w-3xl text-lg font-medium leading-8 text-[#343131]/64 md:text-xl">
+                                {copy.desc}
                             </p>
-                            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                                <Link
-                                    href={primaryHref}
-                                    className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#343131] px-7 py-4 text-[11px] font-black uppercase tracking-[0.22em] !text-white transition-all hover:scale-[1.02] hover:bg-black active:scale-[0.98]"
+                            <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                                <a
+                                    href="#products"
+                                    className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#343131] px-7 py-4 text-[11px] font-black uppercase tracking-[0.22em] text-white transition-all hover:scale-[1.02] hover:bg-black active:scale-[0.98]"
                                 >
-                                    {primaryLabel}
+                                    {copy.primaryCta}
                                     <ArrowRight size={16} />
-                                </Link>
-                                <Link
-                                    href={`${PRODUCT_URL}#pricing`}
+                                </a>
+                                <a
+                                    href="#purchase-flow"
                                     className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl border border-[#343131]/10 bg-white px-7 py-4 text-[11px] font-black uppercase tracking-[0.22em] text-[#343131] transition-colors hover:border-[#e6c800]/30 hover:bg-[#e6c800]/10"
                                 >
-                                    Fiyatı Gör
-                                </Link>
+                                    {copy.secondaryCta}
+                                </a>
                             </div>
                         </motion.div>
-                    </div>
+                    </section>
 
-                    {/* Flagship Product Showcase (Hukuk Araçları Paketi) */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 40 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 0.8 }}
-                    >
-                        <div className="surface-dark product-surface-dark relative w-full rounded-[2.5rem] md:rounded-[3.5rem] bg-[#141313] text-white p-8 md:p-16 lg:p-20 overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.15)] group">
-                            
-                            {/* Inner glows for dark card */}
-                            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-[#e6c800]/20 to-transparent rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3" />
-                            <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-gradient-to-tr from-white/5 to-transparent rounded-full blur-[80px] translate-y-1/3 -translate-x-1/3" />
+                    <section id="products" className="space-y-8">
+                        <div className="max-w-3xl">
+                            <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#343131]/40">{copy.liveTitle}</p>
+                            <h2 className="mt-3 text-3xl font-display font-black tracking-tight text-[#343131] md:text-4xl">
+                                {copy.liveTitle}
+                            </h2>
+                            <p className="mt-4 text-base font-medium leading-7 text-[#343131]/64">
+                                {copy.liveDesc}
+                            </p>
+                        </div>
 
-                            <div className="relative z-10 grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
-                                
-                                {/* Left: Info */}
-                                <div>
-                                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#e6c800]/10 !text-[#e6c800] border border-[#e6c800]/20 text-[10px] font-black uppercase tracking-widest mb-8">
-                                        <Star size={12} fill="currentColor" />
-                                        {t("flagshipBadge")}
-                                    </div>
-                                    
-                                    <h2 className="product-surface-strong text-4xl md:text-5xl lg:text-6xl font-display font-black !text-white mb-6 tracking-tight leading-[1.05]">
-                                        {t("services.legalToolkitName")}
-                                    </h2>
-                                    
-                                    <p className="product-surface-muted !text-white/80 text-lg md:text-xl leading-relaxed mb-8 font-medium">
-                                        {t("services.legalToolkitDesc")}
-                                    </p>
-
-                                    <div className="flex flex-col gap-4 mb-10">
-                                        {[
-                                            "Sınırsız araç kullanımı", 
-                                            "Aynı gün aktivasyon", 
-                                            "KVKK uyumlu & İşlem sonrası otomatik silinme"
-                                        ].map((item, idx) => (
-                                            <div key={idx} className="product-surface-muted !text-white/85 flex items-center gap-3 font-medium">
-                                                <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
-                                                    <CheckCircle2 size={12} className="text-emerald-400" />
-                                                </div>
-                                                <span className="!text-white/85" style={{ color: "rgba(248, 250, 252, 0.85)" }}>{item}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                                            <Link
-                                                href={primaryHref}
-                                                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#e6c800] px-8 py-4 text-[13px] font-black uppercase tracking-widest !text-[#141313] shadow-xl shadow-[#e6c800]/20 transition-all hover:scale-[1.02] hover:bg-[#c9ad00] active:scale-[0.98] whitespace-nowrap"
-                                            >
-                                                {primaryLabel} <ArrowRight size={18} />
-                                            </Link>
-                                            <Link
-                                                href={PRODUCT_URL}
-                                                className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl border border-white/20 bg-white/5 px-8 py-4 text-[12px] font-black uppercase tracking-[0.18em] !text-white transition-colors hover:bg-white/12 hover:!text-white"
-                                            >
-                                                {t("viewDetails")}
-                                            </Link>
+                        <div className="grid gap-6 lg:grid-cols-2">
+                            {liveProducts.map((product, index) => (
+                                <motion.article
+                                    key={product.slug}
+                                    initial={{ opacity: 0, y: 24 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true, margin: "-80px" }}
+                                    transition={{ duration: 0.55, delay: index * 0.08 }}
+                                    className="group rounded-[2rem] border border-[#343131]/[0.06] bg-white p-8 shadow-[0_16px_48px_rgba(15,23,42,0.05)] transition-all hover:-translate-y-1 hover:shadow-[0_24px_60px_rgba(15,23,42,0.08)]"
+                                >
+                                    <div className="flex flex-wrap items-center justify-between gap-3">
+                                        <div className="inline-flex items-center gap-2 rounded-full border border-[#343131]/10 bg-[#fafafc] px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-[#343131]/72">
+                                            <Sparkles size={12} className="text-[#e6c800]" />
+                                            {product.badge}
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className="product-surface-strong !text-white text-2xl font-black">₺3.000 <span className="product-surface-soft !text-white/65 text-sm font-bold">{t("services.legalToolkitPeriod")}</span></span>
-                                            <span className="product-surface-accent !text-[#e6c800] text-xs font-bold uppercase tracking-wider mt-1">{t("services.legalToolkitToolCount")}</span>
+                                        <div className="text-[11px] font-black uppercase tracking-[0.18em] text-[#343131]/38">
+                                            {product.category}
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Right: Features Grid (Bento style inside the card) */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="home-card-dark product-surface-card p-6 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-colors">
-                                        <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center mb-4">
-                                            <FileText size={24} />
-                                        </div>
-                                        <div className="product-surface-strong text-sm font-bold mb-2">{t("services.legalToolkitF1")}</div>
-                                    </div>
-                                    
-                                    <div className="home-card-dark product-surface-card p-6 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-colors translate-y-0 lg:translate-y-8">
-                                        <div className="w-12 h-12 rounded-xl bg-violet-500/10 text-violet-400 flex items-center justify-center mb-4">
-                                            <Layers size={24} />
-                                        </div>
-                                        <div className="product-surface-strong text-sm font-bold mb-2">{t("services.legalToolkitF4")}</div>
-                                    </div>
-
-                                    <div className="home-card-dark product-surface-card p-6 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-colors">
-                                        <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-4">
-                                            <Scissors size={24} />
-                                        </div>
-                                        <div className="product-surface-strong text-sm font-bold mb-2">{t("services.legalToolkitF5")}</div>
-                                    </div>
-
-                                    <div className="home-card-dark product-surface-card p-6 rounded-3xl backdrop-blur-md hover:bg-white/10 transition-colors translate-y-0 lg:translate-y-8">
-                                        <div className="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center mb-4">
-                                            <ImageIcon size={24} />
-                                        </div>
-                                        <div className="product-surface-strong text-sm font-bold mb-2">{t("services.legalToolkitF6")}</div>
-                                    </div>
-                                    
-                                    <div className="col-span-2 bg-[#e6c800]/10 border border-[#e6c800]/20 p-6 rounded-3xl backdrop-blur-md mt-0 lg:mt-8 flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-[#e6c800] text-[#141313] flex items-center justify-center shrink-0">
-                                            <Zap size={24} />
-                                        </div>
+                                    <div className="mt-7 space-y-4">
                                         <div>
-                                            <div className="product-surface-strong text-sm font-bold mb-1">OCR & AI Destekli Toplu İşlemler</div>
-                                            <p className="product-surface-muted text-xs font-medium leading-relaxed">Yeni nesil belge yönetimi. Sureclerinizi saniyelere indirin.</p>
+                                            <h3 className="text-3xl font-display font-black tracking-tight text-[#343131]">
+                                                {product.title}
+                                            </h3>
+                                            <p className="mt-3 max-w-2xl text-base font-medium leading-7 text-[#343131]/64">
+                                                {product.description}
+                                            </p>
+                                        </div>
+
+                                        <div className="flex flex-wrap gap-2.5">
+                                            {product.highlights.map((highlight) => (
+                                                <span
+                                                    key={highlight}
+                                                    className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#343131]/8 bg-[#fafafc] px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-[#343131]"
+                                                >
+                                                    <span className="h-2 w-2 rounded-full bg-[#e6c800]" />
+                                                    {highlight}
+                                                </span>
+                                            ))}
+                                        </div>
+
+                                        <div className="grid gap-3 sm:grid-cols-3">
+                                            {product.features.map((feature) => (
+                                                <div
+                                                    key={feature}
+                                                    className="rounded-[1.35rem] border border-[#343131]/8 bg-[#fcfcfe] px-4 py-4"
+                                                >
+                                                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-[#343131]/4 text-[#343131]/58">
+                                                        {feature.toLowerCase().includes("ocr") ? <Wand2 size={18} /> : feature.toLowerCase().includes("sınırsız") || feature.toLowerCase().includes("unlimited") ? <Zap size={18} /> : <Layers size={18} />}
+                                                    </div>
+                                                    <p className="text-sm font-black leading-6 text-[#343131]">{feature}</p>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
-                                </div>
 
-                            </div>
+                                    <div className="mt-8 flex flex-col gap-5 border-t border-[#343131]/8 pt-6 lg:flex-row lg:items-end lg:justify-between">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-[11px] font-black uppercase tracking-[0.18em] text-[#343131]/38">{copy.pricing}</span>
+                                            <span className="text-3xl font-display font-black text-[#343131]">
+                                                {product.priceLabel}
+                                                <span className="ml-2 text-sm font-bold uppercase tracking-[0.12em] text-[#343131]/42">
+                                                    / {copy.annual}
+                                                </span>
+                                            </span>
+                                        </div>
+
+                                        <div className="flex flex-col gap-3 sm:flex-row">
+                                            {product.owned && product.accessHref ? (
+                                                <Link
+                                                    href={product.accessHref}
+                                                    className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#343131] px-6 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-white transition-all hover:scale-[1.02] hover:bg-black active:scale-[0.98]"
+                                                >
+                                                    {copy.goToProduct}
+                                                    <ArrowRight size={16} />
+                                                </Link>
+                                            ) : (
+                                                <PaymentModalTrigger
+                                                    productId={product.slug}
+                                                    className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#343131] px-6 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-white transition-all hover:scale-[1.02] hover:bg-black active:scale-[0.98]"
+                                                >
+                                                    {copy.buyNow}
+                                                    <ArrowRight size={16} />
+                                                </PaymentModalTrigger>
+                                            )}
+
+                                            {product.href ? (
+                                                <Link
+                                                    href={product.href}
+                                                    className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl border border-[#343131]/10 bg-white px-6 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-[#343131] transition-colors hover:border-[#e6c800]/35 hover:bg-[#e6c800]/10"
+                                                >
+                                                    {copy.viewDetails}
+                                                </Link>
+                                            ) : null}
+                                        </div>
+                                    </div>
+                                </motion.article>
+                            ))}
                         </div>
-                    </motion.div>
+                    </section>
 
-                    {/* How It Works Layer */}
-                    <div className="mt-32">
-                        <div className="text-center mb-16">
-                            <h2 className="text-3xl font-display font-black text-[#343131] mb-4">{t("howItWorksTitle")}</h2>
-                            <p className="text-[#343131]/60 font-medium">Satın alma ve aktivasyon adımları</p>
+                    <section id="purchase-flow" className="space-y-8">
+                        <div className="max-w-3xl">
+                            <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#343131]/40">{copy.processTitle}</p>
+                            <h2 className="mt-3 text-3xl font-display font-black tracking-tight text-[#343131] md:text-4xl">
+                                {copy.processTitle}
+                            </h2>
+                            <p className="mt-4 text-base font-medium leading-7 text-[#343131]/64">
+                                {copy.processDesc}
+                            </p>
                         </div>
 
-                        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-                            {[
-                                { step: 1, title: "Hesap Oluşturun", desc: "Ücretsiz hesabınıza giriş yapın.", icon: <ShieldCheck size={24} /> },
-                                { step: 2, title: "Ödeme Yapın", desc: "İlgili tutarı banka hesabımıza gönderin.", icon: <FileText size={24} /> },
-                                { step: 3, title: "Dekont İletin", desc: "Panelden ödeme bildirimi gönderin.", icon: <Layers size={24} /> },
-                                { step: 4, title: "Anında Kullanın", desc: "Onay ardından araçlarınızı sınırsız kullanın.", icon: <Zap size={24} /> },
-                            ].map((item, i) => (
-                                <motion.div 
-                                    key={i}
+                        <div className="grid gap-6 md:grid-cols-3">
+                            {processItems.map((item, index) => (
+                                <motion.div
+                                    key={item.step}
                                     initial={{ opacity: 0, y: 20 }}
                                     whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 0.5, delay: i * 0.1 }}
-                                    className="bg-white border border-[#343131]/[0.06] rounded-3xl p-8 hover:shadow-xl hover:-translate-y-1 transition-all"
+                                    viewport={{ once: true, margin: "-60px" }}
+                                    transition={{ duration: 0.45, delay: index * 0.08 }}
+                                    className="rounded-[1.9rem] border border-[#343131]/[0.06] bg-white p-8 shadow-[0_16px_40px_rgba(15,23,42,0.04)]"
                                 >
-                                    <div className="w-12 h-12 rounded-2xl bg-[#fafafc] border border-[#343131]/5 flex items-center justify-center text-[#343131]/40 mb-6">
+                                    <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fafafc] text-[#343131]/46">
                                         {item.icon}
                                     </div>
-                                    <div className="text-[10px] font-black text-[#e6c800] mb-2 uppercase tracking-widest">Adım 0{item.step}</div>
-                                    <h3 className="text-lg font-black text-[#343131] mb-2">{item.title}</h3>
-                                    <p className="text-sm text-[#343131]/60 font-medium leading-relaxed">{item.desc}</p>
+                                    <div className="text-[10px] font-black uppercase tracking-[0.22em] text-[#e6c800]">{item.step}</div>
+                                    <h3 className="mt-3 text-xl font-black text-[#343131]">{item.title}</h3>
+                                    <p className="mt-3 text-sm font-medium leading-7 text-[#343131]/62">{item.desc}</p>
                                 </motion.div>
                             ))}
                         </div>
-                    </div>
-
+                    </section>
                 </div>
             </main>
 

@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { ShieldAlert, Zap } from "lucide-react";
 import { TrialRequestCTA } from "@/components/trial/TrialRequestCTA";
 import { useTranslations } from "next-intl";
+import { PaymentModalTrigger } from "@/components/payment/PaymentModalTrigger";
 
 type ToolLockedGateProps = {
     session: { user?: Record<string, unknown> } | null;
@@ -39,9 +40,9 @@ export function ToolLockedGate({ session }: ToolLockedGateProps) {
                 <Link href="/dijital-urunler/hukuk-araclari-paketi" className="bg-slate-100 text-[#343131] px-10 py-4 rounded-2xl font-black uppercase tracking-wider hover:bg-slate-200 transition-all inline-flex items-center gap-3">
                     {t("viewPackage")} <Zap size={18} fill="currentColor" />
                 </Link>
-                <Link href="/dashboard/billing?product=legal-toolkit" className="bg-[#343131] text-white px-10 py-4 rounded-2xl font-black uppercase tracking-wider hover:bg-[#343131]/90 transition-all shadow-xl inline-flex items-center gap-3">
+                <PaymentModalTrigger className="bg-[#343131] text-white px-10 py-4 rounded-2xl font-black uppercase tracking-wider hover:bg-[#343131]/90 transition-all shadow-xl inline-flex items-center gap-3">
                     {t("reportPayment")}
-                </Link>
+                </PaymentModalTrigger>
             </div>
         </div>
     );

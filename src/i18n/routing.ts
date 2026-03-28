@@ -27,6 +27,10 @@ export const routing = defineRouting({
         "/terms": { tr: "/terms", en: "/terms" },
         "/privacy": { tr: "/privacy", en: "/privacy" },
         "/kvkk": { tr: "/kvkk", en: "/kvkk" },
+        "/payment": {
+            tr: "/odeme",
+            en: "/payment",
+        },
 
         /* ── Müşteri paneli (dashboard) ───────────────────────────── */
         "/dashboard": {
@@ -38,6 +42,10 @@ export const routing = defineRouting({
             en: "/dashboard/profile",
         },
         "/dashboard/billing": {
+            tr: "/panel/odeme-akisi",
+            en: "/dashboard/checkout",
+        },
+        "/dashboard/payments": {
             tr: "/panel/odemeler",
             en: "/dashboard/payments",
         },
