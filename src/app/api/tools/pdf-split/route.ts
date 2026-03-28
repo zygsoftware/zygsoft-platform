@@ -141,6 +141,9 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Parça sayfa adedi belirtilmedi." }, { status: 400 });
         }
 
+        const pageRangeInput = typeof pageRange === "string" ? pageRange : "";
+        const chunkSizeInput = typeof chunkSizeValue === "string" ? chunkSizeValue : "";
+
         const isPdf =
             file.type === "application/pdf" ||
             file.name.toLowerCase().endsWith(".pdf");
@@ -180,7 +183,7 @@ export async function POST(req: Request) {
         }
 
         if (splitMode === "chunks") {
-            const parsedChunk = parseChunkSize(chunkSizeValue);
+            const parsedChunk = parseChunkSize(chunkSizeInput);
             if ("error" in parsedChunk) {
                 return NextResponse.json({ error: parsedChunk.error }, { status: 400 });
             }
@@ -226,7 +229,7 @@ export async function POST(req: Request) {
             });
         }
 
-        const parsed = parsePageRange(pageRange, pageCount);
+        const parsed = parsePageRange(pageRangeInput, pageCount);
         if ("error" in parsed) {
             return NextResponse.json({ error: parsed.error }, { status: 400 });
         }

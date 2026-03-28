@@ -21,7 +21,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession();
     const router = useRouter();
     const t = useTranslations("Dashboard.shared.shell");
-    const user = session?.user as (typeof session.user & DashboardShellUser) | undefined;
+    const user = session?.user as DashboardShellUser | undefined;
     const [mobileOpen, setMobileOpen] = useState(false);
 
     useEffect(() => {
@@ -84,7 +84,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
                 <div className="h-full overflow-y-auto p-4 sm:p-6 lg:p-12">
                     <Breadcrumbs />
                     <EmailVerificationBanner
-                        emailVerified={user?.emailVerified}
+                        emailVerified={user?.emailVerified ?? null}
                         isAdmin={user?.role === "admin"}
                     />
                     <TrialConversionBanner

@@ -51,8 +51,12 @@ export default function DashboardPage() {
     const t = useTranslations("Dashboard.overview");
     const tTrial = useTranslations("Dashboard.shared.trial");
     const locale = useLocale();
-    const user = session?.user as (typeof session.user & DashboardUser) | undefined;
+    const user = session?.user as DashboardUser | undefined;
+    const normalizedUser = user ? { ...user, role: user.role ?? undefined } : undefined;
     const activeProductSlugs: string[] = user?.activeProductSlugs || [];
+    const normalizedEmailVerified = Boolean(user?.emailVerified);
+    const normalizedTrialEndsAt =
+        user?.trialEndsAt instanceof Date ? user.trialEndsAt.toISOString() : (user?.trialEndsAt ?? null);
 
     const [summary, setSummary] = useState<Summary | null>(null);
     const [loading, setLoading] = useState(true);
@@ -75,7 +79,7 @@ export default function DashboardPage() {
         if (session) fetchSummary();
     }, [session, fetchSummary]);
 
-    const hasLegalToolkitAccess = hasToolAccess(user);
+    const hasLegalToolkitAccess = hasToolAccess(normalizedUser);
     const hasPaidSubscription = activeProductSlugs.includes("legal-toolkit") || user?.role === "admin";
 
     const effectiveActiveProducts = hasLegalToolkitAccess ? Math.max(summary?.activeProducts ?? 0, 1) : (summary?.activeProducts ?? 0);
@@ -138,7 +142,7 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-2 flex-wrap">
                     {!hasLegalToolkitAccess && (user?.role === "customer" || !user?.role) && (
                         <TrialRequestCTA
-                            emailVerified={user?.emailVerified ?? false}
+                            emailVerified={Boolean(user?.emailVerified)}
                             trialStatus={user?.trialStatus ?? "none"}
                             hasSubscription={hasLegalToolkitAccess}
                             compact
@@ -148,7 +152,7 @@ export default function DashboardPage() {
                     {!hasLegalToolkitAccess && user?.trialStatus === "active" && (
                         <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-xl">
                             <Sparkles size={13} className="text-amber-500" />
-                            {t("sections.demoPrefix")} {formatTimeLeftCompact(user?.trialEndsAt ?? null, tTrial)}
+                            {t("sections.demoPrefix")} {formatTimeLeftCompact(normalizedTrialEndsAt, tTrial)}
                         </div>
                     )}
                     <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl">
@@ -163,7 +167,7 @@ export default function DashboardPage() {
                 (user?.role === "customer" || !user?.role) &&
                 !user?.onboardingCompleted && (
                     <OnboardingChecklist
-                        emailVerified={user?.emailVerified ?? false}
+                        emailVerified={normalizedEmailVerified}
                         trialStatus={user?.trialStatus ?? "none"}
                         trialOperationsUsed={user?.trialOperationsUsed ?? 0}
                         hasSubscription={hasLegalToolkitAccess}
@@ -175,11 +179,11 @@ export default function DashboardPage() {
             {!hasPaidSubscription && (user?.role === "customer" || !user?.role) && (
                 <TrialCountdownCard
                     trialStatus={user?.trialStatus ?? "none"}
-                    trialEndsAt={user?.trialEndsAt ?? null}
+                    trialEndsAt={normalizedTrialEndsAt}
                     trialOperationsUsed={user?.trialOperationsUsed ?? 0}
                     trialOperationsLimit={user?.trialOperationsLimit ?? 20}
                     hasSubscription={hasPaidSubscription}
-                    emailVerified={user?.emailVerified ?? false}
+                    emailVerified={normalizedEmailVerified}
                 />
             )}
 
@@ -397,7 +401,7 @@ export default function DashboardPage() {
                                 <div className="flex flex-wrap gap-3 justify-center">
                                     {!hasLegalToolkitAccess && (user?.role === "customer" || !user?.role) && (
                                         <TrialRequestCTA
-                                            emailVerified={user?.emailVerified ?? false}
+                                            emailVerified={normalizedEmailVerified}
                                             trialStatus={user?.trialStatus ?? "none"}
                                             hasSubscription={hasLegalToolkitAccess}
                                             source="dashboard"
@@ -470,7 +474,7 @@ export default function DashboardPage() {
                                 <div className="flex flex-wrap gap-3 justify-center">
                                     {!hasLegalToolkitAccess && (user?.role === "customer" || !user?.role) && (
                                         <TrialRequestCTA
-                                            emailVerified={user?.emailVerified ?? false}
+                                            emailVerified={normalizedEmailVerified}
                                             trialStatus={user?.trialStatus ?? "none"}
                                             hasSubscription={hasLegalToolkitAccess}
                                             compact

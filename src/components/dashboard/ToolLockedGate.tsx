@@ -31,7 +31,7 @@ export function ToolLockedGate({ session }: ToolLockedGateProps) {
             <div className="flex flex-wrap gap-4 justify-center">
                 {user && (
                     <TrialRequestCTA
-                        emailVerified={user?.emailVerified ?? false}
+                        emailVerified={Boolean(user?.emailVerified)}
                         trialStatus={user?.trialStatus ?? "none"}
                         hasSubscription={false}
                         source="tool-page"

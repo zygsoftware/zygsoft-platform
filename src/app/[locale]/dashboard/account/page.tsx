@@ -49,7 +49,7 @@ export default function AccountPage() {
         );
     }
 
-    const user = session.user as typeof session.user & AccountUser;
+    const user = session.user as AccountUser;
 
     const handlePasswordChange = async (e: React.FormEvent) => {
         e.preventDefault();

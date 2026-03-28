@@ -10,8 +10,14 @@ export default function DashboardBillingRedirect() {
 
     useEffect(() => {
         const product = searchParams.get("product");
-        const target = product ? `/payment?product=${encodeURIComponent(product)}` : "/payment";
-        router.replace(target);
+        router.replace(
+            product
+                ? {
+                      pathname: "/payment",
+                      query: { product },
+                  }
+                : "/payment"
+        );
     }, [router, searchParams]);
 
     return (

@@ -182,9 +182,9 @@ function FaqItem({ q, a, isOpen, onToggle }: { q: string; a: string; isOpen: boo
 export default function HukukAraclariPaketiPage() {
     const { data: session, status } = useSession();
     const reducedMotion = !!useReducedMotion();
-    const sessionUser = session?.user as (typeof session.user & ProductSessionUser) | undefined;
+    const sessionUser = session?.user as ProductSessionUser | undefined;
     const hasLegalToolkit = sessionUser?.activeProductSlugs?.includes("legal-toolkit") ?? false;
-    const emailVerified = sessionUser?.emailVerified ?? false;
+    const emailVerified = Boolean(sessionUser?.emailVerified);
     const [activeStep, setActiveStep] = useState(0);
     const [faqOpen, setFaqOpen] = useState<number | null>(0);
 

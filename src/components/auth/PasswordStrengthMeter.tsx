@@ -46,9 +46,7 @@ export function PasswordStrengthMeter({ password }: PasswordStrengthMeterProps) 
                         style={{ width: `${width}%` }}
                     />
                 </div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500">
-                    {locale === "en" ? t(strength) : t(strength)}
-                </span>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-500">{t(strength)}</span>
             </div>
         </div>
     );

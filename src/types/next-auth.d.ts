@@ -2,11 +2,14 @@ import type { DefaultSession } from "next-auth";
 import type { JWT as DefaultJWT } from "next-auth/jwt";
 
 type SubscriptionSummary = {
+    id: string;
     status: string;
-    endsAt: Date | null;
+    createdAt?: Date | string | null;
+    endsAt: Date | string | null;
     product: {
         slug: string;
-    };
+        name?: string | null;
+    } | null;
 };
 
 declare module "next-auth" {
