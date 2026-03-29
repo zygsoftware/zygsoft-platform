@@ -1,7 +1,16 @@
+import { execFile } from "node:child_process";
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { promisify } from "node:util";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { checkToolAccess, incrementTrialUsage } from "@/lib/trial-guard";
 import { formatMbLimit, getToolMaxFileBytes } from "@/lib/tool-policy";
+
+const execFileAsync = promisify(execFile);
+const ocrToolDir = path.join(process.cwd(), "tools", "ocr-text");
+const ocrScript = path.join(ocrToolDir, "ocr.py");
 
 function parseErrorDetail(body: unknown): string {
     if (!body || typeof body !== "object") return "OCR işlemi başarısız.";
@@ -23,6 +32,66 @@ function isValidFile(file: File): boolean {
 }
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
+function getPythonCandidates(): string[] {
+    const candidates = [
+        process.env.UDF_PYTHON_BIN,
+        process.env.PYTHON_EXECUTABLE,
+        "python3",
+        "python",
+    ].filter((value): value is string => Boolean(value && value.trim()));
+
+    return [...new Set(candidates)];
+}
+
+function parseExecError(error: unknown): string {
+    if (!error || typeof error !== "object") return "Yerel OCR çalıştırılamadı.";
+    const err = error as { stderr?: string | Buffer; stdout?: string | Buffer; message?: string };
+    const raw = [
+        typeof err.stderr === "string" ? err.stderr : err.stderr?.toString(),
+        typeof err.stdout === "string" ? err.stdout : err.stdout?.toString(),
+        err.message,
+    ]
+        .filter(Boolean)
+        .join("\n")
+        .trim();
+
+    if (!raw) return "Yerel OCR çalıştırılamadı.";
+    return raw.split("\n").slice(-8).join("\n");
+}
+
+async function runLocalOcr(file: File, language: "tr" | "en"): Promise<string> {
+    const tempDir = await mkdtemp(path.join(tmpdir(), "zyg-ocr-"));
+    try {
+        const inputName = (file.name || "input").normalize("NFC");
+        const inputPath = path.join(tempDir, inputName);
+        await writeFile(inputPath, Buffer.from(await file.arrayBuffer()));
+
+        let lastError: unknown = null;
+        for (const pythonBin of getPythonCandidates()) {
+            try {
+                const { stdout } = await execFileAsync(pythonBin, [ocrScript, inputPath, language], {
+                    cwd: ocrToolDir,
+                    timeout: 120000,
+                    maxBuffer: 20 * 1024 * 1024,
+                });
+
+                const payload = JSON.parse(stdout || "{}") as { text?: string; error?: string };
+                if (payload.error) {
+                    throw new Error(payload.error);
+                }
+                return payload.text ?? "";
+            } catch (error) {
+                lastError = error;
+            }
+        }
+
+        throw new Error(parseExecError(lastError));
+    } finally {
+        await rm(tempDir, { recursive: true, force: true }).catch(() => {});
+    }
+}
 
 export async function POST(req: Request) {
     try {
@@ -64,7 +133,19 @@ export async function POST(req: Request) {
             if (err?.name === "AbortError") {
                 return NextResponse.json({ error: "İşlem zaman aşımına uğradı." }, { status: 504 });
             }
-            return NextResponse.json({ error: "OCR servisine bağlanılamadı. Lütfen daha sonra tekrar deneyin." }, { status: 503 });
+            try {
+                const text = await runLocalOcr(file, language as "tr" | "en");
+                response = new Response(JSON.stringify({ text }), {
+                    status: 200,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-OCR-Fallback": "local-python",
+                    },
+                });
+            } catch (localErr) {
+                console.error("[ocr-text] Local fallback error", localErr);
+                return NextResponse.json({ error: "OCR servisine bağlanılamadı ve yerel OCR de çalıştırılamadı. Lütfen daha sonra tekrar deneyin." }, { status: 503 });
+            }
         }
 
         if (!response.ok) {

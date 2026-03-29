@@ -8,14 +8,20 @@ Output: JSON to stdout {"text": "..."} or {"error": "..."}
 """
 import sys
 import json
+import subprocess
+import tempfile
 from pathlib import Path
 
 try:
-    import pytesseract
     from PIL import Image
 except ImportError as e:
-    print(json.dumps({"error": "Python dependencies missing. Install: pip install pytesseract Pillow PyMuPDF"}))
+    print(json.dumps({"error": "Python dependencies missing. Install: pip install Pillow PyMuPDF"}))
     sys.exit(1)
+
+try:
+    import pytesseract
+except ImportError:
+    pytesseract = None
 
 try:
     import fitz  # PyMuPDF
@@ -24,6 +30,9 @@ except ImportError:
 
 ALLOWED_EXT = {".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff"}
 LANG_MAP = {"tr": "tur", "en": "eng"}
+VISION_LANG_MAP = {"tr": "tr", "en": "en"}
+ROOT = Path(__file__).resolve().parent
+VISION_SCRIPT = ROOT / "vision_ocr.swift"
 
 
 def pdf_to_images(pdf_path: Path) -> list:
@@ -45,7 +54,38 @@ def pdf_to_images(pdf_path: Path) -> list:
 
 def image_to_text(img: Image.Image, lang: str) -> str:
     """Run Tesseract OCR on a PIL Image."""
-    return pytesseract.image_to_string(img, lang=lang)
+    if pytesseract is not None:
+        return pytesseract.image_to_string(img, lang=lang)
+    return vision_image_to_text(img, "tr" if lang == "tur" else "en")
+
+
+def vision_image_to_text(img: Image.Image, lang: str) -> str:
+    """Fallback OCR for macOS using Vision via Swift."""
+    if sys.platform != "darwin":
+        raise RuntimeError("Tesseract kurulu değil ve macOS Vision fallback kullanılamıyor.")
+    if not VISION_SCRIPT.exists():
+        raise RuntimeError("Vision OCR script bulunamadı.")
+
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
+        temp_path = Path(temp_file.name)
+
+    try:
+        export_img = img.convert("RGB") if img.mode not in ("RGB", "L") else img
+        export_img.save(temp_path, format="PNG")
+        result = subprocess.run(
+            ["swift", str(VISION_SCRIPT), str(temp_path), VISION_LANG_MAP.get(lang, "tr")],
+            capture_output=True,
+            text=True,
+            timeout=90,
+            check=False,
+        )
+        raw = (result.stdout or "").strip() or (result.stderr or "").strip()
+        payload = json.loads(raw or "{}")
+        if result.returncode != 0 or payload.get("error"):
+            raise RuntimeError(payload.get("error") or raw or "Vision OCR başarısız.")
+        return payload.get("text", "")
+    finally:
+        temp_path.unlink(missing_ok=True)
 
 
 def main() -> int:
@@ -96,10 +136,10 @@ def main() -> int:
                     if img.mode not in ("RGB", "L"):
                         img = img.convert("RGB")
                     result = image_to_text(img, lang)
-    except pytesseract.TesseractNotFoundError:
-        print(json.dumps({"error": "Tesseract not installed. Install system Tesseract (e.g. brew install tesseract)."}))
-        return 1
     except Exception as e:
+        if pytesseract is not None and isinstance(e, pytesseract.TesseractNotFoundError):
+            print(json.dumps({"error": "Tesseract kurulu değil. Yerel OCR için macOS Vision fallback denendi ancak başarısız oldu."}))
+            return 1
         print(json.dumps({"error": str(e)}))
         return 1
 
