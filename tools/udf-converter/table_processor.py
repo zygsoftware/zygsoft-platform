@@ -1,8 +1,8 @@
 from docx.oxml.ns import qn
 from docx import Document
+from paragraph_processor import process_paragraph
 
 def process_table(table, document, current_offset):
-    from paragraph_processor import process_paragraph
     table_text = ""
     rows = []
     
