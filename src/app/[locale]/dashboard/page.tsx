@@ -11,7 +11,6 @@ import {
     Clock,
     Sparkles,
     CreditCard,
-    Wrench,
     MessageSquare,
     ShoppingCart,
     Activity,
@@ -120,7 +119,7 @@ export default function DashboardPage() {
     ];
 
     const quickActions = [
-        { label: t("quickActions.tools"),     href: "/dashboard/tools",     icon: Wrench },
+        { label: t("quickActions.tools"),     href: "/document-tools",      icon: Box },
         { label: t("quickActions.support"),  href: "/dashboard/support",   icon: MessageSquare },
         { label: t("quickActions.services"), href: "/dashboard/services",   icon: Briefcase },
         { label: t("quickActions.subscriptions"), href: "/dijital-urunler/hukuk-araclari-paketi", icon: ShoppingCart },
@@ -258,12 +257,12 @@ export default function DashboardPage() {
                     if (hasLegalToolkitAccess) {
                         return (
                             <Link
-                                href="/dashboard/tools"
+                                href="/document-tools"
                                 className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-100 hover:bg-emerald-100/80 transition-colors group"
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
-                                        <Wrench size={18} />
+                                        <Box size={18} />
                                     </div>
                                     <p className="text-sm font-bold text-slate-950">
                                         {t("onboarding.hasTools")}
@@ -357,13 +356,13 @@ export default function DashboardPage() {
                                 </div>
                                 <div className="shrink-0 flex flex-col items-end gap-2">
                                     <Link
-                                        href="/dashboard/tools/doc-to-udf"
+                                        href="/document-tools/doc-to-udf"
                                         className="px-4 py-2.5 bg-[#e6c800] text-[#343131] rounded-xl text-[11px] font-black uppercase tracking-wider hover:bg-white transition-all"
                                     >
                                         {t("sections.start")}
                                     </Link>
                                     <Link
-                                        href="/dashboard/tools"
+                                        href="/document-tools"
                                         className="text-white/50 text-[10px] font-bold hover:text-white transition-colors"
                                     >
                                         {t("tools.allTools")} →

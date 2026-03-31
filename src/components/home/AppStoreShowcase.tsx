@@ -117,7 +117,7 @@ export function AppStoreShowcase() {
 
                         {hasLegalToolkit ? (
                             <Link
-                                href="/dashboard/tools"
+                                href="/document-tools"
                                 className="home-btn-primary-yellow inline-flex items-center gap-2.5 px-8 py-4 font-black uppercase tracking-[0.24em] text-[11px] rounded-2xl !text-[#343131] [font-family:var(--font-button)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
                             >
                                 {primaryLabel} <ArrowRight size={18} />
@@ -236,7 +236,7 @@ export function AppStoreShowcase() {
 
                                 <div className="mt-6 flex flex-col sm:flex-row gap-3">
                                     {hasLegalToolkit ? (
-                                        <Link href="/dashboard/tools" className="home-btn-primary-yellow inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] !text-[#343131] [font-family:var(--font-button)] transition-colors">
+                                        <Link href="/document-tools" className="home-btn-primary-yellow inline-flex justify-center items-center gap-2 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] !text-[#343131] [font-family:var(--font-button)] transition-colors">
                                             {primaryLabel}
                                             <ArrowRight size={14} />
                                         </Link>
@@ -262,7 +262,7 @@ export function AppStoreShowcase() {
                                 className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3"
                             >
                                 {previewProducts.slice(1).map((prod) => (
-                                    <Link key={prod.id} href="/dashboard/tools" className="block">
+                                    <Link key={prod.id} href="/document-tools" className="block">
                                         <motion.div variants={createRevealUp(reducedMotion, 28, 8)} whileHover={{ y: -3 }} transition={{ duration: 0.2 }} className="home-card-dark rounded-2xl p-4 hover:border-[#e6c800]/40 transition-colors duration-200">
                                             <div className="flex items-center gap-3 mb-3 !text-white">
                                                 <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">{prod.icon}</div>

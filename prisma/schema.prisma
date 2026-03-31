@@ -235,6 +235,8 @@ model Product {
   name          String
   slug          String         @unique
   description   String
+  imageUrl      String?
+  imagePath     String?
   price         Float          @default(0)
   billingPeriod String         @default("yearly") // yearly | monthly
   category      String         @default("legal")  // legal | automation | ai | document

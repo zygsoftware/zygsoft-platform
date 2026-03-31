@@ -11,7 +11,6 @@ import {
     ChevronRight,
     LogOut,
     ArrowLeft,
-    Wrench,
     ReceiptText,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -30,12 +29,11 @@ export function DashboardSidebar({ className = "", onNavigate }: DashboardSideba
     const t = useTranslations("Dashboard.sidebar");
 
     const menuItems = [
-        { name: t("overview"),  href: "/dashboard",          icon: LayoutDashboard },
-        { name: t("products"),  href: "/dashboard/products",  icon: Box },
-        { name: t("tools"),     href: "/dashboard/tools",     icon: Wrench },
-        { name: t("services"),  href: "/dashboard/services",  icon: Briefcase },
-        { name: t("payments"),  href: "/dashboard/payments",  icon: ReceiptText },
-        { name: t("support"),   href: "/dashboard/support",   icon: LifeBuoy },
+        { name: t("overview"),  href: "/dashboard",         icon: LayoutDashboard },
+        { name: t("products"),  href: "/dashboard/products", icon: Box },
+        { name: t("services"),  href: "/dashboard/services", icon: Briefcase },
+        { name: t("payments"),  href: "/dashboard/payments", icon: ReceiptText },
+        { name: t("support"),   href: "/dashboard/support",  icon: LifeBuoy },
     ];
 
     return (

@@ -116,7 +116,7 @@ export function OnboardingChecklist(props: OnboardingChecklistProps) {
     };
 
     const packageHref = locale === "en" ? "/en/dijital-urunler/hukuk-araclari-paketi" : "/dijital-urunler/hukuk-araclari-paketi";
-    const toolsHref = "/dashboard/tools";
+    const toolsHref = "/document-tools";
 
     return (
         <motion.div

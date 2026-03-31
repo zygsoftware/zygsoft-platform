@@ -145,7 +145,7 @@ export default function PdfMergeTool() {
         return (
             <div className="relative">
                 <div className="max-w-5xl relative z-10">
-                    <Link href="/dashboard/tools" className="inline-flex items-center gap-2 text-[#888] hover:text-[#0e0e0e] transition-colors mb-8 text-sm font-bold uppercase tracking-wider">
+                    <Link href="/document-tools" className="mb-8 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#343131]/48 transition-colors hover:text-[#343131]">
                         <ArrowLeft size={16} /> {t("backToHub")}
                     </Link>
                     <ToolLockedGate session={session} />
@@ -157,15 +157,15 @@ export default function PdfMergeTool() {
     return (
         <div className="relative">
             <div className="max-w-5xl relative z-10">
-                <Link href="/dashboard/tools" className="inline-flex items-center gap-2 text-[#888] hover:text-[#0e0e0e] transition-colors mb-8 text-sm font-bold uppercase tracking-wider">
+                <Link href="/document-tools" className="mb-8 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#343131]/48 transition-colors hover:text-[#343131]">
                     <ArrowLeft size={16} /> {t("backToHub")}
                 </Link>
 
-                <div className="mb-12">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div className="mb-10 border-b border-[#343131]/8 pb-8">
+                    <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
                         <div>
-                            <h1 className="text-4xl font-display font-black text-[#0e0e0e] mb-3">{copy.title}</h1>
-                            <p className="text-[#666] font-medium text-lg max-w-2xl">
+                            <h1 className="mb-3 text-3xl md:text-4xl font-display font-black tracking-tight text-[#343131]">{copy.title}</h1>
+                            <p className="max-w-2xl text-[16px] leading-8 text-[#343131]/60">
                                 {copy.description}
                             </p>
                         </div>
@@ -174,7 +174,7 @@ export default function PdfMergeTool() {
 
                 {/* Usage tip */}
                 <div className="mb-4">
-                    <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 border border-slate-100 text-sm text-slate-600">
+                    <div className="flex items-start gap-3 rounded-[1.15rem] border border-[#343131]/8 bg-white/72 px-4 py-3 text-sm text-[#343131]/62">
                         <span className="text-amber-500 font-black">•</span>
                         {tPdf("tip1")}
                     </div>
@@ -187,7 +187,7 @@ export default function PdfMergeTool() {
                             onDragLeave={handleDrag}
                             onDragOver={handleDrag}
                             onDrop={handleDrop}
-                            className={`glass rounded-3xl border-2 border-dashed p-10 text-center cursor-pointer transition-all h-full flex flex-col justify-center items-center relative ${isDragging ? "border-amber-400 bg-amber-50/50 scale-[0.99]" : "border-slate-200 hover:border-slate-300 hover:bg-slate-50/50"
+                            className={`glass rounded-[1.8rem] border-2 border-dashed p-10 text-center cursor-pointer transition-all h-full flex flex-col justify-center items-center relative ${isDragging ? "border-amber-400 bg-amber-50/50 scale-[0.99]" : "border-[#343131]/10 hover:border-[#343131]/16 hover:bg-white"
                                 }`}
                         >
                             <input
@@ -208,7 +208,7 @@ export default function PdfMergeTool() {
                     </div>
 
                     <div className="lg:col-span-2">
-                        <div className="glass rounded-3xl border border-slate-200 p-8 h-full flex flex-col">
+                        <div className="glass rounded-[1.8rem] p-8 h-full flex flex-col">
                             {!resultUrl ? (
                                 <>
                                     <div className="flex items-center justify-between mb-8">

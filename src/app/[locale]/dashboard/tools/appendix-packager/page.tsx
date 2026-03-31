@@ -171,7 +171,7 @@ export default function AppendixPackagerPage() {
         return (
             <div className="relative">
                 <div className="max-w-5xl relative z-10">
-                    <Link href="/dashboard/tools" className="inline-flex items-center gap-2 text-[#888] hover:text-[#0e0e0e] transition-colors mb-8 text-sm font-bold uppercase tracking-wider">
+                    <Link href="/document-tools" className="mb-8 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#343131]/48 transition-colors hover:text-[#343131]">
                         <ArrowLeft size={16} /> {t("backToHub")}
                     </Link>
                     <ToolLockedGate session={session} />
@@ -183,13 +183,13 @@ export default function AppendixPackagerPage() {
     return (
         <div className="relative">
             <div className="max-w-5xl relative z-10">
-                <Link href="/dashboard/tools" className="inline-flex items-center gap-2 text-[#888] hover:text-[#0e0e0e] transition-colors mb-8 text-sm font-bold uppercase tracking-wider">
+                <Link href="/document-tools" className="mb-8 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#343131]/48 transition-colors hover:text-[#343131]">
                     <ArrowLeft size={16} /> {t("backToHub")}
                 </Link>
 
                 <div className="mb-12 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
                     <div>
-                        <h1 className="text-4xl font-display font-black text-[#0e0e0e] mb-3">{tAppendix("title")}</h1>
+                        <h1 className="mb-3 text-3xl md:text-4xl font-display font-black tracking-tight text-[#343131]">{tAppendix("title")}</h1>
                         <p className="text-[#666] font-medium text-lg max-w-3xl">{tAppendix("description")}</p>
                     </div>
                     <div className="inline-flex items-center gap-2 rounded-2xl bg-[#0e0e0e] px-5 py-3 text-sm font-black text-[#e6c800]">

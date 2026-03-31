@@ -257,23 +257,24 @@ export default function DocToUdfTool() {
     return (
         <div className="relative">
             <div className="max-w-5xl relative z-10">
-                <Link href="/dashboard/tools" className="inline-flex items-center gap-2 text-[#343131]/50 hover:text-[#343131] transition-colors mb-10 text-xs font-bold uppercase tracking-wider">
+                <Link href="/document-tools" className="mb-8 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#343131]/48 transition-colors hover:text-[#343131]">
                     <ArrowLeft size={14} /> {t("backToHub")}
                 </Link>
 
-                <div className="mb-12">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+                <div className="mb-10 border-b border-[#343131]/8 pb-8">
+                    <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
                         <div>
-                            <h1 className="text-3xl md:text-4xl font-display font-black text-[#343131] mb-3 tracking-tight">{copy.title}</h1>
-                            <p className="text-[#343131]/60 font-medium text-lg max-w-xl leading-relaxed">
+                            <h1 className="mb-3 text-3xl font-display font-black tracking-tight text-[#343131] md:text-4xl">{copy.title}</h1>
+                            <p className="max-w-xl text-[16px] leading-8 text-[#343131]/60">
                                 {copy.description}
                             </p>
                         </div>
-                        <div className="flex flex-wrap items-center gap-3">
-                            <div className="px-4 py-2.5 bg-[#343131] text-[#e6c800] rounded-xl text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                                <FileText size={14} /> {SUPPORTED_LABEL}
-                            </div>
-                            <p className="text-[11px] text-[#343131]/50 font-medium">{copy.maxTime}</p>
+                        <div className="flex flex-wrap items-center gap-4 text-[11px] font-bold uppercase tracking-[0.16em] text-[#343131]/46">
+                            <span className="inline-flex items-center gap-2 rounded-full border border-[#343131]/10 px-3 py-1.5">
+                                <FileText size={13} />
+                                {SUPPORTED_LABEL}
+                            </span>
+                            <p>{copy.maxTime}</p>
                         </div>
                     </div>
                 </div>
@@ -282,24 +283,24 @@ export default function DocToUdfTool() {
                     <ToolLockedGate session={session} />
                 ) : null}
                 {hasSubscription && session?.user ? (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                         {/* Usage tips */}
-                        <div className="lg:col-span-3 mb-4">
-                            <div className="flex flex-wrap gap-3">
-                                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 border border-slate-100 text-sm text-slate-600">
-                                    <span className="text-[#e6c800] font-black">•</span>
-                                    {tUdf("tip1")}
+                        <div className="mb-2 lg:col-span-3">
+                            <div className="grid gap-2 md:grid-cols-2">
+                                <div className="flex items-start gap-3 rounded-[1.25rem] border border-[#343131]/8 bg-white/70 px-4 py-3 text-sm text-[#343131]/62">
+                                    <span className="mt-1 text-[#e6c800] font-black">•</span>
+                                    <span>{tUdf("tip1")}</span>
                                 </div>
-                                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 border border-slate-100 text-sm text-slate-600">
-                                    <span className="text-[#e6c800] font-black">•</span>
-                                    {tUdf("tip2")}
+                                <div className="flex items-start gap-3 rounded-[1.25rem] border border-[#343131]/8 bg-white/70 px-4 py-3 text-sm text-[#343131]/62">
+                                    <span className="mt-1 text-[#e6c800] font-black">•</span>
+                                    <span>{tUdf("tip2")}</span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Letterhead panel */}
                         <div className="lg:col-span-3 mb-4">
-                            <div className="bg-white rounded-[2rem] border border-[#343131]/[0.06] p-6 shadow-sm">
+                            <div className="rounded-[1.8rem] border border-white/80 bg-white/90 p-6 shadow-[0_18px_44px_rgba(17,24,39,0.05)]">
                                 <h3 className="text-base font-black text-[#343131] flex items-center gap-2 mb-4">
                                     <ImageIcon size={18} className="text-[#e6c800]" />
                                     {copy.letterheadTitle}
@@ -386,11 +387,12 @@ export default function DocToUdfTool() {
                                 onDragOver={handleDragOver}
                                 onDragLeave={handleDragLeave}
                                 onDrop={handleDrop}
-                                className={`bg-white rounded-[2rem] border-2 border-dashed p-10 text-center cursor-pointer transition-all duration-300 h-full flex flex-col justify-center items-center shadow-sm hover:shadow-lg hover:shadow-[#343131]/[0.06] ${isDragging
+                                className={`relative overflow-hidden rounded-[1.9rem] border-2 border-dashed p-10 text-center cursor-pointer transition-all duration-300 h-full flex flex-col justify-center items-center shadow-[0_18px_44px_rgba(17,24,39,0.05)] ${isDragging
                                     ? "border-amber-400 bg-amber-50/50 scale-[1.01]"
-                                    : "border-[#343131]/[0.12] hover:border-[#343131]/[0.2] hover:bg-[#fafafc]"
+                                    : "border-[#343131]/[0.10] bg-white/90 hover:border-[#343131]/[0.18] hover:bg-white"
                                     }`}
                             >
+                                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#e6c800]/70 to-transparent" />
                                 <input
                                     type="file"
                                     ref={fileInputRef}
@@ -419,7 +421,7 @@ export default function DocToUdfTool() {
                         </div>
 
                         <div className="lg:col-span-2">
-                            <div className="bg-white rounded-[2rem] border border-[#343131]/[0.06] p-8 h-full flex flex-col shadow-sm">
+                            <div className="rounded-[1.9rem] border border-white/80 bg-white/92 p-8 h-full flex flex-col shadow-[0_20px_48px_rgba(17,24,39,0.06)]">
                                 <div className="flex items-center justify-between mb-8">
                                     <h3 className="text-lg font-black text-[#343131] flex items-center gap-2">
                                         <Files size={18} className="text-[#e6c800]" />
@@ -429,7 +431,7 @@ export default function DocToUdfTool() {
                                         <button
                                             onClick={handleConvertAll}
                                             disabled={isProcessing || !files.some(f => f.status === "idle" && !f.error)}
-                                            className="px-6 py-3 bg-[#e6c800] text-[#343131] rounded-xl text-xs font-black uppercase tracking-wider hover:bg-[#c9ad00] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 shadow-sm"
+                                            className="px-6 py-3 bg-[#e6c800] text-[#343131] rounded-xl text-xs font-black uppercase tracking-wider hover:-translate-y-0.5 hover:bg-[#c9ad00] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 shadow-sm"
                                         >
                                             {isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
                                             {copy.startConversion}

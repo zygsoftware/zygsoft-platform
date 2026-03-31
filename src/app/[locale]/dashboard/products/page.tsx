@@ -147,7 +147,7 @@ export default function ProductsPage() {
                                         )}
                                         
                                         {!isLocked ? (
-                                            <Link href="/dashboard/tools" className="inline-flex items-center gap-2 bg-[#343131] text-[#e6c800] px-8 py-4 rounded-xl text-sm font-black hover:bg-[#1a1818] hover:shadow-lg transition-all">
+                                            <Link href="/document-tools" className="inline-flex items-center gap-2 bg-[#343131] text-[#e6c800] px-8 py-4 rounded-xl text-sm font-black hover:bg-[#1a1818] hover:shadow-lg transition-all">
                                                 {t("ctaToolsHub")} <ArrowRight size={18} />
                                             </Link>
                                         ) : (

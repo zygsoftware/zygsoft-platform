@@ -82,7 +82,7 @@ const CATEGORY_STYLE: Record<string, { icon: React.ReactNode; bg: string; text: 
 };
 
 const TOOL_URLS: Record<string, string> = {
-    "legal-toolkit":  "/dashboard/tools",
+    "legal-toolkit":  "/document-tools",
 };
 
 /* ── Progress helper ───────────────────────────────────────────── */

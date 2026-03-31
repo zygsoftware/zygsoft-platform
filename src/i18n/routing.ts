@@ -31,6 +31,54 @@ export const routing = defineRouting({
             tr: "/odeme",
             en: "/payment",
         },
+        "/document-tools": {
+            tr: "/hukuk-araclari-paketi",
+            en: "/legal-toolkit",
+        },
+        "/document-tools/appendix-packager": {
+            tr: "/ek-klasor-paketleme",
+            en: "/appendix-packager",
+        },
+        "/document-tools/batch-convert": {
+            tr: "/toplu-donusturme",
+            en: "/batch-converter",
+        },
+        "/document-tools/doc-to-udf": {
+            tr: "/docx-udf-donusturucu",
+            en: "/docx-to-udf-converter",
+        },
+        "/document-tools/image-to-pdf": {
+            tr: "/gorsel-pdf-donusturucu",
+            en: "/image-to-pdf-converter",
+        },
+        "/document-tools/ocr-text": {
+            tr: "/ocr-metin-cikarma",
+            en: "/ocr-text-extraction",
+        },
+        "/document-tools/pdf-compress": {
+            tr: "/pdf-sikistirma",
+            en: "/pdf-compressor",
+        },
+        "/document-tools/pdf-merge": {
+            tr: "/pdf-birlestirme",
+            en: "/pdf-merger",
+        },
+        "/document-tools/pdf-split": {
+            tr: "/pdf-bolme",
+            en: "/pdf-splitter",
+        },
+        "/document-tools/pdf-to-image": {
+            tr: "/pdf-gorsele-donustur",
+            en: "/pdf-to-image-converter",
+        },
+        "/document-tools/pdf-to-word": {
+            tr: "/pdf-worde-donustur",
+            en: "/pdf-to-word-converter",
+        },
+        "/document-tools/tiff-to-pdf": {
+            tr: "/tiff-pdf-donusturucu",
+            en: "/tiff-to-pdf-converter",
+        },
 
         /* ── Müşteri paneli (dashboard) ───────────────────────────── */
         "/dashboard": {
@@ -62,52 +110,52 @@ export const routing = defineRouting({
             en: "/dashboard/support",
         },
         "/dashboard/tools": {
-            tr: "/panel/araclar",
-            en: "/dashboard/tools",
+            tr: "/panel/belge-merkezi",
+            en: "/dashboard/document-tools",
         },
         "/dashboard/tools/appendix-packager": {
-            tr: "/panel/araclar/ek-klasoru",
-            en: "/dashboard/tools/appendix-packager",
+            tr: "/panel/ek-klasor-paketleme",
+            en: "/dashboard/appendix-packager",
         },
         "/dashboard/tools/batch-convert": {
-            tr: "/panel/araclar/toplu-donustur",
-            en: "/dashboard/tools/batch-convert",
+            tr: "/panel/toplu-donusturme",
+            en: "/dashboard/batch-converter",
         },
         "/dashboard/tools/doc-to-udf": {
-            tr: "/panel/araclar/docx-udf",
-            en: "/dashboard/tools/docx-to-udf",
+            tr: "/panel/docx-udf-donusturucu",
+            en: "/dashboard/docx-to-udf-converter",
         },
         "/dashboard/tools/image-to-pdf": {
-            tr: "/panel/araclar/gorsel-pdf",
-            en: "/dashboard/tools/image-to-pdf",
+            tr: "/panel/gorsel-pdf-donusturucu",
+            en: "/dashboard/image-to-pdf-converter",
         },
         "/dashboard/tools/ocr-text": {
-            tr: "/panel/araclar/ocr-metin",
-            en: "/dashboard/tools/text-extraction",
+            tr: "/panel/ocr-metin-cikarma",
+            en: "/dashboard/ocr-text-extraction",
         },
         "/dashboard/tools/pdf-compress": {
-            tr: "/panel/araclar/pdf-sikistir",
-            en: "/dashboard/tools/compress-pdf",
+            tr: "/panel/pdf-sikistirma",
+            en: "/dashboard/pdf-compressor",
         },
         "/dashboard/tools/pdf-merge": {
-            tr: "/panel/araclar/pdf-birlestir",
-            en: "/dashboard/tools/merge-pdf",
+            tr: "/panel/pdf-birlestirme",
+            en: "/dashboard/pdf-merger",
         },
         "/dashboard/tools/pdf-split": {
-            tr: "/panel/araclar/pdf-bol",
-            en: "/dashboard/tools/split-pdf",
+            tr: "/panel/pdf-bolme",
+            en: "/dashboard/pdf-splitter",
         },
         "/dashboard/tools/pdf-to-image": {
-            tr: "/panel/araclar/pdf-gorsel",
-            en: "/dashboard/tools/pdf-to-images",
+            tr: "/panel/pdf-gorsele-donustur",
+            en: "/dashboard/pdf-to-image-converter",
         },
         "/dashboard/tools/pdf-to-word": {
-            tr: "/panel/araclar/pdf-word",
-            en: "/dashboard/tools/pdf-to-word",
+            tr: "/panel/pdf-worde-donustur",
+            en: "/dashboard/pdf-to-word-converter",
         },
         "/dashboard/tools/tiff-to-pdf": {
-            tr: "/panel/araclar/tiff-pdf",
-            en: "/dashboard/tools/tiff-to-pdf",
+            tr: "/panel/tiff-pdf-donusturucu",
+            en: "/dashboard/tiff-to-pdf-converter",
         },
     },
 });

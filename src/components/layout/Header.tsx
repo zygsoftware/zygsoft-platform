@@ -5,18 +5,21 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Menu, X, ChevronDown, LogOut, ArrowUpRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useSession, signOut } from "next-auth/react";
 import { Magnetic } from "@/components/ui/Magnetic";
+import { PRODUCTS } from "@/components/payment/payment-config";
 
 export function Header() {
     const { data: session } = useSession();
     const pathname = usePathname();
+    const locale = useLocale();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isServicesOpen, setIsServicesOpen] = useState(false);
+    const [isProductsOpen, setIsProductsOpen] = useState(false);
     const [isAboutOpen, setIsAboutOpen] = useState(false);
 
     useEffect(() => {
@@ -35,6 +38,20 @@ export function Header() {
         { name: s("digitalStrategy"), href: "/services/dijital-strateji-ve-pazarlama" },
         { name: s("adsManagement"), href: "/services/google-ads-ve-meta-pixel-reklam-yonetimi" },
     ];
+    const productHrefMap = {
+        "legal-toolkit": "/dijital-urunler/hukuk-araclari-paketi",
+    } as const;
+    const productLinks = Object.entries(PRODUCTS)
+        .map(([slug, product]) => {
+            const href = productHrefMap[slug as keyof typeof productHrefMap];
+            if (!href) return null;
+            return {
+                href,
+                name: locale === "tr" ? product.titleTr : product.titleEn,
+                description: locale === "tr" ? product.descTr : product.descEn,
+            };
+        })
+        .filter((item): item is NonNullable<typeof item> => Boolean(item));
     const aboutLinks = [
         { name: nav("about"), href: "/about" },
         { name: nav("portfolio"), href: "/portfolio" },
@@ -95,7 +112,46 @@ export function Header() {
                             </AnimatePresence>
                         </div>
 
-                        <NavLink href="/dijital-urunler" active={pathname.includes("/dijital-urunler")}>{nav("products")}</NavLink>
+                        <div className="relative" onMouseEnter={() => setIsProductsOpen(true)} onMouseLeave={() => setIsProductsOpen(false)}>
+                            <button className={`flex items-center gap-1.5 text-[13px] font-extrabold tracking-tight transition-colors duration-200 ${pathname.includes("/dijital-urunler") ? "text-[#343131]" : "text-[#343131]/72 hover:text-[#343131]"}`}>
+                                {nav("products")} <ChevronDown size={14} className={`transition-transform duration-300 ${isProductsOpen ? "rotate-180" : ""}`} />
+                            </button>
+                            <AnimatePresence>
+                                {isProductsOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 15 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: 15 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="absolute top-full left-0 mt-4 w-[22rem] bg-white/95 backdrop-blur-xl border border-[#343131]/10 shadow-2xl rounded-2xl overflow-hidden p-2"
+                                    >
+                                        <Link
+                                            href="/dijital-urunler"
+                                            className="group flex items-center justify-between px-4 py-3 text-[14px] text-[#343131]/84 hover:bg-[#fafafc] hover:text-[#343131] rounded-xl transition-all font-extrabold"
+                                        >
+                                            {nav("products")}
+                                            <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        </Link>
+                                        <div className="mx-2 my-1 h-px bg-[#343131]/8" />
+                                        {productLinks.map((link) => (
+                                            <Link
+                                                key={link.href}
+                                                href={link.href}
+                                                className="group block rounded-xl px-4 py-3 transition-all hover:bg-[#fafafc]"
+                                            >
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <div className="text-[14px] font-extrabold text-[#343131]">{link.name}</div>
+                                                    <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity text-[#343131]/60" />
+                                                </div>
+                                                <div className="mt-1 text-[12px] leading-5 text-[#343131]/56 line-clamp-2">
+                                                    {link.description}
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
                         <div className="relative" onMouseEnter={() => setIsAboutOpen(true)} onMouseLeave={() => setIsAboutOpen(false)}>
                             <button className={`flex items-center gap-1.5 text-[13px] font-extrabold tracking-tight transition-colors duration-200 ${pathname.includes("/about") || pathname.includes("/projeler") || pathname.includes("/projects") || pathname.includes("/portfolio") ? "text-[#343131]" : "text-[#343131]/72 hover:text-[#343131]"}`}>
                                 {nav("about")} <ChevronDown size={14} className={`transition-transform duration-300 ${isAboutOpen ? "rotate-180" : ""}`} />
@@ -195,6 +251,26 @@ export function Header() {
                                     {link.name}
                                 </Link>
                             ))}
+                            <div className="pt-2">
+                                <div className="px-0 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-[#343131]/38">
+                                    {nav("products")}
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    {productLinks.map((link) => (
+                                        <Link
+                                            key={link.href}
+                                            href={link.href}
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-3"
+                                        >
+                                            <div className="text-[15px] font-black text-[#343131]">{link.name}</div>
+                                            <div className="mt-1 text-[13px] leading-5 text-[#343131]/58">
+                                                {link.description}
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                         <div className="mt-8 flex flex-col gap-3">
                             {session ? (

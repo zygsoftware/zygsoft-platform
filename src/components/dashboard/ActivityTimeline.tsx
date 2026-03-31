@@ -188,7 +188,7 @@ function mapItemToRow(
     const toolKey = `toolEvents.${camel}`;
     const toolTitle =
         item.toolSlug in TIMELINE_TOOL_HREFS ? t(toolKey) : t("toolEvents.generic");
-    const href = TIMELINE_TOOL_HREFS[item.toolSlug] ?? "/dashboard/tools";
+    const href = TIMELINE_TOOL_HREFS[item.toolSlug] ?? "/document-tools";
     return {
         id: item.id,
         type,

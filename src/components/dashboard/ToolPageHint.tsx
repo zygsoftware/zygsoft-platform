@@ -13,18 +13,18 @@ export function ToolPageHint() {
 
     return (
         <Link
-            href="/dashboard/tools"
-            className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-slate-100/80 transition-colors group"
+            href="/document-tools"
+            className="group flex items-center justify-between gap-4 rounded-[1.5rem] border border-[#343131]/8 bg-white/88 p-4 shadow-[0_14px_34px_rgba(17,24,39,0.04)] transition-all hover:-translate-y-0.5 hover:border-[#343131]/14 hover:shadow-[0_18px_44px_rgba(17,24,39,0.07)]"
         >
             <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-500 shrink-0 group-hover:text-amber-600 transition-colors">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f8f7f2] text-[#343131]/54 transition-colors group-hover:text-[#8c7600]">
                     <Wrench size={18} />
                 </div>
-                <p className="text-sm font-bold text-slate-950">
+                <p className="text-sm font-bold text-[#343131]">
                     {t("browseOther")}
                 </p>
             </div>
-            <ArrowRight size={14} className="text-slate-400 group-hover:text-amber-600 group-hover:translate-x-0.5 transition-all shrink-0" />
+            <ArrowRight size={14} className="shrink-0 text-[#343131]/35 transition-all group-hover:translate-x-0.5 group-hover:text-[#8c7600]" />
         </Link>
     );
 }

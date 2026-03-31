@@ -192,7 +192,7 @@ export default function HukukAraclariPaketiPage() {
         ? "Araçları Aç"
         : "Şimdi Satın Al";
     const secondaryCtaHref = hasLegalToolkit
-        ? "/dashboard/tools"
+        ? "/document-tools"
         : "/dijital-urunler#pricing";
 
     const productJsonLd = {
@@ -270,7 +270,7 @@ export default function HukukAraclariPaketiPage() {
                                 <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                                     {hasLegalToolkit ? (
                                         <Link
-                                            href="/dashboard/tools"
+                                            href="/document-tools"
                                             className="home-btn-primary-yellow inline-flex min-h-12 items-center justify-center gap-2.5 px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-lg shadow-[#e6c800]/25 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                                         >
                                             {ctaLabel} <ArrowRight size={18} />
@@ -597,7 +597,7 @@ export default function HukukAraclariPaketiPage() {
                                     ))}
                                 </ul>
                                 {status === "authenticated" && hasLegalToolkit ? (
-                                    <Link href="/dashboard/tools" className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl">
+                                    <Link href="/document-tools" className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl">
                                         Araçlara Git <ArrowRight size={18} />
                                     </Link>
                                 ) : status === "authenticated" ? (
@@ -682,7 +682,7 @@ export default function HukukAraclariPaketiPage() {
                             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
                                 {hasLegalToolkit ? (
                                     <Link
-                                        href="/dashboard/tools"
+                                        href="/document-tools"
                                         className="home-btn-primary-yellow inline-flex items-center gap-3 px-10 py-4 font-black uppercase tracking-[0.2em] text-[11px] rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 shadow-lg shadow-[#e6c800]/25"
                                     >
                                         {ctaLabel} <ArrowRight size={20} />
@@ -706,7 +706,7 @@ export default function HukukAraclariPaketiPage() {
                                 <Link href="/blog" className="product-surface-soft hover:text-white transition-colors">
                                     Blog
                                 </Link>
-                                <Link href="/dashboard/tools" className="product-surface-soft hover:text-white transition-colors">
+                                <Link href="/document-tools" className="product-surface-soft hover:text-white transition-colors">
                                     Araçlar
                                 </Link>
                             </div>
