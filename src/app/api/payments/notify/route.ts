@@ -33,6 +33,24 @@ function getErrorMessage(error: unknown, fallback: string): string {
     return error instanceof Error && error.message ? error.message : fallback;
 }
 
+function isLikelyPrismaSchemaMismatch(error: unknown): boolean {
+    if (!(error instanceof Error)) return false;
+
+    const message = error.message.toLowerCase();
+
+    return [
+        "unknown argument",
+        "unknown field",
+        "unknown column",
+        "column",
+        "does not exist",
+        "invalid invocation",
+        "prisma client",
+        "imageurl",
+        "imagepath",
+    ].some((part) => message.includes(part));
+}
+
 function parseReceiptDataUrl(dataUrl: string): { buffer: Buffer; contentType: string; extension: string } {
     const match = dataUrl.match(/^data:(.+?);base64,(.+)$/);
     if (!match) {
@@ -196,7 +214,7 @@ export async function POST(req: Request) {
         console.error("PAYMENT_NOTIFY_ERROR", error);
 
         let errorMessage = "Bildirim oluşturulurken hata oluştu.";
-        if (error instanceof Error && error.message.includes("product")) {
+        if (isLikelyPrismaSchemaMismatch(error)) {
             errorMessage = "Veritabanı değişikliği algılandı. Lütfen terminali (npm run dev) kapatıp YENİDEN BAŞLATIN.";
         } else if (error instanceof Error && error.message) {
             errorMessage = error.message;
