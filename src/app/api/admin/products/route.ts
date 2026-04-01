@@ -98,10 +98,9 @@ export async function PUT(req: Request) {
             }
         }
 
-        const nextImagePath = imagePath !== undefined ? imagePath?.trim() || null : existingProduct.imagePath;
-        const shouldRemoveOldImage =
-            existingProduct.imagePath &&
-            existingProduct.imagePath !== nextImagePath;
+        const oldImagePath = existingProduct.imagePath;
+        const nextImagePath = imagePath !== undefined ? imagePath?.trim() || null : oldImagePath;
+        const shouldRemoveOldImage = Boolean(oldImagePath && oldImagePath !== nextImagePath);
 
         const updatedProduct = await prisma.product.update({
             where: { id },
@@ -118,8 +117,8 @@ export async function PUT(req: Request) {
             }
         });
 
-        if (shouldRemoveOldImage) {
-            removeFromStorage(storageBuckets.projects, [existingProduct.imagePath]).catch((storageError) => {
+        if (shouldRemoveOldImage && oldImagePath) {
+            removeFromStorage(storageBuckets.projects, [oldImagePath]).catch((storageError) => {
                 console.error("PRODUCT_IMAGE_CLEANUP_ERROR", storageError);
             });
         }
